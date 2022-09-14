@@ -1,19 +1,15 @@
-use std::{
-    collections::HashMap,
-    ffi::{CStr, CString},
-};
+use std::{collections::HashMap, sync::Arc};
 
 use bevy::prelude::*;
-use rusty_spine::c::*;
-
-pub struct SyncPtr<T>(*mut T);
-unsafe impl<T> Send for SyncPtr<T> {}
-unsafe impl<T> Sync for SyncPtr<T> {}
+use rusty_spine::{
+    animation_state::AnimationState, animation_state_data::AnimationStateData, atlas::Atlas,
+    error::Error, skeleton::Skeleton, skeleton_json::SkeletonJson,
+};
 
 #[derive(Component)]
 struct Spine {
-    skeleton: SyncPtr<spSkeleton>,
-    animation_state: SyncPtr<spAnimationState>,
+    skeleton: Skeleton,
+    animation_state: AnimationState,
     bones: HashMap<String, Entity>,
 }
 
@@ -27,41 +23,36 @@ fn main() {
 
 fn setup(mut commands: Commands) {
     commands.spawn_bundle(Camera2dBundle::default());
-    let (c_skeleton, c_animation_state) = unsafe { load_skeleton() };
-    unsafe {
-        let c_animation_name = CString::new("walk").unwrap();
-        spAnimationState_setAnimationByName(c_animation_state, 0, c_animation_name.as_ptr(), 1);
+    match load_skeleton() {
+        Ok((skeleton, mut animation_state)) => {
+            animation_state.set_animation_by_name(0, "run", true);
+            let mut bones = HashMap::new();
+            for bone in skeleton.bones().iter() {
+                let entity = commands
+                    .spawn_bundle(SpriteBundle {
+                        sprite: Sprite {
+                            color: Color::RED,
+                            custom_size: Some(Vec2::ONE * 16.),
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    })
+                    .id();
+                bones.insert(bone.name().to_owned(), entity);
+            }
+            commands.spawn().insert(Spine {
+                skeleton,
+                animation_state,
+                bones,
+            });
+        }
+        Err(err) => {
+            println!("{:?}", err);
+        }
     }
-    let mut bones = HashMap::new();
-    let bone_count = unsafe { (*c_skeleton).bonesCount } as isize;
-    for i in 0..bone_count {
-        let bone = unsafe { *(*c_skeleton).bones.offset(i) };
-        let entity = commands
-            .spawn_bundle(SpriteBundle {
-                sprite: Sprite {
-                    color: Color::RED,
-                    custom_size: Some(Vec2::ONE * 16.),
-                    ..Default::default()
-                },
-                ..Default::default()
-            })
-            .id();
-        let bone_name =
-            String::from(unsafe { CStr::from_ptr((*(*bone).data).name).to_str().unwrap() });
-        bones.insert(bone_name, entity);
-    }
-    commands.spawn().insert(Spine {
-        skeleton: SyncPtr(c_skeleton),
-        animation_state: SyncPtr(c_animation_state),
-        bones,
-    });
 }
 
-fn spine_update(
-    mut spine_query: Query<&mut Spine>,
-    mut transform_query: Query<&mut Transform>,
-    time: Res<Time>,
-) {
+fn spine_update(mut spine_query: Query<&mut Spine>, mut transform_query: Query<&mut Transform>) {
     let scale = 0.5;
     let offset = Vec2::new(0., -200.);
     for mut spine in spine_query.iter_mut() {
@@ -70,43 +61,27 @@ fn spine_update(
             skeleton,
             bones,
         } = spine.as_mut();
-        unsafe {
-            spAnimationState_update(animation_state.0, time.delta_seconds());
-            spAnimationState_apply(animation_state.0, skeleton.0);
-            spSkeleton_updateWorldTransform(skeleton.0);
-        }
-        let bone_count = unsafe { (*skeleton.0).bonesCount } as isize;
-        for i in 0..bone_count {
-            let bone = unsafe { *(*skeleton.0).bones.offset(i) };
-            let bone_name =
-                String::from(unsafe { CStr::from_ptr((*(*bone).data).name).to_str().unwrap() });
-            let bone_entity = bones.get(&bone_name).unwrap();
+        animation_state.update(0.016);
+        animation_state.apply(skeleton);
+        skeleton.update_world_transform();
+        for bone in skeleton.bones().iter() {
+            let bone_entity = bones.get(bone.name()).unwrap();
             let mut bone_transform = transform_query.get_mut(*bone_entity).unwrap();
-            unsafe {
-                bone_transform.translation =
-                    Vec3::new((*bone).worldX * scale, (*bone).worldY * scale, 0.)
-                        + offset.extend(0.);
-            }
+            bone_transform.translation =
+                Vec3::new(bone.world_x() * scale, bone.world_y() * scale, 0.) + offset.extend(0.);
         }
     }
 }
 
-unsafe fn load_skeleton() -> (*mut spSkeleton, *mut spAnimationState) {
-    let file = include_str!("../spineboy/spineboy-pro.atlas");
-    let c_file = CString::new(file).unwrap();
-    let c_dir = CString::new("./").unwrap();
-    let c_atlas = spAtlas_create(
-        c_file.as_ptr(),
-        file.len() as c_int,
-        c_dir.as_ptr(),
-        std::ptr::null_mut(),
-    );
-    let json = include_str!("../spineboy/spineboy-pro.json");
-    let c_json = CString::new(json).unwrap();
-    let c_skeleton_json = spSkeletonJson_create(c_atlas);
-    let c_skeleton_data = spSkeletonJson_readSkeletonData(c_skeleton_json, c_json.as_ptr());
-    let c_animation_state_data = spAnimationStateData_create(c_skeleton_data);
-    let c_skeleton = spSkeleton_create(c_skeleton_data);
-    let c_animation_state = spAnimationState_create(c_animation_state_data);
-    (c_skeleton, c_animation_state)
+fn load_skeleton() -> Result<(Skeleton, AnimationState), Error> {
+    let file = include_bytes!("../spineboy/spineboy-pro.atlas");
+    let dir = "./";
+    let atlas = Atlas::new(file, dir)?;
+    let skeleton_json = SkeletonJson::new(Arc::new(atlas));
+    let skeleton_data =
+        Arc::new(skeleton_json.read_skeleton_data(include_str!("../spineboy/spineboy-pro.json"))?);
+    let animation_state_data = AnimationStateData::new(skeleton_data.clone());
+    let skeleton = Skeleton::new(skeleton_data)?;
+    let animation_state = AnimationState::new(Arc::new(animation_state_data));
+    Ok((skeleton, animation_state))
 }
