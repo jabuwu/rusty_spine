@@ -47,9 +47,7 @@ impl AnimationState {
         unsafe { spAnimationState_apply(self.c_animation_state.0, skeleton.c_ptr()) != 0 }
     }
 
-    pub fn c_ptr(&self) -> *mut spAnimationState {
-        self.c_animation_state.0
-    }
+    c_ptr!(c_animation_state, spAnimationState);
 }
 
 impl Drop for AnimationState {

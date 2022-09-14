@@ -38,7 +38,7 @@ fn setup(mut commands: Commands) {
                         ..Default::default()
                     })
                     .id();
-                bones.insert(bone.name().to_owned(), entity);
+                bones.insert(bone.data().name().to_owned(), entity);
             }
             commands.spawn().insert(Spine {
                 skeleton,
@@ -64,8 +64,8 @@ fn spine_update(mut spine_query: Query<&mut Spine>, mut transform_query: Query<&
         animation_state.update(0.016);
         animation_state.apply(skeleton);
         skeleton.update_world_transform();
-        for bone in skeleton.bones().iter() {
-            let bone_entity = bones.get(bone.name()).unwrap();
+        for bone in skeleton.bones_mut().iter_mut() {
+            let bone_entity = bones.get(bone.data().name()).unwrap();
             let mut bone_transform = transform_query.get_mut(*bone_entity).unwrap();
             bone_transform.translation =
                 Vec3::new(bone.world_x() * scale, bone.world_y() * scale, 0.) + offset.extend(0.);

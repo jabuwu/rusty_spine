@@ -41,9 +41,7 @@ impl Atlas {
         &self.pages
     }
 
-    pub fn c_ptr(&self) -> *mut spAtlas {
-        self.c_atlas.0
-    }
+    c_ptr!(c_atlas, spAtlas);
 }
 
 impl Drop for Atlas {
@@ -60,7 +58,7 @@ pub struct AtlasPage {
 }
 
 impl AtlasPage {
-    pub(crate) fn new(c_atlas_page: *mut spAtlasPage) -> Self {
+    fn new(c_atlas_page: *mut spAtlasPage) -> Self {
         Self {
             c_atlas_page: SyncPtr(c_atlas_page),
         }
@@ -71,7 +69,5 @@ impl AtlasPage {
         c_str.to_str().unwrap()
     }
 
-    pub fn c_ptr(&self) -> *mut spAtlasPage {
-        self.c_atlas_page.0
-    }
+    c_ptr!(c_atlas_page, spAtlasPage);
 }

@@ -15,9 +15,7 @@ impl SkeletonData {
         }
     }
 
-    pub fn c_ptr(&self) -> *mut spSkeletonData {
-        self.c_skeleton_data.0
-    }
+    c_ptr!(c_skeleton_data, spSkeletonData);
 }
 
 impl Drop for SkeletonData {

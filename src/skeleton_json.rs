@@ -41,9 +41,7 @@ impl SkeletonJson {
         }
     }
 
-    pub fn c_ptr(&self) -> *mut spSkeletonJson {
-        self.c_skeleton_json.0
-    }
+    c_ptr!(c_skeleton_json, spSkeletonJson);
 }
 
 impl Drop for SkeletonJson {

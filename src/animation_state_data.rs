@@ -21,9 +21,7 @@ impl AnimationStateData {
         }
     }
 
-    pub fn c_ptr(&self) -> *mut spAnimationStateData {
-        self.c_animation_state_data.0
-    }
+    c_ptr!(c_animation_state_data, spAnimationStateData);
 }
 
 impl Drop for AnimationStateData {
