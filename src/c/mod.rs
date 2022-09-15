@@ -8,16 +8,6 @@ mod environment {
 }
 
 #[no_mangle]
-extern "C" fn _spAtlasPage_createTexture(
-    _s: *mut spAtlasPage,
-    _path: *const environment::types::c_char,
-) {
-}
-
-#[no_mangle]
-extern "C" fn _spAtlasPage_disposeTexture(_s: *mut spAtlasPage) {}
-
-#[no_mangle]
 extern "C" fn _spUtil_readFile(
     _path: *const environment::types::c_char,
     _length: *mut environment::types::c_int,

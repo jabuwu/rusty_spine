@@ -17,7 +17,7 @@ use crate::{
 #[derive(Debug)]
 pub struct SkeletonJson {
     c_skeleton_json: SyncPtr<spSkeletonJson>,
-    _atlas: Option<Arc<Atlas>>,
+    atlas: Option<Arc<Atlas>>,
 }
 
 impl SkeletonJson {
@@ -25,7 +25,7 @@ impl SkeletonJson {
         let c_skeleton_json = unsafe { spSkeletonJson_create(atlas.c_ptr()) };
         Self {
             c_skeleton_json: SyncPtr(c_skeleton_json),
-            _atlas: Some(atlas),
+            atlas: Some(atlas),
         }
     }
 
@@ -34,7 +34,7 @@ impl SkeletonJson {
         let c_skeleton_data =
             unsafe { spSkeletonJson_readSkeletonData(self.c_skeleton_json.0, c_json.as_ptr()) };
         if !c_skeleton_data.is_null() {
-            Ok(SkeletonData::new(c_skeleton_data))
+            Ok(SkeletonData::new(c_skeleton_data, self.atlas.clone()))
         } else {
             let c_error = unsafe { CStr::from_ptr((*self.c_skeleton_json.0).error) };
             Err(Error::new_from_spine(c_error.to_str().unwrap()))
