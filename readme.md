@@ -1,6 +1,6 @@
 # rusty_spine
 
-Spine runtime for Rust transpiled from the official C Runtime. Currently not useable without manually implementing the missing functions in `src/c/mod.rs`. The goal is to write a thin wrapper around the C runtime.
+Spine runtime for Rust (and wasm!) transpiled from the official C Runtime. It is useable in two ways, either by [using the Spine C Runtime directly](https://github.com/jabuwu/rusty_spine/blob/main/examples/c.rs) or by using the provided Rust API. The Rust API is not stable and is likely to change a lot.
 
 ## License
 
