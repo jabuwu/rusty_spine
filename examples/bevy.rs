@@ -3,7 +3,8 @@ use std::{collections::HashMap, sync::Arc};
 use bevy::{prelude::*, sprite::Rect};
 use rusty_spine::{
     animation_state::AnimationState, animation_state_data::AnimationStateData, atlas::Atlas,
-    error::Error, skeleton::Skeleton, skeleton_json::SkeletonJson,
+    c::spTextureRegion, error::Error, skeleton::Skeleton, skeleton_json::SkeletonJson,
+    sync_ptr::SyncPtr,
 };
 
 #[derive(Component)]
@@ -13,9 +14,15 @@ struct Spine {
     slots: HashMap<String, Entity>,
 }
 
+#[derive(Default)]
+struct RegionData {
+    region_to_index: HashMap<SyncPtr<spTextureRegion>, usize>,
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .init_resource::<RegionData>()
         .add_startup_system(setup)
         .add_system(spine_update)
         .run();
@@ -25,15 +32,17 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut region_data: ResMut<RegionData>,
 ) {
     commands.spawn_bundle(Camera2dBundle::default());
+
     match load_skeleton() {
         Ok((skeleton, mut animation_state, atlas)) => {
             let mut texture_atlas = TextureAtlas::new_empty(
                 asset_server.load("./spineboy-pro.png"),
                 Vec2::new(1534., 529.),
             );
-            for region in atlas.regions().iter() {
+            for (i, region) in atlas.regions().iter().enumerate() {
                 let width = region.page().width() as f32;
                 let height = region.page().height() as f32;
                 let u = region.texture_region().u() as f32;
@@ -44,10 +53,13 @@ fn setup(
                     min: Vec2::new(width * u, height * v),
                     max: Vec2::new(width * u2, height * v2),
                 });
+                region_data
+                    .region_to_index
+                    .insert(SyncPtr(region.texture_region().c_ptr()), i);
             }
             let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-            animation_state.set_animation_by_name(0, "hoverboard", true);
+            animation_state.set_animation_by_name(0, "run", true);
             let mut slots = HashMap::new();
             for slot in skeleton.slots().iter() {
                 let entity = commands
@@ -74,7 +86,11 @@ fn setup(
     }
 }
 
-fn spine_update(mut spine_query: Query<&mut Spine>, mut children_query: Query<&mut Transform>) {
+fn spine_update(
+    mut spine_query: Query<&mut Spine>,
+    mut children_query: Query<(&mut Transform, &mut TextureAtlasSprite)>,
+    region_data: Res<RegionData>,
+) {
     let scale = 0.5;
     let offset = Vec2::new(0., -200.);
     let mut z = 0.;
@@ -87,9 +103,13 @@ fn spine_update(mut spine_query: Query<&mut Spine>, mut children_query: Query<&m
         animation_state.update(0.016);
         animation_state.apply(skeleton);
         skeleton.update_world_transform();
-        for slot in skeleton.slots_mut().iter_mut() {
+        for slot in skeleton.slots().iter() {
+            if slot.attachment().is_none() {
+                continue;
+            }
             let slot_entity = slots.get(slot.data().name()).unwrap();
-            let mut slot_transform = children_query.get_mut(*slot_entity).unwrap();
+            let (mut slot_transform, mut slot_sprite) =
+                children_query.get_mut(*slot_entity).unwrap();
             slot_transform.translation = Vec3::new(
                 slot.bone().world_x() * scale,
                 slot.bone().world_y() * scale,
@@ -97,6 +117,34 @@ fn spine_update(mut spine_query: Query<&mut Spine>, mut children_query: Query<&m
             ) + offset.extend(0.);
             slot_transform.rotation =
                 Quat::from_axis_angle(Vec3::Z, slot.bone().rotation().to_radians());
+            slot_transform.scale = (Vec2::ONE * 0.3).extend(1.);
+            if let Some(region_attachment) = slot
+                .attachment()
+                .and_then(|attachment| attachment.as_region())
+            {
+                let region = region_attachment.region();
+                slot_transform.rotate_z(-(region.degrees() as f32).to_radians());
+                if let Some(index) = region_data
+                    .region_to_index
+                    .get(&SyncPtr(region_attachment.region().c_ptr()))
+                {
+                    slot_sprite.index = *index;
+                }
+            } else if let Some(mesh_attachment) = slot
+                .attachment()
+                .and_then(|attachment| attachment.as_mesh())
+            {
+                let region = mesh_attachment.region();
+                slot_transform.rotate_z(-(region.degrees() as f32).to_radians());
+                if let Some(index) = region_data
+                    .region_to_index
+                    .get(&SyncPtr(mesh_attachment.region().c_ptr()))
+                {
+                    slot_sprite.index = *index;
+                }
+            } else {
+                slot_transform.scale = Vec3::ZERO;
+            }
         }
         z += 0.01;
     }

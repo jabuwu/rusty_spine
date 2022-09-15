@@ -27,8 +27,13 @@ pub mod types {
     pub type c_float = f32;
     #[allow(non_camel_case_types)]
     pub type c_double = f64;
+
     #[allow(non_camel_case_types)]
-    pub type c_void = u8;
+    #[repr(u8)]
+    pub enum c_void {
+        __variant1,
+        __variant2,
+    }
 }
 use types::*;
 
@@ -59,7 +64,7 @@ impl Allocator {
         let mut data: Vec<u8> = vec![];
         data.resize(size, 0);
         let ptr = data.as_ptr();
-        allocator.allocations.insert(ptr, data);
+        allocator.allocations.insert(ptr as *const c_void, data);
         ptr as *mut c_void
     }
 
@@ -69,7 +74,9 @@ impl Allocator {
         let mut previous_allocation = allocator.allocations.remove(&ptr).unwrap();
         previous_allocation.resize(size, 0);
         let new_ptr = previous_allocation.as_ptr();
-        allocator.allocations.insert(new_ptr, previous_allocation);
+        allocator
+            .allocations
+            .insert(new_ptr as *const c_void, previous_allocation);
         new_ptr as *mut c_void
     }
 
@@ -363,7 +370,7 @@ mod tests {
     fn allocator() {
         let mut allocations = vec![];
         for _ in 0..30 {
-            let data = Allocator::malloc(255);
+            let data = Allocator::malloc(255) as *mut u8;
             unsafe {
                 for i in 0..255 {
                     *data.offset(i) = i as u8;
@@ -371,13 +378,13 @@ mod tests {
                 for i in 0..255 {
                     assert_eq!(*data.offset(i), i as u8);
                 }
-                assert_eq!(Allocator::size(data), 255);
+                assert_eq!(Allocator::size(data as *const super::c_void), 255);
             }
             allocations.push(data);
         }
         assert_eq!(Allocator::size_allocated(), 30 * 255);
         for allocation in allocations.iter() {
-            unsafe { Allocator::free(*allocation) }
+            unsafe { Allocator::free(*allocation as *const super::c_void) }
         }
         assert_eq!(Allocator::size_allocated(), 0);
     }

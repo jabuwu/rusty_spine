@@ -55,10 +55,6 @@ impl Skeleton {
         &self.bones
     }
 
-    pub fn bones_mut(&mut self) -> &mut Vec<Bone> {
-        &mut self.bones
-    }
-
     pub fn find_bone(&self, name: &str) -> Option<&Bone> {
         if let Ok(c_name) = CString::new(name) {
             let bone = unsafe { spSkeleton_findBone(self.c_skeleton.0, c_name.as_ptr()) };
@@ -74,10 +70,6 @@ impl Skeleton {
 
     pub fn slots(&self) -> &Vec<Slot> {
         &self.slots
-    }
-
-    pub fn slots_mut(&mut self) -> &mut Vec<Slot> {
-        &mut self.slots
     }
 
     pub fn find_slot(&self, name: &str) -> Option<&Slot> {
