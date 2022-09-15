@@ -194,13 +194,19 @@ unsafe fn spine_strtol(nptr: *const c_char, endptr: *mut *mut c_char, base: c_in
         endptr as *mut *mut libc::c_char,
         base as libc::c_int,
     ) as libc::c_long*/
-    if let Ok(value) = c_long::from_str_radix(CStr::from_ptr(nptr).to_str().unwrap(), base as u32) {
+    let mut len = 1;
+    let str = String::from(CStr::from_ptr(nptr).to_str().unwrap());
+    let mut result = 0;
+    *endptr = nptr as *mut c_char;
+    while let Ok(value) = c_long::from_str_radix(&str[0..len], base as u32) {
+        result = value;
         *endptr = (nptr as *mut c_char).offset(value.to_string().len() as isize);
-        value
-    } else {
-        *endptr = nptr as *mut c_char;
-        0
+        len += 1;
+        if len == str.len() {
+            break;
+        }
     }
+    result
 }
 
 #[no_mangle]
@@ -210,14 +216,19 @@ unsafe fn spine_strtoul(nptr: *const c_char, endptr: *mut *mut c_char, base: c_i
         endptr as *mut *mut libc::c_char,
         base as libc::c_int,
     ) as c_ulong*/
-    if let Ok(value) = c_ulong::from_str_radix(CStr::from_ptr(nptr).to_str().unwrap(), base as u32)
-    {
+    let mut len = 1;
+    let str = String::from(CStr::from_ptr(nptr).to_str().unwrap());
+    let mut result = 0;
+    *endptr = nptr as *mut c_char;
+    while let Ok(value) = c_ulong::from_str_radix(&str[0..len], base as u32) {
+        result = value;
         *endptr = (nptr as *mut c_char).offset(value.to_string().len() as isize);
-        value
-    } else {
-        *endptr = nptr as *mut c_char;
-        0
+        len += 1;
+        if len == str.len() {
+            break;
+        }
     }
+    result
 }
 
 #[no_mangle]
@@ -344,6 +355,8 @@ unsafe fn spine_ftell(_stream: *mut FILE) -> c_long {
 mod tests {
     use std::ffi::CString;
 
+    use crate::c::wasm::{spine_strtol, spine_strtoul};
+
     use super::{spine_strlen, Allocator};
 
     #[test]
@@ -376,6 +389,40 @@ mod tests {
             assert_eq!(spine_strlen(empty.as_ptr()), 0);
             let hello_world = CString::new("hello world").unwrap();
             assert_eq!(spine_strlen(hello_world.as_ptr()), 11);
+        }
+    }
+
+    #[test]
+    fn strtol() {
+        unsafe {
+            let str = CString::new("1234 hello world").unwrap();
+            let mut endptr: *mut super::c_char = std::ptr::null_mut();
+            let value = spine_strtol(str.as_ptr(), &mut endptr, 10);
+            assert_eq!(value, 1234);
+            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(4));
+
+            let str = CString::new("hello world").unwrap();
+            let mut endptr: *mut super::c_char = std::ptr::null_mut();
+            let value = spine_strtol(str.as_ptr(), &mut endptr, 10);
+            assert_eq!(value, 0);
+            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(0));
+        }
+    }
+
+    #[test]
+    fn strtoul() {
+        unsafe {
+            let str = CString::new("1234 hello world").unwrap();
+            let mut endptr: *mut super::c_char = std::ptr::null_mut();
+            let value = spine_strtoul(str.as_ptr(), &mut endptr, 10);
+            assert_eq!(value, 1234);
+            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(4));
+
+            let str = CString::new("hello world").unwrap();
+            let mut endptr: *mut super::c_char = std::ptr::null_mut();
+            let value = spine_strtoul(str.as_ptr(), &mut endptr, 10);
+            assert_eq!(value, 0);
+            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(0));
         }
     }
 }
