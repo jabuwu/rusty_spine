@@ -9,8 +9,8 @@ use crate::{
 
 #[derive(Default)]
 pub struct Extension {
-    create_texture_cb: Option<Box<dyn Fn(&AtlasPage, &str)>>,
-    dispose_texture_cb: Option<Box<dyn Fn(&AtlasPage)>>,
+    create_texture_cb: Option<Box<dyn Fn(&mut AtlasPage, &str)>>,
+    dispose_texture_cb: Option<Box<dyn Fn(&mut AtlasPage)>>,
     read_file_cb: Option<Box<dyn Fn(&str) -> Option<Vec<u8>>>>,
 }
 
@@ -30,7 +30,7 @@ impl Extension {
 
 pub fn set_create_texture_cb<F>(create_texture_cb: F)
 where
-    F: Fn(&AtlasPage, &str) + 'static,
+    F: Fn(&mut AtlasPage, &str) + 'static,
 {
     let singleton = Extension::singleton();
     let mut extension = singleton.lock().unwrap();
@@ -39,7 +39,7 @@ where
 
 pub fn set_dispose_texture_cb<F>(dispose_texture_cb: F)
 where
-    F: Fn(&AtlasPage) + 'static,
+    F: Fn(&mut AtlasPage) + 'static,
 {
     let singleton = Extension::singleton();
     let mut extension = singleton.lock().unwrap();
@@ -60,7 +60,7 @@ extern "C" fn _spAtlasPage_createTexture(c_atlas_page: *mut spAtlasPage, c_path:
     let singleton = Extension::singleton();
     let extension = singleton.lock().unwrap();
     if let Some(cb) = &extension.create_texture_cb {
-        cb(&AtlasPage::new_from_ptr(c_atlas_page), unsafe {
+        cb(&mut AtlasPage::new_from_ptr(c_atlas_page), unsafe {
             CStr::from_ptr(c_path).to_str().unwrap()
         });
     }
@@ -71,7 +71,7 @@ extern "C" fn _spAtlasPage_disposeTexture(c_atlas_page: *mut spAtlasPage) {
     let singleton = Extension::singleton();
     let extension = singleton.lock().unwrap();
     if let Some(cb) = &extension.dispose_texture_cb {
-        cb(&AtlasPage::new_from_ptr(c_atlas_page));
+        cb(&mut AtlasPage::new_from_ptr(c_atlas_page));
     }
 }
 

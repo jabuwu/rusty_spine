@@ -80,7 +80,7 @@ impl Atlas {
     }
 
     c_ptr!(c_atlas, spAtlas);
-    c_accessor_void_ptr!(renderer_object, renderer_object_mut, rendererObject);
+    c_accessor_renderer_object!();
 }
 
 impl Drop for Atlas {
@@ -114,7 +114,7 @@ impl AtlasPage {
     c_accessor!(width, width_mut, width, i32);
     c_accessor!(height, height_mut, height, i32);
     c_accessor_bool!(pma, set_pma, pma);
-    c_accessor_void_ptr!(renderer_object, renderer_object_mut, rendererObject);
+    c_accessor_renderer_object!();
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

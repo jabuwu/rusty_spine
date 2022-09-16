@@ -19,13 +19,19 @@ macro_rules! c_ptr {
 
 macro_rules! c_accessor {
     ($rust:ident, $rust_mut:ident, $c:ident, $type:ty) => {
+        c_accessor_for!(c_ptr_ref, c_ptr_mut, $rust, $rust_mut, $c, $type);
+    };
+}
+
+macro_rules! c_accessor_for {
+    ($for:ident, $for_mut:ident, $rust:ident, $rust_mut:ident, $c:ident, $type:ty) => {
         #[inline]
         pub fn $rust(&self) -> $type {
-            self.c_ptr_ref().$c
+            self.$for().$c
         }
         #[inline]
         pub fn $rust_mut(&mut self) -> &mut $type {
-            &mut self.c_ptr_mut().$c
+            &mut self.$for_mut().$c
         }
     };
 }
@@ -88,13 +94,10 @@ macro_rules! c_accessor_enum {
     };
 }
 
-macro_rules! c_accessor_void_ptr {
-    ($rust:ident, $rust_mut:ident, $c:ident) => {
-        pub fn $rust(&self) -> *const crate::c::c_void {
-            self.c_ptr_ref().$c
-        }
-        pub fn $rust_mut(&mut self) -> &mut *mut crate::c::c_void {
-            &mut self.c_ptr_mut().$c
+macro_rules! c_accessor_renderer_object {
+    () => {
+        pub fn renderer_object(&self) -> crate::renderer_object::RendererObject {
+            crate::renderer_object::RendererObject::new(&mut self.c_ptr_mut().rendererObject)
         }
     };
 }
@@ -130,21 +133,21 @@ macro_rules! c_accessor_super {
 macro_rules! c_accessor_passthrough {
     ($rust:ident, $rust_mut:ident, $c:ident, $type:ty, $type_mut:ty) => {
         pub fn $rust(&self) -> $type {
-            self.c_ptr_ref().splits
+            self.c_ptr_ref().$c
         }
 
         pub fn $rust_mut(&mut self) -> $type_mut {
-            self.c_ptr_mut().splits
+            self.c_ptr_mut().$c
         }
     };
 }
 
 macro_rules! c_attachment_accessors {
-    ($c:ident) => {
+    ($c:expr) => {
         #[inline]
         pub fn name(&self) -> &str {
             unsafe {
-                std::ffi::CStr::from_ptr(self.c_ptr_ref().super_0.name)
+                std::ffi::CStr::from_ptr(self.attachment().name)
                     .to_str()
                     .unwrap()
             }
@@ -152,8 +155,52 @@ macro_rules! c_attachment_accessors {
 
         #[inline]
         pub fn attachment_type(&self) -> crate::attachment::AttachmentType {
-            self.c_ptr_ref().super_0.type_0.into()
+            self.attachment().type_0.into()
         }
+    };
+}
+
+macro_rules! c_vertex_attachment_accessors {
+    ($c:expr) => {
+        // TODO: fill accessors
+        #[inline]
+        pub unsafe fn compute_world_vertices(
+            &self,
+            slot: &crate::slot::Slot,
+            start: i32,
+            count: i32,
+            world_vertices: &mut [f32],
+            offset: i32,
+            stride: i32,
+        ) {
+            crate::c::spVertexAttachment_computeWorldVertices(
+                self.vertex_attachment() as *const crate::c::spVertexAttachment
+                    as *mut crate::c::spVertexAttachment,
+                slot.c_ptr(),
+                start,
+                count,
+                world_vertices.as_mut_ptr(),
+                offset,
+                stride,
+            );
+        }
+
+        c_accessor_for!(
+            vertex_attachment,
+            vertex_attachment_mut,
+            world_vertices_length,
+            world_vertex_length_mut,
+            worldVerticesLength,
+            i32
+        );
+        c_accessor_for!(
+            vertex_attachment,
+            vertex_attachment_mut,
+            id,
+            id_mut,
+            id,
+            i32
+        );
     };
 }
 
@@ -163,12 +210,15 @@ pub mod atlas;
 pub mod attachment;
 pub mod bone;
 pub mod c;
+pub mod clipping_attachment;
 pub mod color;
 pub mod error;
 pub mod extension;
 pub mod mesh_attachment;
 pub mod region_attachment;
+pub mod renderer_object;
 pub mod skeleton;
+pub mod skeleton_clipping;
 pub mod skeleton_data;
 pub mod skeleton_json;
 pub mod slot;

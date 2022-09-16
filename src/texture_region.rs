@@ -24,5 +24,5 @@ impl TextureRegion {
     c_accessor!(height, height_mut, height, i32);
     c_accessor!(original_width, original_width_mut, originalWidth, i32);
     c_accessor!(original_height, original_height_mut, originalHeight, i32);
-    c_accessor_void_ptr!(renderer_object, renderer_object_mut, rendererObject);
+    c_accessor_renderer_object!();
 }

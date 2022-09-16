@@ -1,4 +1,9 @@
-use crate::{c::spRegionAttachment, sync_ptr::SyncPtr, texture_region::TextureRegion};
+use crate::{
+    c::{spAttachment, spRegionAttachment, spRegionAttachment_computeWorldVertices},
+    slot::Slot,
+    sync_ptr::SyncPtr,
+    texture_region::TextureRegion,
+};
 
 #[derive(Debug)]
 pub struct RegionAttachment {
@@ -12,8 +17,28 @@ impl RegionAttachment {
         }
     }
 
+    fn attachment(&self) -> &spAttachment {
+        &self.c_ptr_ref().super_0
+    }
+
+    pub unsafe fn compute_world_vertices(
+        &self,
+        slot: &Slot,
+        vertices: &mut [f32],
+        offset: i32,
+        stride: i32,
+    ) {
+        spRegionAttachment_computeWorldVertices(
+            self.c_ptr() as *const spRegionAttachment as *mut spRegionAttachment,
+            slot.c_ptr(),
+            vertices.as_mut_ptr(),
+            offset,
+            stride,
+        );
+    }
+
     c_ptr!(c_region_attachment, spRegionAttachment);
-    c_attachment_accessors!(c_region_attachment);
+    c_attachment_accessors!(self.c_ptr_ref().super_0);
     c_accessor_string!(path, path);
     c_accessor!(x, x_mut, x, f32);
     c_accessor!(y, y_mut, y, f32);
@@ -23,7 +48,7 @@ impl RegionAttachment {
     c_accessor!(width, width_mut, width, f32);
     c_accessor!(height, height_mut, height, f32);
     c_accessor_color!(color, color_mut, color);
-    c_accessor_void_ptr!(renderer_object, renderer_object_mut, rendererObject);
+    c_accessor_renderer_object!();
     c_accessor_tmp_ptr!(region, region_mut, region, TextureRegion);
 
     // TODO: sequence, offset, uvs

@@ -1,5 +1,8 @@
 use crate::{
-    c::{spAttachment, spAttachmentType, spMeshAttachment, spRegionAttachment},
+    c::{
+        spAttachment, spAttachmentType, spClippingAttachment, spMeshAttachment, spRegionAttachment,
+    },
+    clipping_attachment::ClippingAttachment,
     mesh_attachment::MeshAttachment,
     region_attachment::RegionAttachment,
     sync_ptr::SyncPtr,
@@ -31,6 +34,16 @@ impl Attachment {
         if self.attachment_type() == AttachmentType::Mesh {
             Some(MeshAttachment::new_from_ptr(
                 self.c_attachment.0 as *mut spMeshAttachment,
+            ))
+        } else {
+            None
+        }
+    }
+
+    pub fn as_clipping(&self) -> Option<ClippingAttachment> {
+        if self.attachment_type() == AttachmentType::Clipping {
+            Some(ClippingAttachment::new_from_ptr(
+                self.c_attachment.0 as *mut spClippingAttachment,
             ))
         } else {
             None

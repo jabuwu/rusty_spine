@@ -42,6 +42,7 @@ impl SkeletonJson {
     }
 
     c_ptr!(c_skeleton_json, spSkeletonJson);
+    c_accessor!(scale, scale_mut, scale, f32);
 }
 
 impl Drop for SkeletonJson {
