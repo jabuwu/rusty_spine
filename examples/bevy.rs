@@ -237,7 +237,11 @@ pub fn spine_update(
                 let mut clip_uvs = vec![];
                 let mut color = rusty_spine::color::Color::default();
                 if let Some(mesh_attachment) = slot.attachment().and_then(|a| a.as_mesh()) {
-                    color = *mesh_attachment.color();
+                    //color = *mesh_attachment.color();
+                    color.r = mesh_attachment.c_ptr_mut().color.r;
+                    color.g = mesh_attachment.c_ptr_mut().color.g;
+                    color.b = mesh_attachment.c_ptr_mut().color.b;
+                    color.a = mesh_attachment.c_ptr_mut().color.a;
 
                     let mut world_vertices = vec![];
                     world_vertices.resize(1000, 0.);
@@ -265,13 +269,17 @@ pub fn spine_update(
 
                     for i in 0..mesh_attachment.triangles_count() {
                         clip_indices.push(
-                            unsafe { *mesh_attachment.triangles().offset(i as isize) } as i32
+                            unsafe { *mesh_attachment.triangles().offset(i as isize) } as u16
                         );
                     }
                 } else if let Some(region_attachment) =
                     slot.attachment().and_then(|a| a.as_region())
                 {
-                    color = *region_attachment.color();
+                    //color = *region_attachment.color();
+                    color.r = region_attachment.c_ptr_mut().color.r;
+                    color.g = region_attachment.c_ptr_mut().color.g;
+                    color.b = region_attachment.c_ptr_mut().color.b;
+                    color.a = region_attachment.c_ptr_mut().color.a;
 
                     let mut world_vertices = vec![];
                     world_vertices.resize(1000, 0.);
@@ -417,18 +425,17 @@ pub fn spine_update(
                         None
                     };
 
-                    color.r *= slot.color().r * skeleton.color().r;
-                    color.g *= slot.color().g * skeleton.color().g;
-                    color.b *= slot.color().b * skeleton.color().b;
-                    color.a *= slot.color().a * skeleton.color().a;
+                    color.r *= slot.c_ptr_mut().color.r * skeleton.c_ptr_mut().color.r;
+                    color.g *= slot.c_ptr_mut().color.g * skeleton.c_ptr_mut().color.g;
+                    color.b *= slot.c_ptr_mut().color.b * skeleton.c_ptr_mut().color.b;
+                    color.a *= slot.c_ptr_mut().color.a * skeleton.c_ptr_mut().color.a;
 
                     color_material.texture = texture_path.map(|p| asset_server.load(p.as_str()));
                     // TODO: figure out why colors are broken
-                    /*color_material.color.set_r(color.r);
+                    color_material.color.set_r(color.r);
                     color_material.color.set_g(color.g);
                     color_material.color.set_b(color.b);
-                    color_material.color.set_a(color.a);*/
-                    color_material.color = Color::WHITE;
+                    color_material.color.set_a(color.a);
                 }
             }
         }

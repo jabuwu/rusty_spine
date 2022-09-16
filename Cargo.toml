@@ -3,6 +3,15 @@ name = "rusty_spine"
 version = "0.1.0"
 edition = "2021"
 
+[dependencies]
+libc = { version = "0.2", optional = true }
+
 [dev-dependencies]
 transpiler = { path = "./transpiler" }
 bevy = "0.8"
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[features]
+use_libc = [ "libc" ]

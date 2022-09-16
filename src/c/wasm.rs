@@ -6,9 +6,9 @@ use std::sync::{Arc, Mutex, Once};
 
 pub mod types {
     #[allow(non_camel_case_types)]
-    pub type c_short = u32;
+    pub type c_short = i16;
     #[allow(non_camel_case_types)]
-    pub type c_ushort = i32;
+    pub type c_ushort = u16;
     #[allow(non_camel_case_types)]
     pub type c_int = i32;
     #[allow(non_camel_case_types)]

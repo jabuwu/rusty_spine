@@ -2531,6 +2531,7 @@ name = "rusty_spine"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "libc",
  "transpiler",
 ]
 
