@@ -9,7 +9,9 @@ use rusty_spine::{
     animation_state::AnimationState,
     animation_state_data::AnimationStateData,
     atlas::Atlas,
-    c::{spSkeletonClipping_clipTriangles, spSkeletonClipping_isClipping},
+    c::{
+        spSkeletonClipping_clipTriangles, spSkeletonClipping_isClipping, spSkeleton_setToSetupPose,
+    },
     error::Error,
     skeleton::Skeleton,
     skeleton_clipping::SkeletonClipping,
@@ -26,7 +28,7 @@ pub struct Spine {
 
 #[derive(Debug)]
 struct SpineTexture {
-    _path: String,
+    path: String,
 }
 
 fn make_cube(mesh: &mut Mesh) {
@@ -45,7 +47,7 @@ fn make_cube(mesh: &mut Mesh) {
 fn main() {
     rusty_spine::extension::set_create_texture_cb(|page, path| {
         page.renderer_object().set(SpineTexture {
-            _path: path.to_owned(),
+            path: path.to_owned(),
         });
     });
     rusty_spine::extension::set_dispose_texture_cb(|page| unsafe {
@@ -62,14 +64,17 @@ fn star(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    asset_server: Res<AssetServer>,
 ) {
-    let (skeleton, mut animation_state, _) = load_skeleton().unwrap();
+    let (mut skeleton, mut animation_state, _) = load_skeleton().unwrap();
+    unsafe {
+        spSkeleton_setToSetupPose(skeleton.c_ptr());
+    }
+    skeleton.update_world_transform();
     animation_state.set_animation_by_name(0, "portal", true);
     let mut slots = HashMap::new();
     commands
         .spawn_bundle((
-            Transform::default(),
+            Transform::from_scale(Vec3::ONE * 0.5),
             GlobalTransform::default(),
             Visibility::default(),
             ComputedVisibility::default(),
@@ -84,13 +89,13 @@ fn star(
                     parent
                         .spawn_bundle((
                             Mesh2dHandle(mesh.clone()),
-                            Transform::from_xyz(0., -200., 0.),
+                            Transform::from_xyz(0., -400., 0.),
                             GlobalTransform::default(),
                             Visibility::default(),
                             ComputedVisibility::default(),
                             materials.add(ColorMaterial {
                                 color: Color::WHITE,
-                                texture: Some(asset_server.load("spineboy-pro.png")),
+                                texture: None,
                             }),
                         ))
                         .id(),
@@ -108,9 +113,11 @@ fn star(
 
 pub fn star_update(
     mut spine_query: Query<&mut Spine>,
-    colored_mesh2d: Query<&Mesh2dHandle>,
+    colored_mesh2d: Query<(&Mesh2dHandle, &Handle<ColorMaterial>)>,
     mut meshes: ResMut<Assets<Mesh>>,
+    mut color_materials: ResMut<Assets<ColorMaterial>>,
     time: Res<Time>,
+    asset_server: Res<AssetServer>,
 ) {
     for mut spine in spine_query.iter_mut() {
         let Spine {
@@ -124,7 +131,11 @@ pub fn star_update(
         skeleton.update_world_transform();
         for slot in skeleton.slots().iter() {
             let slot_entity = slots.get(slot.data().name()).unwrap();
-            if let Ok(mesh_handle) = colored_mesh2d.get(*slot_entity) {
+            if let Ok((mesh_handle, color_material_handle)) = colored_mesh2d.get(*slot_entity) {
+                if !slot.bone().active() {
+                    continue;
+                }
+
                 let mesh = meshes.get_mut(&mesh_handle.0).unwrap();
                 let mut clip_vertices = vec![];
                 let mut clip_indices = vec![];
@@ -184,6 +195,7 @@ pub fn star_update(
                     continue;
                 } else {
                     make_cube(mesh);
+                    clipper.clip_end(slot);
                     continue;
                 }
 
@@ -272,6 +284,41 @@ pub fn star_update(
                 mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
 
                 clipper.clip_end(slot);
+
+                if let Some(color_material) = color_materials.get_mut(color_material_handle) {
+                    let texture_path = if let Some(mesh_attachment) =
+                        slot.attachment().and_then(|a| a.as_mesh())
+                    {
+                        Some(unsafe {
+                            mesh_attachment
+                                .renderer_object()
+                                .get_atlas_region()
+                                .page()
+                                .renderer_object()
+                                .get::<SpineTexture>()
+                                .path
+                                .as_str()
+                                .to_owned()
+                        })
+                    } else if let Some(region_attachment) =
+                        slot.attachment().and_then(|a| a.as_region())
+                    {
+                        Some(unsafe {
+                            region_attachment
+                                .renderer_object()
+                                .get_atlas_region()
+                                .page()
+                                .renderer_object()
+                                .get::<SpineTexture>()
+                                .path
+                                .as_str()
+                                .to_owned()
+                        })
+                    } else {
+                        None
+                    };
+                    color_material.texture = texture_path.map(|p| asset_server.load(p.as_str()));
+                }
             }
         }
 
@@ -280,13 +327,14 @@ pub fn star_update(
 }
 
 fn load_skeleton() -> Result<(Skeleton, AnimationState, Arc<Atlas>), Error> {
-    let file = include_bytes!("../spineboy/spineboy-pro.atlas");
-    let dir = "";
+    let file = include_bytes!("../assets/spineboy/export/spineboy.atlas");
+    let dir = "../assets/spineboy/export/";
     let atlas = Arc::new(Atlas::new(file, dir)?);
-    let mut skeleton_json = SkeletonJson::new(atlas.clone());
-    *skeleton_json.scale_mut() = 0.4;
-    let skeleton_data =
-        Arc::new(skeleton_json.read_skeleton_data(include_str!("../spineboy/spineboy-pro.json"))?);
+    let skeleton_json = SkeletonJson::new(atlas.clone());
+    let skeleton_data = Arc::new(
+        skeleton_json
+            .read_skeleton_data(include_str!("../assets/spineboy/export/spineboy-pro.json"))?,
+    );
     let animation_state_data = AnimationStateData::new(skeleton_data.clone());
     let skeleton = Skeleton::new(skeleton_data)?;
     let animation_state = AnimationState::new(Arc::new(animation_state_data));
