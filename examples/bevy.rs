@@ -1,8 +1,4 @@
-use std::{
-    collections::HashMap,
-    fs::{read, read_to_string},
-    sync::Arc,
-};
+use std::{collections::HashMap, sync::Arc};
 
 use bevy::{
     prelude::*,
@@ -26,7 +22,6 @@ use rusty_spine::{
 pub struct Spine {
     skeleton: Skeleton,
     animation_state: AnimationState,
-    slots: HashMap<String, Entity>,
     clipper: SkeletonClipping,
 }
 
@@ -36,8 +31,8 @@ struct SpineTexture {
 }
 
 struct Demo {
-    atlas: String,
-    json: String,
+    atlas: Vec<u8>,
+    json: Vec<u8>,
     dir: String,
     animation: String,
     position: Vec2,
@@ -75,32 +70,32 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .insert_resource(Demos(vec![
             Demo {
-                atlas: "assets/spineboy/export/spineboy.atlas".to_owned(),
-                json: "assets/spineboy/export/spineboy-pro.json".to_owned(),
+                atlas: include_bytes!("../assets/spineboy/export/spineboy.atlas").to_vec(),
+                json: include_bytes!("../assets/spineboy/export/spineboy-pro.json").to_vec(),
                 dir: "spineboy/export/".to_owned(),
                 animation: "portal".to_owned(),
                 position: Vec2::new(0., -400.),
                 scale: 0.5,
             },
             Demo {
-                atlas: "assets/windmill/export/windmill.atlas".to_owned(),
-                json: "assets/windmill/export/windmill-ess.json".to_owned(),
+                atlas: include_bytes!("../assets/windmill/export/windmill.atlas").to_vec(),
+                json: include_bytes!("../assets/windmill/export/windmill-ess.json").to_vec(),
                 dir: "windmill/export/".to_owned(),
                 animation: "animation".to_owned(),
                 position: Vec2::new(0., -150.),
                 scale: 0.5,
             },
             Demo {
-                atlas: "assets/alien/export/alien.atlas".to_owned(),
-                json: "assets/alien/export/alien-pro.json".to_owned(),
+                atlas: include_bytes!("../assets/alien/export/alien.atlas").to_vec(),
+                json: include_bytes!("../assets/alien/export/alien-pro.json").to_vec(),
                 dir: "alien/export/".to_owned(),
                 animation: "death".to_owned(),
                 position: Vec2::new(0., -600.),
                 scale: 0.25,
             },
             Demo {
-                atlas: "assets/coin/export/coin.atlas".to_owned(),
-                json: "assets/coin/export/coin-pro.json".to_owned(),
+                atlas: include_bytes!("../assets/coin/export/coin.atlas").to_vec(),
+                json: include_bytes!("../assets/coin/export/coin-pro.json").to_vec(),
                 dir: "coin/export/".to_owned(),
                 animation: "animation".to_owned(),
                 position: Vec2::new(0., 0.),
@@ -183,7 +178,6 @@ fn demo_load(
             .insert(Spine {
                 skeleton,
                 animation_state,
-                slots,
                 clipper: SkeletonClipping::new(),
             });
     }
@@ -207,26 +201,29 @@ fn demo_next(
 }
 
 pub fn spine_update(
-    mut spine_query: Query<&mut Spine>,
-    colored_mesh2d: Query<(&Mesh2dHandle, &Handle<ColorMaterial>)>,
+    mut spine_query: Query<(&mut Spine, &Children)>,
+    mut colored_mesh2d: Query<(&Mesh2dHandle, &Handle<ColorMaterial>, &mut Transform)>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut color_materials: ResMut<Assets<ColorMaterial>>,
     time: Res<Time>,
     asset_server: Res<AssetServer>,
 ) {
-    for mut spine in spine_query.iter_mut() {
+    for (mut spine, spine_children) in spine_query.iter_mut() {
         let Spine {
             animation_state,
             skeleton,
-            slots,
             clipper,
         } = spine.as_mut();
         animation_state.update(time.delta_seconds());
         animation_state.apply(skeleton);
         skeleton.update_world_transform();
-        for slot in skeleton.slots().iter() {
-            let slot_entity = slots.get(slot.data().name()).unwrap();
-            if let Ok((mesh_handle, color_material_handle)) = colored_mesh2d.get(*slot_entity) {
+        let draw_order = skeleton.draw_order();
+        for (slot_index, child) in spine_children.iter().enumerate() {
+            let slot_entity = *child;
+            let slot = &draw_order[slot_index];
+            if let Ok((mesh_handle, color_material_handle, mut transform)) =
+                colored_mesh2d.get_mut(slot_entity)
+            {
                 if !slot.bone().active() {
                     continue;
                 }
@@ -313,6 +310,8 @@ pub fn spine_update(
                 let mut v_pos = vec![];
                 let mut indices = vec![];
                 let mut uvs = vec![];
+                let z = slot_index as f32 / 100.;
+                transform.translation.z = z;
                 unsafe {
                     if spSkeletonClipping_isClipping(clipper.c_ptr()) != 0 {
                         spSkeletonClipping_clipTriangles(
@@ -333,7 +332,7 @@ pub fn spine_update(
                                 *(*clipper.c_ptr_ref().clippedVertices)
                                     .items
                                     .offset(i as isize * 2 + 1),
-                                0.,
+                                z,
                             ]);
                         }
                         let clipped_triangles_size = (*clipper.c_ptr_ref().clippedTriangles).size;
@@ -357,7 +356,7 @@ pub fn spine_update(
                         }
                     } else {
                         for i in 0..(clip_vertices.len() / 2) {
-                            v_pos.push([clip_vertices[i * 2], clip_vertices[i * 2 + 1], 0.]);
+                            v_pos.push([clip_vertices[i * 2], clip_vertices[i * 2 + 1], z]);
                         }
                         for index in clip_indices.iter() {
                             indices.push(*index as u32);
@@ -445,15 +444,13 @@ pub fn spine_update(
 }
 
 fn load_skeleton(
-    atlas: &str,
-    json: &str,
+    atlas: &Vec<u8>,
+    json: &Vec<u8>,
     dir: &str,
 ) -> Result<(Skeleton, AnimationState, Arc<Atlas>), Error> {
-    let atlas_data = read(atlas).unwrap();
-    let atlas = Arc::new(Atlas::new(&atlas_data, dir)?);
-    let skeleton_data = read_to_string(json).unwrap();
+    let atlas = Arc::new(Atlas::new(atlas, dir)?);
     let skeleton_json = SkeletonJson::new(atlas.clone());
-    let skeleton_data = Arc::new(skeleton_json.read_skeleton_data(&skeleton_data)?);
+    let skeleton_data = Arc::new(skeleton_json.read_skeleton_data(json)?);
     let animation_state_data = AnimationStateData::new(skeleton_data.clone());
     let skeleton = Skeleton::new(skeleton_data)?;
     let animation_state = AnimationState::new(Arc::new(animation_state_data));

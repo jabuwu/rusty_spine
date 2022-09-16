@@ -85,6 +85,16 @@ impl Skeleton {
         }
     }
 
+    pub fn draw_order(&self) -> Vec<Slot> {
+        let mut vec = vec![];
+        for i in 0..self.c_ptr_mut().slotsCount {
+            vec.push(Slot::new_from_ptr(unsafe {
+                *self.c_ptr_mut().drawOrder.offset(i as isize)
+            }));
+        }
+        vec
+    }
+
     c_ptr!(c_skeleton, spSkeleton);
     c_accessor_color!(color, color_mut, color);
 }

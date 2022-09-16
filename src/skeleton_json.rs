@@ -29,7 +29,7 @@ impl SkeletonJson {
         }
     }
 
-    pub fn read_skeleton_data(&self, json: &str) -> Result<SkeletonData, Error> {
+    pub fn read_skeleton_data(&self, json: &[u8]) -> Result<SkeletonData, Error> {
         let c_json = CString::new(json)?;
         let c_skeleton_data =
             unsafe { spSkeletonJson_readSkeletonData(self.c_skeleton_json.0, c_json.as_ptr()) };
