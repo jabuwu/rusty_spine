@@ -219,6 +219,7 @@ pub mod region_attachment;
 pub mod renderer_object;
 pub mod skeleton;
 pub mod skeleton_clipping;
+pub mod skeleton_controller;
 pub mod skeleton_data;
 pub mod skeleton_json;
 pub mod slot;

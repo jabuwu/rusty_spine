@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, mem::take, sync::Arc};
 
 use bevy::{
     prelude::*,
@@ -6,23 +6,13 @@ use bevy::{
     sprite::Mesh2dHandle,
 };
 use rusty_spine::{
-    animation_state::AnimationState,
-    animation_state_data::AnimationStateData,
-    atlas::Atlas,
-    c::{
-        spSkeletonClipping_clipTriangles, spSkeletonClipping_isClipping, spSkeleton_setToSetupPose,
-    },
-    error::Error,
-    skeleton::Skeleton,
-    skeleton_clipping::SkeletonClipping,
-    skeleton_json::SkeletonJson,
+    animation_state_data::AnimationStateData, atlas::Atlas, error::Error,
+    skeleton_controller::SkeletonController, skeleton_json::SkeletonJson,
 };
 
 #[derive(Component)]
 pub struct Spine {
-    skeleton: Skeleton,
-    animation_state: AnimationState,
-    clipper: SkeletonClipping,
+    controller: SkeletonController,
 }
 
 #[derive(Debug)]
@@ -137,13 +127,10 @@ fn demo_load(
             commands.entity(entity).despawn();
         }
         let demo = &demos.0[event.0];
-        let (mut skeleton, mut animation_state, _) =
-            load_skeleton(&demo.atlas, &demo.json, &demo.dir).unwrap();
-        unsafe {
-            spSkeleton_setToSetupPose(skeleton.c_ptr());
-        }
-        skeleton.update_world_transform();
-        animation_state.set_animation_by_name(0, &demo.animation, true);
+        let mut controller = load_skeleton(&demo.atlas, &demo.json, &demo.dir).unwrap();
+        controller
+            .animation_state
+            .set_animation_by_name(0, &demo.animation, true);
         let mut slots = HashMap::new();
         commands
             .spawn_bundle((
@@ -153,7 +140,7 @@ fn demo_load(
                 ComputedVisibility::default(),
             ))
             .with_children(|parent| {
-                for slot in skeleton.slots().iter() {
+                for slot in controller.skeleton.slots().iter() {
                     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
                     make_cube(&mut mesh);
                     let mesh = meshes.add(mesh);
@@ -175,11 +162,7 @@ fn demo_load(
                     );
                 }
             })
-            .insert(Spine {
-                skeleton,
-                animation_state,
-                clipper: SkeletonClipping::new(),
-            });
+            .insert(Spine { controller });
     }
 }
 
@@ -202,257 +185,59 @@ fn demo_next(
 
 pub fn spine_update(
     mut spine_query: Query<(&mut Spine, &Children)>,
-    mut colored_mesh2d: Query<(&Mesh2dHandle, &Handle<ColorMaterial>, &mut Transform)>,
+    colored_mesh2d: Query<(&Mesh2dHandle, &Handle<ColorMaterial>)>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut color_materials: ResMut<Assets<ColorMaterial>>,
     time: Res<Time>,
     asset_server: Res<AssetServer>,
 ) {
     for (mut spine, spine_children) in spine_query.iter_mut() {
-        let Spine {
-            animation_state,
-            skeleton,
-            clipper,
-        } = spine.as_mut();
-        animation_state.update(time.delta_seconds());
-        animation_state.apply(skeleton);
-        skeleton.update_world_transform();
-        let draw_order = skeleton.draw_order();
-        for (slot_index, child) in spine_children.iter().enumerate() {
-            let slot_entity = *child;
-            let slot = &draw_order[slot_index];
-            if let Ok((mesh_handle, color_material_handle, mut transform)) =
-                colored_mesh2d.get_mut(slot_entity)
-            {
-                if !slot.bone().active() {
-                    continue;
-                }
-
-                let mesh = meshes.get_mut(&mesh_handle.0).unwrap();
-                let mut clip_vertices = vec![];
-                let mut clip_indices = vec![];
-                let mut clip_uvs = vec![];
-                let mut color = rusty_spine::color::Color::default();
-                if let Some(mesh_attachment) = slot.attachment().and_then(|a| a.as_mesh()) {
-                    //color = *mesh_attachment.color();
-                    color.r = mesh_attachment.c_ptr_mut().color.r;
-                    color.g = mesh_attachment.c_ptr_mut().color.g;
-                    color.b = mesh_attachment.c_ptr_mut().color.b;
-                    color.a = mesh_attachment.c_ptr_mut().color.a;
-
-                    let mut world_vertices = vec![];
-                    world_vertices.resize(1000, 0.);
-                    unsafe {
-                        mesh_attachment.compute_world_vertices(
-                            slot,
-                            0,
-                            mesh_attachment.world_vertices_length(),
-                            &mut world_vertices,
-                            0,
-                            2,
-                        );
+        let Spine { controller } = spine.as_mut();
+        controller.update(time.delta_seconds());
+        let mut renderables = controller.renderables();
+        for (renderable_index, child) in spine_children.iter().enumerate() {
+            if let Ok((mesh_handle, color_material_handle)) = colored_mesh2d.get(*child) {
+                if let Some(renderable) = renderables.get_mut(renderable_index) {
+                    let mut normals = vec![];
+                    for _ in 0..renderable.vertices.len() {
+                        normals.push([0., 0., 0.]);
                     }
-
-                    for i in 0..mesh_attachment.world_vertices_length() {
-                        clip_vertices.push(world_vertices[i as usize * 2]);
-                        clip_vertices.push(world_vertices[i as usize * 2 + 1]);
-
-                        unsafe {
-                            clip_uvs.push(*mesh_attachment.c_ptr_mut().uvs.offset(i as isize * 2));
-                            clip_uvs
-                                .push(*mesh_attachment.c_ptr_mut().uvs.offset(i as isize * 2 + 1));
-                        }
+                    let mesh = meshes.get_mut(&mesh_handle.0).unwrap();
+                    mesh.set_indices(Some(Indices::U32(take(&mut renderable.indices))));
+                    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, take(&mut renderable.vertices));
+                    mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
+                    mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, take(&mut renderable.uvs));
+                    if let Some(color_material) = color_materials.get_mut(color_material_handle) {
+                        color_material.color.set_r(renderable.color.r);
+                        color_material.color.set_g(renderable.color.g);
+                        color_material.color.set_b(renderable.color.b);
+                        color_material.color.set_a(renderable.color.a);
+                        let texture_path = if let Some(attachment_render_object) =
+                            renderable.attachment_renderer_object
+                        {
+                            let spine_texture =
+                                unsafe { &mut *(attachment_render_object as *mut SpineTexture) };
+                            Some(spine_texture.path.clone())
+                        } else {
+                            None
+                        };
+                        color_material.texture =
+                            texture_path.map(|p| asset_server.load(p.as_str()));
                     }
-
-                    for i in 0..mesh_attachment.triangles_count() {
-                        clip_indices.push(
-                            unsafe { *mesh_attachment.triangles().offset(i as isize) } as u16
-                        );
-                    }
-                } else if let Some(region_attachment) =
-                    slot.attachment().and_then(|a| a.as_region())
-                {
-                    //color = *region_attachment.color();
-                    color.r = region_attachment.c_ptr_mut().color.r;
-                    color.g = region_attachment.c_ptr_mut().color.g;
-                    color.b = region_attachment.c_ptr_mut().color.b;
-                    color.a = region_attachment.c_ptr_mut().color.a;
-
-                    let mut world_vertices = vec![];
-                    world_vertices.resize(1000, 0.);
-                    unsafe {
-                        region_attachment.compute_world_vertices(slot, &mut world_vertices, 0, 2);
-                    }
-
-                    for i in 0..4 {
-                        clip_vertices.push(world_vertices[i as usize * 2]);
-                        clip_vertices.push(world_vertices[i as usize * 2 + 1]);
-
-                        clip_uvs.push(region_attachment.c_ptr_mut().uvs[i as usize * 2]);
-                        clip_uvs.push(region_attachment.c_ptr_mut().uvs[i as usize * 2 + 1]);
-                    }
-
-                    clip_indices = vec![0, 1, 2, 2, 3, 0];
-                } else if let Some(clipping_attachment) =
-                    slot.attachment().and_then(|a| a.as_clipping())
-                {
-                    clipper.clip_start(slot, &clipping_attachment);
-                    continue;
                 } else {
-                    make_cube(mesh);
-                    continue;
-                }
-
-                for _ in clip_vertices.iter() {
-                    clip_uvs.push(0.);
-                    clip_uvs.push(0.);
-                }
-                let mut v_pos = vec![];
-                let mut indices = vec![];
-                let mut uvs = vec![];
-                let z = slot_index as f32 / 100.;
-                transform.translation.z = z;
-                unsafe {
-                    if spSkeletonClipping_isClipping(clipper.c_ptr()) != 0 {
-                        spSkeletonClipping_clipTriangles(
-                            clipper.c_ptr(),
-                            clip_vertices.as_mut_ptr(),
-                            clip_vertices.len() as i32 / 2,
-                            clip_indices.as_mut_ptr(),
-                            clip_indices.len() as i32,
-                            clip_uvs.as_mut_ptr(),
-                            2,
-                        );
-                        let clipped_vertices_size = (*clipper.c_ptr_ref().clippedVertices).size;
-                        for i in 0..(clipped_vertices_size / 2) {
-                            v_pos.push([
-                                *(*clipper.c_ptr_ref().clippedVertices)
-                                    .items
-                                    .offset(i as isize * 2),
-                                *(*clipper.c_ptr_ref().clippedVertices)
-                                    .items
-                                    .offset(i as isize * 2 + 1),
-                                z,
-                            ]);
-                        }
-                        let clipped_triangles_size = (*clipper.c_ptr_ref().clippedTriangles).size;
-                        for i in 0..clipped_triangles_size {
-                            indices.push(
-                                *(*clipper.c_ptr_ref().clippedTriangles)
-                                    .items
-                                    .offset(i as isize) as u32,
-                            );
-                        }
-                        let clipped_uvs_size = (*clipper.c_ptr_ref().clippedUVs).size;
-                        for i in 0..(clipped_uvs_size / 2) {
-                            uvs.push([
-                                *(*clipper.c_ptr_ref().clippedUVs)
-                                    .items
-                                    .offset(i as isize * 2),
-                                *(*clipper.c_ptr_ref().clippedUVs)
-                                    .items
-                                    .offset(i as isize * 2 + 1),
-                            ]);
-                        }
-                    } else {
-                        for i in 0..(clip_vertices.len() / 2) {
-                            v_pos.push([clip_vertices[i * 2], clip_vertices[i * 2 + 1], z]);
-                        }
-                        for index in clip_indices.iter() {
-                            indices.push(*index as u32);
-                        }
-                        for i in 0..v_pos.len() {
-                            uvs.push([clip_uvs[i * 2], clip_uvs[i * 2 + 1]]);
-                        }
+                    if let Some(color_material) = color_materials.get_mut(color_material_handle) {
+                        color_material.color = Color::NONE;
                     }
-                }
-
-                for i in 0..indices.len() / 3 {
-                    let a = indices[i * 3 + 1];
-                    indices[i * 3] = indices[i * 3];
-                    indices[i * 3 + 1] = indices[i * 3 + 2];
-                    indices[i * 3 + 2] = a;
-                }
-
-                let mut v_color: Vec<u32> = vec![];
-                for _ in 0..v_pos.len() {
-                    v_color.push(Color::BLACK.as_linear_rgba_u32());
-                }
-
-                let mut normals = vec![];
-                for _ in 0..v_pos.len() {
-                    normals.push([0., 0., 0.]);
-                }
-
-                mesh.set_indices(Some(Indices::U32(indices)));
-                mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, v_pos);
-                mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
-                mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
-
-                clipper.clip_end(slot);
-
-                if let Some(color_material) = color_materials.get_mut(color_material_handle) {
-                    let texture_path = if let Some(mesh_attachment) =
-                        slot.attachment().and_then(|a| a.as_mesh())
-                    {
-                        Some(unsafe {
-                            mesh_attachment
-                                .renderer_object()
-                                .get_atlas_region()
-                                .page()
-                                .renderer_object()
-                                .get::<SpineTexture>()
-                                .path
-                                .as_str()
-                                .to_owned()
-                        })
-                    } else if let Some(region_attachment) =
-                        slot.attachment().and_then(|a| a.as_region())
-                    {
-                        Some(unsafe {
-                            region_attachment
-                                .renderer_object()
-                                .get_atlas_region()
-                                .page()
-                                .renderer_object()
-                                .get::<SpineTexture>()
-                                .path
-                                .as_str()
-                                .to_owned()
-                        })
-                    } else {
-                        None
-                    };
-
-                    color.r *= slot.c_ptr_mut().color.r * skeleton.c_ptr_mut().color.r;
-                    color.g *= slot.c_ptr_mut().color.g * skeleton.c_ptr_mut().color.g;
-                    color.b *= slot.c_ptr_mut().color.b * skeleton.c_ptr_mut().color.b;
-                    color.a *= slot.c_ptr_mut().color.a * skeleton.c_ptr_mut().color.a;
-
-                    color_material.texture = texture_path.map(|p| asset_server.load(p.as_str()));
-                    // TODO: figure out why colors are broken
-                    color_material.color.set_r(color.r);
-                    color_material.color.set_g(color.g);
-                    color_material.color.set_b(color.b);
-                    color_material.color.set_a(color.a);
                 }
             }
         }
-
-        clipper.clip_end2();
     }
 }
 
-fn load_skeleton(
-    atlas: &Vec<u8>,
-    json: &Vec<u8>,
-    dir: &str,
-) -> Result<(Skeleton, AnimationState, Arc<Atlas>), Error> {
+fn load_skeleton(atlas: &Vec<u8>, json: &Vec<u8>, dir: &str) -> Result<SkeletonController, Error> {
     let atlas = Arc::new(Atlas::new(atlas, dir)?);
     let skeleton_json = SkeletonJson::new(atlas.clone());
     let skeleton_data = Arc::new(skeleton_json.read_skeleton_data(json)?);
-    let animation_state_data = AnimationStateData::new(skeleton_data.clone());
-    let skeleton = Skeleton::new(skeleton_data)?;
-    let animation_state = AnimationState::new(Arc::new(animation_state_data));
-    Ok((skeleton, animation_state, atlas))
+    let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
+    Ok(SkeletonController::new(skeleton_data, animation_state_data))
 }
