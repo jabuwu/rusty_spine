@@ -44,6 +44,7 @@ impl Slot {
     }
 
     c_ptr!(c_slot, spSlot);
+    c_accessor_color!(color, color_mut, color);
 
     // TODO: accessors
 }

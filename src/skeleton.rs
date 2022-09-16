@@ -86,4 +86,5 @@ impl Skeleton {
     }
 
     c_ptr!(c_skeleton, spSkeleton);
+    c_accessor_color!(color, color_mut, color);
 }

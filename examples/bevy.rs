@@ -1,4 +1,8 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::HashMap,
+    fs::{read, read_to_string},
+    sync::Arc,
+};
 
 use bevy::{
     prelude::*,
@@ -31,6 +35,20 @@ struct SpineTexture {
     path: String,
 }
 
+struct Demo {
+    atlas: String,
+    json: String,
+    dir: String,
+    animation: String,
+    position: Vec2,
+    scale: f32,
+}
+
+struct Demos(Vec<Demo>);
+
+#[derive(Clone)]
+struct DemoLoad(usize);
+
 fn make_cube(mesh: &mut Mesh) {
     let indices = Indices::U32(vec![]);
 
@@ -54,64 +72,141 @@ fn main() {
         page.renderer_object().dispose::<SpineTexture>();
     });
     App::new()
+        .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
+        .insert_resource(Demos(vec![
+            Demo {
+                atlas: "assets/spineboy/export/spineboy.atlas".to_owned(),
+                json: "assets/spineboy/export/spineboy-pro.json".to_owned(),
+                dir: "spineboy/export/".to_owned(),
+                animation: "portal".to_owned(),
+                position: Vec2::new(0., -400.),
+                scale: 0.5,
+            },
+            Demo {
+                atlas: "assets/windmill/export/windmill.atlas".to_owned(),
+                json: "assets/windmill/export/windmill-ess.json".to_owned(),
+                dir: "windmill/export/".to_owned(),
+                animation: "animation".to_owned(),
+                position: Vec2::new(0., -150.),
+                scale: 0.5,
+            },
+            Demo {
+                atlas: "assets/alien/export/alien.atlas".to_owned(),
+                json: "assets/alien/export/alien-pro.json".to_owned(),
+                dir: "alien/export/".to_owned(),
+                animation: "death".to_owned(),
+                position: Vec2::new(0., -600.),
+                scale: 0.25,
+            },
+            Demo {
+                atlas: "assets/coin/export/coin.atlas".to_owned(),
+                json: "assets/coin/export/coin-pro.json".to_owned(),
+                dir: "coin/export/".to_owned(),
+                animation: "animation".to_owned(),
+                position: Vec2::new(0., 0.),
+                scale: 0.75,
+            },
+            /*TODO: figure out why dragon crashes - Demo {
+                atlas: "assets/dragon/export/dragon.atlas".to_owned(),
+                json: "assets/dragon/export/dragon-ess.json".to_owned(),
+                dir: "dragon/export/".to_owned(),
+                animation: "flying".to_owned(),
+                position: Vec2::new(0., 0.),
+                scale: 0.75,
+            },*/
+        ]))
+        .add_event::<DemoLoad>()
         .add_plugins(DefaultPlugins)
-        .add_startup_system(star)
-        .add_system(star_update)
+        .add_startup_system(startup)
+        .add_system(demo_load)
+        .add_system(demo_next)
+        .add_system(spine_update)
         .run();
 }
 
-fn star(
+fn startup(mut commands: Commands, mut ev_demo_load: EventWriter<DemoLoad>) {
+    commands.spawn_bundle(Camera2dBundle::default());
+    ev_demo_load.send(DemoLoad(0));
+}
+
+fn demo_load(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    mut ev_demo_load: EventReader<DemoLoad>,
+    entity_query: Query<Entity, Without<Camera>>,
+    demos: Res<Demos>,
 ) {
-    let (mut skeleton, mut animation_state, _) = load_skeleton().unwrap();
-    unsafe {
-        spSkeleton_setToSetupPose(skeleton.c_ptr());
+    for event in ev_demo_load.iter() {
+        for entity in entity_query.iter() {
+            commands.entity(entity).despawn();
+        }
+        let demo = &demos.0[event.0];
+        let (mut skeleton, mut animation_state, _) =
+            load_skeleton(&demo.atlas, &demo.json, &demo.dir).unwrap();
+        unsafe {
+            spSkeleton_setToSetupPose(skeleton.c_ptr());
+        }
+        skeleton.update_world_transform();
+        animation_state.set_animation_by_name(0, &demo.animation, true);
+        let mut slots = HashMap::new();
+        commands
+            .spawn_bundle((
+                Transform::from_scale(Vec3::ONE * demo.scale),
+                GlobalTransform::default(),
+                Visibility::default(),
+                ComputedVisibility::default(),
+            ))
+            .with_children(|parent| {
+                for slot in skeleton.slots().iter() {
+                    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
+                    make_cube(&mut mesh);
+                    let mesh = meshes.add(mesh);
+                    slots.insert(
+                        slot.data().name().to_owned(),
+                        parent
+                            .spawn_bundle((
+                                Mesh2dHandle(mesh.clone()),
+                                Transform::from_xyz(demo.position.x, demo.position.y, 0.),
+                                GlobalTransform::default(),
+                                Visibility::default(),
+                                ComputedVisibility::default(),
+                                materials.add(ColorMaterial {
+                                    color: Color::NONE,
+                                    texture: None,
+                                }),
+                            ))
+                            .id(),
+                    );
+                }
+            })
+            .insert(Spine {
+                skeleton,
+                animation_state,
+                slots,
+                clipper: SkeletonClipping::new(),
+            });
     }
-    skeleton.update_world_transform();
-    animation_state.set_animation_by_name(0, "portal", true);
-    let mut slots = HashMap::new();
-    commands
-        .spawn_bundle((
-            Transform::from_scale(Vec3::ONE * 0.5),
-            GlobalTransform::default(),
-            Visibility::default(),
-            ComputedVisibility::default(),
-        ))
-        .with_children(|parent| {
-            for slot in skeleton.slots().iter() {
-                let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-                make_cube(&mut mesh);
-                let mesh = meshes.add(mesh);
-                slots.insert(
-                    slot.data().name().to_owned(),
-                    parent
-                        .spawn_bundle((
-                            Mesh2dHandle(mesh.clone()),
-                            Transform::from_xyz(0., -400., 0.),
-                            GlobalTransform::default(),
-                            Visibility::default(),
-                            ComputedVisibility::default(),
-                            materials.add(ColorMaterial {
-                                color: Color::WHITE,
-                                texture: None,
-                            }),
-                        ))
-                        .id(),
-                );
-            }
-        })
-        .insert(Spine {
-            skeleton,
-            animation_state,
-            slots,
-            clipper: SkeletonClipping::new(),
-        });
-    commands.spawn_bundle(Camera2dBundle::default());
 }
 
-pub fn star_update(
+#[derive(Default)]
+struct DemoNextLocal {
+    current_index: usize,
+}
+
+fn demo_next(
+    mut ev_demo_load: EventWriter<DemoLoad>,
+    mut local: Local<DemoNextLocal>,
+    keys: Res<Input<KeyCode>>,
+    demos: Res<Demos>,
+) {
+    if keys.just_pressed(KeyCode::Space) {
+        local.current_index = (local.current_index + 1) % demos.0.len();
+        ev_demo_load.send(DemoLoad(local.current_index));
+    }
+}
+
+pub fn spine_update(
     mut spine_query: Query<&mut Spine>,
     colored_mesh2d: Query<(&Mesh2dHandle, &Handle<ColorMaterial>)>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -140,7 +235,10 @@ pub fn star_update(
                 let mut clip_vertices = vec![];
                 let mut clip_indices = vec![];
                 let mut clip_uvs = vec![];
+                let mut color = rusty_spine::color::Color::default();
                 if let Some(mesh_attachment) = slot.attachment().and_then(|a| a.as_mesh()) {
+                    color = *mesh_attachment.color();
+
                     let mut world_vertices = vec![];
                     world_vertices.resize(1000, 0.);
                     unsafe {
@@ -173,6 +271,8 @@ pub fn star_update(
                 } else if let Some(region_attachment) =
                     slot.attachment().and_then(|a| a.as_region())
                 {
+                    color = *region_attachment.color();
+
                     let mut world_vertices = vec![];
                     world_vertices.resize(1000, 0.);
                     unsafe {
@@ -195,7 +295,6 @@ pub fn star_update(
                     continue;
                 } else {
                     make_cube(mesh);
-                    clipper.clip_end(slot);
                     continue;
                 }
 
@@ -317,7 +416,19 @@ pub fn star_update(
                     } else {
                         None
                     };
+
+                    color.r *= slot.color().r * skeleton.color().r;
+                    color.g *= slot.color().g * skeleton.color().g;
+                    color.b *= slot.color().b * skeleton.color().b;
+                    color.a *= slot.color().a * skeleton.color().a;
+
                     color_material.texture = texture_path.map(|p| asset_server.load(p.as_str()));
+                    // TODO: figure out why colors are broken
+                    /*color_material.color.set_r(color.r);
+                    color_material.color.set_g(color.g);
+                    color_material.color.set_b(color.b);
+                    color_material.color.set_a(color.a);*/
+                    color_material.color = Color::WHITE;
                 }
             }
         }
@@ -326,15 +437,16 @@ pub fn star_update(
     }
 }
 
-fn load_skeleton() -> Result<(Skeleton, AnimationState, Arc<Atlas>), Error> {
-    let file = include_bytes!("../assets/spineboy/export/spineboy.atlas");
-    let dir = "../assets/spineboy/export/";
-    let atlas = Arc::new(Atlas::new(file, dir)?);
+fn load_skeleton(
+    atlas: &str,
+    json: &str,
+    dir: &str,
+) -> Result<(Skeleton, AnimationState, Arc<Atlas>), Error> {
+    let atlas_data = read(atlas).unwrap();
+    let atlas = Arc::new(Atlas::new(&atlas_data, dir)?);
+    let skeleton_data = read_to_string(json).unwrap();
     let skeleton_json = SkeletonJson::new(atlas.clone());
-    let skeleton_data = Arc::new(
-        skeleton_json
-            .read_skeleton_data(include_str!("../assets/spineboy/export/spineboy-pro.json"))?,
-    );
+    let skeleton_data = Arc::new(skeleton_json.read_skeleton_data(&skeleton_data)?);
     let animation_state_data = AnimationStateData::new(skeleton_data.clone());
     let skeleton = Skeleton::new(skeleton_data)?;
     let animation_state = AnimationState::new(Arc::new(animation_state_data));
