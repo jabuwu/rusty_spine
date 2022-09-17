@@ -1,25 +1,41 @@
 use std::sync::Arc;
 
 use crate::{
+    animation::Animation,
     atlas::Atlas,
     bone::BoneData,
-    c::{spBoneData, spSkeletonData, spSkeletonData_dispose},
+    c::{spAnimation, spBoneData, spSkeletonData, spSkeletonData_dispose, spSkin, spSlotData},
+    c_interface::NewFromPtr,
+    skin::Skin,
+    slot::SlotData,
     sync_ptr::SyncPtr,
 };
 
 #[derive(Debug)]
 pub struct SkeletonData {
     c_skeleton_data: SyncPtr<spSkeletonData>,
+    owns_memory: bool,
     // TODO: this atlas arc is kind of a hack
     // skeleton data should keep a reference to data it requires
     // but that will not be an atlas if a custom attachment loader is used
     _atlas: Option<Arc<Atlas>>,
 }
 
+impl NewFromPtr<spSkeletonData> for SkeletonData {
+    unsafe fn new_from_ptr(c_skeleton_data: *const spSkeletonData) -> Self {
+        Self {
+            c_skeleton_data: SyncPtr(c_skeleton_data as *mut spSkeletonData),
+            owns_memory: false,
+            _atlas: None,
+        }
+    }
+}
+
 impl SkeletonData {
     pub(crate) fn new(c_skeleton_data: *mut spSkeletonData, atlas: Option<Arc<Atlas>>) -> Self {
         Self {
             c_skeleton_data: SyncPtr(c_skeleton_data),
+            owns_memory: true,
             _atlas: atlas,
         }
     }
@@ -67,14 +83,49 @@ impl SkeletonData {
         bones,
         bones_count
     );
+    c_accessor_array!(
+        slots,
+        slots_mut,
+        slot_at_index,
+        slot_at_index_mut,
+        SkeletonData,
+        SlotData,
+        spSlotData,
+        slots,
+        slots_count
+    );
+    c_accessor_array!(
+        skins,
+        skins_mut,
+        skin_at_index,
+        skin_at_index_mut,
+        SkeletonData,
+        Skin,
+        spSkin,
+        skins,
+        skins_count
+    );
+    c_accessor_array!(
+        animations,
+        animations_mut,
+        animation_at_index,
+        animation_at_index_mut,
+        SkeletonData,
+        Animation,
+        spAnimation,
+        animations,
+        animations_count
+    );
 
     // TODO: accessors and methods for the arrays in spSkeletonData
 }
 
 impl Drop for SkeletonData {
     fn drop(&mut self) {
-        unsafe {
-            spSkeletonData_dispose(self.c_skeleton_data.0);
+        if self.owns_memory {
+            unsafe {
+                spSkeletonData_dispose(self.c_skeleton_data.0);
+            }
         }
     }
 }

@@ -801,7 +801,7 @@ unsafe fn spine_realloc(ptr: *mut c_void, size: size_t) -> *mut c_void {
 
 #[no_mangle]
 unsafe fn spine_free(ptr: *mut c_void) {
-    if !ptr.is_null() {
+    if !ptr.is_null() && ptr != 1 as *mut c_void {
         let singleton = Allocator::singleton();
         let mut allocator = singleton.lock().unwrap();
         allocator.free(ptr)

@@ -2,6 +2,7 @@ use crate::{
     c::{
         spClippingAttachment, spSkeletonClipping, spSkeletonClipping_clipEnd,
         spSkeletonClipping_clipEnd2, spSkeletonClipping_clipStart, spSkeletonClipping_create,
+        spSkeletonClipping_dispose,
     },
     clipping_attachment::ClippingAttachment,
     slot::Slot,
@@ -11,12 +12,14 @@ use crate::{
 #[derive(Debug)]
 pub struct SkeletonClipping {
     c_skeleton_clipping: SyncPtr<spSkeletonClipping>,
+    owns_memory: bool,
 }
 
 impl SkeletonClipping {
     pub fn new() -> Self {
         Self {
             c_skeleton_clipping: unsafe { SyncPtr(spSkeletonClipping_create()) },
+            owns_memory: true,
         }
     }
 
@@ -52,4 +55,14 @@ impl SkeletonClipping {
     spFloatArray *scratch;
     spClippingAttachment *clipAttachment;
     spArrayFloatArray *clippingPolygons;*/
+}
+
+impl Drop for SkeletonClipping {
+    fn drop(&mut self) {
+        if self.owns_memory {
+            unsafe {
+                spSkeletonClipping_dispose(self.c_skeleton_clipping.0);
+            }
+        }
+    }
 }

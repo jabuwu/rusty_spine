@@ -1,4 +1,4 @@
-use std::{collections::HashMap, ffi::CString, mem::take, sync::Arc};
+use std::{collections::HashMap, mem::take, sync::Arc};
 
 use bevy::{
     prelude::*,
@@ -8,7 +8,6 @@ use bevy::{
 use rusty_spine::{
     animation_state_data::AnimationStateData,
     atlas::Atlas,
-    c::spSkeleton_setSkinByName,
     error::Error,
     skeleton_controller::{CullDirection, SkeletonController, SkeletonControllerSettings},
     skeleton_json::SkeletonJson,
@@ -173,14 +172,11 @@ fn demo_load(
         }
         let demo = &demos.0[event.0];
         let mut controller = load_skeleton(&demo.atlas, &demo.json, &demo.dir).unwrap();
-        controller
+        let _ = controller
             .animation_state
             .set_animation_by_name(0, &demo.animation, true);
         if let Some(skin) = &demo.skin {
-            unsafe {
-                let c_skin = CString::new(skin.as_str()).unwrap();
-                spSkeleton_setSkinByName(controller.skeleton.c_ptr(), c_skin.as_ptr());
-            }
+            let _ = controller.skeleton.set_skin_by_name(skin);
         }
         let mut slots = HashMap::new();
         commands

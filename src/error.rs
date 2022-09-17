@@ -5,6 +5,7 @@ use std::ffi::NulError;
 pub enum Error {
     Spine(String),
     NulError(NulError),
+    NotFound,
 }
 
 impl Error {

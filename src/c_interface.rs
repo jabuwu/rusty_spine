@@ -40,7 +40,7 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.count {
-            let item = unsafe { T::new_from_ptr(*self.items.offset(1)) };
+            let item = unsafe { T::new_from_ptr(*self.items.offset(self.index as isize)) };
             self.index += 1;
             Some(TmpRef::new(self._parent, item))
         } else {
@@ -83,7 +83,7 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.count {
-            let item = unsafe { T::new_from_ptr(*self.items.offset(1)) };
+            let item = unsafe { T::new_from_ptr(*self.items.offset(self.index as isize)) };
             self.index += 1;
             Some(TmpRefMut::new(self._parent, item))
         } else {
@@ -266,7 +266,7 @@ macro_rules! c_accessor_passthrough {
         }
 
         pub fn $rust_mut(&mut self) -> $type_mut {
-            self.c_ptr_mut().$c
+            self.c_ptr_mut().$c as $type_mut
         }
     };
 }

@@ -17,12 +17,14 @@ use crate::{
 #[derive(Debug)]
 pub struct Atlas {
     c_atlas: SyncPtr<spAtlas>,
+    owns_memory: bool,
 }
 
 impl NewFromPtr<spAtlas> for Atlas {
     unsafe fn new_from_ptr(c_atlas: *const spAtlas) -> Atlas {
         Atlas {
             c_atlas: SyncPtr(c_atlas as *mut spAtlas),
+            owns_memory: true,
         }
     }
 }
@@ -82,8 +84,10 @@ impl Atlas {
 
 impl Drop for Atlas {
     fn drop(&mut self) {
-        unsafe {
-            spAtlas_dispose(self.c_atlas.0);
+        if self.owns_memory {
+            unsafe {
+                spAtlas_dispose(self.c_atlas.0);
+            }
         }
     }
 }

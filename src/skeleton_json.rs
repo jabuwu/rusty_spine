@@ -18,6 +18,7 @@ use crate::{
 #[derive(Debug)]
 pub struct SkeletonJson {
     c_skeleton_json: SyncPtr<spSkeletonJson>,
+    owns_memory: bool,
     atlas: Option<Arc<Atlas>>,
 }
 
@@ -26,6 +27,7 @@ impl SkeletonJson {
         let c_skeleton_json = unsafe { spSkeletonJson_create(atlas.c_ptr()) };
         Self {
             c_skeleton_json: SyncPtr(c_skeleton_json),
+            owns_memory: true,
             atlas: Some(atlas),
         }
     }
@@ -60,8 +62,10 @@ impl SkeletonJson {
 
 impl Drop for SkeletonJson {
     fn drop(&mut self) {
-        unsafe {
-            spSkeletonJson_dispose(self.c_skeleton_json.0);
+        if self.owns_memory {
+            unsafe {
+                spSkeletonJson_dispose(self.c_skeleton_json.0);
+            }
         }
     }
 }
