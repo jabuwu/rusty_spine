@@ -14,11 +14,11 @@ use crate::{
         spAnimationState_setEmptyAnimations, spAnimationState_update, spTrackEntry,
         spTrackEntry_getAnimationTime, spTrackEntry_getTrackComplete,
     },
+    c_interface::CTmpRef,
     c_interface::NewFromPtr,
     error::Error,
     skeleton::Skeleton,
     sync_ptr::SyncPtr,
-    tmp_ref::TmpRef,
 };
 
 #[derive(Debug)]
@@ -184,11 +184,11 @@ impl AnimationState {
         }
     }
 
-    pub fn get_current(&self, track_index: i32) -> Option<TmpRef<Self, TrackEntry>> {
+    pub fn get_current(&self, track_index: i32) -> Option<CTmpRef<Self, TrackEntry>> {
         unsafe {
             let ptr = spAnimationState_getCurrent(self.c_ptr(), track_index);
             if !ptr.is_null() {
-                Some(TmpRef::new(self, TrackEntry::new_from_ptr(ptr)))
+                Some(CTmpRef::new(self, TrackEntry::new_from_ptr(ptr), None))
             } else {
                 None
             }

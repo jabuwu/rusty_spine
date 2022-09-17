@@ -1,8 +1,8 @@
 use crate::{
     atlas::AtlasRegion,
     c::{c_void, spAtlasRegion},
+    c_interface::CTmpRef,
     c_interface::NewFromPtr,
-    tmp_ref::TmpRef,
 };
 
 pub struct RendererObject<'a> {
@@ -32,10 +32,11 @@ impl<'a> RendererObject<'a> {
         &mut *(*self.renderer_object as *mut T)
     }
 
-    pub unsafe fn get_atlas_region(&mut self) -> TmpRef<Self, AtlasRegion> {
-        TmpRef::new(
+    pub unsafe fn get_atlas_region(&mut self) -> CTmpRef<Self, AtlasRegion> {
+        CTmpRef::new(
             self,
             AtlasRegion::new_from_ptr(*self.renderer_object as *mut spAtlasRegion),
+            None,
         )
     }
 

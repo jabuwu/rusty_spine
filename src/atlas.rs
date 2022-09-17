@@ -5,10 +5,9 @@ use crate::c::{
     spAtlasFilter, spAtlasFormat, spAtlasRegion, spAtlasWrap, spAtlas_createFromFile,
     spTextureRegion,
 };
-use crate::c_interface::NewFromPtr;
+use crate::c_interface::{CTmpMut, CTmpRef, NewFromPtr};
 use crate::sync_ptr::SyncPtr;
 use crate::texture_region::TextureRegion;
-use crate::tmp_ref::{TmpRef, TmpRefMut};
 use crate::{
     c::{c_int, spAtlas, spAtlasPage, spAtlas_create, spAtlas_dispose},
     error::Error,
@@ -126,13 +125,13 @@ pub struct AtlasPageIterator<'a> {
 }
 
 impl<'a> Iterator for AtlasPageIterator<'a> {
-    type Item = TmpRef<'a, Atlas, AtlasPage>;
+    type Item = CTmpRef<'a, Atlas, AtlasPage>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.page.is_null() {
             let page = unsafe { AtlasPage::new_from_ptr(self.page) };
             self.page = unsafe { (*self.page).next };
-            Some(TmpRef::new(self._atlas, page))
+            Some(CTmpRef::new(self._atlas, page, None))
         } else {
             None
         }
@@ -145,13 +144,13 @@ pub struct AtlasPageMutIterator<'a> {
 }
 
 impl<'a> Iterator for AtlasPageMutIterator<'a> {
-    type Item = TmpRefMut<'a, Atlas, AtlasPage>;
+    type Item = CTmpMut<'a, Atlas, AtlasPage>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.page.is_null() {
             let page = unsafe { AtlasPage::new_from_ptr(self.page) };
             self.page = unsafe { (*self.page).next };
-            Some(TmpRefMut::new(self._atlas, page))
+            Some(CTmpMut::new(self._atlas, page, None))
         } else {
             None
         }
@@ -287,13 +286,13 @@ pub struct AtlasRegionIterator<'a> {
 }
 
 impl<'a> Iterator for AtlasRegionIterator<'a> {
-    type Item = TmpRef<'a, Atlas, AtlasRegion>;
+    type Item = CTmpRef<'a, Atlas, AtlasRegion>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.region.is_null() {
             let page = unsafe { AtlasRegion::new_from_ptr(self.region) };
             self.region = unsafe { (*self.region).next };
-            Some(TmpRef::new(self._atlas, page))
+            Some(CTmpRef::new(self._atlas, page, None))
         } else {
             None
         }
@@ -306,13 +305,13 @@ pub struct AtlasRegionMutIterator<'a> {
 }
 
 impl<'a> Iterator for AtlasRegionMutIterator<'a> {
-    type Item = TmpRefMut<'a, Atlas, AtlasRegion>;
+    type Item = CTmpMut<'a, Atlas, AtlasRegion>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.region.is_null() {
             let page = unsafe { AtlasRegion::new_from_ptr(self.region) };
             self.region = unsafe { (*self.region).next };
-            Some(TmpRefMut::new(self._atlas, page))
+            Some(CTmpMut::new(self._atlas, page, None))
         } else {
             None
         }

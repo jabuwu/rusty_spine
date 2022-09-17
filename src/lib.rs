@@ -25,7 +25,6 @@ pub mod skin;
 pub mod slot;
 pub mod sync_ptr;
 pub mod texture_region;
-pub mod tmp_ref;
 
 #[cfg(test)]
 pub mod tests;
