@@ -4,17 +4,21 @@ use crate::{
     animation::Animation,
     animation_state_data::AnimationStateData,
     c::{
-        spAnimationState, spAnimationStateData, spAnimationState_addAnimation,
+        spAnimation, spAnimationState, spAnimationStateData, spAnimationState_addAnimation,
         spAnimationState_addAnimationByName, spAnimationState_addEmptyAnimation,
         spAnimationState_apply, spAnimationState_clearListenerNotifications,
-        spAnimationState_clearTrack, spAnimationState_clearTracks, spAnimationState_create,
-        spAnimationState_dispose, spAnimationState_disposeStatics, spAnimationState_setAnimation,
+        spAnimationState_clearNext, spAnimationState_clearTrack, spAnimationState_clearTracks,
+        spAnimationState_create, spAnimationState_dispose, spAnimationState_disposeStatics,
+        spAnimationState_getCurrent, spAnimationState_setAnimation,
         spAnimationState_setAnimationByName, spAnimationState_setEmptyAnimation,
-        spAnimationState_setEmptyAnimations, spAnimationState_update,
+        spAnimationState_setEmptyAnimations, spAnimationState_update, spTrackEntry,
+        spTrackEntry_getAnimationTime, spTrackEntry_getTrackComplete,
     },
+    c_interface::NewFromPtr,
     error::Error,
     skeleton::Skeleton,
     sync_ptr::SyncPtr,
+    tmp_ref::TmpRef,
 };
 
 #[derive(Debug)]
@@ -178,7 +182,16 @@ impl AnimationState {
         }
     }
 
-    // TODO: SP_API spTrackEntry *spAnimationState_getCurrent(spAnimationState *self, int trackIndex);
+    pub fn get_current(&self, track_index: i32) -> Option<TmpRef<Self, TrackEntry>> {
+        unsafe {
+            let ptr = spAnimationState_getCurrent(self.c_ptr(), track_index);
+            if !ptr.is_null() {
+                Some(TmpRef::new(self, TrackEntry::new_from_ptr(ptr)))
+            } else {
+                None
+            }
+        }
+    }
 
     pub fn clear_listener_notifications(&mut self) {
         unsafe {
@@ -186,9 +199,11 @@ impl AnimationState {
         }
     }
 
-    // TODO: SP_API float spTrackEntry_getAnimationTime(spTrackEntry *entry);
-    // TODO: SP_API float spTrackEntry_getTrackComplete(spTrackEntry *entry);
-    // TODO: SP_API void spAnimationState_clearNext(spAnimationState *self, spTrackEntry *entry);
+    pub fn clear_next(&mut self, entry: &TrackEntry) {
+        unsafe {
+            spAnimationState_clearNext(self.c_ptr(), entry.c_ptr());
+        }
+    }
 
     c_ptr!(c_animation_state, spAnimationState);
     c_accessor_tmp_ptr!(
@@ -198,6 +213,26 @@ impl AnimationState {
         AnimationStateData,
         spAnimationStateData
     );
+    c_accessor!(tracks_count, tracks_count_mut, tracksCount, i32);
+    c_accessor_array!(
+        tracks,
+        tracks_mut,
+        track_at_index,
+        track_at_index_mut,
+        AnimationState,
+        TrackEntry,
+        spTrackEntry,
+        tracks,
+        tracks_count
+    );
+    c_accessor!(timescale, timescale_mut, timeScale, f32);
+    c_accessor!(unkeyed_state, unkeyed_state_mut, unkeyedState, i32);
+    c_accessor_renderer_object!();
+
+    /*TODO
+    spAnimationStateListener listener;
+    void *userData;
+    */
 
     pub fn dispose_statics() {
         unsafe {
@@ -214,4 +249,74 @@ impl Drop for AnimationState {
             }
         }
     }
+}
+
+#[derive(Debug)]
+pub struct TrackEntry {
+    c_track_entry: SyncPtr<spTrackEntry>,
+}
+
+impl NewFromPtr<spTrackEntry> for TrackEntry {
+    unsafe fn new_from_ptr(c_track_entry: *const spTrackEntry) -> Self {
+        Self {
+            c_track_entry: SyncPtr(c_track_entry as *mut spTrackEntry),
+        }
+    }
+}
+
+impl TrackEntry {
+    pub fn get_animation_time(&self) -> f32 {
+        unsafe { spTrackEntry_getAnimationTime(self.c_ptr()) }
+    }
+
+    pub fn get_track_complete(&self) -> f32 {
+        unsafe { spTrackEntry_getTrackComplete(self.c_ptr()) }
+    }
+
+    c_ptr!(c_track_entry, spTrackEntry);
+    c_accessor_tmp_ptr!(animation, animation_mut, animation, Animation, spAnimation);
+    c_accessor!(track_index, track_index_mut, trackIndex, i32);
+    c_accessor_bool!(looping, set_looping, loop_0);
+    c_accessor_bool!(hold_previous, set_hold_previous, holdPrevious);
+    c_accessor_bool!(reverse, set_reverse, reverse);
+    c_accessor_bool!(shortest_rotation, set_shortest_rotation, shortestRotation);
+    c_accessor!(event_threshold, event_threshold_mut, eventThreshold, f32);
+    c_accessor!(
+        attachment_threshold,
+        attachment_threshold_mut,
+        attachmentThreshold,
+        f32
+    );
+    c_accessor!(
+        draw_order_threshold,
+        draw_order_threshold_mut,
+        drawOrderThreshold,
+        f32
+    );
+    c_accessor!(delay, delay_mut, delay, f32);
+    c_accessor!(track_time, track_time_mut, trackTime, f32);
+    c_accessor!(track_last, track_last_mut, trackLast, f32);
+    c_accessor!(next_track_last, next_track_last_mut, nextTrackLast, f32);
+    c_accessor!(track_end, track_end_mut, trackEnd, f32);
+    c_accessor!(timescale, timescale_mut, timeScale, f32);
+    c_accessor!(alpha, alpha_mut, alpha, f32);
+    c_accessor!(mix_time, mix_time_mut, mixTime, f32);
+    c_accessor!(mix_duration, mix_duration_mut, mixDuration, f32);
+    c_accessor!(interrupt_alpha, interrupt_alpha_mut, interruptAlpha, f32);
+    c_accessor!(total_alpha, total_alpha_mut, totalAlpha, f32);
+
+    /*TODO
+    spAnimation *animation;
+    spTrackEntry *previous;
+    spTrackEntry *next;
+    spTrackEntry *mixingFrom;
+    spTrackEntry *mixingTo;
+    spAnimationStateListener listener;
+    spMixBlend mixBlend;
+    spIntArray *timelineMode;
+    spTrackEntryArray *timelineHoldMix;
+    float *timelinesRotation;
+    int timelinesRotationCount;
+    void *rendererObject;
+    void *userData;*/
 }
