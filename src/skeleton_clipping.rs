@@ -8,6 +8,7 @@ use crate::{
     sync_ptr::SyncPtr,
 };
 
+#[derive(Debug)]
 pub struct SkeletonClipping {
     c_skeleton_clipping: SyncPtr<spSkeletonClipping>,
 }

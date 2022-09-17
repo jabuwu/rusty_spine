@@ -13,10 +13,53 @@ use crate::{
     skeleton_data::SkeletonData,
 };
 
+#[derive(Debug)]
 pub struct SkeletonController {
     pub skeleton: Skeleton,
     pub animation_state: AnimationState,
     pub clipper: SkeletonClipping,
+    pub settings: SkeletonControllerSettings,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SkeletonControllerSettings {
+    pub premultiplied_alpha: bool,
+    pub cull_direction: CullDirection,
+}
+
+impl Default for SkeletonControllerSettings {
+    fn default() -> Self {
+        Self {
+            premultiplied_alpha: false,
+            cull_direction: CullDirection::Clockwise,
+        }
+    }
+}
+
+impl SkeletonControllerSettings {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn with_premultiplied_alpha(self, premultiplied_alpha: bool) -> Self {
+        Self {
+            premultiplied_alpha,
+            ..self
+        }
+    }
+
+    pub fn with_cull_direction(self, cull_direction: CullDirection) -> Self {
+        Self {
+            cull_direction,
+            ..self
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CullDirection {
+    Clockwise,
+    CounterClockwise,
 }
 
 impl SkeletonController {
@@ -33,7 +76,12 @@ impl SkeletonController {
             skeleton,
             animation_state: AnimationState::new(animation_state_data),
             clipper: SkeletonClipping::new(),
+            settings: SkeletonControllerSettings::default(),
         }
+    }
+
+    pub fn with_settings(self, settings: SkeletonControllerSettings) -> Self {
+        Self { settings, ..self }
     }
 
     pub fn update(&mut self, delta_seconds: f32) {
@@ -175,11 +223,13 @@ impl SkeletonController {
                 }
             }
 
-            for i in 0..indices.len() / 3 {
-                let a = indices[i * 3 + 1];
-                indices[i * 3] = indices[i * 3];
-                indices[i * 3 + 1] = indices[i * 3 + 2];
-                indices[i * 3 + 2] = a;
+            if self.settings.cull_direction == CullDirection::CounterClockwise {
+                for i in 0..indices.len() / 3 {
+                    let a = indices[i * 3 + 1];
+                    indices[i * 3] = indices[i * 3];
+                    indices[i * 3 + 1] = indices[i * 3 + 2];
+                    indices[i * 3 + 2] = a;
+                }
             }
 
             self.clipper.clip_end(&slot);
@@ -219,6 +269,8 @@ impl SkeletonController {
                 uvs,
                 indices,
                 color,
+                blend_mode: BlendMode::Normal,
+                premultiplied_alpha: self.settings.premultiplied_alpha,
                 attachment_renderer_object,
             });
         }
@@ -227,11 +279,22 @@ impl SkeletonController {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct SkeletonRenderable {
     pub slot_index: usize,
     pub vertices: Vec<[f32; 3]>,
     pub uvs: Vec<[f32; 2]>,
     pub indices: Vec<u32>,
     pub color: Color,
+    pub blend_mode: BlendMode,
+    pub premultiplied_alpha: bool,
     pub attachment_renderer_object: Option<*const c_void>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BlendMode {
+    Normal,
+    Additive,
+    Multiply,
+    Screen,
 }

@@ -6,8 +6,12 @@ use bevy::{
     sprite::Mesh2dHandle,
 };
 use rusty_spine::{
-    animation_state_data::AnimationStateData, atlas::Atlas, c::spSkeleton_setSkinByName,
-    error::Error, skeleton_controller::SkeletonController, skeleton_json::SkeletonJson,
+    animation_state_data::AnimationStateData,
+    atlas::Atlas,
+    c::spSkeleton_setSkinByName,
+    error::Error,
+    skeleton_controller::{CullDirection, SkeletonController, SkeletonControllerSettings},
+    skeleton_json::SkeletonJson,
 };
 
 #[derive(Component)]
@@ -286,5 +290,9 @@ fn load_skeleton(atlas: &Vec<u8>, json: &Vec<u8>, dir: &str) -> Result<SkeletonC
     let skeleton_json = SkeletonJson::new(atlas.clone());
     let skeleton_data = Arc::new(skeleton_json.read_skeleton_data(json)?);
     let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
-    Ok(SkeletonController::new(skeleton_data, animation_state_data))
+    Ok(
+        SkeletonController::new(skeleton_data, animation_state_data).with_settings(
+            SkeletonControllerSettings::new().with_cull_direction(CullDirection::CounterClockwise),
+        ),
+    )
 }

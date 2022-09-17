@@ -12,6 +12,7 @@ pub mod color;
 pub mod error;
 pub mod extension;
 pub mod mesh_attachment;
+pub mod prelude;
 pub mod region_attachment;
 pub mod renderer_object;
 pub mod skeleton;
