@@ -178,7 +178,7 @@ impl<'a, P, T> CTmpMut<'a, P, T> {
         }
     }
 
-    pub fn keep(self) -> CMut<T> {
+    pub unsafe fn keep(self) -> CMut<T> {
         if let Some(validator) = self.validator {
             validator.create_mut(self.data)
         } else {
