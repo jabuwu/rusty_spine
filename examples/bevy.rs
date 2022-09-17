@@ -1,4 +1,4 @@
-use std::{collections::HashMap, mem::take, sync::Arc};
+use std::{collections::HashMap, ffi::CString, mem::take, sync::Arc};
 
 use bevy::{
     prelude::*,
@@ -6,8 +6,8 @@ use bevy::{
     sprite::Mesh2dHandle,
 };
 use rusty_spine::{
-    animation_state_data::AnimationStateData, atlas::Atlas, error::Error,
-    skeleton_controller::SkeletonController, skeleton_json::SkeletonJson,
+    animation_state_data::AnimationStateData, atlas::Atlas, c::spSkeleton_setSkinByName,
+    error::Error, skeleton_controller::SkeletonController, skeleton_json::SkeletonJson,
 };
 
 #[derive(Component)]
@@ -27,6 +27,7 @@ struct Demo {
     animation: String,
     position: Vec2,
     scale: f32,
+    skin: Option<String>,
 }
 
 struct Demos(Vec<Demo>);
@@ -66,6 +67,7 @@ fn main() {
                 animation: "portal".to_owned(),
                 position: Vec2::new(0., -400.),
                 scale: 0.5,
+                skin: None,
             },
             Demo {
                 atlas: include_bytes!("../assets/windmill/export/windmill.atlas").to_vec(),
@@ -74,6 +76,7 @@ fn main() {
                 animation: "animation".to_owned(),
                 position: Vec2::new(0., -150.),
                 scale: 0.5,
+                skin: None,
             },
             Demo {
                 atlas: include_bytes!("../assets/alien/export/alien.atlas").to_vec(),
@@ -82,6 +85,7 @@ fn main() {
                 animation: "death".to_owned(),
                 position: Vec2::new(0., -600.),
                 scale: 0.25,
+                skin: None,
             },
             Demo {
                 atlas: include_bytes!("../assets/coin/export/coin.atlas").to_vec(),
@@ -90,6 +94,7 @@ fn main() {
                 animation: "animation".to_owned(),
                 position: Vec2::new(0., 0.),
                 scale: 0.75,
+                skin: None,
             },
             /*TODO: figure out why dragon crashes - Demo {
                 atlas: "assets/dragon/export/dragon.atlas".to_owned(),
@@ -99,6 +104,33 @@ fn main() {
                 position: Vec2::new(0., 0.),
                 scale: 0.75,
             },*/
+            Demo {
+                atlas: include_bytes!("../assets/goblins/export/goblins.atlas").to_vec(),
+                json: include_bytes!("../assets/goblins/export/goblins-pro.json").to_vec(),
+                dir: "goblins/export/".to_owned(),
+                animation: "walk".to_owned(),
+                position: Vec2::new(0., -200.),
+                scale: 1.,
+                skin: Some("goblingirl".to_owned()),
+            },
+            Demo {
+                atlas: include_bytes!("../assets/stretchyman/export/stretchyman.atlas").to_vec(),
+                json: include_bytes!("../assets/stretchyman/export/stretchyman-pro.json").to_vec(),
+                dir: "stretchyman/export/".to_owned(),
+                animation: "sneak".to_owned(),
+                position: Vec2::new(-700., -250.),
+                scale: 0.75,
+                skin: None,
+            },
+            Demo {
+                atlas: include_bytes!("../assets/tank/export/tank.atlas").to_vec(),
+                json: include_bytes!("../assets/tank/export/tank-pro.json").to_vec(),
+                dir: "tank/export/".to_owned(),
+                animation: "drive".to_owned(),
+                position: Vec2::new(3500., -850.),
+                scale: 0.3,
+                skin: None,
+            },
         ]))
         .add_event::<DemoLoad>()
         .add_plugins(DefaultPlugins)
@@ -131,6 +163,12 @@ fn demo_load(
         controller
             .animation_state
             .set_animation_by_name(0, &demo.animation, true);
+        if let Some(skin) = &demo.skin {
+            unsafe {
+                let c_skin = CString::new(skin.as_str()).unwrap();
+                spSkeleton_setSkinByName(controller.skeleton.c_ptr(), c_skin.as_ptr());
+            }
+        }
         let mut slots = HashMap::new();
         commands
             .spawn_bundle((
