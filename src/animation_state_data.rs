@@ -45,7 +45,7 @@ impl AnimationStateData {
         SkeletonData,
         spSkeletonData
     );
-    c_accessor!(default_mix, default_mix_mut, defaultMix, f32);
+    c_accessor!(default_mix, set_default_mix, defaultMix, f32);
     c_accessor_passthrough!(entries, entries_mut, entries, *const c_void, *mut c_void);
 }
 

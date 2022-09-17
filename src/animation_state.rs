@@ -28,6 +28,8 @@ pub struct AnimationState {
     _animation_state_data: Arc<AnimationStateData>,
 }
 
+// TODO: track entries are going to require their own memory management solution
+// they can be disposed when finished (and an event is fired)
 impl AnimationState {
     pub fn new(animation_state_data: Arc<AnimationStateData>) -> Self {
         let c_animation_state = unsafe { spAnimationState_create(animation_state_data.c_ptr()) };
@@ -213,7 +215,7 @@ impl AnimationState {
         AnimationStateData,
         spAnimationStateData
     );
-    c_accessor!(tracks_count, tracks_count_mut, tracksCount, i32);
+    c_accessor!(tracks_count, set_tracks_count, tracksCount, i32);
     c_accessor_array!(
         tracks,
         tracks_mut,
@@ -225,8 +227,8 @@ impl AnimationState {
         tracks,
         tracks_count
     );
-    c_accessor!(timescale, timescale_mut, timeScale, f32);
-    c_accessor!(unkeyed_state, unkeyed_state_mut, unkeyedState, i32);
+    c_accessor!(timescale, set_timescale, timeScale, f32);
+    c_accessor!(unkeyed_state, set_unkeyed_state, unkeyedState, i32);
     c_accessor_renderer_object!();
 
     /*TODO
@@ -275,35 +277,35 @@ impl TrackEntry {
 
     c_ptr!(c_track_entry, spTrackEntry);
     c_accessor_tmp_ptr!(animation, animation_mut, animation, Animation, spAnimation);
-    c_accessor!(track_index, track_index_mut, trackIndex, i32);
+    c_accessor!(track_index, set_track_index, trackIndex, i32);
     c_accessor_bool!(looping, set_looping, loop_0);
     c_accessor_bool!(hold_previous, set_hold_previous, holdPrevious);
     c_accessor_bool!(reverse, set_reverse, reverse);
     c_accessor_bool!(shortest_rotation, set_shortest_rotation, shortestRotation);
-    c_accessor!(event_threshold, event_threshold_mut, eventThreshold, f32);
+    c_accessor!(event_threshold, set_event_threshold, eventThreshold, f32);
     c_accessor!(
         attachment_threshold,
-        attachment_threshold_mut,
+        set_attachment_threshold,
         attachmentThreshold,
         f32
     );
     c_accessor!(
         draw_order_threshold,
-        draw_order_threshold_mut,
+        set_draw_order_threshold,
         drawOrderThreshold,
         f32
     );
-    c_accessor!(delay, delay_mut, delay, f32);
-    c_accessor!(track_time, track_time_mut, trackTime, f32);
-    c_accessor!(track_last, track_last_mut, trackLast, f32);
-    c_accessor!(next_track_last, next_track_last_mut, nextTrackLast, f32);
-    c_accessor!(track_end, track_end_mut, trackEnd, f32);
-    c_accessor!(timescale, timescale_mut, timeScale, f32);
-    c_accessor!(alpha, alpha_mut, alpha, f32);
-    c_accessor!(mix_time, mix_time_mut, mixTime, f32);
-    c_accessor!(mix_duration, mix_duration_mut, mixDuration, f32);
-    c_accessor!(interrupt_alpha, interrupt_alpha_mut, interruptAlpha, f32);
-    c_accessor!(total_alpha, total_alpha_mut, totalAlpha, f32);
+    c_accessor!(delay, set_delay, delay, f32);
+    c_accessor!(track_time, set_track_time, trackTime, f32);
+    c_accessor!(track_last, set_track_last, trackLast, f32);
+    c_accessor!(next_track_last, set_next_track_last, nextTrackLast, f32);
+    c_accessor!(track_end, set_track_end, trackEnd, f32);
+    c_accessor!(timescale, set_timescale, timeScale, f32);
+    c_accessor!(alpha, set_alpha, alpha, f32);
+    c_accessor!(mix_time, set_mix_time, mixTime, f32);
+    c_accessor!(mix_duration, set_mix_duration, mixDuration, f32);
+    c_accessor!(interrupt_alpha, set_interrupt_alpha, interruptAlpha, f32);
+    c_accessor!(total_alpha, set_total_alpha, totalAlpha, f32);
 
     /*TODO
     spAnimation *animation;

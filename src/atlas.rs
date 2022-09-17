@@ -114,8 +114,8 @@ impl AtlasPage {
     c_accessor_enum!(mag_filter, set_mag_filter, magFilter, AtlasFilter);
     c_accessor_enum!(u_wrap, set_u_wrap, uWrap, AtlasWrap);
     c_accessor_enum!(v_wrap, set_v_wrap, vWrap, AtlasWrap);
-    c_accessor!(width, width_mut, width, i32);
-    c_accessor!(height, height_mut, height, i32);
+    c_accessor!(width, set_width, width, i32);
+    c_accessor!(height, set_height, height, i32);
     c_accessor_bool!(pma, set_pma, pma);
     c_accessor_renderer_object!();
 }
@@ -253,9 +253,9 @@ impl AtlasRegion {
         spTextureRegion
     );
     c_accessor_string!(name, name);
-    c_accessor!(x, x_mut, x, i32);
-    c_accessor!(y, y_mut, y, i32);
-    c_accessor!(index, index_mut, index, i32);
+    c_accessor!(x, set_x, x, i32);
+    c_accessor!(y, set_y, y, i32);
+    c_accessor!(index, set_index, index, i32);
     c_accessor_passthrough!(splits, splits_mut, splits, *const c_int, *mut c_int);
     c_accessor_passthrough!(pads, pads_mut, pads, *const c_int, *mut c_int);
     c_accessor_tmp_ptr!(page, page_mut, page, AtlasPage, spAtlasPage);

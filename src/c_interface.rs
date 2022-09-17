@@ -112,20 +112,20 @@ macro_rules! c_ptr {
 }
 
 macro_rules! c_accessor {
-    ($rust:ident, $rust_mut:ident, $c:ident, $type:ty) => {
-        c_accessor_for!(c_ptr_ref, c_ptr_mut, $rust, $rust_mut, $c, $type);
+    ($rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
+        c_accessor_for!(c_ptr_ref, c_ptr_mut, $rust, $rust_set, $c, $type);
     };
 }
 
 macro_rules! c_accessor_for {
-    ($for:ident, $for_mut:ident, $rust:ident, $rust_mut:ident, $c:ident, $type:ty) => {
+    ($for:ident, $for_mut:ident, $rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
         #[inline]
         pub fn $rust(&self) -> $type {
             self.$for().$c
         }
         #[inline]
-        pub fn $rust_mut(&mut self) -> &mut $type {
-            &mut self.$for_mut().$c
+        pub fn $rust_set(&mut self, value: $type) {
+            self.$for_mut().$c = value;
         }
     };
 }

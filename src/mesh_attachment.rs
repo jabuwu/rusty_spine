@@ -36,10 +36,10 @@ impl MeshAttachment {
     c_vertex_attachment_accessors!(super_0.super_0);
     c_accessor_string!(path, path);
     c_accessor_color!(color, color_mut, color);
-    c_accessor!(hull_length, hull_length_mut, hullLength, i32);
-    c_accessor!(width, width_mut, width, f32);
-    c_accessor!(height, height_mut, height, f32);
-    c_accessor!(triangles_count, triangles_count_mut, trianglesCount, i32);
+    c_accessor!(hull_length, set_hull_length, hullLength, i32);
+    c_accessor!(width, set_width, width, f32);
+    c_accessor!(height, set_height, height, f32);
+    c_accessor!(triangles_count, set_triangles_count, trianglesCount, i32);
     c_accessor_renderer_object!();
     c_accessor_tmp_ptr!(region, region_mut, region, TextureRegion, spTextureRegion);
     c_accessor_tmp_ptr!(
