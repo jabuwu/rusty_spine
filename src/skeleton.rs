@@ -8,7 +8,7 @@ use crate::{
         spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose, spSkeleton_updateCache,
         spSkeleton_updateWorldTransform, spSlot,
     },
-    c_interface::CRefValidator,
+    c_interface::{CRefValidate, CRefValidator},
     error::Error,
     skeleton_data::SkeletonData,
     skin::Skin,
@@ -20,7 +20,7 @@ use crate::{
 pub struct Skeleton {
     c_skeleton: SyncPtr<spSkeleton>,
     owns_memory: bool,
-    validator: CRefValidator,
+    validator: CRefValidator<Skeleton>,
     _skeleton_data: Arc<SkeletonData>,
 }
 
@@ -163,6 +163,12 @@ impl Drop for Skeleton {
                 spSkeleton_dispose(self.c_skeleton.0);
             }
         }
+    }
+}
+
+impl CRefValidate for Skeleton {
+    fn validate(&self, id: u32) -> bool {
+        self.validator.check(id)
     }
 }
 

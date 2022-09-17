@@ -1,62 +1,97 @@
 use std::marker::PhantomData;
 
 use std::ops::{Deref, DerefMut};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 
 pub trait NewFromPtr<C> {
     unsafe fn new_from_ptr(c_ptr: *const C) -> Self;
 }
 
-#[derive(Debug, Clone)]
-pub struct CRefValidator {
-    valid: Arc<AtomicBool>,
+#[derive(Debug)]
+pub struct CRefValidator<P> {
+    id: Arc<AtomicU32>,
+    _marker: PhantomData<P>,
 }
 
-impl CRefValidator {
+impl<P> CRefValidator<P> {
     pub fn new() -> Self {
+        static NEXT_ID: AtomicU32 = AtomicU32::new(1);
+        let id = NEXT_ID.fetch_add(1, Ordering::SeqCst);
         Self {
-            valid: Arc::new(AtomicBool::new(true)),
+            id: Arc::new(AtomicU32::new(id)),
+            _marker: Default::default(),
         }
+    }
+
+    pub fn check(&self, id: u32) -> bool {
+        self.id.load(Ordering::SeqCst) == id
     }
 
     pub fn invalidate(&mut self) {
-        self.valid.store(false, Ordering::SeqCst);
+        self.id.store(0, Ordering::SeqCst);
     }
 
-    pub fn create_ref<T>(&self, value: T) -> CRef<T> {
+    pub fn create_ref<T>(&self, value: T) -> CRef<P, T> {
         CRef {
-            valid: self.valid.clone(),
+            id: self.id.clone(),
             value,
+            _marker: Default::default(),
         }
     }
 
-    pub fn create_mut<T>(&self, value: T) -> CMut<T> {
+    pub fn create_mut<T>(&self, value: T) -> CMut<P, T> {
         CMut {
-            valid: self.valid.clone(),
+            id: self.id.clone(),
             value,
+            _marker: Default::default(),
         }
     }
 }
 
-pub struct CRef<T> {
-    valid: Arc<AtomicBool>,
-    value: T,
+impl<P> Clone for CRefValidator<P> {
+    fn clone(&self) -> Self {
+        Self {
+            id: self.id.clone(),
+            _marker: Default::default(),
+        }
+    }
 }
 
-impl<T> CRef<T> {
+pub trait CRefValidate {
+    fn validate(&self, id: u32) -> bool;
+}
+
+pub struct CRef<P, T> {
+    id: Arc<AtomicU32>,
+    value: T,
+    _marker: PhantomData<P>,
+}
+
+impl<P, T> CRef<P, T> {
     pub(crate) fn new_bad(value: T) -> Self {
         Self {
-            valid: Arc::new(AtomicBool::new(false)),
+            id: Arc::new(AtomicU32::new(0)),
             value,
+            _marker: Default::default(),
         }
     }
 
     pub fn is_valid(&self) -> bool {
-        self.valid.load(Ordering::SeqCst)
+        self.id.load(Ordering::SeqCst) != 0
+    }
+}
+
+impl<P: CRefValidate, T> CRef<P, T> {
+    pub fn get(&self, parent: &P) -> Option<&T> {
+        if self.is_valid() && parent.validate(self.id.load(Ordering::SeqCst)) {
+            Some(&self.value)
+        } else {
+            None
+        }
     }
 
-    pub fn get(&self) -> Option<&T> {
+    pub unsafe fn get_unchecked(&self) -> Option<&T> {
         if self.is_valid() {
             Some(&self.value)
         } else {
@@ -65,7 +100,7 @@ impl<T> CRef<T> {
     }
 }
 
-impl<T: std::fmt::Debug> std::fmt::Debug for CRef<T> {
+impl<P, T: std::fmt::Debug> std::fmt::Debug for CRef<P, T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.is_valid() {
             f.write_str("CRef(")?;
@@ -77,24 +112,36 @@ impl<T: std::fmt::Debug> std::fmt::Debug for CRef<T> {
     }
 }
 
-pub struct CMut<T> {
-    valid: Arc<AtomicBool>,
+pub struct CMut<P, T> {
+    id: Arc<AtomicU32>,
     value: T,
+    _marker: PhantomData<P>,
 }
 
-impl<T> CMut<T> {
+impl<P, T> CMut<P, T> {
     pub(crate) fn new_bad(value: T) -> Self {
         Self {
-            valid: Arc::new(AtomicBool::new(false)),
+            id: Arc::new(AtomicU32::new(0)),
             value,
+            _marker: Default::default(),
         }
     }
 
     pub fn is_valid(&self) -> bool {
-        self.valid.load(Ordering::SeqCst)
+        self.id.load(Ordering::SeqCst) != 0
+    }
+}
+
+impl<P: CRefValidate, T> CMut<P, T> {
+    pub fn get(&self, parent: &P) -> Option<&T> {
+        if self.is_valid() && parent.validate(self.id.load(Ordering::SeqCst)) {
+            Some(&self.value)
+        } else {
+            None
+        }
     }
 
-    pub fn get(&self) -> Option<&T> {
+    pub unsafe fn get_unchecked(&self) -> Option<&T> {
         if self.is_valid() {
             Some(&self.value)
         } else {
@@ -102,7 +149,15 @@ impl<T> CMut<T> {
         }
     }
 
-    pub fn get_mut(&mut self) -> Option<&mut T> {
+    pub fn get_mut(&mut self, parent: &mut P) -> Option<&mut T> {
+        if self.is_valid() && parent.validate(self.id.load(Ordering::SeqCst)) {
+            Some(&mut self.value)
+        } else {
+            None
+        }
+    }
+
+    pub unsafe fn get_unchecked_mut(&mut self) -> Option<&mut T> {
         if self.is_valid() {
             Some(&mut self.value)
         } else {
@@ -111,7 +166,7 @@ impl<T> CMut<T> {
     }
 }
 
-impl<T: std::fmt::Debug> std::fmt::Debug for CMut<T> {
+impl<P, T: std::fmt::Debug> std::fmt::Debug for CMut<P, T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.is_valid() {
             f.write_str("CMut(")?;
@@ -125,12 +180,12 @@ impl<T: std::fmt::Debug> std::fmt::Debug for CMut<T> {
 
 pub struct CTmpRef<'a, P, T> {
     data: T,
-    validator: Option<CRefValidator>,
+    validator: Option<CRefValidator<P>>,
     _parent: &'a P,
 }
 
 impl<'a, P, T> CTmpRef<'a, P, T> {
-    pub fn new(parent: &'a P, data: T, validator: Option<CRefValidator>) -> Self {
+    pub fn new(parent: &'a P, data: T, validator: Option<CRefValidator<P>>) -> Self {
         Self {
             data,
             validator,
@@ -138,7 +193,7 @@ impl<'a, P, T> CTmpRef<'a, P, T> {
         }
     }
 
-    pub fn keep(self) -> CRef<T> {
+    pub fn keep(self) -> CRef<P, T> {
         if let Some(validator) = self.validator {
             validator.create_ref(self.data)
         } else {
@@ -165,12 +220,12 @@ impl<'a, P, T: std::fmt::Debug> std::fmt::Debug for CTmpRef<'a, P, T> {
 
 pub struct CTmpMut<'a, P, T> {
     data: T,
-    validator: Option<CRefValidator>,
+    validator: Option<CRefValidator<P>>,
     _parent: &'a P,
 }
 
 impl<'a, P, T> CTmpMut<'a, P, T> {
-    pub fn new(parent: &'a P, data: T, validator: Option<CRefValidator>) -> Self {
+    pub fn new(parent: &'a P, data: T, validator: Option<CRefValidator<P>>) -> Self {
         Self {
             data,
             validator,
@@ -178,7 +233,7 @@ impl<'a, P, T> CTmpMut<'a, P, T> {
         }
     }
 
-    pub unsafe fn keep(self) -> CMut<T> {
+    pub fn keep(self) -> CMut<P, T> {
         if let Some(validator) = self.validator {
             validator.create_mut(self.data)
         } else {
@@ -217,7 +272,7 @@ where
     items: *mut *mut C,
     index: usize,
     count: usize,
-    validator: Option<CRefValidator>,
+    validator: Option<CRefValidator<P>>,
     _marker: PhantomData<T>,
 }
 
@@ -229,7 +284,7 @@ where
         parent: &'a P,
         items: *mut *mut C,
         count: usize,
-        validator: Option<CRefValidator>,
+        validator: Option<CRefValidator<P>>,
     ) -> Self {
         Self {
             _parent: parent,
@@ -267,7 +322,7 @@ where
     items: *mut *mut C,
     index: usize,
     count: usize,
-    validator: Option<CRefValidator>,
+    validator: Option<CRefValidator<P>>,
     _marker: PhantomData<T>,
 }
 
@@ -279,7 +334,7 @@ where
         parent: &'a P,
         items: *mut *mut C,
         count: usize,
-        validator: Option<CRefValidator>,
+        validator: Option<CRefValidator<P>>,
     ) -> Self {
         Self {
             _parent: parent,
@@ -608,7 +663,7 @@ macro_rules! c_accessor_array_validated {
                             *self.c_ptr_ref().$c.offset(index as isize),
                         )
                     },
-                    None,
+                    Some(self.$validator.clone()),
                 ))
             } else {
                 None
@@ -627,7 +682,7 @@ macro_rules! c_accessor_array_validated {
                             *self.c_ptr_mut().$c.offset(index as isize),
                         )
                     },
-                    None,
+                    Some(self.$validator.clone()),
                 ))
             } else {
                 None
