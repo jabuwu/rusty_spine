@@ -44,11 +44,13 @@ impl SkeletonController {
 
     pub fn renderables(&mut self) -> Vec<SkeletonRenderable> {
         let mut renderables = vec![];
-        let draw_order = self.skeleton.draw_order();
-        for slot_index in 0..self.skeleton.slots().len() {
-            let slot = &draw_order[slot_index];
+        for slot_index in 0..self.skeleton.slots_count() {
+            let slot = self
+                .skeleton
+                .draw_order_at_index(slot_index as usize)
+                .unwrap();
             if !slot.bone().active() {
-                self.clipper.clip_end(slot);
+                self.clipper.clip_end(&slot);
                 continue;
             }
 
@@ -64,7 +66,7 @@ impl SkeletonController {
                 world_vertices.resize(1000, 0.);
                 unsafe {
                     mesh_attachment.compute_world_vertices(
-                        slot,
+                        &slot,
                         0,
                         mesh_attachment.world_vertices_length(),
                         &mut world_vertices,
@@ -93,7 +95,7 @@ impl SkeletonController {
                 let mut world_vertices = vec![];
                 world_vertices.resize(1000, 0.);
                 unsafe {
-                    region_attachment.compute_world_vertices(slot, &mut world_vertices, 0, 2);
+                    region_attachment.compute_world_vertices(&slot, &mut world_vertices, 0, 2);
                 }
 
                 for i in 0..4 {
@@ -108,10 +110,10 @@ impl SkeletonController {
             } else if let Some(clipping_attachment) =
                 slot.attachment().and_then(|a| a.as_clipping())
             {
-                self.clipper.clip_start(slot, &clipping_attachment);
+                self.clipper.clip_start(&slot, &clipping_attachment);
                 continue;
             } else {
-                self.clipper.clip_end(slot);
+                self.clipper.clip_end(&slot);
                 continue;
             }
 
@@ -180,7 +182,7 @@ impl SkeletonController {
                 indices[i * 3 + 2] = a;
             }
 
-            self.clipper.clip_end(slot);
+            self.clipper.clip_end(&slot);
 
             let attachment_renderer_object = if let Some(mesh_attachment) =
                 slot.attachment().and_then(|a| a.as_mesh())
@@ -212,7 +214,7 @@ impl SkeletonController {
             color.a *= slot.c_ptr_mut().color.a * self.skeleton.c_ptr_mut().color.a;
 
             renderables.push(SkeletonRenderable {
-                slot_index,
+                slot_index: slot_index as usize,
                 vertices,
                 uvs,
                 indices,

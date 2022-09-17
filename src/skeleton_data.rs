@@ -24,6 +24,16 @@ impl SkeletonData {
     }
 
     c_ptr!(c_skeleton_data, spSkeletonData);
+    c_accessor_string!(version, version);
+    c_accessor_string!(hash, hash);
+    c_accessor_string!(images_path, imagesPath);
+    c_accessor_string!(audio_path, audioPath);
+    c_accessor!(x, x_mut, x, f32);
+    c_accessor!(y, y_mut, y, f32);
+    c_accessor!(width, width_mut, width, f32);
+    c_accessor!(height, height_mut, height, f32);
+
+    // TODO: accessors and methods for the arrays in spSkeletonData
 }
 
 impl Drop for SkeletonData {

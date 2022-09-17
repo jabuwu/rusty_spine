@@ -1,4 +1,5 @@
 use std::ffi::CStr;
+use std::fs::read;
 use std::sync::{Arc, Mutex, Once};
 
 use crate::c::{c_int, c_void, size_t};
@@ -96,6 +97,16 @@ extern "C" fn _spUtil_readFile(c_path: *const c_char, c_length: *mut c_int) -> *
             std::ptr::null_mut()
         }
     } else {
-        std::ptr::null_mut()
+        let str = unsafe { CStr::from_ptr(c_path).to_str().unwrap().to_owned() };
+        if let Ok(data) = read(str) {
+            let c_data = unsafe { spine_malloc(data.len() as size_t) };
+            unsafe {
+                spine_memcpy(c_data, data.as_ptr() as *const c_void, data.len() as size_t);
+                *c_length = data.len() as c_int;
+            }
+            c_data as *mut c_char
+        } else {
+            std::ptr::null_mut()
+        }
     }
 }

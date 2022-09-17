@@ -178,7 +178,7 @@ fn demo_load(
                 ComputedVisibility::default(),
             ))
             .with_children(|parent| {
-                for slot in controller.skeleton.slots().iter() {
+                for slot in controller.skeleton.slots() {
                     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
                     make_cube(&mut mesh);
                     let mesh = meshes.add(mesh);
