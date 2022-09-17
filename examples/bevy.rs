@@ -70,6 +70,15 @@ fn main() {
                 skin: None,
             },
             Demo {
+                atlas: include_bytes!("../assets/spineboy/export/spineboy.atlas").to_vec(),
+                json: include_bytes!("../assets/spineboy/export/spineboy-pro.json").to_vec(),
+                dir: "spineboy/export/".to_owned(),
+                animation: "hoverboard".to_owned(),
+                position: Vec2::new(0., -400.),
+                scale: 0.5,
+                skin: None,
+            },
+            Demo {
                 atlas: include_bytes!("../assets/windmill/export/windmill.atlas").to_vec(),
                 json: include_bytes!("../assets/windmill/export/windmill-ess.json").to_vec(),
                 dir: "windmill/export/".to_owned(),

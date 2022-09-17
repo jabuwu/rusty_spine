@@ -2,6 +2,7 @@ use crate::{
     c::{
         spAttachment, spAttachmentType, spClippingAttachment, spMeshAttachment, spRegionAttachment,
     },
+    c_interface::NewFromPtr,
     clipping_attachment::ClippingAttachment,
     mesh_attachment::MeshAttachment,
     region_attachment::RegionAttachment,
@@ -13,13 +14,15 @@ pub struct Attachment {
     c_attachment: SyncPtr<spAttachment>,
 }
 
-impl Attachment {
-    pub fn new_from_ptr(c_attachment: *const spAttachment) -> Self {
+impl NewFromPtr<spAttachment> for Attachment {
+    unsafe fn new_from_ptr(c_attachment: *const spAttachment) -> Self {
         Self {
             c_attachment: SyncPtr(c_attachment as *mut spAttachment),
         }
     }
+}
 
+impl Attachment {
     pub fn as_region(&self) -> Option<RegionAttachment> {
         if self.attachment_type() == AttachmentType::Region {
             Some(RegionAttachment::new_from_ptr(
@@ -32,9 +35,9 @@ impl Attachment {
 
     pub fn as_mesh(&self) -> Option<MeshAttachment> {
         if self.attachment_type() == AttachmentType::Mesh {
-            Some(MeshAttachment::new_from_ptr(
-                self.c_attachment.0 as *mut spMeshAttachment,
-            ))
+            Some(unsafe {
+                MeshAttachment::new_from_ptr(self.c_attachment.0 as *mut spMeshAttachment)
+            })
         } else {
             None
         }
@@ -42,9 +45,9 @@ impl Attachment {
 
     pub fn as_clipping(&self) -> Option<ClippingAttachment> {
         if self.attachment_type() == AttachmentType::Clipping {
-            Some(ClippingAttachment::new_from_ptr(
-                self.c_attachment.0 as *mut spClippingAttachment,
-            ))
+            Some(unsafe {
+                ClippingAttachment::new_from_ptr(self.c_attachment.0 as *mut spClippingAttachment)
+            })
         } else {
             None
         }

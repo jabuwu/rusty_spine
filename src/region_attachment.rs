@@ -1,5 +1,7 @@
 use crate::{
-    c::{spAttachment, spRegionAttachment, spRegionAttachment_computeWorldVertices},
+    c::{
+        spAttachment, spRegionAttachment, spRegionAttachment_computeWorldVertices, spTextureRegion,
+    },
     slot::Slot,
     sync_ptr::SyncPtr,
     texture_region::TextureRegion,
@@ -49,7 +51,7 @@ impl RegionAttachment {
     c_accessor!(height, height_mut, height, f32);
     c_accessor_color!(color, color_mut, color);
     c_accessor_renderer_object!();
-    c_accessor_tmp_ptr!(region, region_mut, region, TextureRegion);
+    c_accessor_tmp_ptr!(region, region_mut, region, TextureRegion, spTextureRegion);
 
     // TODO: sequence, offset, uvs
 }

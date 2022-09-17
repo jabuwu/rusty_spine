@@ -90,47 +90,36 @@ impl Allocator {
         }
     }
 
-    pub fn malloc(size: usize) -> *mut c_void {
-        let singleton = Self::singleton();
-        let mut allocator = singleton.lock().unwrap();
+    pub fn malloc(&mut self, size: usize) -> *mut c_void {
         let mut data: Vec<u8> = vec![];
         data.resize(size, 0);
         let ptr = data.as_ptr();
-        allocator.allocations.insert(ptr as *const c_void, data);
+        self.allocations.insert(ptr as *const c_void, data);
         ptr as *mut c_void
     }
 
-    pub unsafe fn realloc(ptr: *const c_void, size: usize) -> *mut c_void {
-        let singleton = Self::singleton();
-        let mut allocator = singleton.lock().unwrap();
-        let mut previous_allocation = allocator.allocations.remove(&ptr).unwrap();
+    pub unsafe fn realloc(&mut self, ptr: *const c_void, size: usize) -> *mut c_void {
+        let mut previous_allocation = self.allocations.remove(&ptr).unwrap();
         previous_allocation.resize(size, 0);
         let new_ptr = previous_allocation.as_ptr();
-        allocator
-            .allocations
+        self.allocations
             .insert(new_ptr as *const c_void, previous_allocation);
         new_ptr as *mut c_void
     }
 
     #[allow(dead_code)]
-    pub unsafe fn size(ptr: *const c_void) -> usize {
-        let singleton = Self::singleton();
-        let allocator = singleton.lock().unwrap();
-        allocator.allocations.get(&ptr).unwrap().len()
+    pub unsafe fn size(&mut self, ptr: *const c_void) -> usize {
+        self.allocations.get(&ptr).unwrap().len()
     }
 
-    pub unsafe fn free(ptr: *const c_void) {
-        let singleton = Self::singleton();
-        let mut allocator = singleton.lock().unwrap();
-        allocator.allocations.remove(&ptr).unwrap();
+    pub unsafe fn free(&mut self, ptr: *const c_void) {
+        self.allocations.remove(&ptr).unwrap();
     }
 
     #[allow(dead_code)]
-    pub fn size_allocated() -> usize {
-        let singleton = Self::singleton();
-        let allocator = singleton.lock().unwrap();
+    pub fn size_allocated(&self) -> usize {
         let mut size = 0;
-        for (_, allocation) in allocator.allocations.iter() {
+        for (_, allocation) in self.allocations.iter() {
             size += allocation.len();
         }
         size
@@ -794,13 +783,17 @@ fn spine_sqrtf(x: c_float) -> c_float {
 
 #[no_mangle]
 unsafe fn spine_malloc(size: size_t) -> *mut c_void {
-    Allocator::malloc(size as usize)
+    let singleton = Allocator::singleton();
+    let mut allocator = singleton.lock().unwrap();
+    allocator.malloc(size as usize)
 }
 
 #[no_mangle]
 unsafe fn spine_realloc(ptr: *mut c_void, size: size_t) -> *mut c_void {
     if !ptr.is_null() {
-        Allocator::realloc(ptr, size as usize)
+        let singleton = Allocator::singleton();
+        let mut allocator = singleton.lock().unwrap();
+        allocator.realloc(ptr, size as usize)
     } else {
         std::ptr::null_mut()
     }
@@ -809,7 +802,9 @@ unsafe fn spine_realloc(ptr: *mut c_void, size: size_t) -> *mut c_void {
 #[no_mangle]
 unsafe fn spine_free(ptr: *mut c_void) {
     if !ptr.is_null() {
-        Allocator::free(ptr)
+        let singleton = Allocator::singleton();
+        let mut allocator = singleton.lock().unwrap();
+        allocator.free(ptr)
     }
 }
 
@@ -883,9 +878,10 @@ mod tests {
 
     #[test]
     fn allocator() {
+        let mut allocator = Allocator::default();
         let mut allocations = vec![];
         for _ in 0..30 {
-            let data = Allocator::malloc(255) as *mut u8;
+            let data = allocator.malloc(255) as *mut u8;
             unsafe {
                 for i in 0..255 {
                     *data.offset(i) = i as u8;
@@ -893,15 +889,15 @@ mod tests {
                 for i in 0..255 {
                     assert_eq!(*data.offset(i), i as u8);
                 }
-                assert_eq!(Allocator::size(data as *const super::c_void), 255);
+                assert_eq!(allocator.size(data as *const super::c_void), 255);
             }
             allocations.push(data);
         }
-        assert_eq!(Allocator::size_allocated(), 30 * 255);
+        assert_eq!(allocator.size_allocated(), 30 * 255);
         for allocation in allocations.iter() {
-            unsafe { Allocator::free(*allocation as *const super::c_void) }
+            unsafe { allocator.free(*allocation as *const super::c_void) }
         }
-        assert_eq!(Allocator::size_allocated(), 0);
+        assert_eq!(allocator.size_allocated(), 0);
     }
 
     #[test]

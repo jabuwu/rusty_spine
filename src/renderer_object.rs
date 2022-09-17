@@ -1,6 +1,7 @@
 use crate::{
     atlas::AtlasRegion,
     c::{c_void, spAtlasRegion},
+    c_interface::NewFromPtr,
     tmp_ref::TmpRef,
 };
 

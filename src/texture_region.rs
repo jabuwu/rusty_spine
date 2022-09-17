@@ -1,17 +1,19 @@
-use crate::{c::spTextureRegion, sync_ptr::SyncPtr};
+use crate::{c::spTextureRegion, c_interface::NewFromPtr, sync_ptr::SyncPtr};
 
 #[derive(Debug)]
 pub struct TextureRegion {
     c_texture_region: SyncPtr<spTextureRegion>,
 }
 
-impl TextureRegion {
-    pub(crate) fn new_from_ptr(c_texture_region: *const spTextureRegion) -> Self {
+impl NewFromPtr<spTextureRegion> for TextureRegion {
+    unsafe fn new_from_ptr(c_texture_region: *const spTextureRegion) -> Self {
         Self {
             c_texture_region: SyncPtr(c_texture_region as *mut spTextureRegion),
         }
     }
+}
 
+impl TextureRegion {
     c_ptr!(c_texture_region, spTextureRegion);
     c_accessor!(u, u_mut, u, f32);
     c_accessor!(v, v_mut, v, f32);

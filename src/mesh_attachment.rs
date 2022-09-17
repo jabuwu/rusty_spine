@@ -1,5 +1,6 @@
 use crate::{
-    c::{c_ushort, spAttachment, spMeshAttachment, spVertexAttachment},
+    c::{c_ushort, spAttachment, spMeshAttachment, spTextureRegion, spVertexAttachment},
+    c_interface::NewFromPtr,
     sync_ptr::SyncPtr,
     texture_region::TextureRegion,
 };
@@ -9,13 +10,15 @@ pub struct MeshAttachment {
     c_mesh_attachment: SyncPtr<spMeshAttachment>,
 }
 
-impl MeshAttachment {
-    pub fn new_from_ptr(c_mesh_attachment: *const spMeshAttachment) -> Self {
+impl NewFromPtr<spMeshAttachment> for MeshAttachment {
+    unsafe fn new_from_ptr(c_mesh_attachment: *const spMeshAttachment) -> Self {
         Self {
             c_mesh_attachment: SyncPtr(c_mesh_attachment as *mut spMeshAttachment),
         }
     }
+}
 
+impl MeshAttachment {
     fn attachment(&self) -> &spAttachment {
         &self.c_ptr_ref().super_0.super_0
     }
@@ -38,8 +41,14 @@ impl MeshAttachment {
     c_accessor!(height, height_mut, height, f32);
     c_accessor!(triangles_count, triangles_count_mut, trianglesCount, i32);
     c_accessor_renderer_object!();
-    c_accessor_tmp_ptr!(region, region_mut, region, TextureRegion);
-    c_accessor_tmp_ptr!(parent_mesh, parent_mesh_mut, parentMesh, MeshAttachment);
+    c_accessor_tmp_ptr!(region, region_mut, region, TextureRegion, spTextureRegion);
+    c_accessor_tmp_ptr!(
+        parent_mesh,
+        parent_mesh_mut,
+        parentMesh,
+        MeshAttachment,
+        spMeshAttachment
+    );
 
     // TODO: better accessor than passthrough?
     c_accessor_passthrough!(

@@ -2,7 +2,8 @@ use std::sync::Arc;
 
 use crate::{
     atlas::Atlas,
-    c::{spSkeletonData, spSkeletonData_dispose},
+    bone::BoneData,
+    c::{spBoneData, spSkeletonData, spSkeletonData_dispose},
     sync_ptr::SyncPtr,
 };
 
@@ -32,6 +33,40 @@ impl SkeletonData {
     c_accessor!(y, y_mut, y, f32);
     c_accessor!(width, width_mut, width, f32);
     c_accessor!(height, height_mut, height, f32);
+    c_accessor!(bones_count, bones_count_mut, bonesCount, i32);
+    c_accessor!(slots_count, slots_count_mut, slotsCount, i32);
+    c_accessor!(skins_count, skins_count_mut, skinsCount, i32);
+    c_accessor!(events_count, events_count_mut, eventsCount, i32);
+    c_accessor!(animations_count, animations_count_mut, animationsCount, i32);
+    c_accessor!(
+        ik_constraints_count,
+        ik_constraints_count_mut,
+        ikConstraintsCount,
+        i32
+    );
+    c_accessor!(
+        transform_constraints_count,
+        transform_constraints_count_mut,
+        transformConstraintsCount,
+        i32
+    );
+    c_accessor!(
+        path_constraints_count,
+        path_constraints_count_mut,
+        pathConstraintsCount,
+        i32
+    );
+    c_accessor_array!(
+        bones,
+        bones_mut,
+        bone_at_index,
+        bone_at_index_mut,
+        SkeletonData,
+        BoneData,
+        spBoneData,
+        bones,
+        bones_count
+    );
 
     // TODO: accessors and methods for the arrays in spSkeletonData
 }

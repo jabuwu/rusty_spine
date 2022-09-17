@@ -1,7 +1,11 @@
 use std::ffi::{CStr, CString};
 use std::{path::Path, ptr::null_mut};
 
-use crate::c::{spAtlasFilter, spAtlasFormat, spAtlasRegion, spAtlasWrap, spAtlas_createFromFile};
+use crate::c::{
+    spAtlasFilter, spAtlasFormat, spAtlasRegion, spAtlasWrap, spAtlas_createFromFile,
+    spTextureRegion,
+};
+use crate::c_interface::NewFromPtr;
 use crate::sync_ptr::SyncPtr;
 use crate::texture_region::TextureRegion;
 use crate::tmp_ref::{TmpRef, TmpRefMut};
@@ -13,6 +17,14 @@ use crate::{
 #[derive(Debug)]
 pub struct Atlas {
     c_atlas: SyncPtr<spAtlas>,
+}
+
+impl NewFromPtr<spAtlas> for Atlas {
+    unsafe fn new_from_ptr(c_atlas: *const spAtlas) -> Atlas {
+        Atlas {
+            c_atlas: SyncPtr(c_atlas as *mut spAtlas),
+        }
+    }
 }
 
 impl Atlas {
@@ -27,19 +39,13 @@ impl Atlas {
                 null_mut(),
             )
         };
-        Ok(Self::new_from_ptr(c_atlas))
+        Ok(unsafe { Self::new_from_ptr(c_atlas) })
     }
 
     pub fn new_from_file<P: AsRef<Path>>(path: P) -> Result<Atlas, Error> {
         let c_path = CString::new(path.as_ref().to_str().unwrap())?;
         let c_atlas = unsafe { spAtlas_createFromFile(c_path.as_ptr(), null_mut()) };
-        Ok(Self::new_from_ptr(c_atlas))
-    }
-
-    pub(crate) fn new_from_ptr(c_atlas: *const spAtlas) -> Atlas {
-        Atlas {
-            c_atlas: SyncPtr(c_atlas as *mut spAtlas),
-        }
+        Ok(unsafe { Self::new_from_ptr(c_atlas) })
     }
 
     pub fn pages(&self) -> AtlasPageIterator {
@@ -87,15 +93,17 @@ pub struct AtlasPage {
     c_atlas_page: SyncPtr<spAtlasPage>,
 }
 
-impl AtlasPage {
-    pub(crate) fn new_from_ptr(c_atlas_page: *const spAtlasPage) -> Self {
+impl NewFromPtr<spAtlasPage> for AtlasPage {
+    unsafe fn new_from_ptr(c_atlas_page: *const spAtlasPage) -> Self {
         Self {
             c_atlas_page: SyncPtr(c_atlas_page as *mut spAtlasPage),
         }
     }
+}
 
+impl AtlasPage {
     c_ptr!(c_atlas_page, spAtlasPage);
-    c_accessor_tmp_ptr!(atlas, atlas_mut, atlas, Atlas);
+    c_accessor_tmp_ptr!(atlas, atlas_mut, atlas, Atlas, spAtlas);
     c_accessor_string!(name, name);
     c_accessor_enum!(format, set_format, format, AtlasFormat);
     c_accessor_enum!(min_filter, set_min_filter, minFilter, AtlasFilter);
@@ -118,7 +126,7 @@ impl<'a> Iterator for AtlasPageIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.page.is_null() {
-            let page = AtlasPage::new_from_ptr(self.page);
+            let page = unsafe { AtlasPage::new_from_ptr(self.page) };
             self.page = unsafe { (*self.page).next };
             Some(TmpRef::new(self._atlas, page))
         } else {
@@ -137,7 +145,7 @@ impl<'a> Iterator for AtlasPageMutIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.page.is_null() {
-            let page = AtlasPage::new_from_ptr(self.page);
+            let page = unsafe { AtlasPage::new_from_ptr(self.page) };
             self.page = unsafe { (*self.page).next };
             Some(TmpRefMut::new(self._atlas, page))
         } else {
@@ -224,22 +232,29 @@ pub struct AtlasRegion {
     c_atlas_region: SyncPtr<spAtlasRegion>,
 }
 
-impl AtlasRegion {
-    pub(crate) fn new_from_ptr(c_atlas_region: *const spAtlasRegion) -> Self {
+impl NewFromPtr<spAtlasRegion> for AtlasRegion {
+    unsafe fn new_from_ptr(c_atlas_region: *const spAtlasRegion) -> Self {
         Self {
             c_atlas_region: SyncPtr(c_atlas_region as *mut spAtlasRegion),
         }
     }
+}
 
+impl AtlasRegion {
     c_ptr!(c_atlas_region, spAtlasRegion);
-    c_accessor_super!(texture_region, texture_region_mut, TextureRegion);
+    c_accessor_super!(
+        texture_region,
+        texture_region_mut,
+        TextureRegion,
+        spTextureRegion
+    );
     c_accessor_string!(name, name);
     c_accessor!(x, x_mut, x, i32);
     c_accessor!(y, y_mut, y, i32);
     c_accessor!(index, index_mut, index, i32);
     c_accessor_passthrough!(splits, splits_mut, splits, *const c_int, *mut c_int);
     c_accessor_passthrough!(pads, pads_mut, pads, *const c_int, *mut c_int);
-    c_accessor_tmp_ptr!(page, page_mut, page, AtlasPage);
+    c_accessor_tmp_ptr!(page, page_mut, page, AtlasPage, spAtlasPage);
 
     pub fn key_values(&self) -> Vec<KeyValue> {
         let mut vec = vec![];
@@ -272,7 +287,7 @@ impl<'a> Iterator for AtlasRegionIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.region.is_null() {
-            let page = AtlasRegion::new_from_ptr(self.region);
+            let page = unsafe { AtlasRegion::new_from_ptr(self.region) };
             self.region = unsafe { (*self.region).next };
             Some(TmpRef::new(self._atlas, page))
         } else {
@@ -291,7 +306,7 @@ impl<'a> Iterator for AtlasRegionMutIterator<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if !self.region.is_null() {
-            let page = AtlasRegion::new_from_ptr(self.region);
+            let page = unsafe { AtlasRegion::new_from_ptr(self.region) };
             self.region = unsafe { (*self.region).next };
             Some(TmpRefMut::new(self._atlas, page))
         } else {

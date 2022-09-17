@@ -1,27 +1,23 @@
 use crate::{
-    c::{spBone, spBoneData},
+    c::{spBone, spBoneData, spTransformMode},
+    c_interface::NewFromPtr,
     sync_ptr::SyncPtr,
 };
 
 #[derive(Debug)]
 pub struct Bone {
     c_bone: SyncPtr<spBone>,
-    data: BoneData,
+}
+
+impl NewFromPtr<spBone> for Bone {
+    unsafe fn new_from_ptr(c_bone: *const spBone) -> Self {
+        Self {
+            c_bone: SyncPtr(c_bone as *mut spBone),
+        }
+    }
 }
 
 impl Bone {
-    pub(crate) fn new_from_ptr(c_bone: *const spBone) -> Self {
-        let c_bone_data = unsafe { (*c_bone).data };
-        Self {
-            c_bone: SyncPtr(c_bone as *mut spBone),
-            data: BoneData::new(c_bone_data),
-        }
-    }
-
-    pub fn data(&self) -> &BoneData {
-        &self.data
-    }
-
     c_ptr!(c_bone, spBone);
     c_accessor!(x, x_mut, x, f32);
     c_accessor!(y, y_mut, y, f32);
@@ -45,6 +41,7 @@ impl Bone {
     c_accessor!(world_y, world_y_mut, worldY, f32);
     c_accessor_bool!(sorted, set_sorted, sorted);
     c_accessor_bool!(active, set_active, active);
+    c_accessor_tmp_ptr!(data, data_mut, data, BoneData, spBoneData);
 }
 
 #[derive(Debug)]
@@ -52,13 +49,15 @@ pub struct BoneData {
     c_bone_data: SyncPtr<spBoneData>,
 }
 
-impl BoneData {
-    fn new(c_bone_data: *mut spBoneData) -> Self {
+impl NewFromPtr<spBoneData> for BoneData {
+    unsafe fn new_from_ptr(c_bone_data: *const spBoneData) -> Self {
         Self {
-            c_bone_data: SyncPtr(c_bone_data),
+            c_bone_data: SyncPtr(c_bone_data as *mut spBoneData),
         }
     }
+}
 
+impl BoneData {
     c_ptr!(c_bone_data, spBoneData);
     c_accessor_string!(name, name);
     c_accessor!(index, index_mut, index, i32);
@@ -70,7 +69,35 @@ impl BoneData {
     c_accessor!(scale_y, scale_y_mut, scaleY, f32);
     c_accessor!(shear_x, shear_x_mut, shearX, f32);
     c_accessor!(shear_y, shear_y_mut, shearY, f32);
+    c_accessor_color!(color, color_mut, color);
     c_accessor_bool!(skin_required, set_skin_required, skinRequired);
+    c_accessor_enum!(
+        transform_mode,
+        set_transform_mode,
+        transformMode,
+        TransformMode
+    );
+    c_accessor_tmp_ptr_optional!(parent, parent_mut, parent, BoneData, spBoneData);
+}
 
-    // TODO: parent, transformMode, color
+pub enum TransformMode {
+    Normal = 0,
+    OnlyTranslation = 1,
+    NoRotationOrReflection = 2,
+    NoScale = 3,
+    NoScaleOrReflection = 4,
+    Unknown = 99,
+}
+
+impl From<spTransformMode> for TransformMode {
+    fn from(mode: spTransformMode) -> Self {
+        match mode {
+            0 => Self::Normal,
+            1 => Self::OnlyTranslation,
+            2 => Self::NoRotationOrReflection,
+            3 => Self::NoScale,
+            4 => Self::NoScaleOrReflection,
+            _ => Self::Unknown,
+        }
+    }
 }

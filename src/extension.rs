@@ -3,6 +3,7 @@ use std::fs::read;
 use std::sync::{Arc, Mutex, Once};
 
 use crate::c::{c_int, c_void, size_t};
+use crate::c_interface::NewFromPtr;
 use crate::{
     atlas::AtlasPage,
     c::{c_char, spAtlasPage},
@@ -61,9 +62,12 @@ extern "C" fn _spAtlasPage_createTexture(c_atlas_page: *mut spAtlasPage, c_path:
     let singleton = Extension::singleton();
     let extension = singleton.lock().unwrap();
     if let Some(cb) = &extension.create_texture_cb {
-        cb(&mut AtlasPage::new_from_ptr(c_atlas_page), unsafe {
-            CStr::from_ptr(c_path).to_str().unwrap()
-        });
+        unsafe {
+            cb(
+                &mut AtlasPage::new_from_ptr(c_atlas_page),
+                CStr::from_ptr(c_path).to_str().unwrap(),
+            );
+        }
     }
 }
 
@@ -72,7 +76,9 @@ extern "C" fn _spAtlasPage_disposeTexture(c_atlas_page: *mut spAtlasPage) {
     let singleton = Extension::singleton();
     let extension = singleton.lock().unwrap();
     if let Some(cb) = &extension.dispose_texture_cb {
-        cb(&mut AtlasPage::new_from_ptr(c_atlas_page));
+        unsafe {
+            cb(&mut AtlasPage::new_from_ptr(c_atlas_page));
+        }
     }
 }
 

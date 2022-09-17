@@ -103,29 +103,64 @@ macro_rules! c_accessor_renderer_object {
 }
 
 macro_rules! c_accessor_tmp_ptr {
-    ($rust:ident, $rust_mut:ident, $c:ident, $type:ty) => {
+    ($rust:ident, $rust_mut:ident, $c:ident, $type:ty, $c_type:ident) => {
         pub fn $rust(&self) -> crate::tmp_ref::TmpRef<Self, $type> {
-            crate::tmp_ref::TmpRef::new(self, <$type>::new_from_ptr(self.c_ptr_ref().$c))
+            crate::tmp_ref::TmpRef::new(self, unsafe {
+                <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                    self.c_ptr_ref().$c,
+                )
+            })
         }
         pub fn $rust_mut(&mut self) -> crate::tmp_ref::TmpRefMut<Self, $type> {
-            crate::tmp_ref::TmpRefMut::new(self, <$type>::new_from_ptr(self.c_ptr_ref().$c))
+            crate::tmp_ref::TmpRefMut::new(self, unsafe {
+                <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                    self.c_ptr_ref().$c,
+                )
+            })
+        }
+    };
+}
+
+macro_rules! c_accessor_tmp_ptr_optional {
+    ($rust:ident, $rust_mut:ident, $c:ident, $type:ty, $c_type:ident) => {
+        pub fn $rust(&self) -> Option<crate::tmp_ref::TmpRef<Self, $type>> {
+            let ptr = self.c_ptr_ref().$c;
+            if !ptr.is_null() {
+                Some(crate::tmp_ref::TmpRef::new(self, unsafe {
+                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
+                }))
+            } else {
+                None
+            }
+        }
+        pub fn $rust_mut(&mut self) -> Option<crate::tmp_ref::TmpRefMut<Self, $type>> {
+            let ptr = self.c_ptr_ref().$c;
+            if !ptr.is_null() {
+                Some(crate::tmp_ref::TmpRefMut::new(self, unsafe {
+                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
+                }))
+            } else {
+                None
+            }
         }
     };
 }
 
 macro_rules! c_accessor_super {
-    ($rust:ident, $rust_mut:ident, $type:ty) => {
+    ($rust:ident, $rust_mut:ident, $type:ty, $c_type:ident) => {
         pub fn $rust(&self) -> crate::tmp_ref::TmpRef<Self, $type> {
-            crate::tmp_ref::TmpRef::new(
-                self,
-                TextureRegion::new_from_ptr(&mut self.c_ptr_mut().super_0),
-            )
+            crate::tmp_ref::TmpRef::new(self, unsafe {
+                <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                    &mut self.c_ptr_mut().super_0,
+                )
+            })
         }
         pub fn $rust_mut(&mut self) -> crate::tmp_ref::TmpRefMut<Self, $type> {
-            crate::tmp_ref::TmpRefMut::new(
-                self,
-                TextureRegion::new_from_ptr(&mut self.c_ptr_mut().super_0),
-            )
+            crate::tmp_ref::TmpRefMut::new(self, unsafe {
+                <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                    &mut self.c_ptr_mut().super_0,
+                )
+            })
         }
     };
 }
@@ -138,6 +173,55 @@ macro_rules! c_accessor_passthrough {
 
         pub fn $rust_mut(&mut self) -> $type_mut {
             self.c_ptr_mut().$c
+        }
+    };
+}
+
+macro_rules! c_accessor_array {
+    ($rust:ident, $rust_mut:ident, $rust_index:ident, $rust_index_mut:ident, $parent_type:ident, $type:ident, $c_type:ident, $c:ident, $count_fn:ident) => {
+        pub fn $rust(&self) -> crate::c_interface::CArrayIterator<$parent_type, $type, $c_type> {
+            crate::c_interface::CArrayIterator::new(
+                self,
+                self.c_ptr_ref().$c,
+                self.$count_fn() as usize,
+            )
+        }
+
+        pub fn $rust_mut(
+            &mut self,
+        ) -> crate::c_interface::CArrayMutIterator<$parent_type, $type, $c_type> {
+            crate::c_interface::CArrayMutIterator::new(
+                self,
+                self.c_ptr_ref().$c,
+                self.$count_fn() as usize,
+            )
+        }
+
+        pub fn $rust_index(&self, index: usize) -> Option<crate::tmp_ref::TmpRef<Self, $type>> {
+            if index < self.$count_fn() as usize {
+                Some(crate::tmp_ref::TmpRef::new(self, unsafe {
+                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                        *self.c_ptr_ref().$c.offset(index as isize),
+                    )
+                }))
+            } else {
+                None
+            }
+        }
+
+        pub fn $rust_index_mut(
+            &mut self,
+            index: usize,
+        ) -> Option<crate::tmp_ref::TmpRefMut<Self, $type>> {
+            if index < self.$count_fn() as usize {
+                Some(crate::tmp_ref::TmpRefMut::new(self, unsafe {
+                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                        *self.c_ptr_mut().$c.offset(index as isize),
+                    )
+                }))
+            } else {
+                None
+            }
         }
     };
 }
@@ -210,6 +294,7 @@ pub mod atlas;
 pub mod attachment;
 pub mod bone;
 pub mod c;
+pub mod c_interface;
 pub mod clipping_attachment;
 pub mod color;
 pub mod error;
@@ -226,3 +311,6 @@ pub mod slot;
 pub mod sync_ptr;
 pub mod texture_region;
 pub mod tmp_ref;
+
+#[cfg(test)]
+pub mod tests;

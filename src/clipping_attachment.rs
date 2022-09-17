@@ -1,5 +1,6 @@
 use crate::{
     c::{spAttachment, spClippingAttachment},
+    c_interface::NewFromPtr,
     sync_ptr::SyncPtr,
 };
 
@@ -8,13 +9,15 @@ pub struct ClippingAttachment {
     c_clipping_attachment: SyncPtr<spClippingAttachment>,
 }
 
-impl ClippingAttachment {
-    pub fn new_from_ptr(c_clipping_attachment: *const spClippingAttachment) -> Self {
+impl NewFromPtr<spClippingAttachment> for ClippingAttachment {
+    unsafe fn new_from_ptr(c_clipping_attachment: *const spClippingAttachment) -> Self {
         Self {
             c_clipping_attachment: SyncPtr(c_clipping_attachment as *mut spClippingAttachment),
         }
     }
+}
 
+impl ClippingAttachment {
     fn attachment(&self) -> &spAttachment {
         &self.c_ptr_ref().super_0.super_0
     }
