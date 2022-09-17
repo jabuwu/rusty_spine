@@ -161,9 +161,9 @@ macro_rules! c_accessor_color {
                 &*(&self.c_ptr_ref().$c as *const crate::c::spColor as *const crate::color::Color)
             }
         }
-        pub fn $rust_mut(&self) -> &mut crate::color::Color {
+        pub fn $rust_mut(&mut self) -> &mut crate::color::Color {
             unsafe {
-                &mut *(&self.c_ptr_ref().$c as *const crate::c::spColor as *mut crate::color::Color)
+                &mut *(&self.c_ptr_mut().$c as *const crate::c::spColor as *mut crate::color::Color)
             }
         }
     };
