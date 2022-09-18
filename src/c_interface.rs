@@ -4,6 +4,8 @@ use std::ops::{Deref, DerefMut};
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 
+use crate::error::Error;
+
 pub trait NewFromPtr<C> {
     unsafe fn new_from_ptr(c_ptr: *const C) -> Self;
 }
@@ -83,19 +85,19 @@ impl<P, T> CRef<P, T> {
 }
 
 impl<P: CRefValidate, T> CRef<P, T> {
-    pub fn get(&self, parent: &P) -> Option<&T> {
+    pub fn get(&self, parent: &P) -> Result<&T, Error> {
         if self.is_valid() && parent.validate(self.id.load(Ordering::SeqCst)) {
-            Some(&self.value)
+            Ok(&self.value)
         } else {
-            None
+            Err(Error::NotFound)
         }
     }
 
-    pub unsafe fn get_unchecked(&self) -> Option<&T> {
+    pub unsafe fn get_unchecked(&self) -> Result<&T, Error> {
         if self.is_valid() {
-            Some(&self.value)
+            Ok(&self.value)
         } else {
-            None
+            Err(Error::NotFound)
         }
     }
 }
@@ -133,35 +135,35 @@ impl<P, T> CMut<P, T> {
 }
 
 impl<P: CRefValidate, T> CMut<P, T> {
-    pub fn get(&self, parent: &P) -> Option<&T> {
+    pub fn get(&self, parent: &P) -> Result<&T, Error> {
         if self.is_valid() && parent.validate(self.id.load(Ordering::SeqCst)) {
-            Some(&self.value)
+            Ok(&self.value)
         } else {
-            None
+            Err(Error::NotFound)
         }
     }
 
-    pub unsafe fn get_unchecked(&self) -> Option<&T> {
+    pub unsafe fn get_unchecked(&self) -> Result<&T, Error> {
         if self.is_valid() {
-            Some(&self.value)
+            Ok(&self.value)
         } else {
-            None
+            Err(Error::NotFound)
         }
     }
 
-    pub fn get_mut(&mut self, parent: &mut P) -> Option<&mut T> {
+    pub fn get_mut(&mut self, parent: &mut P) -> Result<&mut T, Error> {
         if self.is_valid() && parent.validate(self.id.load(Ordering::SeqCst)) {
-            Some(&mut self.value)
+            Ok(&mut self.value)
         } else {
-            None
+            Err(Error::NotFound)
         }
     }
 
-    pub unsafe fn get_unchecked_mut(&mut self) -> Option<&mut T> {
+    pub unsafe fn get_unchecked_mut(&mut self) -> Result<&mut T, Error> {
         if self.is_valid() {
-            Some(&mut self.value)
+            Ok(&mut self.value)
         } else {
-            None
+            Err(Error::NotFound)
         }
     }
 }
