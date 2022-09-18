@@ -145,6 +145,7 @@ impl Bone {
     c_accessor_bool!(sorted, set_sorted, sorted);
     c_accessor_bool!(active, set_active, active);
     c_accessor_tmp_ptr!(data, data_mut, data, BoneData, spBoneData);
+    c_accessor_tmp_ptr!(parent, parent_mut, parent, Bone, spBone);
 
     pub fn set_y_down(y_down: bool) {
         unsafe {
