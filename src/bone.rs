@@ -7,7 +7,8 @@ use crate::{
         spBone_updateWorldTransformWith, spBone_worldToLocal, spBone_worldToLocalRotation,
         spTransformMode,
     },
-    c_interface::NewFromPtr,
+    c_interface::{CMut, CRef, NewFromPtr},
+    prelude::Skeleton,
     sync_ptr::SyncPtr,
 };
 
@@ -157,6 +158,9 @@ impl Bone {
         unsafe { spBone_isYDown() != 0 }
     }
 }
+
+pub type BoneRef = CRef<Skeleton, Bone>;
+pub type BoneMut = CMut<Skeleton, Bone>;
 
 #[derive(Debug)]
 pub struct BoneData {
