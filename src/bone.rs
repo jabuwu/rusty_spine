@@ -1,5 +1,12 @@
 use crate::{
-    c::{spBone, spBoneData, spTransformMode},
+    c::{
+        spBone, spBoneData, spBone_getWorldRotationX, spBone_getWorldRotationY,
+        spBone_getWorldScaleX, spBone_getWorldScaleY, spBone_isYDown, spBone_localToWorld,
+        spBone_rotateWorld, spBone_setToSetupPose, spBone_setYDown, spBone_update,
+        spBone_updateAppliedTransform, spBone_updateWorldTransform,
+        spBone_updateWorldTransformWith, spBone_worldToLocal, spBone_worldToLocalRotation,
+        spTransformMode,
+    },
     c_interface::NewFromPtr,
     sync_ptr::SyncPtr,
 };
@@ -18,6 +25,102 @@ impl NewFromPtr<spBone> for Bone {
 }
 
 impl Bone {
+    pub fn set_to_setup_pose(&mut self) {
+        unsafe {
+            spBone_setToSetupPose(self.c_ptr());
+        }
+    }
+
+    pub fn update(&mut self) {
+        unsafe {
+            spBone_update(self.c_ptr());
+        }
+    }
+
+    pub fn update_world_transform(&mut self) {
+        unsafe {
+            spBone_updateWorldTransform(self.c_ptr());
+        }
+    }
+
+    pub fn update_world_transform_with(
+        &mut self,
+        x: f32,
+        y: f32,
+        rotation: f32,
+        scale_x: f32,
+        scale_y: f32,
+        shear_x: f32,
+        shear_y: f32,
+    ) {
+        unsafe {
+            spBone_updateWorldTransformWith(
+                self.c_ptr(),
+                x,
+                y,
+                rotation,
+                scale_x,
+                scale_y,
+                shear_x,
+                shear_y,
+            );
+        }
+    }
+
+    pub fn get_world_rotation_x(&self) -> f32 {
+        unsafe { spBone_getWorldRotationX(self.c_ptr()) }
+    }
+
+    pub fn get_world_rotation_y(&self) -> f32 {
+        unsafe { spBone_getWorldRotationY(self.c_ptr()) }
+    }
+
+    pub fn get_world_scale_x(&self) -> f32 {
+        unsafe { spBone_getWorldScaleX(self.c_ptr()) }
+    }
+
+    pub fn get_world_scale_y(&self) -> f32 {
+        unsafe { spBone_getWorldScaleY(self.c_ptr()) }
+    }
+
+    pub fn update_applied_transform(&mut self) {
+        unsafe {
+            spBone_updateAppliedTransform(self.c_ptr());
+        }
+    }
+
+    pub fn world_to_local(&self, world_x: f32, world_y: f32) -> (f32, f32) {
+        let mut local_x: f32 = 0.;
+        let mut local_y: f32 = 0.;
+        unsafe {
+            spBone_worldToLocal(self.c_ptr(), world_x, world_y, &mut local_x, &mut local_y);
+        }
+        (local_x, local_y)
+    }
+
+    pub fn local_to_world(&self, local_x: f32, local_y: f32) -> (f32, f32) {
+        let mut world_x: f32 = 0.;
+        let mut world_y: f32 = 0.;
+        unsafe {
+            spBone_localToWorld(self.c_ptr(), local_x, local_y, &mut world_x, &mut world_y);
+        }
+        (world_x, world_y)
+    }
+
+    pub fn world_to_local_rotation(&self, world_rotation: f32) -> f32 {
+        unsafe { spBone_worldToLocalRotation(self.c_ptr(), world_rotation) }
+    }
+
+    pub fn local_to_world_rotation(&self, local_rotation: f32) -> f32 {
+        unsafe { spBone_worldToLocalRotation(self.c_ptr(), local_rotation) }
+    }
+
+    pub fn rotate_world(&self, degrees: f32) {
+        unsafe {
+            spBone_rotateWorld(self.c_ptr(), degrees);
+        }
+    }
+
     c_ptr!(c_bone, spBone);
     c_accessor!(x, set_x, x, f32);
     c_accessor!(y, set_y, y, f32);
@@ -42,6 +145,16 @@ impl Bone {
     c_accessor_bool!(sorted, set_sorted, sorted);
     c_accessor_bool!(active, set_active, active);
     c_accessor_tmp_ptr!(data, data_mut, data, BoneData, spBoneData);
+
+    pub fn set_y_down(y_down: bool) {
+        unsafe {
+            spBone_setYDown(y_down as i32);
+        }
+    }
+
+    pub fn is_y_down() -> bool {
+        unsafe { spBone_isYDown() != 0 }
+    }
 }
 
 #[derive(Debug)]
