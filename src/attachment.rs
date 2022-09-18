@@ -1,10 +1,13 @@
 use crate::{
+    bounding_box_attachment::BoundingBoxAttachment,
     c::{
-        spAttachment, spAttachmentType, spClippingAttachment, spMeshAttachment, spRegionAttachment,
+        spAttachment, spAttachmentType, spBoundingBoxAttachment, spClippingAttachment,
+        spMeshAttachment, spPointAttachment, spRegionAttachment,
     },
     c_interface::NewFromPtr,
     clipping_attachment::ClippingAttachment,
     mesh_attachment::MeshAttachment,
+    point_attachment::PointAttachment,
     region_attachment::RegionAttachment,
     sync_ptr::SyncPtr,
 };
@@ -33,10 +36,32 @@ impl Attachment {
         }
     }
 
+    pub fn as_bounding_box(&self) -> Option<BoundingBoxAttachment> {
+        if self.attachment_type() == AttachmentType::BoundingBox {
+            Some(unsafe {
+                BoundingBoxAttachment::new_from_ptr(
+                    self.c_attachment.0 as *mut spBoundingBoxAttachment,
+                )
+            })
+        } else {
+            None
+        }
+    }
+
     pub fn as_mesh(&self) -> Option<MeshAttachment> {
         if self.attachment_type() == AttachmentType::Mesh {
             Some(unsafe {
                 MeshAttachment::new_from_ptr(self.c_attachment.0 as *mut spMeshAttachment)
+            })
+        } else {
+            None
+        }
+    }
+
+    pub fn as_point(&self) -> Option<PointAttachment> {
+        if self.attachment_type() == AttachmentType::Point {
+            Some(unsafe {
+                PointAttachment::new_from_ptr(self.c_attachment.0 as *mut spPointAttachment)
             })
         } else {
             None

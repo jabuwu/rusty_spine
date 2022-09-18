@@ -1,7 +1,7 @@
 use crate::{
     attachment::Attachment,
     bone::Bone,
-    c::{spAttachment, spBone, spSlot, spSlotData},
+    c::{spAttachment, spBone, spSlot, spSlotData, spSlot_setAttachment, spSlot_setToSetupPose},
     c_interface::NewFromPtr,
     sync_ptr::SyncPtr,
 };
@@ -20,6 +20,18 @@ impl NewFromPtr<spSlot> for Slot {
 }
 
 impl Slot {
+    pub fn set_attachment(&mut self, attachment: &Attachment) {
+        unsafe {
+            spSlot_setAttachment(self.c_ptr(), attachment.c_ptr());
+        }
+    }
+
+    pub fn set_to_setup_pose(&mut self) {
+        unsafe {
+            spSlot_setToSetupPose(self.c_ptr());
+        }
+    }
+
     c_ptr!(c_slot, spSlot);
     c_accessor_color!(color, color_mut, color);
     c_accessor_tmp_ptr!(data, data_mut, data, SlotData, spSlotData);

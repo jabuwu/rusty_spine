@@ -1,9 +1,11 @@
-use std::sync::Arc;
+use std::{ffi::CString, sync::Arc};
 
 use crate::{
+    animation::Animation,
     c::{
         c_void, spAnimationStateData, spAnimationStateData_create, spAnimationStateData_dispose,
-        spSkeletonData,
+        spAnimationStateData_getMix, spAnimationStateData_setMix,
+        spAnimationStateData_setMixByName, spSkeletonData,
     },
     c_interface::NewFromPtr,
     skeleton_data::SkeletonData,
@@ -35,6 +37,29 @@ impl AnimationStateData {
             owns_memory: true,
             _skeleton_data: Some(skeleton_data),
         }
+    }
+
+    pub fn set_mix_by_name(&mut self, from_name: &str, to_name: &str, duration: f32) {
+        let c_from_name = CString::new(from_name).unwrap();
+        let c_to_name = CString::new(to_name).unwrap();
+        unsafe {
+            spAnimationStateData_setMixByName(
+                self.c_ptr(),
+                c_from_name.as_ptr(),
+                c_to_name.as_ptr(),
+                duration,
+            );
+        }
+    }
+
+    pub fn set_mix(&mut self, from: &Animation, to: &Animation, duration: f32) {
+        unsafe {
+            spAnimationStateData_setMix(self.c_ptr(), from.c_ptr(), to.c_ptr(), duration);
+        }
+    }
+
+    pub fn get_mix(&mut self, from: &Animation, to: &Animation) -> f32 {
+        unsafe { spAnimationStateData_getMix(self.c_ptr(), from.c_ptr(), to.c_ptr()) }
     }
 
     c_ptr!(c_animation_state_data, spAnimationStateData);

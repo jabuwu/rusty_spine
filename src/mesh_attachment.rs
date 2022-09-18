@@ -32,8 +32,8 @@ impl MeshAttachment {
     }
 
     c_ptr!(c_mesh_attachment, spMeshAttachment);
-    c_attachment_accessors!(super_0.super_0);
-    c_vertex_attachment_accessors!(super_0.super_0);
+    c_attachment_accessors!();
+    c_vertex_attachment_accessors!();
     c_accessor_string!(path, path);
     c_accessor_color!(color, color_mut, color);
     c_accessor!(hull_length, set_hull_length, hullLength, i32);

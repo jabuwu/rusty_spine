@@ -694,7 +694,7 @@ macro_rules! c_accessor_array_validated {
 }
 
 macro_rules! c_attachment_accessors {
-    ($c:expr) => {
+    () => {
         #[inline]
         pub fn name(&self) -> &str {
             unsafe {
@@ -712,7 +712,7 @@ macro_rules! c_attachment_accessors {
 }
 
 macro_rules! c_vertex_attachment_accessors {
-    ($c:expr) => {
+    () => {
         // TODO: fill accessors
         #[inline]
         pub unsafe fn compute_world_vertices(

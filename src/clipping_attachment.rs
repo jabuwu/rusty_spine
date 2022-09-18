@@ -23,5 +23,5 @@ impl ClippingAttachment {
     }
 
     c_ptr!(c_clipping_attachment, spClippingAttachment);
-    c_attachment_accessors!(super_0.super_0);
+    c_attachment_accessors!();
 }

@@ -40,7 +40,7 @@ impl RegionAttachment {
     }
 
     c_ptr!(c_region_attachment, spRegionAttachment);
-    c_attachment_accessors!(self.c_ptr_ref().super_0);
+    c_attachment_accessors!();
     c_accessor_string!(path, path);
     c_accessor!(x, set_x, x, f32);
     c_accessor!(y, set_y, y, f32);
