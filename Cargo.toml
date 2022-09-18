@@ -7,6 +7,9 @@ homepage = "https://github.com/jabuwu/rusty_spine"
 repository = "https://github.com/jabuwu/rusty_spine"
 readme = "readme.md"
 license-file = "LICENSE"
+exclude = [
+    "assets/*",
+]
 
 [dependencies]
 libc = { version = "0.2", optional = true }
