@@ -124,7 +124,7 @@ impl Bone {
     c_ptr!(c_bone, spBone);
     c_accessor!(x, set_x, x, f32);
     c_accessor!(y, set_y, y, f32);
-    c_accessor!(rotation, rotation_mut, rotation, f32);
+    c_accessor!(rotation, set_rotation, rotation, f32);
     c_accessor!(scale_x, set_scale_x, scaleX, f32);
     c_accessor!(scale_y, set_scale_y, scaleY, f32);
     c_accessor!(shear_x, set_shear_x, shearX, f32);
