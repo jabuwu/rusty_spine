@@ -1,4 +1,8 @@
-use std::{collections::HashMap, mem::take, sync::Arc};
+use std::{
+    collections::HashMap,
+    mem::take,
+    sync::{Arc, Mutex},
+};
 
 use bevy::{
     prelude::*,
@@ -48,17 +52,40 @@ fn make_cube(mesh: &mut Mesh) {
     mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
 }
 
+struct PersistentImageHandles {
+    handles: Arc<Mutex<Vec<(String, Handle<Image>)>>>,
+    remember: Arc<Mutex<Vec<String>>>,
+    forget: Arc<Mutex<Vec<String>>>,
+}
+
 fn main() {
-    rusty_spine::extension::set_create_texture_cb(|page, path| {
+    let image_handles: Arc<Mutex<Vec<(String, Handle<Image>)>>> = Arc::new(Mutex::new(Vec::new()));
+    let image_remember: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+    let image_forget: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+    let remember = image_remember.clone();
+    rusty_spine::extension::set_create_texture_cb(move |page, path| {
+        remember.lock().unwrap().push(path.to_owned());
         page.renderer_object().set(SpineTexture {
             path: path.to_owned(),
         });
     });
-    rusty_spine::extension::set_dispose_texture_cb(|page| unsafe {
+    let forget = image_forget.clone();
+    rusty_spine::extension::set_dispose_texture_cb(move |page| unsafe {
+        forget.lock().unwrap().push(
+            page.renderer_object()
+                .get_unchecked::<SpineTexture>()
+                .path
+                .clone(),
+        );
         page.renderer_object().dispose::<SpineTexture>();
     });
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
+        .insert_resource(PersistentImageHandles {
+            handles: image_handles,
+            remember: image_remember,
+            forget: image_forget,
+        })
         .insert_resource(Demos(vec![
             Demo {
                 atlas: include_bytes!("../assets/spineboy/export/spineboy.atlas").to_vec(),
@@ -110,8 +137,8 @@ fn main() {
                 json: include_bytes!("../assets/dragon/export/dragon-ess.json").to_vec(),
                 dir: "dragon/export/".to_owned(),
                 animation: "flying".to_owned(),
-                position: Vec2::new(0., 0.),
-                scale: 0.75,
+                position: Vec2::new(0., -100.),
+                scale: 0.85,
                 skin: None,
             },
             Demo {
@@ -173,6 +200,7 @@ fn demo_load(
         let _ = controller
             .animation_state
             .set_animation_by_name(0, &demo.animation, true);
+        controller.update(0.016);
         if let Some(skin) = &demo.skin {
             let _ = controller.skeleton.set_skin_by_name(skin);
         }
@@ -228,16 +256,30 @@ fn demo_next(
     }
 }
 
-pub fn spine_update(
+fn spine_update(
     mut spine_query: Query<(&mut Spine, &Children)>,
     colored_mesh2d: Query<(&Mesh2dHandle, &Handle<ColorMaterial>)>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut color_materials: ResMut<Assets<ColorMaterial>>,
     time: Res<Time>,
     asset_server: Res<AssetServer>,
+    persistent_image_handles: Res<PersistentImageHandles>,
 ) {
+    let mut image_handles = persistent_image_handles.handles.lock().unwrap();
+    let mut image_remember = persistent_image_handles.remember.lock().unwrap();
+    let mut image_forget = persistent_image_handles.forget.lock().unwrap();
+    while let Some(image) = image_remember.pop() {
+        println!("remember {}", image);
+        image_handles.push((image.clone(), asset_server.load(&image)));
+    }
+    while let Some(image) = image_forget.pop() {
+        println!("forget {}", image);
+        if let Some(index) = image_handles.iter().position(|i| i.0 == image) {
+            image_handles.remove(index);
+        }
+    }
     for (mut spine, spine_children) in spine_query.iter_mut() {
-        let Spine { controller } = spine.as_mut();
+        let Spine { controller, .. } = spine.as_mut();
         controller.update(time.delta_seconds());
         let mut renderables = controller.renderables();
         for (renderable_index, child) in spine_children.iter().enumerate() {

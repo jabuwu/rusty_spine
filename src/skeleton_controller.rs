@@ -241,6 +241,7 @@ impl SkeletonController {
                     mesh_attachment
                         .renderer_object()
                         .get_atlas_region()
+                        .unwrap()
                         .page()
                         .c_ptr_ref()
                         .rendererObject as *const c_void
@@ -250,6 +251,7 @@ impl SkeletonController {
                     region_attachment
                         .renderer_object()
                         .get_atlas_region()
+                        .unwrap()
                         .page()
                         .c_ptr_ref()
                         .rendererObject as *const c_void

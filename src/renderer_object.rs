@@ -37,16 +37,30 @@ impl<'a> RendererObject<'a> {
         *self.renderer_object = ptr;
     }
 
-    pub unsafe fn get<T>(&mut self) -> &mut T {
+    pub unsafe fn get<T>(&mut self) -> Option<&mut T> {
+        let ptr = *self.renderer_object;
+        if !ptr.is_null() {
+            Some(&mut *(*self.renderer_object as *mut T))
+        } else {
+            None
+        }
+    }
+
+    pub unsafe fn get_unchecked<T>(&mut self) -> &mut T {
         &mut *(*self.renderer_object as *mut T)
     }
 
-    pub unsafe fn get_atlas_region(&mut self) -> CTmpRef<Self, AtlasRegion> {
-        CTmpRef::new(
-            self,
-            AtlasRegion::new_from_ptr(*self.renderer_object as *mut spAtlasRegion),
-            None,
-        )
+    pub unsafe fn get_atlas_region(&mut self) -> Option<CTmpRef<Self, AtlasRegion>> {
+        let ptr = *self.renderer_object;
+        if !ptr.is_null() {
+            Some(CTmpRef::new(
+                self,
+                AtlasRegion::new_from_ptr(ptr as *mut spAtlasRegion),
+                None,
+            ))
+        } else {
+            None
+        }
     }
 
     pub unsafe fn dispose<T>(&mut self) {
