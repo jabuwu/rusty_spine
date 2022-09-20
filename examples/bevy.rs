@@ -269,11 +269,9 @@ fn spine_update(
     let mut image_remember = persistent_image_handles.remember.lock().unwrap();
     let mut image_forget = persistent_image_handles.forget.lock().unwrap();
     while let Some(image) = image_remember.pop() {
-        println!("remember {}", image);
         image_handles.push((image.clone(), asset_server.load(&image)));
     }
     while let Some(image) = image_forget.pop() {
-        println!("forget {}", image);
         if let Some(index) = image_handles.iter().position(|i| i.0 == image) {
             image_handles.remove(index);
         }
