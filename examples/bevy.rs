@@ -200,7 +200,6 @@ fn demo_load(
         let _ = controller
             .animation_state
             .set_animation_by_name(0, &demo.animation, true);
-        controller.update(0.016);
         if let Some(skin) = &demo.skin {
             let _ = controller.skeleton.set_skin_by_name(skin);
         }
