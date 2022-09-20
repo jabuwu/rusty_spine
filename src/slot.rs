@@ -32,7 +32,6 @@ impl Slot {
         }
     }
 
-    c_ptr!(c_slot, spSlot);
     c_accessor_color!(color, color_mut, color);
     c_accessor_tmp_ptr!(data, data_mut, data, SlotData, spSlotData);
     c_accessor_tmp_ptr!(bone, bone_mut, bone, Bone, spBone);
@@ -43,6 +42,7 @@ impl Slot {
         Attachment,
         spAttachment
     );
+    c_ptr!(c_slot, spSlot);
 
     // TODO: accessors
 }
@@ -61,7 +61,7 @@ impl NewFromPtr<spSlotData> for SlotData {
 }
 
 impl SlotData {
-    c_ptr!(c_slot_data, spSlotData);
     c_accessor_string!(name, name);
+    c_ptr!(c_slot_data, spSlotData);
     // TODO: accessors
 }

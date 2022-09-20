@@ -1,3 +1,5 @@
+//! Spine runtime for Rust (and wasm!) transpiled from the official C Runtime.
+
 #[macro_use]
 pub mod c_interface;
 pub mod c;

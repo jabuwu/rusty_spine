@@ -39,7 +39,6 @@ impl RegionAttachment {
         );
     }
 
-    c_ptr!(c_region_attachment, spRegionAttachment);
     c_attachment_accessors!();
     c_accessor_string!(path, path);
     c_accessor!(x, set_x, x, f32);
@@ -52,6 +51,7 @@ impl RegionAttachment {
     c_accessor_color!(color, color_mut, color);
     c_accessor_renderer_object!();
     c_accessor_tmp_ptr!(region, region_mut, region, TextureRegion, spTextureRegion);
+    c_ptr!(c_region_attachment, spRegionAttachment);
 
     // TODO: sequence, offset, uvs
 }

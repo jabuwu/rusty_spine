@@ -39,7 +39,7 @@ impl PointAttachment {
         unsafe { spPointAttachment_computeWorldRotation(self.c_ptr(), bone.c_ptr()) }
     }
 
-    c_ptr!(c_point_attachment, spPointAttachment);
     c_attachment_accessors!();
     c_accessor_color!(color, color_mut, color);
+    c_ptr!(c_point_attachment, spPointAttachment);
 }

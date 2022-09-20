@@ -29,6 +29,14 @@ impl NewFromPtr<spAtlas> for Atlas {
 }
 
 impl Atlas {
+    /// Create an Atlas from an in-memory vector.
+    /// ```
+    /// use rusty_spine::Atlas;
+    /// fn load_atlas() -> Atlas {
+    ///     let atlas_file = std::fs::read("skeleton.atlas").unwrap();
+    ///     Atlas::new(&atlas_file, "").unwrap()
+    /// }
+    /// ```
     pub fn new<P: AsRef<Path>>(data: &[u8], dir: P) -> Result<Atlas, Error> {
         let c_data = CString::new(data)?;
         let c_dir = CString::new(dir.as_ref().to_str().unwrap())?;
@@ -43,6 +51,13 @@ impl Atlas {
         Ok(unsafe { Self::new_from_ptr(c_atlas) })
     }
 
+    /// Create an Atlas from a file.
+    /// ```
+    /// use rusty_spine::Atlas;
+    /// fn load_atlas() -> Result<Atlas, rusty_spine::Error>{
+    ///     Ok(Atlas::new_from_file("skeleton.json")?)
+    /// }
+    /// ```
     pub fn new_from_file<P: AsRef<Path>>(path: P) -> Result<Atlas, Error> {
         let c_path = CString::new(path.as_ref().to_str().unwrap())?;
         let c_atlas = unsafe { spAtlas_createFromFile(c_path.as_ptr(), null_mut()) };
@@ -77,8 +92,8 @@ impl Atlas {
         }
     }
 
-    c_ptr!(c_atlas, spAtlas);
     c_accessor_renderer_object!();
+    c_ptr!(c_atlas, spAtlas);
 }
 
 impl Drop for Atlas {
@@ -105,7 +120,6 @@ impl NewFromPtr<spAtlasPage> for AtlasPage {
 }
 
 impl AtlasPage {
-    c_ptr!(c_atlas_page, spAtlasPage);
     c_accessor_tmp_ptr!(atlas, atlas_mut, atlas, Atlas, spAtlas);
     c_accessor_string!(name, name);
     c_accessor_enum!(format, set_format, format, AtlasFormat);
@@ -117,6 +131,7 @@ impl AtlasPage {
     c_accessor!(height, set_height, height, i32);
     c_accessor_bool!(pma, set_pma, pma);
     c_accessor_renderer_object!();
+    c_ptr!(c_atlas_page, spAtlasPage);
 }
 
 pub struct AtlasPageIterator<'a> {
@@ -244,7 +259,6 @@ impl NewFromPtr<spAtlasRegion> for AtlasRegion {
 }
 
 impl AtlasRegion {
-    c_ptr!(c_atlas_region, spAtlasRegion);
     c_accessor_super!(
         texture_region,
         texture_region_mut,
@@ -272,6 +286,8 @@ impl AtlasRegion {
         }
         vec
     }
+
+    c_ptr!(c_atlas_region, spAtlasRegion);
 }
 
 #[derive(Debug)]

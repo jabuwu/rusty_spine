@@ -257,7 +257,6 @@ impl AnimationState {
         }
     }
 
-    c_ptr!(c_animation_state, spAnimationState);
     c_accessor_tmp_ptr!(
         data,
         data_mut,
@@ -286,6 +285,7 @@ impl AnimationState {
             spAnimationState_disposeStatics();
         }
     }
+    c_ptr!(c_animation_state, spAnimationState);
 }
 
 impl Drop for AnimationState {
@@ -355,7 +355,6 @@ impl TrackEntry {
         unsafe { spTrackEntry_getTrackComplete(self.c_ptr()) }
     }
 
-    c_ptr!(c_track_entry, spTrackEntry);
     c_accessor_tmp_ptr!(animation, animation_mut, animation, Animation, spAnimation);
     c_accessor!(track_index, set_track_index, trackIndex, i32);
     c_accessor_bool!(looping, set_looping, loop_0);
@@ -386,6 +385,7 @@ impl TrackEntry {
     c_accessor!(mix_duration, set_mix_duration, mixDuration, f32);
     c_accessor!(interrupt_alpha, set_interrupt_alpha, interruptAlpha, f32);
     c_accessor!(total_alpha, set_total_alpha, totalAlpha, f32);
+    c_ptr!(c_track_entry, spTrackEntry);
 
     /*TODO
     spAnimation *animation;

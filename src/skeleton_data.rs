@@ -40,7 +40,6 @@ impl SkeletonData {
         }
     }
 
-    c_ptr!(c_skeleton_data, spSkeletonData);
     c_accessor_string!(version, version);
     c_accessor_string!(hash, hash);
     c_accessor_string!(images_path, imagesPath);
@@ -116,6 +115,7 @@ impl SkeletonData {
         animations,
         animations_count
     );
+    c_ptr!(c_skeleton_data, spSkeletonData);
 
     // TODO: accessors and methods for the arrays in spSkeletonData
 }

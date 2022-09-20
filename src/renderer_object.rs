@@ -5,6 +5,15 @@ use crate::{
     c_interface::NewFromPtr,
 };
 
+/// A wrapper around a user data void pointer found on a few Spine C structs.
+///
+/// The Spine C runtime sets this automatically to the attachment's atlas region for region and mesh
+/// attachments if using the default atlas attachment loader. In this case,
+/// [get_atlas_region](#method.get_atlas_region) can be used to get the Rust struct.
+///
+/// The value can be set manually but will panic if the value is already set. The previous value
+/// can be disposed using [dispose](#method.dispose), but only if the value was allocated in Rust.
+/// The value can be forgotten using [forget](#method.forget), but this can cause a memory leak.
 pub struct RendererObject<'a> {
     renderer_object: &'a mut *mut c_void,
 }

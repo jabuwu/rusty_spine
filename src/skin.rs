@@ -14,7 +14,7 @@ impl NewFromPtr<spSkin> for Skin {
 }
 
 impl Skin {
-    c_ptr!(c_skin, spSkin);
     c_accessor_string!(name, name);
+    c_ptr!(c_skin, spSkin);
     // TODO: accessors
 }

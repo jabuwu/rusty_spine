@@ -67,7 +67,7 @@ pub mod types {
         __variant2,
     }
 }
-use types::*;
+use self::types::*;
 
 #[allow(non_camel_case_types)]
 type size_t = c_ulong;

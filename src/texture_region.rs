@@ -14,7 +14,6 @@ impl NewFromPtr<spTextureRegion> for TextureRegion {
 }
 
 impl TextureRegion {
-    c_ptr!(c_texture_region, spTextureRegion);
     c_accessor!(u, set_u, u, f32);
     c_accessor!(v, set_v, v, f32);
     c_accessor!(u2, set_u2, u2, f32);
@@ -27,4 +26,5 @@ impl TextureRegion {
     c_accessor!(original_width, set_original_width, originalWidth, i32);
     c_accessor!(original_height, set_original_height, originalHeight, i32);
     c_accessor_renderer_object!();
+    c_ptr!(c_texture_region, spTextureRegion);
 }

@@ -78,9 +78,9 @@ impl Attachment {
         }
     }
 
-    c_ptr!(c_attachment, spAttachment);
     c_accessor_string!(name, name);
     c_accessor_enum_no_set!(attachment_type, type_0, AttachmentType);
+    c_ptr!(c_attachment, spAttachment);
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

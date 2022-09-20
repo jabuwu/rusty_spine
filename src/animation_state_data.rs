@@ -62,7 +62,6 @@ impl AnimationStateData {
         unsafe { spAnimationStateData_getMix(self.c_ptr(), from.c_ptr(), to.c_ptr()) }
     }
 
-    c_ptr!(c_animation_state_data, spAnimationStateData);
     c_accessor_tmp_ptr!(
         skeleton_data,
         skeleton_data_mut,
@@ -72,6 +71,7 @@ impl AnimationStateData {
     );
     c_accessor!(default_mix, set_default_mix, defaultMix, f32);
     c_accessor_passthrough!(entries, entries_mut, entries, *const c_void, *mut c_void);
+    c_ptr!(c_animation_state_data, spAnimationStateData);
 }
 
 impl Drop for AnimationStateData {

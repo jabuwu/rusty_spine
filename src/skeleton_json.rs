@@ -15,6 +15,7 @@ use crate::{
     sync_ptr::SyncPtr,
 };
 
+/// A loader for Spine json files.
 #[derive(Debug)]
 pub struct SkeletonJson {
     c_skeleton_json: SyncPtr<spSkeletonJson>,
@@ -56,8 +57,8 @@ impl SkeletonJson {
         }
     }
 
-    c_ptr!(c_skeleton_json, spSkeletonJson);
     c_accessor!(scale, set_scale, scale, f32);
+    c_ptr!(c_skeleton_json, spSkeletonJson);
 }
 
 impl Drop for SkeletonJson {

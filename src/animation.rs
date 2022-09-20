@@ -14,7 +14,7 @@ impl NewFromPtr<spAnimation> for Animation {
 }
 
 impl Animation {
-    c_ptr!(c_animation, spAnimation);
     c_accessor_string!(name, name);
+    c_ptr!(c_animation, spAnimation);
     // TODO: accessors
 }

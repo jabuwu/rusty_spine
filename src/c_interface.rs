@@ -1,3 +1,5 @@
+//! Helper structs for interacting with C pointers in safe rust.
+
 use std::marker::PhantomData;
 
 use std::ops::{Deref, DerefMut};

@@ -122,7 +122,6 @@ impl Bone {
         }
     }
 
-    c_ptr!(c_bone, spBone);
     c_accessor!(x, set_x, x, f32);
     c_accessor!(y, set_y, y, f32);
     c_accessor!(rotation, set_rotation, rotation, f32);
@@ -157,6 +156,8 @@ impl Bone {
     pub fn is_y_down() -> bool {
         unsafe { spBone_isYDown() != 0 }
     }
+
+    c_ptr!(c_bone, spBone);
 }
 
 pub type BoneRef = CRef<Skeleton, Bone>;

@@ -6,7 +6,7 @@ mod wasm;
 #[cfg(feature = "libc")]
 mod libc;
 
-pub use spine_c::*;
+pub use self::spine_c::*;
 
 mod environment {
     #[cfg(not(feature = "libc"))]

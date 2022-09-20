@@ -31,7 +31,6 @@ impl MeshAttachment {
         &mut self.c_ptr_mut().super_0
     }
 
-    c_ptr!(c_mesh_attachment, spMeshAttachment);
     c_attachment_accessors!();
     c_vertex_attachment_accessors!();
     c_accessor_string!(path, path);
@@ -60,4 +59,5 @@ impl MeshAttachment {
     );
 
     // TODO: sequence, regionUVs, uvs, parentMesh, edges
+    c_ptr!(c_mesh_attachment, spMeshAttachment);
 }

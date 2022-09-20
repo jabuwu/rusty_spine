@@ -90,7 +90,6 @@ impl Skeleton {
 
     // TODO: iterators for ik, transform, path constraints
 
-    c_ptr!(c_skeleton, spSkeleton);
     c_accessor_tmp_ptr!(data, data_mut, data, SkeletonData, spSkeletonData);
     c_accessor_color!(color, color_mut, color);
     c_accessor!(bones_count, set_bones_count, bonesCount, i32);
@@ -153,6 +152,7 @@ impl Skeleton {
         slots_count,
         validator
     );
+    c_ptr!(c_skeleton, spSkeleton);
 }
 
 impl Drop for Skeleton {
