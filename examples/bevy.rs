@@ -32,12 +32,16 @@ struct Demo {
     position: Vec2,
     scale: f32,
     skin: Option<String>,
+    note: String,
 }
 
 struct Demos(Vec<Demo>);
 
 #[derive(Clone)]
 struct DemoLoad(usize);
+
+#[derive(Component)]
+struct NoteText;
 
 fn make_cube(mesh: &mut Mesh) {
     let indices = Indices::U32(vec![]);
@@ -95,6 +99,7 @@ fn main() {
                 position: Vec2::new(0., -400.),
                 scale: 0.5,
                 skin: None,
+                note: "".to_owned(),
             },
             Demo {
                 atlas: include_bytes!("../assets/spineboy/export/spineboy.atlas").to_vec(),
@@ -104,6 +109,7 @@ fn main() {
                 position: Vec2::new(0., -400.),
                 scale: 0.5,
                 skin: None,
+                note: "".to_owned(),
             },
             Demo {
                 atlas: include_bytes!("../assets/windmill/export/windmill.atlas").to_vec(),
@@ -113,6 +119,7 @@ fn main() {
                 position: Vec2::new(0., -150.),
                 scale: 0.5,
                 skin: None,
+                note: "".to_owned(),
             },
             Demo {
                 atlas: include_bytes!("../assets/alien/export/alien.atlas").to_vec(),
@@ -122,15 +129,7 @@ fn main() {
                 position: Vec2::new(0., -600.),
                 scale: 0.25,
                 skin: None,
-            },
-            Demo {
-                atlas: include_bytes!("../assets/coin/export/coin.atlas").to_vec(),
-                json: include_bytes!("../assets/coin/export/coin-pro.json").to_vec(),
-                dir: "coin/export/".to_owned(),
-                animation: "animation".to_owned(),
-                position: Vec2::new(0., 0.),
-                scale: 0.75,
-                skin: None,
+                note: "".to_owned(),
             },
             Demo {
                 atlas: include_bytes!("../assets/dragon/export/dragon.atlas").to_vec(),
@@ -140,6 +139,7 @@ fn main() {
                 position: Vec2::new(0., -100.),
                 scale: 0.85,
                 skin: None,
+                note: "".to_owned(),
             },
             Demo {
                 atlas: include_bytes!("../assets/goblins/export/goblins.atlas").to_vec(),
@@ -149,6 +149,7 @@ fn main() {
                 position: Vec2::new(0., -200.),
                 scale: 1.,
                 skin: Some("goblingirl".to_owned()),
+                note: "".to_owned(),
             },
             Demo {
                 atlas: include_bytes!("../assets/stretchyman/export/stretchyman.atlas").to_vec(),
@@ -158,6 +159,7 @@ fn main() {
                 position: Vec2::new(-700., -250.),
                 scale: 0.75,
                 skin: None,
+                note: "".to_owned(),
             },
             Demo {
                 atlas: include_bytes!("../assets/tank/export/tank.atlas").to_vec(),
@@ -167,6 +169,17 @@ fn main() {
                 position: Vec2::new(3500., -850.),
                 scale: 0.3,
                 skin: None,
+                note: "".to_owned(),
+            },
+            Demo {
+                atlas: include_bytes!("../assets/coin/export/coin.atlas").to_vec(),
+                json: include_bytes!("../assets/coin/export/coin-pro.json").to_vec(),
+                dir: "coin/export/".to_owned(),
+                animation: "animation".to_owned(),
+                position: Vec2::new(0., 0.),
+                scale: 0.75,
+                skin: None,
+                note: "the coin does not render correctly without backface culling disabled and blend modes\nboth of which require a custom renderer in bevy".to_owned(),
             },
         ]))
         .add_event::<DemoLoad>()
@@ -178,9 +191,47 @@ fn main() {
         .run();
 }
 
-fn startup(mut commands: Commands, mut ev_demo_load: EventWriter<DemoLoad>) {
+fn startup(
+    mut commands: Commands,
+    mut ev_demo_load: EventWriter<DemoLoad>,
+    asset_server: Res<AssetServer>,
+) {
     commands.spawn_bundle(Camera2dBundle::default());
     ev_demo_load.send(DemoLoad(0));
+    commands.spawn_bundle(Text2dBundle {
+        text: Text::from_section(
+            "press space for next demo",
+            TextStyle {
+                font: asset_server.load("FiraMono-Medium.ttf"),
+                font_size: 22.0,
+                color: Color::WHITE,
+            },
+        )
+        .with_alignment(TextAlignment {
+            horizontal: HorizontalAlign::Center,
+            vertical: VerticalAlign::Center,
+        }),
+        transform: Transform::from_xyz(0., 320., 1.),
+        ..Default::default()
+    });
+    commands
+        .spawn_bundle(Text2dBundle {
+            text: Text::from_section(
+                "",
+                TextStyle {
+                    font: asset_server.load("FiraMono-Medium.ttf"),
+                    font_size: 22.0,
+                    color: Color::WHITE,
+                },
+            )
+            .with_alignment(TextAlignment {
+                horizontal: HorizontalAlign::Center,
+                vertical: VerticalAlign::Center,
+            }),
+            transform: Transform::from_xyz(0., -320., 1.),
+            ..Default::default()
+        })
+        .insert(NoteText);
 }
 
 fn demo_load(
@@ -188,12 +239,13 @@ fn demo_load(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut ev_demo_load: EventReader<DemoLoad>,
-    entity_query: Query<Entity, Without<Camera>>,
+    mut note_query: Query<&mut Text, With<NoteText>>,
+    entity_query: Query<Entity, With<Spine>>,
     demos: Res<Demos>,
 ) {
     for event in ev_demo_load.iter() {
         for entity in entity_query.iter() {
-            commands.entity(entity).despawn();
+            commands.entity(entity).despawn_recursive();
         }
         let demo = &demos.0[event.0];
         let mut controller = load_skeleton(&demo.atlas, &demo.json, &demo.dir).unwrap();
@@ -235,6 +287,9 @@ fn demo_load(
                 }
             })
             .insert(Spine { controller });
+        for mut note_text in note_query.iter_mut() {
+            note_text.sections[0].value = demo.note.clone();
+        }
     }
 }
 
