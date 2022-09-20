@@ -409,9 +409,13 @@ macro_rules! c_accessor_string {
         #[inline]
         pub fn $rust(&self) -> &str {
             unsafe {
-                std::ffi::CStr::from_ptr(self.c_ptr_ref().$c)
-                    .to_str()
-                    .unwrap()
+                if !self.c_ptr_ref().$c.is_null() {
+                    std::ffi::CStr::from_ptr(self.c_ptr_ref().$c)
+                        .to_str()
+                        .unwrap()
+                } else {
+                    ""
+                }
             }
         }
     };

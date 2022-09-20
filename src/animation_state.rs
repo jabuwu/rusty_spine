@@ -4,19 +4,20 @@ use crate::{
     animation::Animation,
     animation_state_data::AnimationStateData,
     c::{
-        spAnimation, spAnimationState, spAnimationStateData, spAnimationState_addAnimation,
+        c_void, spAnimation, spAnimationState, spAnimationStateData, spAnimationState_addAnimation,
         spAnimationState_addAnimationByName, spAnimationState_addEmptyAnimation,
         spAnimationState_apply, spAnimationState_clearListenerNotifications,
         spAnimationState_clearNext, spAnimationState_clearTrack, spAnimationState_clearTracks,
         spAnimationState_create, spAnimationState_dispose, spAnimationState_disposeStatics,
         spAnimationState_getCurrent, spAnimationState_setAnimation,
         spAnimationState_setAnimationByName, spAnimationState_setEmptyAnimation,
-        spAnimationState_setEmptyAnimations, spAnimationState_update, spTrackEntry,
-        spTrackEntry_getAnimationTime, spTrackEntry_getTrackComplete,
+        spAnimationState_setEmptyAnimations, spAnimationState_update, spEvent, spEventType,
+        spTrackEntry, spTrackEntry_getAnimationTime, spTrackEntry_getTrackComplete,
     },
     c_interface::CTmpRef,
     c_interface::NewFromPtr,
     error::Error,
+    event::Event,
     skeleton::Skeleton,
     sync_ptr::SyncPtr,
 };
@@ -25,7 +26,17 @@ use crate::{
 pub struct AnimationState {
     c_animation_state: SyncPtr<spAnimationState>,
     owns_memory: bool,
-    _animation_state_data: Arc<AnimationStateData>,
+    _animation_state_data: Option<Arc<AnimationStateData>>,
+}
+
+impl NewFromPtr<spAnimationState> for AnimationState {
+    unsafe fn new_from_ptr(c_animation_state: *const spAnimationState) -> Self {
+        Self {
+            c_animation_state: SyncPtr(c_animation_state as *mut spAnimationState),
+            owns_memory: false,
+            _animation_state_data: None,
+        }
+    }
 }
 
 // TODO: track entries are going to require their own memory management solution
@@ -33,10 +44,15 @@ pub struct AnimationState {
 impl AnimationState {
     pub fn new(animation_state_data: Arc<AnimationStateData>) -> Self {
         let c_animation_state = unsafe { spAnimationState_create(animation_state_data.c_ptr()) };
+        unsafe {
+            (*c_animation_state).userData = Box::leak(Box::new(AnimationStateUserData::default()))
+                as *mut AnimationStateUserData
+                as *mut c_void;
+        }
         Self {
             c_animation_state: SyncPtr(c_animation_state),
             owns_memory: true,
-            _animation_state_data: animation_state_data,
+            _animation_state_data: Some(animation_state_data),
         }
     }
 
@@ -195,6 +211,40 @@ impl AnimationState {
         }
     }
 
+    pub fn set_listener<F>(&mut self, listener: F)
+    where
+        F: Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>) + 'static,
+    {
+        extern "C" fn c_listener(
+            c_animation_state: *mut spAnimationState,
+            c_event_type: spEventType,
+            c_track_entry: *mut spTrackEntry,
+            c_event: *mut spEvent,
+        ) {
+            let user_data =
+                unsafe { &mut *((*c_animation_state).userData as *mut AnimationStateUserData) };
+            if let Some(listener) = &user_data.listener {
+                let animation_state = unsafe { AnimationState::new_from_ptr(c_animation_state) };
+                let track_entry = unsafe { TrackEntry::new_from_ptr(c_track_entry) };
+                let event = if !c_event.is_null() {
+                    Some(unsafe { Event::new_from_ptr(c_event) })
+                } else {
+                    None
+                };
+                listener(
+                    &animation_state,
+                    EventType::from(c_event_type),
+                    &track_entry,
+                    event.as_ref(),
+                );
+            }
+        }
+        let user_data =
+            unsafe { &mut *((*self.c_animation_state.0).userData as *mut AnimationStateUserData) };
+        user_data.listener = Some(Box::new(listener));
+        self.c_ptr_mut().listener = Some(c_listener);
+    }
+
     pub fn clear_listener_notifications(&mut self) {
         unsafe {
             spAnimationState_clearListenerNotifications(self.c_ptr());
@@ -231,11 +281,6 @@ impl AnimationState {
     c_accessor!(unkeyed_state, set_unkeyed_state, unkeyedState, i32);
     c_accessor_renderer_object!();
 
-    /*TODO
-    spAnimationStateListener listener;
-    void *userData;
-    */
-
     pub fn dispose_statics() {
         unsafe {
             spAnimationState_disposeStatics();
@@ -247,8 +292,43 @@ impl Drop for AnimationState {
     fn drop(&mut self) {
         if self.owns_memory {
             unsafe {
+                drop(Box::from_raw(
+                    (*self.c_animation_state.0).userData as *mut AnimationStateUserData,
+                ));
+            }
+            unsafe {
                 spAnimationState_dispose(self.c_animation_state.0);
             }
+        }
+    }
+}
+
+#[derive(Default)]
+struct AnimationStateUserData {
+    listener: Option<Box<dyn Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>)>>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EventType {
+    Start = 0,
+    Interrupt = 1,
+    End = 2,
+    Complete = 3,
+    Dispose = 4,
+    Event = 5,
+    Unknown = 99,
+}
+
+impl From<spEventType> for EventType {
+    fn from(event_type: spEventType) -> Self {
+        match event_type {
+            0 => Self::Start,
+            1 => Self::Interrupt,
+            2 => Self::End,
+            3 => Self::Complete,
+            4 => Self::Dispose,
+            5 => Self::Event,
+            _ => Self::Unknown,
         }
     }
 }
