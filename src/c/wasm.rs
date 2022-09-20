@@ -33,7 +33,9 @@
  */
 
 use crate::c::FILE;
+use std::any::Any;
 use std::collections::HashMap;
+use std::ffi::{CStr, CString};
 use std::sync::{Arc, Mutex, Once};
 
 pub mod types {
@@ -829,21 +831,6 @@ unsafe fn spine_memset(s: *mut c_void, c: c_int, n: size_t) -> *mut c_void {
 }
 
 #[no_mangle]
-unsafe fn spine_printf(_format: *const c_char, _: i32) -> c_int {
-    unimplemented!();
-}
-
-#[no_mangle]
-unsafe fn spine_sprintf(_s: *mut c_char, _format: *const c_char, _: i32) -> c_int {
-    unimplemented!();
-}
-
-#[no_mangle]
-unsafe fn spine_sscanf(_s: *const c_char, _format: *const c_char, _: i32) -> c_int {
-    unimplemented!();
-}
-
-#[no_mangle]
 unsafe fn spine_fopen(_filename: *const c_char, _modes: *const c_char) -> *mut FILE {
     unimplemented!();
 }
@@ -868,11 +855,129 @@ unsafe fn spine_ftell(_stream: *mut FILE) -> c_long {
     unimplemented!();
 }
 
+fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
+    let mut new_str = "".to_owned();
+    let mut percent = false;
+    let mut index = 0;
+    for char in format.chars() {
+        if char == '%' {
+            percent = true;
+        } else if percent {
+            if let Some(arg) = args.get(index) {
+                match char {
+                    'i' | 'd' => {
+                        if let Some(i) = arg.downcast_ref::<i32>() {
+                            new_str += &format!("{}", *i);
+                        } else if let Some(i) = arg.downcast_ref::<u32>() {
+                            new_str += &format!("{}", *i);
+                        } else {
+                            panic!("Unsupported printf argument type");
+                        }
+                    }
+                    's' => {
+                        if let Some(s) = arg.downcast_ref::<*const c_char>() {
+                            new_str +=
+                                &format!("{}", unsafe { CStr::from_ptr(*s).to_str().unwrap() });
+                        } else {
+                            panic!("Unsupported printf argument type");
+                        }
+                    }
+                    'f' => {
+                        if let Some(f) = arg.downcast_ref::<f32>() {
+                            new_str += &format!("{:.6}", *f);
+                        } else if let Some(f) = arg.downcast_ref::<f64>() {
+                            new_str += &format!("{:.6}", *f);
+                        } else {
+                            panic!("Unsupported printf argument type");
+                        }
+                    }
+                    'x' => {
+                        if let Some(i) = arg.downcast_ref::<i32>() {
+                            new_str += &format!("{:x}", *i);
+                        } else if let Some(i) = arg.downcast_ref::<u32>() {
+                            new_str += &format!("{:x}", *i);
+                        } else {
+                            panic!("Unsupported printf argument type");
+                        }
+                    }
+                    _ => {
+                        panic!("Unsupported printf tag: %{}", char);
+                    }
+                }
+            } else {
+                panic!("Incorrect argument count");
+            }
+            percent = false;
+            index += 1;
+        } else {
+            new_str.push(char);
+        }
+    }
+    new_str
+}
+
+pub(crate) fn printf(c_format: *const c_char, args: Vec<Box<dyn Any>>) {
+    let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
+    print!("{}", fmt(format, args));
+}
+
+pub(crate) fn sprintf(c_str: *mut c_char, c_format: *const c_char, args: Vec<Box<dyn Any>>) {
+    let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
+    let result = fmt(format, args);
+    unsafe {
+        let str = CString::new(result).unwrap();
+        spine_strcpy(c_str, str.as_ptr());
+    }
+}
+
+pub(crate) fn sscanf(c_str: *const c_char, c_format: *const c_char, args: *mut c_uint) {
+    let str = unsafe { CStr::from_ptr(c_str).to_str().unwrap().to_owned() };
+    let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
+    assert_eq!(format, "%4x");
+    unsafe {
+        *args = c_uint::from_str_radix(&str[0..(str.len().min(4))], 16).unwrap();
+    }
+}
+
+macro_rules! spine_printf {
+    ($format:expr) => {
+        crate::c::wasm::printf($format, vec![]);
+    };
+    ($format:expr, $($arg:expr),+ $(,)? ) => {
+        crate::c::wasm::printf($format, vec![
+            $(Box::new($arg)),+
+        ]);
+    };
+}
+
+macro_rules! spine_sprintf {
+    ($str:expr, $format:expr) => {
+        crate::c::wasm::sprintf($str, $format, vec![]);
+    };
+    ($str:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
+        crate::c::wasm::sprintf($str, $format, vec![
+            $(Box::new($arg)),+
+        ]);
+    };
+}
+
+macro_rules! spine_sscanf {
+    ($str:expr, $format:expr, $a:expr) => {
+        crate::c::wasm::sscanf($str, $format, $a);
+    };
+    ($str:expr, $format:expr, $a:expr,) => {
+        crate::c::wasm::sscanf($str, $format, $a);
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use std::ffi::CString;
 
-    use crate::c::wasm::{spine_strtol, spine_strtoul};
+    use crate::c::{
+        c_uint,
+        wasm::{spine_strtol, spine_strtoul},
+    };
 
     use super::{spine_strlen, Allocator};
 
@@ -942,5 +1047,47 @@ mod tests {
             assert_eq!(value, 0);
             assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(0));
         }
+    }
+
+    #[test]
+    fn fmt() {
+        assert_eq!(
+            super::fmt("integer: (%i)".to_string(), vec![Box::new(52)]),
+            "integer: (52)"
+        );
+        assert_eq!(
+            super::fmt("integer: (%d)".to_string(), vec![Box::new(123)]),
+            "integer: (123)"
+        );
+        assert_eq!(
+            super::fmt("float: (%f)".to_string(), vec![Box::new(3.14)]),
+            "float: (3.140000)"
+        );
+        let c_str = CString::new("hello").unwrap();
+        assert_eq!(
+            super::fmt("string: (%s)".to_string(), vec![Box::new(c_str.as_ptr())]),
+            "string: (hello)"
+        );
+        assert_eq!(
+            super::fmt("hex: (%x)".to_string(), vec![Box::new(200)]),
+            "hex: (c8)"
+        );
+    }
+
+    #[test]
+    fn sscanf() {
+        let c_str = CString::new("3fa5").unwrap();
+        let c_format = CString::new("%4x").unwrap();
+        let mut uc: c_uint = 0;
+        spine_sscanf!(c_str.as_ptr(), c_format.as_ptr(), &mut uc);
+        assert_eq!(uc, 16293);
+
+        let c_str = CString::new("3f").unwrap();
+        spine_sscanf!(c_str.as_ptr(), c_format.as_ptr(), &mut uc);
+        assert_eq!(uc, 63);
+
+        let c_str = CString::new("3fa5ff").unwrap();
+        spine_sscanf!(c_str.as_ptr(), c_format.as_ptr(), &mut uc);
+        assert_eq!(uc, 16293);
     }
 }

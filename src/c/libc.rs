@@ -116,19 +116,31 @@ unsafe fn spine_memset(s: *mut c_void, c: c_int, n: size_t) -> *mut c_void {
     libc::memset(s, c, n)
 }
 
-#[no_mangle]
-unsafe fn spine_printf(_format: *const c_char, _: i32) -> c_int {
-    unimplemented!();
+macro_rules! spine_printf {
+    ($format:expr) => {
+        libc::printf($format);
+    };
+    ($format:expr, $($arg:expr),+ $(,)? ) => {
+        libc::printf($format, $($arg),+);
+    };
 }
 
-#[no_mangle]
-unsafe fn spine_sprintf(_s: *mut c_char, _format: *const c_char, _: i32) -> c_int {
-    unimplemented!();
+macro_rules! spine_sprintf {
+    ($str:expr, $format:expr) => {
+        libc::sprintf($str, $format);
+    };
+    ($str:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
+        libc::sprintf($str, $format, $($arg),+);
+    };
 }
 
-#[no_mangle]
-unsafe fn spine_sscanf(_s: *const c_char, _format: *const c_char, _: i32) -> c_int {
-    unimplemented!();
+macro_rules! spine_sscanf {
+    ($str:expr, $format:expr) => {
+        libc::sscanf($str, $format);
+    };
+    ($str:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
+        libc::sscanf($str, $format, $($arg),+);
+    };
 }
 
 #[no_mangle]

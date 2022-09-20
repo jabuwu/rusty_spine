@@ -105,14 +105,15 @@ fn main() {
                 scale: 0.75,
                 skin: None,
             },
-            /*TODO: figure out why dragon crashes - Demo {
-                atlas: "assets/dragon/export/dragon.atlas".to_owned(),
-                json: "assets/dragon/export/dragon-ess.json".to_owned(),
+            Demo {
+                atlas: include_bytes!("../assets/dragon/export/dragon.atlas").to_vec(),
+                json: include_bytes!("../assets/dragon/export/dragon-ess.json").to_vec(),
                 dir: "dragon/export/".to_owned(),
                 animation: "flying".to_owned(),
                 position: Vec2::new(0., 0.),
                 scale: 0.75,
-            },*/
+                skin: None,
+            },
             Demo {
                 atlas: include_bytes!("../assets/goblins/export/goblins.atlas").to_vec(),
                 json: include_bytes!("../assets/goblins/export/goblins-pro.json").to_vec(),

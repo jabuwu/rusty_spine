@@ -2,6 +2,7 @@ use std::{
     ffi::OsStr,
     fs::{copy, create_dir_all, read_dir, read_to_string, remove_dir_all, write},
     io,
+    path::Path,
     process::{Command, Output, Stdio},
 };
 
@@ -18,9 +19,14 @@ where
         .output()
 }
 
-pub fn replace_identifier(src: String, identifier: &str, replacement: &str) -> String {
-    let mut slice = &src[0..];
-    let mut slice_offset = 0;
+pub fn replace_identifier(
+    src: String,
+    identifier: &str,
+    replacement: &str,
+    offset: usize,
+) -> String {
+    let mut slice = &src[offset..];
+    let mut slice_offset = offset;
     while let Some(index) = slice.find(identifier) {
         let src_index = slice_offset + index;
         let before_is_alphanumeric = src_index != 0
@@ -37,7 +43,7 @@ pub fn replace_identifier(src: String, identifier: &str, replacement: &str) -> S
             let new_src = String::from(&src[0..src_index])
                 + replacement
                 + &src[(src_index + identifier.len())..];
-            return replace_identifier(new_src, identifier, replacement);
+            return replace_identifier(new_src, identifier, replacement, src_index + 1);
         }
         slice = &slice[(index + 1)..];
         slice_offset = src_index + 1;
@@ -58,6 +64,8 @@ pub fn spine_c_include_dir() -> String {
 }
 
 pub fn run() {
+    checks();
+
     c_merge_files("/tmp/spine-merged.c");
     c_fixes_before_preprocessor(
         "/tmp/spine-merged.c",
@@ -82,18 +90,55 @@ pub fn run() {
     copy("/tmp/spine-fixes.rs", "/out/spine_c.rs").unwrap();
 }
 
+pub fn checks() {
+    if !Path::new(&spine_c_dir()).is_dir() {
+        println!("");
+        println!(
+            "Spine source not found. Please checkout spine-runtimes in the transpiler directory."
+        );
+        println!("");
+        println!("git clone https://github.com/EsotericSoftware/spine-runtimes.git");
+        println!("");
+        panic!();
+    }
+}
+
 pub fn c_merge_files(output: &str) {
     let src_dir = spine_c_src_dir();
     let dir = read_dir(&src_dir).unwrap();
     let mut conglomerate = String::new();
     for file in dir {
         let name = String::from(file.unwrap().file_name().to_str().unwrap());
-        if name.ends_with(".c") && name != "SkeletonBinary.c" {
+        if name.ends_with(".c") {
             let full_path = src_dir.clone() + "/" + name.as_str();
-            conglomerate += &read_to_string(&full_path).unwrap();
+            conglomerate += &fix_source(&name, read_to_string(&full_path).unwrap());
         }
     }
     write(output, conglomerate).unwrap();
+}
+
+pub fn fix_source(name: &str, mut src: String) -> String {
+    if name == "SkeletonJson.c" {
+        src = replace_identifier(src, "_spLinkedMesh", "_spLinkedMeshJson", 0);
+        src = replace_identifier(src, "setBezier", "setBezierJson", 0);
+        src = replace_identifier(src, "readTimeline", "readTimelineJson", 0);
+        src = replace_identifier(src, "readTimeline2", "readTimeline2Json", 0);
+        src = replace_identifier(src, "readSequence", "readSequenceJson", 0);
+        src = replace_identifier(src, "_readVertices", "_readVerticesJson", 0);
+        src = replace_identifier(src, "string_starts_with", "string_starts_with_json", 0);
+        src
+    } else if name == "SkeletonBinary.c" {
+        src = replace_identifier(src, "_spLinkedMesh", "_spLinkedMeshBinary", 0);
+        src = replace_identifier(src, "setBezier", "setBezierBinary", 0);
+        src = replace_identifier(src, "readTimeline", "readTimelineBinary", 0);
+        src = replace_identifier(src, "readTimeline2", "readTimeline2Binary", 0);
+        src = replace_identifier(src, "readSequence", "readSequenceBinary", 0);
+        src = replace_identifier(src, "_readVertices", "_readVerticesBinary", 0);
+        src = replace_identifier(src, "string_starts_with", "string_starts_with_binary", 0);
+        src
+    } else {
+        src
+    }
 }
 
 pub fn c_fixes_before_preprocessor(input: &str, output: &str) {
@@ -127,32 +172,32 @@ pub fn c_run_preprocessor(input: &str, output: &str) {
 
 pub fn c_fixes_after_preprocessor(input: &str, output: &str) {
     let mut src = read_to_string(input).unwrap();
-    src = replace_identifier(src, "memmove", "spine_memmove");
-    src = replace_identifier(src, "strlen", "spine_strlen");
-    src = replace_identifier(src, "memcpy", "spine_memcpy");
-    src = replace_identifier(src, "memset", "spine_memset");
-    src = replace_identifier(src, "strcpy", "spine_strcpy");
-    src = replace_identifier(src, "strcmp", "spine_strcmp");
-    src = replace_identifier(src, "strrchr", "spine_strrchr");
-    src = replace_identifier(src, "sqrtf", "spine_sqrtf");
-    src = replace_identifier(src, "strcasecmp", "spine_strcasecmp");
-    src = replace_identifier(src, "strncmp", "spine_strncmp");
-    src = replace_identifier(src, "strncat", "spine_strncat");
-    src = replace_identifier(src, "malloc", "spine_malloc");
-    src = replace_identifier(src, "realloc", "spine_realloc");
-    src = replace_identifier(src, "free", "spine_free");
-    src = replace_identifier(src, "strtol", "spine_strtol");
-    src = replace_identifier(src, "sprintf", "spine_sprintf");
-    src = replace_identifier(src, "printf", "spine_printf");
-    src = replace_identifier(src, "sscanf", "spine_sscanf");
-    src = replace_identifier(src, "strtoul", "spine_strtoul");
-    src = replace_identifier(src, "rand", "spine_rand");
-    src = replace_identifier(src, "fopen", "spine_fopen");
-    src = replace_identifier(src, "fseek", "spine_fseek");
-    src = replace_identifier(src, "ftell", "spine_ftell");
-    src = replace_identifier(src, "fread", "spine_fread");
-    src = replace_identifier(src, "fclose", "spine_fclose");
-    src = replace_identifier(src, "fclose", "spine_fclose");
+    src = replace_identifier(src, "memmove", "spine_memmove", 0);
+    src = replace_identifier(src, "strlen", "spine_strlen", 0);
+    src = replace_identifier(src, "memcpy", "spine_memcpy", 0);
+    src = replace_identifier(src, "memset", "spine_memset", 0);
+    src = replace_identifier(src, "strcpy", "spine_strcpy", 0);
+    src = replace_identifier(src, "strcmp", "spine_strcmp", 0);
+    src = replace_identifier(src, "strrchr", "spine_strrchr", 0);
+    src = replace_identifier(src, "sqrtf", "spine_sqrtf", 0);
+    src = replace_identifier(src, "strcasecmp", "spine_strcasecmp", 0);
+    src = replace_identifier(src, "strncmp", "spine_strncmp", 0);
+    src = replace_identifier(src, "strncat", "spine_strncat", 0);
+    src = replace_identifier(src, "malloc", "spine_malloc", 0);
+    src = replace_identifier(src, "realloc", "spine_realloc", 0);
+    src = replace_identifier(src, "free", "spine_free", 0);
+    src = replace_identifier(src, "strtol", "spine_strtol", 0);
+    src = replace_identifier(src, "sprintf", "spine_sprintf", 0);
+    src = replace_identifier(src, "printf", "spine_printf", 0);
+    src = replace_identifier(src, "sscanf", "spine_sscanf", 0);
+    src = replace_identifier(src, "strtoul", "spine_strtoul", 0);
+    src = replace_identifier(src, "rand", "spine_rand", 0);
+    src = replace_identifier(src, "fopen", "spine_fopen", 0);
+    src = replace_identifier(src, "fseek", "spine_fseek", 0);
+    src = replace_identifier(src, "ftell", "spine_ftell", 0);
+    src = replace_identifier(src, "fread", "spine_fread", 0);
+    src = replace_identifier(src, "fclose", "spine_fclose", 0);
+    src = replace_identifier(src, "fclose", "spine_fclose", 0);
     write(output, src).unwrap();
 }
 
@@ -197,5 +242,20 @@ type _IO_codecvt = u8;
 type _IO_marker = u8;
 pub use crate::c::environment::types::*;
     ";
+    src = src.replace(
+        "fn spine_printf(__format: *const c_char, _: ...) -> c_int;",
+        "",
+    );
+    src = src.replace(
+        "fn spine_sprintf(\n        __s: *mut c_char,\n        __format: *const c_char,\n        _: ...\n    ) -> c_int;",
+        "",
+    );
+    src = src.replace(
+        "fn spine_sscanf(\n        __s: *const c_char,\n        __format: *const c_char,\n        _: ...\n    ) -> c_int;",
+        "",
+    );
+    src = replace_identifier(src, "spine_printf", "spine_printf!", 0);
+    src = replace_identifier(src, "spine_sprintf", "spine_sprintf!", 0);
+    src = replace_identifier(src, "spine_sscanf", "spine_sscanf!", 0);
     write(output, src).unwrap();
 }
