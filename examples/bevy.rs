@@ -250,57 +250,48 @@ fn demo_load(
         for entity in entity_query.iter() {
             commands.entity(entity).despawn_recursive();
         }
-        for x in -9..=9 {
-            for y in -5..=5 {
-                let demo = &demos.0[event.0];
-                let mut controller = load_skeleton(&demo.atlas, &demo.json, &demo.dir).unwrap();
-                let _ = controller
-                    .animation_state
-                    .set_animation_by_name(0, &demo.animation, true);
-                if let Some(skin) = &demo.skin {
-                    let _ = controller.skeleton.set_skin_by_name(skin);
+        let demo = &demos.0[event.0];
+        let mut controller = load_skeleton(&demo.atlas, &demo.json, &demo.dir).unwrap();
+        let _ = controller
+            .animation_state
+            .set_animation_by_name(0, &demo.animation, true);
+        if let Some(skin) = &demo.skin {
+            let _ = controller.skeleton.set_skin_by_name(skin);
+        }
+        let mut slots = HashMap::new();
+        commands
+            .spawn_bundle((
+                Transform::from_scale(Vec3::ONE * demo.scale),
+                GlobalTransform::default(),
+                Visibility::default(),
+                ComputedVisibility::default(),
+            ))
+            .with_children(|parent| {
+                for slot in controller.skeleton.slots() {
+                    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
+                    make_cube(&mut mesh);
+                    let mesh = meshes.add(mesh);
+                    slots.insert(
+                        slot.data().name().to_owned(),
+                        parent
+                            .spawn_bundle((
+                                Mesh2dHandle(mesh.clone()),
+                                Transform::from_xyz(demo.position.x, demo.position.y, 0.),
+                                GlobalTransform::default(),
+                                Visibility::default(),
+                                ComputedVisibility::default(),
+                                materials.add(ColorMaterial {
+                                    color: Color::NONE,
+                                    texture: None,
+                                }),
+                            ))
+                            .id(),
+                    );
                 }
-                let mut slots = HashMap::new();
-                commands
-                    .spawn_bundle((
-                        Transform::from_xyz(
-                            x as f32 * 100.,
-                            y as f32 * 100.,
-                            0.5 + x as f32 * -0.01,
-                        )
-                        .with_scale(Vec3::ONE * demo.scale * 0.25),
-                        GlobalTransform::default(),
-                        Visibility::default(),
-                        ComputedVisibility::default(),
-                    ))
-                    .with_children(|parent| {
-                        for slot in controller.skeleton.slots() {
-                            let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-                            make_cube(&mut mesh);
-                            let mesh = meshes.add(mesh);
-                            slots.insert(
-                                slot.data().name().to_owned(),
-                                parent
-                                    .spawn_bundle((
-                                        Mesh2dHandle(mesh.clone()),
-                                        Transform::from_xyz(demo.position.x, demo.position.y, 0.),
-                                        GlobalTransform::default(),
-                                        Visibility::default(),
-                                        ComputedVisibility::default(),
-                                        materials.add(ColorMaterial {
-                                            color: Color::NONE,
-                                            texture: None,
-                                        }),
-                                    ))
-                                    .id(),
-                            );
-                        }
-                    })
-                    .insert(Spine { controller });
-                for mut note_text in note_query.iter_mut() {
-                    note_text.sections[0].value = demo.note.clone();
-                }
-            }
+            })
+            .insert(Spine { controller });
+        for mut note_text in note_query.iter_mut() {
+            note_text.sections[0].value = demo.note.clone();
         }
     }
 }
