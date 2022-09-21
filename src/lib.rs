@@ -7,6 +7,13 @@ pub mod extension;
 pub mod prelude;
 pub mod sync_ptr;
 
+#[cfg(feature = "draw_functions")]
+pub mod draw;
+#[cfg(feature = "draw_functions")]
+mod skeleton_controller;
+#[cfg(feature = "draw_functions")]
+pub use skeleton_controller::*;
+
 mod animation;
 mod animation_state;
 mod animation_state_data;
@@ -25,7 +32,6 @@ mod renderer_object;
 mod skeleton;
 mod skeleton_binary;
 mod skeleton_clipping;
-mod skeleton_controller;
 mod skeleton_data;
 mod skeleton_json;
 mod skin;
@@ -50,7 +56,6 @@ pub use renderer_object::*;
 pub use skeleton::*;
 pub use skeleton_binary::*;
 pub use skeleton_clipping::*;
-pub use skeleton_controller::*;
 pub use skeleton_data::*;
 pub use skeleton_json::*;
 pub use skin::*;

@@ -8,6 +8,7 @@ use crate::{
         spSkeleton_setToSetupPose,
     },
     color::Color,
+    draw::CullDirection,
     skeleton::Skeleton,
     skeleton_clipping::SkeletonClipping,
     skeleton_data::SkeletonData,
@@ -56,12 +57,6 @@ impl SkeletonControllerSettings {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CullDirection {
-    Clockwise,
-    CounterClockwise,
-}
-
 impl SkeletonController {
     pub fn new(
         skeleton_data: Arc<SkeletonData>,
@@ -108,7 +103,7 @@ impl SkeletonController {
             let mut color;
 
             if let Some(mesh_attachment) = slot.attachment().and_then(|a| a.as_mesh()) {
-                color = *mesh_attachment.color();
+                color = mesh_attachment.color();
 
                 let mut world_vertices = vec![];
                 world_vertices.resize(1000, 0.);
@@ -138,7 +133,7 @@ impl SkeletonController {
                         .push(unsafe { *mesh_attachment.triangles().offset(i as isize) } as u16);
                 }
             } else if let Some(region_attachment) = slot.attachment().and_then(|a| a.as_region()) {
-                color = *region_attachment.color();
+                color = region_attachment.color();
 
                 let mut world_vertices = vec![];
                 world_vertices.resize(1000, 0.);

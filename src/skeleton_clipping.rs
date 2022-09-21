@@ -2,7 +2,7 @@ use crate::{
     c::{
         spClippingAttachment, spSkeletonClipping, spSkeletonClipping_clipEnd,
         spSkeletonClipping_clipEnd2, spSkeletonClipping_clipStart, spSkeletonClipping_create,
-        spSkeletonClipping_dispose,
+        spSkeletonClipping_dispose, spSkeletonClipping_isClipping,
     },
     clipping_attachment::ClippingAttachment,
     slot::Slot,
@@ -43,6 +43,10 @@ impl SkeletonClipping {
         unsafe {
             spSkeletonClipping_clipEnd2(self.c_ptr_mut());
         }
+    }
+
+    pub fn is_clipping(&self) -> bool {
+        unsafe { spSkeletonClipping_isClipping(self.c_ptr_mut()) != 0 }
     }
 
     c_ptr!(c_skeleton_clipping, spSkeletonClipping);

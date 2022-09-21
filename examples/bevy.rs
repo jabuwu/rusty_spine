@@ -10,8 +10,8 @@ use bevy::{
     sprite::Mesh2dHandle,
 };
 use rusty_spine::{
-    AnimationStateData, Atlas, Error, SkeletonJson,
-    {CullDirection, SkeletonController, SkeletonControllerSettings},
+    draw::CullDirection, AnimationStateData, Atlas, Error, SkeletonController,
+    SkeletonControllerSettings, SkeletonJson,
 };
 
 #[derive(Component)]

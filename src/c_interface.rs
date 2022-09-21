@@ -436,9 +436,9 @@ macro_rules! c_accessor_bool {
 
 macro_rules! c_accessor_color {
     ($rust:ident, $rust_mut:ident, $c:ident) => {
-        pub fn $rust(&self) -> &crate::color::Color {
+        pub fn $rust(&self) -> crate::color::Color {
             unsafe {
-                &*(&self.c_ptr_ref().$c as *const crate::c::spColor as *const crate::color::Color)
+                *(&self.c_ptr_ref().$c as *const crate::c::spColor as *const crate::color::Color)
             }
         }
         pub fn $rust_mut(&mut self) -> &mut crate::color::Color {

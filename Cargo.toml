@@ -22,4 +22,6 @@ bevy = "0.8"
 opt-level = 3
 
 [features]
+default = [ "draw_functions" ]
 use_libc = [ "libc" ]
+draw_functions = []

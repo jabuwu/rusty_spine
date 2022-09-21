@@ -1,6 +1,8 @@
+use std::ops::Mul;
+
 use crate::c::c_float;
 
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 #[repr(C)]
 pub struct Color {
     pub r: c_float,
@@ -66,5 +68,18 @@ impl Color {
         self.g = self.r.clamp(0., 1.);
         self.b = self.r.clamp(0., 1.);
         self.a = self.r.clamp(0., 1.);
+    }
+}
+
+impl Mul<Color> for Color {
+    type Output = Color;
+
+    fn mul(self, rhs: Color) -> Self::Output {
+        Color {
+            r: self.r * rhs.r,
+            g: self.g * rhs.g,
+            b: self.b * rhs.b,
+            a: self.a * rhs.a,
+        }
     }
 }
