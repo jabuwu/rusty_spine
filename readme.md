@@ -2,6 +2,8 @@
 
 Spine runtime for Rust (and wasm!) transpiled from the official C Runtime.
 
+[Online demo!](https://jabuwu.github.io/rusty_spine/)
+
 ## Rust API
 
 A Rust API is provided on top of the C API, because working with C APIs directly in Rust is tedious and error prone. It's made to be as thin a wrapper as possible. Additionally, a `SkeletonController` is provided as a generic solution that should be good enough for most use cases. [See the simple example of this in action](https://github.com/jabuwu/rusty_spine/blob/main/examples/simple.rs).
