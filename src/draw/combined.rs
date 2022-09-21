@@ -124,20 +124,47 @@ impl CombinedDrawer {
             let color = if let Some(mesh_attachment) = slot.attachment().and_then(|a| a.as_mesh()) {
                 let color = mesh_attachment.color() * slot.color() * skeleton.color();
 
+                uvs.resize(
+                    vertex_base as usize + mesh_attachment.world_vertices_length() as usize,
+                    [0., 0.],
+                );
                 for i in 0..mesh_attachment.world_vertices_length() {
                     vertices.push([
                         world_vertices[i as usize * 2],
                         world_vertices[i as usize * 2 + 1],
                     ]);
 
-                    unsafe {
-                        uvs.push([
-                            *mesh_attachment.c_ptr_mut().uvs.offset(i as isize * 2),
-                            *mesh_attachment.c_ptr_mut().uvs.offset(i as isize * 2 + 1),
-                        ]);
-                    }
-
                     colors.push([color.r, color.g, color.b, color.a]);
+                }
+
+                // UVs need to be copied from the indices. I'm not entirely sure why, but it can lead to crashes otherwise.
+                macro_rules! copy_uvs {
+                    ($i:ident) => {
+                        let index = *mesh_attachment.triangles().offset($i);
+                        uvs[vertex_base as usize + index as usize] = [
+                            *mesh_attachment.c_ptr_mut().uvs.offset(index as isize * 2),
+                            *mesh_attachment
+                                .c_ptr_mut()
+                                .uvs
+                                .offset(index as isize * 2 + 1),
+                        ];
+                        let index = *mesh_attachment.triangles().offset($i + 1);
+                        uvs[vertex_base as usize + index as usize] = [
+                            *mesh_attachment.c_ptr_mut().uvs.offset(index as isize * 2),
+                            *mesh_attachment
+                                .c_ptr_mut()
+                                .uvs
+                                .offset(index as isize * 2 + 1),
+                        ];
+                        let index = *mesh_attachment.triangles().offset($i + 2);
+                        uvs[vertex_base as usize + index as usize] = [
+                            *mesh_attachment.c_ptr_mut().uvs.offset(index as isize * 2),
+                            *mesh_attachment
+                                .c_ptr_mut()
+                                .uvs
+                                .offset(index as isize * 2 + 1),
+                        ];
+                    };
                 }
 
                 if matches!(self.cull_direction, CullDirection::CounterClockwise) {
@@ -146,6 +173,7 @@ impl CombinedDrawer {
                             indices.push(vertex_base + *mesh_attachment.triangles().offset(i + 2));
                             indices.push(vertex_base + *mesh_attachment.triangles().offset(i + 1));
                             indices.push(vertex_base + *mesh_attachment.triangles().offset(i));
+                            copy_uvs!(i);
                         }
                     }
                 } else {
@@ -154,6 +182,7 @@ impl CombinedDrawer {
                             indices.push(vertex_base + *mesh_attachment.triangles().offset(i));
                             indices.push(vertex_base + *mesh_attachment.triangles().offset(i + 1));
                             indices.push(vertex_base + *mesh_attachment.triangles().offset(i + 2));
+                            copy_uvs!(i);
                         }
                     }
                 }

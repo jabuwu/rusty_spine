@@ -1,15 +1,17 @@
 use crate::{
-    c::{c_void, spSkeletonClipping_clipTriangles},
+    c::{c_void, spMeshAttachment_updateRegion, spSkeletonClipping_clipTriangles},
     Color, Skeleton, SkeletonClipping,
 };
 
-use super::CullDirection;
+use super::{BlendMode, CullDirection};
 
 pub struct SimpleRenderable {
+    pub slot_index: usize,
     pub vertices: Vec<[f32; 2]>,
     pub uvs: Vec<[f32; 2]>,
     pub indices: Vec<u16>,
     pub color: Color,
+    pub blend_mode: BlendMode,
     pub attachment_renderer_object: Option<*const c_void>,
 }
 
@@ -44,6 +46,9 @@ impl SimpleDrawer {
             let mut color;
 
             if let Some(mesh_attachment) = slot.attachment().and_then(|a| a.as_mesh()) {
+                unsafe {
+                    spMeshAttachment_updateRegion(mesh_attachment.c_ptr());
+                };
                 color = mesh_attachment.color();
 
                 unsafe {
@@ -59,18 +64,42 @@ impl SimpleDrawer {
 
                 vertices.reserve(mesh_attachment.world_vertices_length() as usize);
                 uvs.reserve(mesh_attachment.world_vertices_length() as usize);
+                uvs.resize(mesh_attachment.world_vertices_length() as usize, [0., 0.]);
                 for i in 0..mesh_attachment.world_vertices_length() {
                     vertices.push([
                         world_vertices[i as usize * 2],
                         world_vertices[i as usize * 2 + 1],
                     ]);
+                }
 
-                    unsafe {
-                        uvs.push([
-                            *mesh_attachment.c_ptr_mut().uvs.offset(i as isize * 2),
-                            *mesh_attachment.c_ptr_mut().uvs.offset(i as isize * 2 + 1),
-                        ]);
-                    }
+                // UVs need to be copied from the indices. I'm not entirely sure why, but it can lead to crashes otherwise.
+                macro_rules! copy_uvs {
+                    ($i:ident) => {
+                        let index = *mesh_attachment.triangles().offset($i);
+                        uvs[index as usize] = [
+                            *mesh_attachment.c_ptr_mut().uvs.offset(index as isize * 2),
+                            *mesh_attachment
+                                .c_ptr_mut()
+                                .uvs
+                                .offset(index as isize * 2 + 1),
+                        ];
+                        let index = *mesh_attachment.triangles().offset($i + 1);
+                        uvs[index as usize] = [
+                            *mesh_attachment.c_ptr_mut().uvs.offset(index as isize * 2),
+                            *mesh_attachment
+                                .c_ptr_mut()
+                                .uvs
+                                .offset(index as isize * 2 + 1),
+                        ];
+                        let index = *mesh_attachment.triangles().offset($i + 2);
+                        uvs[index as usize] = [
+                            *mesh_attachment.c_ptr_mut().uvs.offset(index as isize * 2),
+                            *mesh_attachment
+                                .c_ptr_mut()
+                                .uvs
+                                .offset(index as isize * 2 + 1),
+                        ];
+                    };
                 }
 
                 indices.reserve(mesh_attachment.triangles_count() as usize);
@@ -80,6 +109,7 @@ impl SimpleDrawer {
                             indices.push(*mesh_attachment.triangles().offset(i + 2));
                             indices.push(*mesh_attachment.triangles().offset(i + 1));
                             indices.push(*mesh_attachment.triangles().offset(i));
+                            copy_uvs!(i);
                         }
                     }
                 } else {
@@ -88,6 +118,15 @@ impl SimpleDrawer {
                             indices.push(*mesh_attachment.triangles().offset(i));
                             indices.push(*mesh_attachment.triangles().offset(i + 1));
                             indices.push(*mesh_attachment.triangles().offset(i + 2));
+                            let index = *mesh_attachment.triangles().offset(i);
+                            uvs[index as usize * 2] = [
+                                *mesh_attachment.c_ptr_mut().uvs.offset(index as isize * 2),
+                                *mesh_attachment
+                                    .c_ptr_mut()
+                                    .uvs
+                                    .offset(index as isize * 2 + 1),
+                            ];
+                            copy_uvs!(i);
                         }
                     }
                 }
@@ -217,10 +256,12 @@ impl SimpleDrawer {
             color.a *= slot.c_ptr_mut().color.a * skeleton.c_ptr_mut().color.a;
 
             renderables.push(SimpleRenderable {
+                slot_index: slot_index as usize,
                 vertices,
                 uvs,
                 indices,
                 color,
+                blend_mode: BlendMode::Normal,
                 attachment_renderer_object,
             });
             if let Some(clipper) = clipper.as_deref_mut() {

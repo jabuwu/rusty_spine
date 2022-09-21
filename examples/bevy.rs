@@ -6,7 +6,10 @@ use std::{
 
 use bevy::{
     prelude::*,
-    render::{mesh::Indices, render_resource::PrimitiveTopology},
+    render::{
+        mesh::{Indices, MeshVertexAttribute},
+        render_resource::{PrimitiveTopology, VertexFormat},
+    },
     sprite::Mesh2dHandle,
 };
 use rusty_spine::{
@@ -247,48 +250,57 @@ fn demo_load(
         for entity in entity_query.iter() {
             commands.entity(entity).despawn_recursive();
         }
-        let demo = &demos.0[event.0];
-        let mut controller = load_skeleton(&demo.atlas, &demo.json, &demo.dir).unwrap();
-        let _ = controller
-            .animation_state
-            .set_animation_by_name(0, &demo.animation, true);
-        if let Some(skin) = &demo.skin {
-            let _ = controller.skeleton.set_skin_by_name(skin);
-        }
-        let mut slots = HashMap::new();
-        commands
-            .spawn_bundle((
-                Transform::from_scale(Vec3::ONE * demo.scale),
-                GlobalTransform::default(),
-                Visibility::default(),
-                ComputedVisibility::default(),
-            ))
-            .with_children(|parent| {
-                for slot in controller.skeleton.slots() {
-                    let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-                    make_cube(&mut mesh);
-                    let mesh = meshes.add(mesh);
-                    slots.insert(
-                        slot.data().name().to_owned(),
-                        parent
-                            .spawn_bundle((
-                                Mesh2dHandle(mesh.clone()),
-                                Transform::from_xyz(demo.position.x, demo.position.y, 0.),
-                                GlobalTransform::default(),
-                                Visibility::default(),
-                                ComputedVisibility::default(),
-                                materials.add(ColorMaterial {
-                                    color: Color::NONE,
-                                    texture: None,
-                                }),
-                            ))
-                            .id(),
-                    );
+        for x in -9..=9 {
+            for y in -5..=5 {
+                let demo = &demos.0[event.0];
+                let mut controller = load_skeleton(&demo.atlas, &demo.json, &demo.dir).unwrap();
+                let _ = controller
+                    .animation_state
+                    .set_animation_by_name(0, &demo.animation, true);
+                if let Some(skin) = &demo.skin {
+                    let _ = controller.skeleton.set_skin_by_name(skin);
                 }
-            })
-            .insert(Spine { controller });
-        for mut note_text in note_query.iter_mut() {
-            note_text.sections[0].value = demo.note.clone();
+                let mut slots = HashMap::new();
+                commands
+                    .spawn_bundle((
+                        Transform::from_xyz(
+                            x as f32 * 100.,
+                            y as f32 * 100.,
+                            0.5 + x as f32 * -0.01,
+                        )
+                        .with_scale(Vec3::ONE * demo.scale * 0.25),
+                        GlobalTransform::default(),
+                        Visibility::default(),
+                        ComputedVisibility::default(),
+                    ))
+                    .with_children(|parent| {
+                        for slot in controller.skeleton.slots() {
+                            let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
+                            make_cube(&mut mesh);
+                            let mesh = meshes.add(mesh);
+                            slots.insert(
+                                slot.data().name().to_owned(),
+                                parent
+                                    .spawn_bundle((
+                                        Mesh2dHandle(mesh.clone()),
+                                        Transform::from_xyz(demo.position.x, demo.position.y, 0.),
+                                        GlobalTransform::default(),
+                                        Visibility::default(),
+                                        ComputedVisibility::default(),
+                                        materials.add(ColorMaterial {
+                                            color: Color::NONE,
+                                            texture: None,
+                                        }),
+                                    ))
+                                    .id(),
+                            );
+                        }
+                    })
+                    .insert(Spine { controller });
+                for mut note_text in note_query.iter_mut() {
+                    note_text.sections[0].value = demo.note.clone();
+                }
+            }
         }
     }
 }
@@ -342,8 +354,11 @@ fn spine_update(
                         normals.push([0., 0., 0.]);
                     }
                     let mesh = meshes.get_mut(&mesh_handle.0).unwrap();
-                    mesh.set_indices(Some(Indices::U32(take(&mut renderable.indices))));
-                    mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, take(&mut renderable.vertices));
+                    mesh.set_indices(Some(Indices::U16(take(&mut renderable.indices))));
+                    mesh.insert_attribute(
+                        MeshVertexAttribute::new("Vertex_Position", 0, VertexFormat::Float32x2),
+                        take(&mut renderable.vertices),
+                    );
                     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
                     mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, take(&mut renderable.uvs));
                     if let Some(color_material) = color_materials.get_mut(color_material_handle) {
