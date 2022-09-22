@@ -5,8 +5,7 @@ use crate::c::{
     spAtlasFilter, spAtlasFormat, spAtlasRegion, spAtlasWrap, spAtlas_createFromFile,
     spTextureRegion,
 };
-use crate::c_interface::{CTmpMut, CTmpRef, NewFromPtr};
-use crate::sync_ptr::SyncPtr;
+use crate::c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr};
 use crate::texture_region::TextureRegion;
 use crate::{
     c::{c_int, spAtlas, spAtlasPage, spAtlas_create, spAtlas_dispose},

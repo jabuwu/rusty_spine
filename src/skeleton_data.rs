@@ -5,10 +5,9 @@ use crate::{
     atlas::Atlas,
     bone::BoneData,
     c::{spAnimation, spBoneData, spSkeletonData, spSkeletonData_dispose, spSkin, spSlotData},
-    c_interface::NewFromPtr,
+    c_interface::{NewFromPtr, SyncPtr},
     skin::Skin,
     slot::SlotData,
-    sync_ptr::SyncPtr,
 };
 
 #[derive(Debug)]

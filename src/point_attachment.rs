@@ -4,8 +4,7 @@ use crate::{
         spAttachment, spPointAttachment, spPointAttachment_computeWorldPosition,
         spPointAttachment_computeWorldRotation,
     },
-    c_interface::NewFromPtr,
-    sync_ptr::SyncPtr,
+    c_interface::{NewFromPtr, SyncPtr},
 };
 
 #[derive(Debug)]

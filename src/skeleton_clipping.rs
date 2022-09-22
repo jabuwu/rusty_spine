@@ -4,9 +4,9 @@ use crate::{
         spSkeletonClipping_clipEnd2, spSkeletonClipping_clipStart, spSkeletonClipping_create,
         spSkeletonClipping_dispose, spSkeletonClipping_isClipping,
     },
+    c_interface::SyncPtr,
     clipping_attachment::ClippingAttachment,
     slot::Slot,
-    sync_ptr::SyncPtr,
 };
 
 #[derive(Debug)]

@@ -8,12 +8,11 @@ use crate::{
         spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose, spSkeleton_updateCache,
         spSkeleton_updateWorldTransform, spSlot,
     },
-    c_interface::{CTmpMut, CTmpRef, NewFromPtr},
+    c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::Error,
     skeleton_data::SkeletonData,
     skin::Skin,
     slot::Slot,
-    sync_ptr::SyncPtr,
 };
 
 #[derive(Debug)]

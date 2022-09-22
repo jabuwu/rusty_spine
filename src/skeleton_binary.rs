@@ -10,9 +10,9 @@ use crate::{
         c_uchar, spSkeletonBinary, spSkeletonBinary_create, spSkeletonBinary_dispose,
         spSkeletonBinary_readSkeletonData, spSkeletonBinary_readSkeletonDataFile,
     },
+    c_interface::SyncPtr,
     error::Error,
     skeleton_data::SkeletonData,
-    sync_ptr::SyncPtr,
 };
 
 /// A loader for Spine binary files.

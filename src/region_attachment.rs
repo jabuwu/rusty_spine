@@ -3,8 +3,8 @@ use crate::{
         c_float, spAttachment, spRegionAttachment, spRegionAttachment_computeWorldVertices,
         spTextureRegion,
     },
+    c_interface::SyncPtr,
     slot::Slot,
-    sync_ptr::SyncPtr,
     texture_region::TextureRegion,
 };
 

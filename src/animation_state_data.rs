@@ -7,9 +7,8 @@ use crate::{
         spAnimationStateData_getMix, spAnimationStateData_setMix,
         spAnimationStateData_setMixByName, spSkeletonData,
     },
-    c_interface::NewFromPtr,
+    c_interface::{NewFromPtr, SyncPtr},
     skeleton_data::SkeletonData,
-    sync_ptr::SyncPtr,
 };
 
 #[derive(Debug)]

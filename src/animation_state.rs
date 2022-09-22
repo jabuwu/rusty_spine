@@ -14,12 +14,10 @@ use crate::{
         spAnimationState_setEmptyAnimations, spAnimationState_update, spEvent, spEventType,
         spTrackEntry, spTrackEntry_getAnimationTime, spTrackEntry_getTrackComplete,
     },
-    c_interface::CTmpRef,
-    c_interface::NewFromPtr,
+    c_interface::{CTmpRef, NewFromPtr, SyncPtr},
     error::Error,
     event::Event,
     skeleton::Skeleton,
-    sync_ptr::SyncPtr,
 };
 
 #[derive(Debug)]

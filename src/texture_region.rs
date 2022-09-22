@@ -1,4 +1,7 @@
-use crate::{c::spTextureRegion, c_interface::NewFromPtr, sync_ptr::SyncPtr};
+use crate::{
+    c::spTextureRegion,
+    c_interface::{NewFromPtr, SyncPtr},
+};
 
 #[derive(Debug)]
 pub struct TextureRegion {

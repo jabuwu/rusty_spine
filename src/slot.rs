@@ -5,8 +5,7 @@ use crate::{
         spAttachment, spBone, spSkeleton, spSlot, spSlotData, spSlot_setAttachment,
         spSlot_setToSetupPose,
     },
-    c_interface::NewFromPtr,
-    sync_ptr::SyncPtr,
+    c_interface::{NewFromPtr, SyncPtr},
     Skeleton,
 };
 

@@ -10,9 +10,9 @@ use crate::{
         spSkeletonJson, spSkeletonJson_create, spSkeletonJson_dispose,
         spSkeletonJson_readSkeletonData, spSkeletonJson_readSkeletonDataFile,
     },
+    c_interface::SyncPtr,
     error::Error,
     skeleton_data::SkeletonData,
-    sync_ptr::SyncPtr,
 };
 
 /// A loader for Spine json files.

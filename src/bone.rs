@@ -7,8 +7,7 @@ use crate::{
         spBone_updateWorldTransformWith, spBone_worldToLocal, spBone_worldToLocalRotation,
         spSkeleton, spTransformMode,
     },
-    c_interface::NewFromPtr,
-    sync_ptr::SyncPtr,
+    c_interface::{NewFromPtr, SyncPtr},
     Skeleton,
 };
 

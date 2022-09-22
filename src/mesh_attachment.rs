@@ -1,7 +1,6 @@
 use crate::{
     c::{c_ushort, spAttachment, spMeshAttachment, spTextureRegion, spVertexAttachment},
-    c_interface::NewFromPtr,
-    sync_ptr::SyncPtr,
+    c_interface::{NewFromPtr, SyncPtr},
     texture_region::TextureRegion,
 };
 

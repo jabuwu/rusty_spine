@@ -1,7 +1,6 @@
 use crate::{
     c::{spEvent, spEventData},
-    c_interface::NewFromPtr,
-    sync_ptr::SyncPtr,
+    c_interface::{NewFromPtr, SyncPtr},
 };
 
 /// Events fired from animations.

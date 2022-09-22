@@ -1,7 +1,6 @@
 use crate::{
     c::{spAttachment, spClippingAttachment},
-    c_interface::NewFromPtr,
-    sync_ptr::SyncPtr,
+    c_interface::{NewFromPtr, SyncPtr},
 };
 
 #[derive(Debug)]

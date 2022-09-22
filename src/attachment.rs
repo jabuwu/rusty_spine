@@ -4,12 +4,11 @@ use crate::{
         spAttachment, spAttachmentType, spBoundingBoxAttachment, spClippingAttachment,
         spMeshAttachment, spPointAttachment, spRegionAttachment,
     },
-    c_interface::NewFromPtr,
+    c_interface::{NewFromPtr, SyncPtr},
     clipping_attachment::ClippingAttachment,
     mesh_attachment::MeshAttachment,
     point_attachment::PointAttachment,
     region_attachment::RegionAttachment,
-    sync_ptr::SyncPtr,
 };
 
 #[derive(Debug)]
