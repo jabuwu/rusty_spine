@@ -4,7 +4,6 @@
 pub mod c_interface;
 pub mod c;
 pub mod extension;
-pub mod prelude;
 
 #[cfg(feature = "draw_functions")]
 pub mod draw;
