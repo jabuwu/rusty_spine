@@ -61,7 +61,13 @@ impl Atlas {
     pub fn new_from_file<P: AsRef<Path>>(path: P) -> Result<Atlas, Error> {
         let c_path = CString::new(path.as_ref().to_str().unwrap())?;
         let c_atlas = unsafe { spAtlas_createFromFile(c_path.as_ptr(), null_mut()) };
-        Ok(unsafe { Self::new_from_ptr(c_atlas) })
+        if !c_atlas.is_null() {
+            Ok(unsafe { Self::new_from_ptr(c_atlas) })
+        } else {
+            Err(Error::FailedToReadFile(
+                path.as_ref().to_str().unwrap().to_owned(),
+            ))
+        }
     }
 
     pub fn pages(&self) -> AtlasPageIterator {
@@ -331,5 +337,21 @@ impl<'a> Iterator for AtlasRegionMutIterator<'a> {
         } else {
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::tests::TEST_SPINEBOY_ATLAS_FILE;
+
+    use super::Atlas;
+
+    #[test]
+    fn new_from_file() {
+        let atlas = Atlas::new_from_file(TEST_SPINEBOY_ATLAS_FILE);
+        assert!(atlas.is_ok());
+
+        let atlas = Atlas::new_from_file(format!("missing/{}", TEST_SPINEBOY_ATLAS_FILE));
+        assert!(atlas.is_err());
     }
 }

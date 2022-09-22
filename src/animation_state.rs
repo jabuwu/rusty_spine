@@ -292,6 +292,7 @@ impl Drop for AnimationState {
     fn drop(&mut self) {
         if self.owns_memory {
             unsafe {
+                (*self.c_animation_state.0).listener = None;
                 drop(Box::from_raw(
                     (*self.c_animation_state.0).userData as *mut AnimationStateUserData,
                 ));

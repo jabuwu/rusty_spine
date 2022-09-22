@@ -2,6 +2,8 @@ use std::sync::Arc;
 
 use crate::{AnimationState, AnimationStateData, Atlas, Skeleton, SkeletonData, SkeletonJson};
 
+pub const TEST_SPINEBOY_ATLAS_FILE: &'static str = "assets/spineboy/export/spineboy.atlas";
+
 pub const TEST_SPINEBOY_ATLAS_BYTES: &'static [u8] =
     include_bytes!("../assets/spineboy/export/spineboy.atlas");
 pub const TEST_SPINEBOY_JSON_BYTES: &'static [u8] =
