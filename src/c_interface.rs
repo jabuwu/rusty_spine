@@ -160,6 +160,104 @@ where
     }
 }
 
+pub struct CTmpPtrNullableIterator<'a, P, T, C>
+where
+    T: NewFromPtr<C>,
+{
+    _parent: &'a P,
+    items: *mut *mut C,
+    index: usize,
+    count: usize,
+    _marker: PhantomData<T>,
+}
+
+impl<'a, P, T, C> CTmpPtrNullableIterator<'a, P, T, C>
+where
+    T: NewFromPtr<C>,
+{
+    pub(crate) fn new(parent: &'a P, items: *mut *mut C, count: usize) -> Self {
+        Self {
+            _parent: parent,
+            items,
+            index: 0,
+            count,
+            _marker: Default::default(),
+        }
+    }
+}
+
+impl<'a, P, T, C> Iterator for CTmpPtrNullableIterator<'a, P, T, C>
+where
+    T: NewFromPtr<C>,
+{
+    type Item = Option<CTmpRef<'a, P, T>>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.count {
+            let ptr = unsafe { *self.items.offset(self.index as isize) };
+            if !ptr.is_null() {
+                let item = unsafe { T::new_from_ptr(ptr) };
+                self.index += 1;
+                Some(Some(CTmpRef::new(self._parent, item)))
+            } else {
+                self.index += 1;
+                Some(None)
+            }
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, P, T, C> Iterator for CTmpMutNullableIterator<'a, P, T, C>
+where
+    T: NewFromPtr<C>,
+{
+    type Item = Option<CTmpMut<'a, P, T>>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.count {
+            let ptr = unsafe { *self.items.offset(self.index as isize) };
+            if !ptr.is_null() {
+                let item = unsafe { T::new_from_ptr(ptr) };
+                self.index += 1;
+                Some(Some(CTmpMut::new(self._parent, item)))
+            } else {
+                self.index += 1;
+                Some(None)
+            }
+        } else {
+            None
+        }
+    }
+}
+
+pub struct CTmpMutNullableIterator<'a, P, T, C>
+where
+    T: NewFromPtr<C>,
+{
+    _parent: &'a P,
+    items: *mut *mut C,
+    index: usize,
+    count: usize,
+    _marker: PhantomData<T>,
+}
+
+impl<'a, P, T, C> CTmpMutNullableIterator<'a, P, T, C>
+where
+    T: NewFromPtr<C>,
+{
+    pub(crate) fn new(parent: &'a P, items: *mut *mut C, count: usize) -> Self {
+        Self {
+            _parent: parent,
+            items,
+            index: 0,
+            count,
+            _marker: Default::default(),
+        }
+    }
+}
+
 macro_rules! c_ptr {
     ($member:ident, $c_type:ty) => {
         #[inline]
@@ -381,7 +479,7 @@ macro_rules! c_accessor_passthrough {
 }
 
 macro_rules! c_accessor_array {
-    ($rust:ident, $rust_mut:ident, $rust_index:ident, $rust_index_mut:ident, $parent_type:ident, $type:ident, $c_type:ident, $c:ident, $count_fn:ident) => {
+    ($rust:ident, $rust_mut:ident, $rust_index:ident, $rust_index_mut:ident, $parent_type:ty, $type:ty, $c_type:ty, $c:ident, $count_fn:ident) => {
         pub fn $rust(&self) -> crate::c_interface::CTmpPtrIterator<$parent_type, $type, $c_type> {
             crate::c_interface::CTmpPtrIterator::new(
                 self,
@@ -425,6 +523,66 @@ macro_rules! c_accessor_array {
                         *self.c_ptr_mut().$c.offset(index as isize),
                     )
                 }))
+            } else {
+                None
+            }
+        }
+    };
+}
+
+macro_rules! c_accessor_array_nullable {
+    ($rust:ident, $rust_mut:ident, $rust_index:ident, $rust_index_mut:ident, $parent_type:ty, $type:ty, $c_type:ty, $c:ident, $count_fn:ident) => {
+        pub fn $rust(
+            &self,
+        ) -> crate::c_interface::CTmpPtrNullableIterator<$parent_type, $type, $c_type> {
+            crate::c_interface::CTmpPtrNullableIterator::new(
+                self,
+                unsafe { self.c_ptr_ref().$c },
+                self.$count_fn() as usize,
+            )
+        }
+
+        pub fn $rust_mut(
+            &mut self,
+        ) -> crate::c_interface::CTmpMutNullableIterator<$parent_type, $type, $c_type> {
+            crate::c_interface::CTmpMutNullableIterator::new(
+                self,
+                unsafe { self.c_ptr_ref().$c },
+                self.$count_fn() as usize,
+            )
+        }
+
+        pub fn $rust_index(
+            &self,
+            index: usize,
+        ) -> Option<crate::c_interface::CTmpRef<Self, $type>> {
+            if index < self.$count_fn() as usize {
+                let ptr = unsafe { *self.c_ptr_ref().$c.offset(index as isize) };
+                if !ptr.is_null() {
+                    Some(crate::c_interface::CTmpRef::new(self, unsafe {
+                        <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
+                    }))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        }
+
+        pub fn $rust_index_mut(
+            &mut self,
+            index: usize,
+        ) -> Option<crate::c_interface::CTmpMut<Self, $type>> {
+            if index < self.$count_fn() as usize {
+                let ptr = unsafe { *self.c_ptr_ref().$c.offset(index as isize) };
+                if !ptr.is_null() {
+                    Some(crate::c_interface::CTmpMut::new(self, unsafe {
+                        <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
+                    }))
+                } else {
+                    None
+                }
             } else {
                 None
             }
@@ -487,6 +645,7 @@ macro_rules! c_vertex_attachment_accessors {
 
 macro_rules! c_handle_decl {
     ($name:ident, $type:ident, $parent:ident, $c_type:ident, $c_parent:ident) => {
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub struct $name {
             c_item: crate::sync_ptr::SyncPtr<$c_type>,
             c_parent: crate::sync_ptr::SyncPtr<$c_parent>,
@@ -502,10 +661,10 @@ macro_rules! c_handle_decl {
 
             pub fn get<'a>(
                 &self,
-                skeleton: &'a $parent,
+                parent: &'a $parent,
             ) -> Option<crate::c_interface::CTmpRef<'a, $parent, $type>> {
-                if skeleton.c_ptr() == self.c_parent.0 {
-                    Some(crate::c_interface::CTmpRef::new(skeleton, unsafe {
+                if parent.c_ptr() == self.c_parent.0 {
+                    Some(crate::c_interface::CTmpRef::new(parent, unsafe {
                         <$type>::new_from_ptr(self.c_item.0)
                     }))
                 } else {
@@ -515,15 +674,82 @@ macro_rules! c_handle_decl {
 
             pub fn get_mut<'a>(
                 &self,
-                skeleton: &'a mut $parent,
+                parent: &'a mut $parent,
             ) -> Option<crate::c_interface::CTmpMut<'a, $parent, $type>> {
-                if skeleton.c_ptr() == self.c_parent.0 {
-                    Some(crate::c_interface::CTmpMut::new(skeleton, unsafe {
+                if parent.c_ptr() == self.c_parent.0 {
+                    Some(crate::c_interface::CTmpMut::new(parent, unsafe {
                         <$type>::new_from_ptr(self.c_item.0)
                     }))
                 } else {
                     None
                 }
+            }
+
+            pub unsafe fn get_unchecked<'a>(&self) -> $type {
+                <$type>::new_from_ptr(self.c_item.0)
+            }
+        }
+    };
+}
+
+macro_rules! c_handle_indexed_decl {
+    ($name:ident, $type:ty, $parent:ty, $c_type:ident, $c_parent:ident) => {
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        pub struct $name {
+            index: i32,
+            c_item: crate::sync_ptr::SyncPtr<$c_type>,
+            c_parent: crate::sync_ptr::SyncPtr<$c_parent>,
+        }
+
+        impl $name {
+            pub(crate) fn new(
+                index: i32,
+                c_item: *const $c_type,
+                c_parent: *const $c_parent,
+            ) -> Self {
+                Self {
+                    index,
+                    c_item: SyncPtr(c_item as *mut $c_type),
+                    c_parent: SyncPtr(c_parent as *mut $c_parent),
+                }
+            }
+
+            pub fn get<'a>(
+                &self,
+                parent: &'a $parent,
+            ) -> Option<crate::c_interface::CTmpRef<'a, $parent, $type>> {
+                if parent.c_ptr() == self.c_parent.0 {
+                    if <$type>::handle_valid(self) {
+                        Some(crate::c_interface::CTmpRef::new(parent, unsafe {
+                            <$type>::new_from_ptr(self.c_item.0)
+                        }))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            }
+
+            pub fn get_mut<'a>(
+                &self,
+                parent: &'a mut $parent,
+            ) -> Option<crate::c_interface::CTmpMut<'a, $parent, $type>> {
+                if parent.c_ptr() == self.c_parent.0 {
+                    if <$type>::handle_valid(self) {
+                        Some(crate::c_interface::CTmpMut::new(parent, unsafe {
+                            <$type>::new_from_ptr(self.c_item.0)
+                        }))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            }
+
+            pub unsafe fn get_unchecked<'a>(&self) -> $type {
+                <$type>::new_from_ptr(self.c_item.0)
             }
         }
     };

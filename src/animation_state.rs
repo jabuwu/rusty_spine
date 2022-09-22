@@ -39,8 +39,6 @@ impl NewFromPtr<spAnimationState> for AnimationState {
     }
 }
 
-// TODO: track entries are going to require their own memory management solution
-// they can be disposed when finished (and an event is fired)
 impl AnimationState {
     pub fn new(animation_state_data: Arc<AnimationStateData>) -> Self {
         let c_animation_state = unsafe { spAnimationState_create(animation_state_data.c_ptr()) };
@@ -58,7 +56,7 @@ impl AnimationState {
 
     pub fn update(&mut self, delta: f32) {
         unsafe {
-            spAnimationState_update(self.c_animation_state.0, delta);
+            spAnimationState_update(self.c_ptr(), delta);
         }
     }
 
@@ -267,7 +265,7 @@ impl AnimationState {
         spAnimationStateData
     );
     c_accessor!(tracks_count, tracksCount, i32);
-    c_accessor_array!(
+    c_accessor_array_nullable!(
         tracks,
         tracks_mut,
         track_at_index,
@@ -343,7 +341,7 @@ pub struct TrackEntry {
 
 impl NewFromPtr<spTrackEntry> for TrackEntry {
     unsafe fn new_from_ptr(c_track_entry: *const spTrackEntry) -> Self {
-        Self {
+        TrackEntry {
             c_track_entry: SyncPtr(c_track_entry as *mut spTrackEntry),
         }
     }
@@ -356,6 +354,25 @@ impl TrackEntry {
 
     pub fn get_track_complete(&self) -> f32 {
         unsafe { spTrackEntry_getTrackComplete(self.c_ptr()) }
+    }
+
+    pub fn handle(&self, animation_state: &AnimationState) -> TrackEntryHandle {
+        TrackEntryHandle::new(self.track_index(), self.c_ptr(), animation_state.c_ptr())
+    }
+
+    fn handle_valid(handle: &TrackEntryHandle) -> bool {
+        let track_count = unsafe { (*handle.c_parent.0).tracksCount };
+        if handle.index < track_count {
+            let track_at_index =
+                unsafe { *(*handle.c_parent.0).tracks.offset(handle.index as isize) };
+            if track_at_index == handle.c_item.0 {
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
     }
 
     c_accessor_tmp_ptr!(animation, animation_mut, animation, Animation, spAnimation);
@@ -381,7 +398,6 @@ impl TrackEntry {
     c_ptr!(c_track_entry, spTrackEntry);
 
     /*TODO
-    spAnimation *animation;
     spTrackEntry *previous;
     spTrackEntry *next;
     spTrackEntry *mixingFrom;
@@ -394,4 +410,68 @@ impl TrackEntry {
     int timelinesRotationCount;
     void *rendererObject;
     void *userData;*/
+}
+
+c_handle_indexed_decl!(
+    TrackEntryHandle,
+    TrackEntry,
+    AnimationState,
+    spTrackEntry,
+    spAnimationState
+);
+
+#[cfg(test)]
+mod tests {
+    use crate::tests::test_spineboy_instance;
+
+    #[test]
+    fn track_entry_optional() {
+        let (_, mut animation_state) = test_spineboy_instance();
+        let _ = animation_state.set_animation_by_name(0, "idle", true);
+        let _ = animation_state.set_animation_by_name(2, "run", true);
+
+        let track_0 = animation_state.tracks().nth(0).unwrap();
+        let track_1 = animation_state.tracks().nth(1).unwrap();
+        let track_2 = animation_state.tracks().nth(2).unwrap();
+        assert!(track_0.is_some());
+        assert!(track_1.is_none());
+        assert!(track_2.is_some());
+        assert_eq!(track_0.unwrap().animation().name(), "idle");
+        assert_eq!(track_2.unwrap().animation().name(), "run");
+        assert!(animation_state.tracks().nth(3).is_none());
+
+        assert!(animation_state.track_at_index(0).is_some());
+        assert!(animation_state.track_at_index(1).is_none());
+        assert!(animation_state.track_at_index(2).is_some());
+    }
+
+    #[test]
+    fn track_entry_invalidate_clear() {
+        let (_, mut animation_state) = test_spineboy_instance();
+        let _ = animation_state.set_animation_by_name(0, "idle", true);
+
+        let track_handle = animation_state
+            .track_at_index(0)
+            .unwrap()
+            .handle(&animation_state);
+
+        assert!(track_handle.get(&animation_state).is_some());
+        animation_state.clear_track(0);
+        assert!(track_handle.get(&animation_state).is_none());
+    }
+
+    #[test]
+    fn track_entry_invalidate_change() {
+        let (_, mut animation_state) = test_spineboy_instance();
+        let _ = animation_state.set_animation_by_name(0, "idle", true);
+
+        let track_handle = animation_state
+            .track_at_index(0)
+            .unwrap()
+            .handle(&animation_state);
+
+        assert!(track_handle.get(&animation_state).is_some());
+        let _ = animation_state.set_animation_by_name(0, "run", true);
+        assert!(track_handle.get(&animation_state).is_none());
+    }
 }
