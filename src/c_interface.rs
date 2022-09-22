@@ -12,15 +12,16 @@ pub trait NewFromPtr<C> {
 
 pub struct CTmpRef<'a, P, T> {
     data: T,
-    _parent: &'a P,
+    parent: &'a P,
 }
 
 impl<'a, P, T> CTmpRef<'a, P, T> {
     pub fn new(parent: &'a P, data: T) -> Self {
-        Self {
-            data,
-            _parent: parent,
-        }
+        Self { data, parent }
+    }
+
+    pub fn unwrap_parent_child(&mut self) -> (&P, &T) {
+        (self.parent, &self.data)
     }
 }
 
@@ -42,15 +43,16 @@ impl<'a, P, T: std::fmt::Debug> std::fmt::Debug for CTmpRef<'a, P, T> {
 
 pub struct CTmpMut<'a, P, T> {
     data: T,
-    _parent: &'a P,
+    parent: &'a mut P,
 }
 
 impl<'a, P, T> CTmpMut<'a, P, T> {
-    pub fn new(parent: &'a P, data: T) -> Self {
-        Self {
-            data,
-            _parent: parent,
-        }
+    pub fn new(parent: &'a mut P, data: T) -> Self {
+        Self { data, parent }
+    }
+
+    pub fn unwrap_parent_child(&mut self) -> (&mut P, &mut T) {
+        (self.parent, &mut self.data)
     }
 }
 
@@ -155,7 +157,10 @@ where
         if self.index < self.count {
             let item = unsafe { T::new_from_ptr(*self.items.offset(self.index as isize)) };
             self.index += 1;
-            Some(CTmpMut::new(self._parent, item))
+            Some(CTmpMut::new(
+                unsafe { &mut *(self._parent as *const P as *mut P) },
+                item,
+            ))
         } else {
             None
         }
@@ -223,7 +228,10 @@ where
             if !ptr.is_null() {
                 let item = unsafe { T::new_from_ptr(ptr) };
                 self.index += 1;
-                Some(Some(CTmpMut::new(self._parent, item)))
+                Some(Some(CTmpMut::new(
+                    unsafe { &mut *(self._parent as *const P as *mut P) },
+                    item,
+                )))
             } else {
                 self.index += 1;
                 Some(None)

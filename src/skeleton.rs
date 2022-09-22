@@ -89,7 +89,7 @@ impl Skeleton {
         CTmpRef::new(self, unsafe { Bone::new_from_ptr(self.c_ptr_mut().root) })
     }
 
-    pub fn bone_root_mut(&self) -> CTmpMut<Skeleton, Bone> {
+    pub fn bone_root_mut(&mut self) -> CTmpMut<Skeleton, Bone> {
         CTmpMut::new(self, unsafe { Bone::new_from_ptr(self.c_ptr_mut().root) })
     }
 

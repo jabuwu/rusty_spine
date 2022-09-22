@@ -170,7 +170,10 @@ impl<'a> Iterator for AtlasPageMutIterator<'a> {
         if !self.page.is_null() {
             let page = unsafe { AtlasPage::new_from_ptr(self.page) };
             self.page = unsafe { (*self.page).next };
-            Some(CTmpMut::new(self._atlas, page))
+            Some(CTmpMut::new(
+                unsafe { &mut *(self._atlas as *const Atlas as *mut Atlas) },
+                page,
+            ))
         } else {
             None
         }
@@ -332,7 +335,10 @@ impl<'a> Iterator for AtlasRegionMutIterator<'a> {
         if !self.region.is_null() {
             let page = unsafe { AtlasRegion::new_from_ptr(self.region) };
             self.region = unsafe { (*self.region).next };
-            Some(CTmpMut::new(self._atlas, page))
+            Some(CTmpMut::new(
+                unsafe { &mut *(self._atlas as *const Atlas as *mut Atlas) },
+                page,
+            ))
         } else {
             None
         }
