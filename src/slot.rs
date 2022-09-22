@@ -1,9 +1,13 @@
 use crate::{
     attachment::Attachment,
     bone::Bone,
-    c::{spAttachment, spBone, spSlot, spSlotData, spSlot_setAttachment, spSlot_setToSetupPose},
+    c::{
+        spAttachment, spBone, spSkeleton, spSlot, spSlotData, spSlot_setAttachment,
+        spSlot_setToSetupPose,
+    },
     c_interface::NewFromPtr,
     sync_ptr::SyncPtr,
+    Skeleton,
 };
 
 #[derive(Debug)]
@@ -32,6 +36,10 @@ impl Slot {
         }
     }
 
+    pub fn handle(&self) -> SlotHandle {
+        SlotHandle::new(self.c_ptr(), self.bone().c_ptr_mut().skeleton)
+    }
+
     c_accessor_color!(color, color_mut, color);
     c_accessor_tmp_ptr!(data, data_mut, data, SlotData, spSlotData);
     c_accessor_tmp_ptr!(bone, bone_mut, bone, Bone, spBone);
@@ -46,6 +54,8 @@ impl Slot {
 
     // TODO: accessors
 }
+
+c_handle_decl!(SlotHandle, Slot, Skeleton, spSlot, spSkeleton);
 
 #[derive(Debug)]
 pub struct SlotData {

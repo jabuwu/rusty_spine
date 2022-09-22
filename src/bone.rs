@@ -5,11 +5,11 @@ use crate::{
         spBone_rotateWorld, spBone_setToSetupPose, spBone_setYDown, spBone_update,
         spBone_updateAppliedTransform, spBone_updateWorldTransform,
         spBone_updateWorldTransformWith, spBone_worldToLocal, spBone_worldToLocalRotation,
-        spTransformMode,
+        spSkeleton, spTransformMode,
     },
-    c_interface::{CMut, CRef, NewFromPtr},
-    prelude::Skeleton,
+    c_interface::NewFromPtr,
     sync_ptr::SyncPtr,
+    Skeleton,
 };
 
 #[derive(Debug)]
@@ -122,6 +122,10 @@ impl Bone {
         }
     }
 
+    pub fn handle(&self) -> BoneHandle {
+        BoneHandle::new(self.c_ptr(), self.c_ptr_mut().skeleton)
+    }
+
     c_accessor!(x, set_x, x, f32);
     c_accessor!(y, set_y, y, f32);
     c_accessor!(rotation, set_rotation, rotation, f32);
@@ -146,6 +150,18 @@ impl Bone {
     c_accessor_bool!(active, set_active, active);
     c_accessor_tmp_ptr!(data, data_mut, data, BoneData, spBoneData);
     c_accessor_tmp_ptr!(parent, parent_mut, parent, Bone, spBone);
+    c_accessor!(children_count, children_count_mut, childrenCount, i32);
+    c_accessor_array!(
+        children,
+        children_mut,
+        childrenat_index,
+        childrenat_index_mut,
+        Bone,
+        Bone,
+        spBone,
+        children,
+        children_count
+    );
 
     pub fn set_y_down(y_down: bool) {
         unsafe {
@@ -160,8 +176,7 @@ impl Bone {
     c_ptr!(c_bone, spBone);
 }
 
-pub type BoneRef = CRef<Skeleton, Bone>;
-pub type BoneMut = CMut<Skeleton, Bone>;
+c_handle_decl!(BoneHandle, Bone, Skeleton, spBone, spSkeleton);
 
 #[derive(Debug)]
 pub struct BoneData {

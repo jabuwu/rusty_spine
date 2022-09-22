@@ -204,7 +204,7 @@ impl AnimationState {
         unsafe {
             let ptr = spAnimationState_getCurrent(self.c_ptr(), track_index);
             if !ptr.is_null() {
-                Some(CTmpRef::new(self, TrackEntry::new_from_ptr(ptr), None))
+                Some(CTmpRef::new(self, TrackEntry::new_from_ptr(ptr)))
             } else {
                 None
             }

@@ -146,7 +146,7 @@ impl<'a> Iterator for AtlasPageIterator<'a> {
         if !self.page.is_null() {
             let page = unsafe { AtlasPage::new_from_ptr(self.page) };
             self.page = unsafe { (*self.page).next };
-            Some(CTmpRef::new(self._atlas, page, None))
+            Some(CTmpRef::new(self._atlas, page))
         } else {
             None
         }
@@ -165,7 +165,7 @@ impl<'a> Iterator for AtlasPageMutIterator<'a> {
         if !self.page.is_null() {
             let page = unsafe { AtlasPage::new_from_ptr(self.page) };
             self.page = unsafe { (*self.page).next };
-            Some(CTmpMut::new(self._atlas, page, None))
+            Some(CTmpMut::new(self._atlas, page))
         } else {
             None
         }
@@ -308,7 +308,7 @@ impl<'a> Iterator for AtlasRegionIterator<'a> {
         if !self.region.is_null() {
             let page = unsafe { AtlasRegion::new_from_ptr(self.region) };
             self.region = unsafe { (*self.region).next };
-            Some(CTmpRef::new(self._atlas, page, None))
+            Some(CTmpRef::new(self._atlas, page))
         } else {
             None
         }
@@ -327,7 +327,7 @@ impl<'a> Iterator for AtlasRegionMutIterator<'a> {
         if !self.region.is_null() {
             let page = unsafe { AtlasRegion::new_from_ptr(self.region) };
             self.region = unsafe { (*self.region).next };
-            Some(CTmpMut::new(self._atlas, page, None))
+            Some(CTmpMut::new(self._atlas, page))
         } else {
             None
         }

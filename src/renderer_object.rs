@@ -63,7 +63,6 @@ impl<'a> RendererObject<'a> {
             Some(CTmpRef::new(
                 self,
                 AtlasRegion::new_from_ptr(ptr as *mut spAtlasRegion),
-                None,
             ))
         } else {
             None

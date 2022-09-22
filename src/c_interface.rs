@@ -3,205 +3,21 @@
 use std::marker::PhantomData;
 
 use std::ops::{Deref, DerefMut};
-use std::sync::atomic::{AtomicU32, Ordering};
-use std::sync::Arc;
-
-use crate::error::Error;
 
 pub trait NewFromPtr<C> {
     unsafe fn new_from_ptr(c_ptr: *const C) -> Self;
 }
 
-#[derive(Debug)]
-pub struct CRefValidator<P> {
-    id: Arc<AtomicU32>,
-    _marker: PhantomData<P>,
-}
-
-impl<P> CRefValidator<P> {
-    pub fn new() -> Self {
-        static NEXT_ID: AtomicU32 = AtomicU32::new(1);
-        let id = NEXT_ID.fetch_add(1, Ordering::SeqCst);
-        Self {
-            id: Arc::new(AtomicU32::new(id)),
-            _marker: Default::default(),
-        }
-    }
-
-    pub fn check(&self, id: u32) -> bool {
-        self.id.load(Ordering::SeqCst) == id
-    }
-
-    pub fn invalidate(&mut self) {
-        self.id.store(0, Ordering::SeqCst);
-    }
-
-    pub fn create_ref<T>(&self, value: T) -> CRef<P, T> {
-        CRef {
-            id: self.id.clone(),
-            value,
-            _marker: Default::default(),
-        }
-    }
-
-    pub fn create_mut<T>(&self, value: T) -> CMut<P, T> {
-        CMut {
-            id: self.id.clone(),
-            value,
-            _marker: Default::default(),
-        }
-    }
-}
-
-impl<P> Clone for CRefValidator<P> {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id.clone(),
-            _marker: Default::default(),
-        }
-    }
-}
-
-pub trait CRefValidate {
-    fn validate(&self, id: u32) -> bool;
-}
-
-pub struct CRef<P, T> {
-    id: Arc<AtomicU32>,
-    value: T,
-    _marker: PhantomData<P>,
-}
-
-impl<P, T> CRef<P, T> {
-    pub(crate) fn new_bad(value: T) -> Self {
-        Self {
-            id: Arc::new(AtomicU32::new(0)),
-            value,
-            _marker: Default::default(),
-        }
-    }
-
-    pub fn is_valid(&self) -> bool {
-        self.id.load(Ordering::SeqCst) != 0
-    }
-}
-
-impl<P: CRefValidate, T> CRef<P, T> {
-    pub fn get(&self, parent: &P) -> Result<&T, Error> {
-        if self.is_valid() && parent.validate(self.id.load(Ordering::SeqCst)) {
-            Ok(&self.value)
-        } else {
-            Err(Error::NotFound)
-        }
-    }
-
-    pub unsafe fn get_unchecked(&self) -> Result<&T, Error> {
-        if self.is_valid() {
-            Ok(&self.value)
-        } else {
-            Err(Error::NotFound)
-        }
-    }
-}
-
-impl<P, T: std::fmt::Debug> std::fmt::Debug for CRef<P, T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.is_valid() {
-            f.write_str("CRef(")?;
-            std::fmt::Debug::fmt(&self.value, f)?;
-            f.write_str(")")
-        } else {
-            f.write_str("CRef(invalid)")
-        }
-    }
-}
-
-pub struct CMut<P, T> {
-    id: Arc<AtomicU32>,
-    value: T,
-    _marker: PhantomData<P>,
-}
-
-impl<P, T> CMut<P, T> {
-    pub(crate) fn new_bad(value: T) -> Self {
-        Self {
-            id: Arc::new(AtomicU32::new(0)),
-            value,
-            _marker: Default::default(),
-        }
-    }
-
-    pub fn is_valid(&self) -> bool {
-        self.id.load(Ordering::SeqCst) != 0
-    }
-}
-
-impl<P: CRefValidate, T> CMut<P, T> {
-    pub fn get(&self, parent: &P) -> Result<&T, Error> {
-        if self.is_valid() && parent.validate(self.id.load(Ordering::SeqCst)) {
-            Ok(&self.value)
-        } else {
-            Err(Error::NotFound)
-        }
-    }
-
-    pub unsafe fn get_unchecked(&self) -> Result<&T, Error> {
-        if self.is_valid() {
-            Ok(&self.value)
-        } else {
-            Err(Error::NotFound)
-        }
-    }
-
-    pub fn get_mut(&mut self, parent: &mut P) -> Result<&mut T, Error> {
-        if self.is_valid() && parent.validate(self.id.load(Ordering::SeqCst)) {
-            Ok(&mut self.value)
-        } else {
-            Err(Error::NotFound)
-        }
-    }
-
-    pub unsafe fn get_unchecked_mut(&mut self) -> Result<&mut T, Error> {
-        if self.is_valid() {
-            Ok(&mut self.value)
-        } else {
-            Err(Error::NotFound)
-        }
-    }
-}
-
-impl<P, T: std::fmt::Debug> std::fmt::Debug for CMut<P, T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.is_valid() {
-            f.write_str("CMut(")?;
-            std::fmt::Debug::fmt(&self.value, f)?;
-            f.write_str(")")
-        } else {
-            f.write_str("CMut(invalid)")
-        }
-    }
-}
-
 pub struct CTmpRef<'a, P, T> {
     data: T,
-    validator: Option<CRefValidator<P>>,
     _parent: &'a P,
 }
 
 impl<'a, P, T> CTmpRef<'a, P, T> {
-    pub fn new(parent: &'a P, data: T, validator: Option<CRefValidator<P>>) -> Self {
+    pub fn new(parent: &'a P, data: T) -> Self {
         Self {
             data,
-            validator,
             _parent: parent,
-        }
-    }
-
-    pub fn keep(self) -> CRef<P, T> {
-        if let Some(validator) = self.validator {
-            validator.create_ref(self.data)
-        } else {
-            CRef::new_bad(self.data)
         }
     }
 }
@@ -224,24 +40,14 @@ impl<'a, P, T: std::fmt::Debug> std::fmt::Debug for CTmpRef<'a, P, T> {
 
 pub struct CTmpMut<'a, P, T> {
     data: T,
-    validator: Option<CRefValidator<P>>,
     _parent: &'a P,
 }
 
 impl<'a, P, T> CTmpMut<'a, P, T> {
-    pub fn new(parent: &'a P, data: T, validator: Option<CRefValidator<P>>) -> Self {
+    pub fn new(parent: &'a P, data: T) -> Self {
         Self {
             data,
-            validator,
             _parent: parent,
-        }
-    }
-
-    pub fn keep(self) -> CMut<P, T> {
-        if let Some(validator) = self.validator {
-            validator.create_mut(self.data)
-        } else {
-            CMut::new_bad(self.data)
         }
     }
 }
@@ -276,7 +82,6 @@ where
     items: *mut *mut C,
     index: usize,
     count: usize,
-    validator: Option<CRefValidator<P>>,
     _marker: PhantomData<T>,
 }
 
@@ -284,18 +89,12 @@ impl<'a, P, T, C> CTmpPtrIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
 {
-    pub(crate) fn new(
-        parent: &'a P,
-        items: *mut *mut C,
-        count: usize,
-        validator: Option<CRefValidator<P>>,
-    ) -> Self {
+    pub(crate) fn new(parent: &'a P, items: *mut *mut C, count: usize) -> Self {
         Self {
             _parent: parent,
             items,
             index: 0,
             count,
-            validator,
             _marker: Default::default(),
         }
     }
@@ -311,7 +110,7 @@ where
         if self.index < self.count {
             let item = unsafe { T::new_from_ptr(*self.items.offset(self.index as isize)) };
             self.index += 1;
-            Some(CTmpRef::new(self._parent, item, self.validator.clone()))
+            Some(CTmpRef::new(self._parent, item))
         } else {
             None
         }
@@ -326,7 +125,6 @@ where
     items: *mut *mut C,
     index: usize,
     count: usize,
-    validator: Option<CRefValidator<P>>,
     _marker: PhantomData<T>,
 }
 
@@ -334,18 +132,12 @@ impl<'a, P, T, C> CTmpMutIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
 {
-    pub(crate) fn new(
-        parent: &'a P,
-        items: *mut *mut C,
-        count: usize,
-        validator: Option<CRefValidator<P>>,
-    ) -> Self {
+    pub(crate) fn new(parent: &'a P, items: *mut *mut C, count: usize) -> Self {
         Self {
             _parent: parent,
             items,
             index: 0,
             count,
-            validator,
             _marker: Default::default(),
         }
     }
@@ -361,7 +153,7 @@ where
         if self.index < self.count {
             let item = unsafe { T::new_from_ptr(*self.items.offset(self.index as isize)) };
             self.index += 1;
-            Some(CTmpMut::new(self._parent, item, self.validator.clone()))
+            Some(CTmpMut::new(self._parent, item))
         } else {
             None
         }
@@ -479,26 +271,18 @@ macro_rules! c_accessor_renderer_object {
 macro_rules! c_accessor_tmp_ptr {
     ($rust:ident, $rust_mut:ident, $c:ident, $type:ty, $c_type:ident) => {
         pub fn $rust(&self) -> crate::c_interface::CTmpRef<Self, $type> {
-            crate::c_interface::CTmpRef::new(
-                self,
-                unsafe {
-                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                        self.c_ptr_ref().$c,
-                    )
-                },
-                None,
-            )
+            crate::c_interface::CTmpRef::new(self, unsafe {
+                <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                    self.c_ptr_ref().$c,
+                )
+            })
         }
         pub fn $rust_mut(&mut self) -> crate::c_interface::CTmpMut<Self, $type> {
-            crate::c_interface::CTmpMut::new(
-                self,
-                unsafe {
-                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                        self.c_ptr_ref().$c,
-                    )
-                },
-                None,
-            )
+            crate::c_interface::CTmpMut::new(self, unsafe {
+                <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                    self.c_ptr_ref().$c,
+                )
+            })
         }
     };
 }
@@ -508,13 +292,9 @@ macro_rules! c_accessor_tmp_ptr_optional {
         pub fn $rust(&self) -> Option<crate::c_interface::CTmpRef<Self, $type>> {
             let ptr = self.c_ptr_ref().$c;
             if !ptr.is_null() {
-                Some(crate::c_interface::CTmpRef::new(
-                    self,
-                    unsafe {
-                        <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
-                    },
-                    None,
-                ))
+                Some(crate::c_interface::CTmpRef::new(self, unsafe {
+                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
+                }))
             } else {
                 None
             }
@@ -522,13 +302,9 @@ macro_rules! c_accessor_tmp_ptr_optional {
         pub fn $rust_mut(&mut self) -> Option<crate::c_interface::CTmpMut<Self, $type>> {
             let ptr = self.c_ptr_ref().$c;
             if !ptr.is_null() {
-                Some(crate::c_interface::CTmpMut::new(
-                    self,
-                    unsafe {
-                        <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
-                    },
-                    None,
-                ))
+                Some(crate::c_interface::CTmpMut::new(self, unsafe {
+                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
+                }))
             } else {
                 None
             }
@@ -539,26 +315,18 @@ macro_rules! c_accessor_tmp_ptr_optional {
 macro_rules! c_accessor_super {
     ($rust:ident, $rust_mut:ident, $type:ty, $c_type:ident) => {
         pub fn $rust(&self) -> crate::c_interface::CTmpRef<Self, $type> {
-            crate::c_interface::CTmpRef::new(
-                self,
-                unsafe {
-                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                        &mut self.c_ptr_mut().super_0,
-                    )
-                },
-                None,
-            )
+            crate::c_interface::CTmpRef::new(self, unsafe {
+                <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                    &mut self.c_ptr_mut().super_0,
+                )
+            })
         }
         pub fn $rust_mut(&mut self) -> crate::c_interface::CTmpMut<Self, $type> {
-            crate::c_interface::CTmpMut::new(
-                self,
-                unsafe {
-                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                        &mut self.c_ptr_mut().super_0,
-                    )
-                },
-                None,
-            )
+            crate::c_interface::CTmpMut::new(self, unsafe {
+                <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                    &mut self.c_ptr_mut().super_0,
+                )
+            })
         }
     };
 }
@@ -582,7 +350,6 @@ macro_rules! c_accessor_array {
                 self,
                 self.c_ptr_ref().$c,
                 self.$count_fn() as usize,
-                None,
             )
         }
 
@@ -593,7 +360,6 @@ macro_rules! c_accessor_array {
                 self,
                 self.c_ptr_ref().$c,
                 self.$count_fn() as usize,
-                None,
             )
         }
 
@@ -602,15 +368,11 @@ macro_rules! c_accessor_array {
             index: usize,
         ) -> Option<crate::c_interface::CTmpRef<Self, $type>> {
             if index < self.$count_fn() as usize {
-                Some(crate::c_interface::CTmpRef::new(
-                    self,
-                    unsafe {
-                        <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                            *self.c_ptr_ref().$c.offset(index as isize),
-                        )
-                    },
-                    None,
-                ))
+                Some(crate::c_interface::CTmpRef::new(self, unsafe {
+                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                        *self.c_ptr_ref().$c.offset(index as isize),
+                    )
+                }))
             } else {
                 None
             }
@@ -621,77 +383,11 @@ macro_rules! c_accessor_array {
             index: usize,
         ) -> Option<crate::c_interface::CTmpMut<Self, $type>> {
             if index < self.$count_fn() as usize {
-                Some(crate::c_interface::CTmpMut::new(
-                    self,
-                    unsafe {
-                        <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                            *self.c_ptr_mut().$c.offset(index as isize),
-                        )
-                    },
-                    None,
-                ))
-            } else {
-                None
-            }
-        }
-    };
-}
-
-macro_rules! c_accessor_array_validated {
-    ($rust:ident, $rust_mut:ident, $rust_index:ident, $rust_index_mut:ident, $parent_type:ident, $type:ident, $c_type:ident, $c:ident, $count_fn:ident, $validator:ident) => {
-        pub fn $rust(&self) -> crate::c_interface::CTmpPtrIterator<$parent_type, $type, $c_type> {
-            crate::c_interface::CTmpPtrIterator::new(
-                self,
-                self.c_ptr_ref().$c,
-                self.$count_fn() as usize,
-                Some(self.$validator.clone()),
-            )
-        }
-
-        pub fn $rust_mut(
-            &mut self,
-        ) -> crate::c_interface::CTmpMutIterator<$parent_type, $type, $c_type> {
-            crate::c_interface::CTmpMutIterator::new(
-                self,
-                self.c_ptr_ref().$c,
-                self.$count_fn() as usize,
-                Some(self.$validator.clone()),
-            )
-        }
-
-        pub fn $rust_index(
-            &self,
-            index: usize,
-        ) -> Option<crate::c_interface::CTmpRef<Self, $type>> {
-            if index < self.$count_fn() as usize {
-                Some(crate::c_interface::CTmpRef::new(
-                    self,
-                    unsafe {
-                        <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                            *self.c_ptr_ref().$c.offset(index as isize),
-                        )
-                    },
-                    Some(self.$validator.clone()),
-                ))
-            } else {
-                None
-            }
-        }
-
-        pub fn $rust_index_mut(
-            &mut self,
-            index: usize,
-        ) -> Option<crate::c_interface::CTmpMut<Self, $type>> {
-            if index < self.$count_fn() as usize {
-                Some(crate::c_interface::CTmpMut::new(
-                    self,
-                    unsafe {
-                        <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                            *self.c_ptr_mut().$c.offset(index as isize),
-                        )
-                    },
-                    Some(self.$validator.clone()),
-                ))
+                Some(crate::c_interface::CTmpMut::new(self, unsafe {
+                    <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
+                        *self.c_ptr_mut().$c.offset(index as isize),
+                    )
+                }))
             } else {
                 None
             }
@@ -758,5 +454,49 @@ macro_rules! c_vertex_attachment_accessors {
             id,
             i32
         );
+    };
+}
+
+macro_rules! c_handle_decl {
+    ($name:ident, $type:ident, $parent:ident, $c_type:ident, $c_parent:ident) => {
+        pub struct $name {
+            c_item: crate::sync_ptr::SyncPtr<$c_type>,
+            c_parent: crate::sync_ptr::SyncPtr<$c_parent>,
+        }
+
+        impl $name {
+            pub(crate) fn new(c_item: *const $c_type, c_parent: *const $c_parent) -> Self {
+                Self {
+                    c_item: SyncPtr(c_item as *mut $c_type),
+                    c_parent: SyncPtr(c_parent as *mut $c_parent),
+                }
+            }
+
+            pub fn get<'a>(
+                &self,
+                skeleton: &'a $parent,
+            ) -> Option<crate::c_interface::CTmpRef<'a, $parent, $type>> {
+                if skeleton.c_ptr() == self.c_parent.0 {
+                    Some(crate::c_interface::CTmpRef::new(skeleton, unsafe {
+                        <$type>::new_from_ptr(self.c_item.0)
+                    }))
+                } else {
+                    None
+                }
+            }
+
+            pub fn get_mut<'a>(
+                &self,
+                skeleton: &'a mut $parent,
+            ) -> Option<crate::c_interface::CTmpMut<'a, $parent, $type>> {
+                if skeleton.c_ptr() == self.c_parent.0 {
+                    Some(crate::c_interface::CTmpMut::new(skeleton, unsafe {
+                        <$type>::new_from_ptr(self.c_item.0)
+                    }))
+                } else {
+                    None
+                }
+            }
+        }
     };
 }

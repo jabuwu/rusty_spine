@@ -8,7 +8,7 @@ use crate::{
         spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose, spSkeleton_updateCache,
         spSkeleton_updateWorldTransform, spSlot,
     },
-    c_interface::{CRefValidate, CRefValidator},
+    c_interface::{CTmpMut, CTmpRef, NewFromPtr},
     error::Error,
     skeleton_data::SkeletonData,
     skin::Skin,
@@ -20,7 +20,6 @@ use crate::{
 pub struct Skeleton {
     c_skeleton: SyncPtr<spSkeleton>,
     owns_memory: bool,
-    validator: CRefValidator<Skeleton>,
     _skeleton_data: Arc<SkeletonData>,
 }
 
@@ -30,7 +29,6 @@ impl Skeleton {
         Ok(Self {
             c_skeleton: SyncPtr(c_skeleton),
             owns_memory: true,
-            validator: CRefValidator::new(),
             _skeleton_data: skeleton_data,
         })
     }
@@ -88,6 +86,14 @@ impl Skeleton {
         }
     }
 
+    pub fn bone_root(&self) -> CTmpRef<Skeleton, Bone> {
+        CTmpRef::new(self, unsafe { Bone::new_from_ptr(self.c_ptr_mut().root) })
+    }
+
+    pub fn bone_root_mut(&self) -> CTmpMut<Skeleton, Bone> {
+        CTmpMut::new(self, unsafe { Bone::new_from_ptr(self.c_ptr_mut().root) })
+    }
+
     // TODO: iterators for ik, transform, path constraints
 
     c_accessor_tmp_ptr!(data, data_mut, data, SkeletonData, spSkeletonData);
@@ -116,7 +122,7 @@ impl Skeleton {
     c_accessor!(scale_y, set_scale_y, scaleY, f32);
     c_accessor!(x, set_x, x, f32);
     c_accessor!(y, set_y, y, f32);
-    c_accessor_array_validated!(
+    c_accessor_array!(
         bones,
         bones_mut,
         bone_at_index,
@@ -125,10 +131,9 @@ impl Skeleton {
         Bone,
         spBone,
         bones,
-        bones_count,
-        validator
+        bones_count
     );
-    c_accessor_array_validated!(
+    c_accessor_array!(
         slots,
         slots_mut,
         slot_at_index,
@@ -137,10 +142,9 @@ impl Skeleton {
         Slot,
         spSlot,
         slots,
-        slots_count,
-        validator
+        slots_count
     );
-    c_accessor_array_validated!(
+    c_accessor_array!(
         draw_order,
         draw_order_mut,
         draw_order_at_index,
@@ -149,26 +153,18 @@ impl Skeleton {
         Slot,
         spSlot,
         drawOrder,
-        slots_count,
-        validator
+        slots_count
     );
     c_ptr!(c_skeleton, spSkeleton);
 }
 
 impl Drop for Skeleton {
     fn drop(&mut self) {
-        self.validator.invalidate();
         if self.owns_memory {
             unsafe {
                 spSkeleton_dispose(self.c_skeleton.0);
             }
         }
-    }
-}
-
-impl CRefValidate for Skeleton {
-    fn validate(&self, id: u32) -> bool {
-        self.validator.check(id)
     }
 }
 
