@@ -23,7 +23,7 @@ impl NewFromPtr<spPointAttachment> for PointAttachment {
 
 impl PointAttachment {
     fn attachment(&self) -> &spAttachment {
-        &self.c_ptr_ref().super_0
+        unsafe { &self.c_ptr_ref().super_0 }
     }
 
     pub fn compute_world_position(&self, bone: &Bone) -> (f32, f32) {
@@ -40,6 +40,6 @@ impl PointAttachment {
     }
 
     c_attachment_accessors!();
-    c_accessor_color!(color, color_mut, color);
+    c_accessor_color!(color, color);
     c_ptr!(c_point_attachment, spPointAttachment);
 }

@@ -57,7 +57,7 @@ impl SkeletonJson {
         }
     }
 
-    c_accessor!(scale, set_scale, scale, f32);
+    c_accessor_mut!(scale, set_scale, scale, f32);
     c_ptr!(c_skeleton_json, spSkeletonJson);
 }
 

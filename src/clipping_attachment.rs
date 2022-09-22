@@ -19,7 +19,7 @@ impl NewFromPtr<spClippingAttachment> for ClippingAttachment {
 
 impl ClippingAttachment {
     fn attachment(&self) -> &spAttachment {
-        &self.c_ptr_ref().super_0.super_0
+        unsafe { &self.c_ptr_ref().super_0.super_0 }
     }
 
     c_attachment_accessors!();

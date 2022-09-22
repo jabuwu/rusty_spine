@@ -1,6 +1,7 @@
 use crate::{
     c::{
-        spAttachment, spRegionAttachment, spRegionAttachment_computeWorldVertices, spTextureRegion,
+        c_float, spAttachment, spRegionAttachment, spRegionAttachment_computeWorldVertices,
+        spTextureRegion,
     },
     slot::Slot,
     sync_ptr::SyncPtr,
@@ -20,7 +21,7 @@ impl RegionAttachment {
     }
 
     fn attachment(&self) -> &spAttachment {
-        &self.c_ptr_ref().super_0
+        unsafe { &self.c_ptr_ref().super_0 }
     }
 
     pub unsafe fn compute_world_vertices(
@@ -41,14 +42,15 @@ impl RegionAttachment {
 
     c_attachment_accessors!();
     c_accessor_string!(path, path);
-    c_accessor!(x, set_x, x, f32);
-    c_accessor!(y, set_y, y, f32);
-    c_accessor!(scale_x, set_scale_x, scaleX, f32);
-    c_accessor!(scale_y, set_scale_y, scaleY, f32);
-    c_accessor!(rotation, set_rotation, rotation, f32);
-    c_accessor!(width, set_width, width, f32);
-    c_accessor!(height, set_height, height, f32);
-    c_accessor_color!(color, color_mut, color);
+    c_accessor!(x, x, f32);
+    c_accessor!(y, y, f32);
+    c_accessor!(scale_x, scaleX, f32);
+    c_accessor!(scale_y, scaleY, f32);
+    c_accessor!(rotation, rotation, f32);
+    c_accessor!(width, width, f32);
+    c_accessor!(height, height, f32);
+    c_accessor_color!(color, color);
+    c_accessor_passthrough!(uvs, uvs, [c_float; 8]);
     c_accessor_renderer_object!();
     c_accessor_tmp_ptr!(region, region_mut, region, TextureRegion, spTextureRegion);
     c_ptr!(c_region_attachment, spRegionAttachment);

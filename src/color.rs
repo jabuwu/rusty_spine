@@ -1,4 +1,4 @@
-use std::ops::Mul;
+use std::ops::{Mul, MulAssign};
 
 use crate::c::c_float;
 
@@ -81,5 +81,14 @@ impl Mul<Color> for Color {
             b: self.b * rhs.b,
             a: self.a * rhs.a,
         }
+    }
+}
+
+impl MulAssign<Color> for Color {
+    fn mul_assign(&mut self, rhs: Color) {
+        self.r *= rhs.r;
+        self.g *= rhs.g;
+        self.b *= rhs.b;
+        self.a *= rhs.a;
     }
 }

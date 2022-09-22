@@ -21,19 +21,15 @@ impl NewFromPtr<spBoundingBoxAttachment> for BoundingBoxAttachment {
 
 impl BoundingBoxAttachment {
     fn attachment(&self) -> &spAttachment {
-        &self.c_ptr_ref().super_0.super_0
+        unsafe { &self.c_ptr_ref().super_0.super_0 }
     }
 
     fn vertex_attachment(&self) -> &spVertexAttachment {
-        &self.c_ptr_ref().super_0
-    }
-
-    fn vertex_attachment_mut(&mut self) -> &mut spVertexAttachment {
-        &mut self.c_ptr_mut().super_0
+        unsafe { &self.c_ptr_ref().super_0 }
     }
 
     c_attachment_accessors!();
     c_vertex_attachment_accessors!();
-    c_accessor_color!(color, color_mut, color);
+    c_accessor_color!(color, color);
     c_ptr!(c_bounding_box_attachment, spBoundingBoxAttachment);
 }

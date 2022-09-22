@@ -168,32 +168,51 @@ macro_rules! c_ptr {
         }
 
         #[inline]
-        pub fn c_ptr_ref(&self) -> &$c_type {
-            unsafe { &*self.$member.0 }
+        #[allow(dead_code)]
+        pub(crate) unsafe fn c_ptr_ref(&self) -> &$c_type {
+            &*self.$member.0
         }
 
         #[inline]
-        pub fn c_ptr_mut(&self) -> &mut $c_type {
-            unsafe { &mut *self.$member.0 }
+        #[allow(dead_code)]
+        pub(crate) unsafe fn c_ptr_mut(&self) -> &mut $c_type {
+            &mut *self.$member.0
         }
     };
 }
 
 macro_rules! c_accessor {
+    ($rust:ident, $c:ident, $type:ty) => {
+        c_accessor_for!(c_ptr_ref, $rust, $c, $type);
+    };
+}
+
+macro_rules! c_accessor_mut {
     ($rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
-        c_accessor_for!(c_ptr_ref, c_ptr_mut, $rust, $rust_set, $c, $type);
+        c_accessor_mut_for!(c_ptr_ref, c_ptr_mut, $rust, $rust_set, $c, $type);
     };
 }
 
 macro_rules! c_accessor_for {
-    ($for:ident, $for_mut:ident, $rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
+    ($for:ident, $rust:ident, $c:ident, $type:ty) => {
         #[inline]
         pub fn $rust(&self) -> $type {
-            self.$for().$c
+            #[allow(unused_unsafe)]
+            unsafe {
+                self.$for().$c
+            }
         }
+    };
+}
+
+macro_rules! c_accessor_mut_for {
+    ($for:ident, $for_mut:ident, $rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
+        c_accessor_for!($for, $rust, $c, $type);
         #[inline]
         pub fn $rust_set(&mut self, value: $type) {
-            self.$for_mut().$c = value;
+            unsafe {
+                self.$for_mut().$c = value;
+            }
         }
     };
 }
@@ -216,23 +235,37 @@ macro_rules! c_accessor_string {
 }
 
 macro_rules! c_accessor_bool {
-    ($rust:ident, $rust_set:ident, $c:ident) => {
+    ($rust:ident, $c:ident) => {
         pub fn $rust(&self) -> bool {
-            self.c_ptr_ref().$c != 0
+            unsafe { self.c_ptr_ref().$c != 0 }
         }
+    };
+}
+
+macro_rules! c_accessor_bool_mut {
+    ($rust:ident, $rust_set:ident, $c:ident) => {
+        c_accessor_bool!($rust, $c);
         pub fn $rust_set(&mut self, value: bool) {
-            self.c_ptr_mut().$c = if value { 1 } else { 0 };
+            unsafe {
+                self.c_ptr_mut().$c = if value { 1 } else { 0 };
+            }
         }
     };
 }
 
 macro_rules! c_accessor_color {
-    ($rust:ident, $rust_mut:ident, $c:ident) => {
+    ($rust:ident, $c:ident) => {
         pub fn $rust(&self) -> crate::color::Color {
             unsafe {
                 *(&self.c_ptr_ref().$c as *const crate::c::spColor as *const crate::color::Color)
             }
         }
+    };
+}
+
+macro_rules! c_accessor_color_mut {
+    ($rust:ident, $rust_mut:ident, $c:ident) => {
+        c_accessor_color!($rust, $c);
         pub fn $rust_mut(&mut self) -> &mut crate::color::Color {
             unsafe {
                 &mut *(&self.c_ptr_mut().$c as *const crate::c::spColor as *mut crate::color::Color)
@@ -244,26 +277,34 @@ macro_rules! c_accessor_color {
 macro_rules! c_accessor_enum_no_set {
     ($rust:ident, $c:ident, $type:ty) => {
         pub fn $rust(&self) -> $type {
-            self.c_ptr_ref().$c.into()
+            unsafe { self.c_ptr_ref().$c.into() }
         }
     };
 }
 
 macro_rules! c_accessor_enum {
-    ($rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
+    ($rust:ident, $c:ident, $type:ty) => {
         pub fn $rust(&self) -> $type {
-            self.c_ptr_ref().$c.into()
-        }
-        pub fn $rust_set(&mut self, value: $type) {
-            self.c_ptr_mut().$c = value as u32;
+            unsafe { self.c_ptr_ref().$c.into() }
         }
     };
 }
 
+/*macro_rules! c_accessor_enum_mut {
+    ($rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
+        c_accessor_enum!($rust, $c, $type);
+        pub fn $rust_set(&mut self, value: $type) {
+            self.c_ptr_mut().$c = value as u32;
+        }
+    };
+}*/
+
 macro_rules! c_accessor_renderer_object {
     () => {
         pub fn renderer_object(&self) -> crate::renderer_object::RendererObject {
-            crate::renderer_object::RendererObject::new(&mut self.c_ptr_mut().rendererObject)
+            crate::renderer_object::RendererObject::new(unsafe {
+                &mut self.c_ptr_mut().rendererObject
+            })
         }
     };
 }
@@ -290,7 +331,7 @@ macro_rules! c_accessor_tmp_ptr {
 macro_rules! c_accessor_tmp_ptr_optional {
     ($rust:ident, $rust_mut:ident, $c:ident, $type:ty, $c_type:ident) => {
         pub fn $rust(&self) -> Option<crate::c_interface::CTmpRef<Self, $type>> {
-            let ptr = self.c_ptr_ref().$c;
+            let ptr = unsafe { self.c_ptr_ref().$c };
             if !ptr.is_null() {
                 Some(crate::c_interface::CTmpRef::new(self, unsafe {
                     <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
@@ -300,7 +341,7 @@ macro_rules! c_accessor_tmp_ptr_optional {
             }
         }
         pub fn $rust_mut(&mut self) -> Option<crate::c_interface::CTmpMut<Self, $type>> {
-            let ptr = self.c_ptr_ref().$c;
+            let ptr = unsafe { self.c_ptr_ref().$c };
             if !ptr.is_null() {
                 Some(crate::c_interface::CTmpMut::new(self, unsafe {
                     <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
@@ -332,13 +373,9 @@ macro_rules! c_accessor_super {
 }
 
 macro_rules! c_accessor_passthrough {
-    ($rust:ident, $rust_mut:ident, $c:ident, $type:ty, $type_mut:ty) => {
-        pub fn $rust(&self) -> $type {
+    ($rust:ident, $c:ident, $type:ty) => {
+        pub unsafe fn $rust(&self) -> $type {
             self.c_ptr_ref().$c
-        }
-
-        pub fn $rust_mut(&mut self) -> $type_mut {
-            self.c_ptr_mut().$c as $type_mut
         }
     };
 }
@@ -348,7 +385,7 @@ macro_rules! c_accessor_array {
         pub fn $rust(&self) -> crate::c_interface::CTmpPtrIterator<$parent_type, $type, $c_type> {
             crate::c_interface::CTmpPtrIterator::new(
                 self,
-                self.c_ptr_ref().$c,
+                unsafe { self.c_ptr_ref().$c },
                 self.$count_fn() as usize,
             )
         }
@@ -358,7 +395,7 @@ macro_rules! c_accessor_array {
         ) -> crate::c_interface::CTmpMutIterator<$parent_type, $type, $c_type> {
             crate::c_interface::CTmpMutIterator::new(
                 self,
-                self.c_ptr_ref().$c,
+                unsafe { self.c_ptr_ref().$c },
                 self.$count_fn() as usize,
             )
         }
@@ -440,20 +477,11 @@ macro_rules! c_vertex_attachment_accessors {
 
         c_accessor_for!(
             vertex_attachment,
-            vertex_attachment_mut,
             world_vertices_length,
-            world_vertex_length_mut,
             worldVerticesLength,
             i32
         );
-        c_accessor_for!(
-            vertex_attachment,
-            vertex_attachment_mut,
-            id,
-            id_mut,
-            id,
-            i32
-        );
+        c_accessor_for!(vertex_attachment, id, id, i32);
     };
 }
 

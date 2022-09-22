@@ -197,10 +197,12 @@ impl CombinedDrawer {
                         world_vertices[i as usize * 2 + 1],
                     ]);
 
-                    uvs.push([
-                        region_attachment.c_ptr_mut().uvs[i as usize * 2],
-                        region_attachment.c_ptr_mut().uvs[i as usize * 2 + 1],
-                    ]);
+                    unsafe {
+                        uvs.push([
+                            region_attachment.uvs()[i as usize * 2],
+                            region_attachment.uvs()[i as usize * 2 + 1],
+                        ]);
+                    }
 
                     colors.push([color.r, color.g, color.b, color.a]);
                 }

@@ -44,33 +44,18 @@ impl SkeletonData {
     c_accessor_string!(hash, hash);
     c_accessor_string!(images_path, imagesPath);
     c_accessor_string!(audio_path, audioPath);
-    c_accessor!(x, set_x, x, f32);
-    c_accessor!(y, set_y, y, f32);
-    c_accessor!(width, set_width, width, f32);
-    c_accessor!(height, set_height, height, f32);
-    c_accessor!(bones_count, set_bones_count, bonesCount, i32);
-    c_accessor!(slots_count, set_slots_count, slotsCount, i32);
-    c_accessor!(skins_count, set_skins_count, skinsCount, i32);
-    c_accessor!(events_count, set_events_count, eventsCount, i32);
-    c_accessor!(animations_count, set_animations_count, animationsCount, i32);
-    c_accessor!(
-        ik_constraints_count,
-        set_ik_constraints_count,
-        ikConstraintsCount,
-        i32
-    );
-    c_accessor!(
-        transform_constraints_count,
-        set_transform_constraints_count,
-        transformConstraintsCount,
-        i32
-    );
-    c_accessor!(
-        path_constraints_count,
-        set_path_constraints_count,
-        pathConstraintsCount,
-        i32
-    );
+    c_accessor!(x, x, f32);
+    c_accessor!(y, y, f32);
+    c_accessor!(width, width, f32);
+    c_accessor!(height, height, f32);
+    c_accessor!(bones_count, bonesCount, i32);
+    c_accessor!(slots_count, slotsCount, i32);
+    c_accessor!(skins_count, skinsCount, i32);
+    c_accessor!(events_count, eventsCount, i32);
+    c_accessor!(animations_count, animationsCount, i32);
+    c_accessor!(ik_constraints_count, ikConstraintsCount, i32);
+    c_accessor!(transform_constraints_count, transformConstraintsCount, i32);
+    c_accessor!(path_constraints_count, pathConstraintsCount, i32);
     c_accessor_array!(
         bones,
         bones_mut,

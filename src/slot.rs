@@ -37,10 +37,10 @@ impl Slot {
     }
 
     pub fn handle(&self) -> SlotHandle {
-        SlotHandle::new(self.c_ptr(), self.bone().c_ptr_mut().skeleton)
+        SlotHandle::new(self.c_ptr(), unsafe { self.bone().c_ptr_mut().skeleton })
     }
 
-    c_accessor_color!(color, color_mut, color);
+    c_accessor_color_mut!(color, color_mut, color);
     c_accessor_tmp_ptr!(data, data_mut, data, SlotData, spSlotData);
     c_accessor_tmp_ptr!(bone, bone_mut, bone, Bone, spBone);
     c_accessor_tmp_ptr_optional!(

@@ -73,28 +73,28 @@ impl Atlas {
     pub fn pages(&self) -> AtlasPageIterator {
         AtlasPageIterator {
             _atlas: self,
-            page: self.c_ptr_mut().pages,
+            page: unsafe { self.c_ptr_mut().pages },
         }
     }
 
     pub fn pages_mut(&mut self) -> AtlasPageMutIterator {
         AtlasPageMutIterator {
             _atlas: self,
-            page: self.c_ptr_mut().pages,
+            page: unsafe { self.c_ptr_mut().pages },
         }
     }
 
     pub fn regions(&self) -> AtlasRegionIterator {
         AtlasRegionIterator {
             _atlas: self,
-            region: self.c_ptr_mut().regions,
+            region: unsafe { self.c_ptr_mut().regions },
         }
     }
 
     pub fn regions_mut(&mut self) -> AtlasRegionMutIterator {
         AtlasRegionMutIterator {
             _atlas: self,
-            region: self.c_ptr_mut().regions,
+            region: unsafe { self.c_ptr_mut().regions },
         }
     }
 
@@ -128,14 +128,14 @@ impl NewFromPtr<spAtlasPage> for AtlasPage {
 impl AtlasPage {
     c_accessor_tmp_ptr!(atlas, atlas_mut, atlas, Atlas, spAtlas);
     c_accessor_string!(name, name);
-    c_accessor_enum!(format, set_format, format, AtlasFormat);
-    c_accessor_enum!(min_filter, set_min_filter, minFilter, AtlasFilter);
-    c_accessor_enum!(mag_filter, set_mag_filter, magFilter, AtlasFilter);
-    c_accessor_enum!(u_wrap, set_u_wrap, uWrap, AtlasWrap);
-    c_accessor_enum!(v_wrap, set_v_wrap, vWrap, AtlasWrap);
-    c_accessor!(width, set_width, width, i32);
-    c_accessor!(height, set_height, height, i32);
-    c_accessor_bool!(pma, set_pma, pma);
+    c_accessor_enum!(format, format, AtlasFormat);
+    c_accessor_enum!(min_filter, minFilter, AtlasFilter);
+    c_accessor_enum!(mag_filter, magFilter, AtlasFilter);
+    c_accessor_enum!(u_wrap, uWrap, AtlasWrap);
+    c_accessor_enum!(v_wrap, vWrap, AtlasWrap);
+    c_accessor!(width, width, i32);
+    c_accessor!(height, height, i32);
+    c_accessor_bool!(pma, pma);
     c_accessor_renderer_object!();
     c_ptr!(c_atlas_page, spAtlasPage);
 }
@@ -272,11 +272,11 @@ impl AtlasRegion {
         spTextureRegion
     );
     c_accessor_string!(name, name);
-    c_accessor!(x, set_x, x, i32);
-    c_accessor!(y, set_y, y, i32);
-    c_accessor!(index, set_index, index, i32);
-    c_accessor_passthrough!(splits, splits_mut, splits, *const c_int, *mut c_int);
-    c_accessor_passthrough!(pads, pads_mut, pads, *const c_int, *mut c_int);
+    c_accessor!(x, x, i32);
+    c_accessor!(y, y, i32);
+    c_accessor!(index, index, i32);
+    c_accessor_passthrough!(splits, splits, *mut c_int);
+    c_accessor_passthrough!(pads, pads, *mut c_int);
     c_accessor_tmp_ptr!(page, page_mut, page, AtlasPage, spAtlasPage);
 
     pub fn key_values(&self) -> Vec<KeyValue> {

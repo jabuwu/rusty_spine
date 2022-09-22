@@ -97,31 +97,16 @@ impl Skeleton {
     // TODO: iterators for ik, transform, path constraints
 
     c_accessor_tmp_ptr!(data, data_mut, data, SkeletonData, spSkeletonData);
-    c_accessor_color!(color, color_mut, color);
-    c_accessor!(bones_count, set_bones_count, bonesCount, i32);
-    c_accessor!(slots_count, set_slots_count, slotsCount, i32);
-    c_accessor!(
-        ik_contraints_count,
-        set_ik_contraints_count,
-        ikConstraintsCount,
-        i32
-    );
-    c_accessor!(
-        transform_contraints_count,
-        set_transform_contraints_count,
-        transformConstraintsCount,
-        i32
-    );
-    c_accessor!(
-        path_contraints_count,
-        set_path_contraints_count,
-        pathConstraintsCount,
-        i32
-    );
-    c_accessor!(scale_x, set_scale_x, scaleX, f32);
-    c_accessor!(scale_y, set_scale_y, scaleY, f32);
-    c_accessor!(x, set_x, x, f32);
-    c_accessor!(y, set_y, y, f32);
+    c_accessor_color_mut!(color, color_mut, color);
+    c_accessor!(bones_count, bonesCount, i32);
+    c_accessor!(slots_count, slotsCount, i32);
+    c_accessor!(ik_contraints_count, ikConstraintsCount, i32);
+    c_accessor!(transform_contraints_count, transformConstraintsCount, i32);
+    c_accessor!(path_contraints_count, pathConstraintsCount, i32);
+    c_accessor_mut!(scale_x, set_scale_x, scaleX, f32);
+    c_accessor_mut!(scale_y, set_scale_y, scaleY, f32);
+    c_accessor_mut!(x, set_x, x, f32);
+    c_accessor_mut!(y, set_y, y, f32);
     c_accessor_array!(
         bones,
         bones_mut,

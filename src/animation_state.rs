@@ -242,7 +242,9 @@ impl AnimationState {
         let user_data =
             unsafe { &mut *((*self.c_animation_state.0).userData as *mut AnimationStateUserData) };
         user_data.listener = Some(Box::new(listener));
-        self.c_ptr_mut().listener = Some(c_listener);
+        unsafe {
+            self.c_ptr_mut().listener = Some(c_listener);
+        }
     }
 
     pub fn clear_listener_notifications(&mut self) {
@@ -264,7 +266,7 @@ impl AnimationState {
         AnimationStateData,
         spAnimationStateData
     );
-    c_accessor!(tracks_count, set_tracks_count, tracksCount, i32);
+    c_accessor!(tracks_count, tracksCount, i32);
     c_accessor_array!(
         tracks,
         tracks_mut,
@@ -276,8 +278,8 @@ impl AnimationState {
         tracks,
         tracks_count
     );
-    c_accessor!(timescale, set_timescale, timeScale, f32);
-    c_accessor!(unkeyed_state, set_unkeyed_state, unkeyedState, i32);
+    c_accessor_mut!(timescale, set_timescale, timeScale, f32);
+    c_accessor!(unkeyed_state, unkeyedState, i32);
     c_accessor_renderer_object!();
 
     pub fn dispose_statics() {
@@ -357,35 +359,25 @@ impl TrackEntry {
     }
 
     c_accessor_tmp_ptr!(animation, animation_mut, animation, Animation, spAnimation);
-    c_accessor!(track_index, set_track_index, trackIndex, i32);
-    c_accessor_bool!(looping, set_looping, loop_0);
-    c_accessor_bool!(hold_previous, set_hold_previous, holdPrevious);
-    c_accessor_bool!(reverse, set_reverse, reverse);
-    c_accessor_bool!(shortest_rotation, set_shortest_rotation, shortestRotation);
-    c_accessor!(event_threshold, set_event_threshold, eventThreshold, f32);
-    c_accessor!(
-        attachment_threshold,
-        set_attachment_threshold,
-        attachmentThreshold,
-        f32
-    );
-    c_accessor!(
-        draw_order_threshold,
-        set_draw_order_threshold,
-        drawOrderThreshold,
-        f32
-    );
-    c_accessor!(delay, set_delay, delay, f32);
-    c_accessor!(track_time, set_track_time, trackTime, f32);
-    c_accessor!(track_last, set_track_last, trackLast, f32);
-    c_accessor!(next_track_last, set_next_track_last, nextTrackLast, f32);
-    c_accessor!(track_end, set_track_end, trackEnd, f32);
-    c_accessor!(timescale, set_timescale, timeScale, f32);
-    c_accessor!(alpha, set_alpha, alpha, f32);
-    c_accessor!(mix_time, set_mix_time, mixTime, f32);
-    c_accessor!(mix_duration, set_mix_duration, mixDuration, f32);
-    c_accessor!(interrupt_alpha, set_interrupt_alpha, interruptAlpha, f32);
-    c_accessor!(total_alpha, set_total_alpha, totalAlpha, f32);
+    c_accessor!(track_index, trackIndex, i32);
+    c_accessor_bool_mut!(looping, set_looping, loop_0);
+    c_accessor_bool_mut!(hold_previous, set_hold_previous, holdPrevious);
+    c_accessor_bool_mut!(reverse, set_reverse, reverse);
+    c_accessor_bool_mut!(shortest_rotation, set_shortest_rotation, shortestRotation);
+    c_accessor!(event_threshold, eventThreshold, f32);
+    c_accessor!(attachment_threshold, attachmentThreshold, f32);
+    c_accessor!(draw_order_threshold, drawOrderThreshold, f32);
+    c_accessor!(delay, delay, f32);
+    c_accessor!(track_time, trackTime, f32);
+    c_accessor!(track_last, trackLast, f32);
+    c_accessor!(next_track_last, nextTrackLast, f32);
+    c_accessor!(track_end, trackEnd, f32);
+    c_accessor_mut!(timescale, set_timescale, timeScale, f32);
+    c_accessor_mut!(alpha, set_alpha, alpha, f32);
+    c_accessor!(mix_time, mixTime, f32);
+    c_accessor_mut!(mix_duration, set_mix_duration, mixDuration, f32);
+    c_accessor!(interrupt_alpha, interruptAlpha, f32);
+    c_accessor!(total_alpha, totalAlpha, f32);
     c_ptr!(c_track_entry, spTrackEntry);
 
     /*TODO

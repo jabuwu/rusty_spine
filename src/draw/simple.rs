@@ -147,10 +147,12 @@ impl SimpleDrawer {
                         world_vertices[i as usize * 2 + 1],
                     ]);
 
-                    uvs.push([
-                        region_attachment.c_ptr_mut().uvs[i as usize * 2],
-                        region_attachment.c_ptr_mut().uvs[i as usize * 2 + 1],
-                    ]);
+                    unsafe {
+                        uvs.push([
+                            region_attachment.uvs()[i as usize * 2],
+                            region_attachment.uvs()[i as usize * 2 + 1],
+                        ]);
+                    }
                 }
 
                 indices.reserve(6);
@@ -250,10 +252,7 @@ impl SimpleDrawer {
                 None
             };
 
-            color.r *= slot.c_ptr_mut().color.r * skeleton.c_ptr_mut().color.r;
-            color.g *= slot.c_ptr_mut().color.g * skeleton.c_ptr_mut().color.g;
-            color.b *= slot.c_ptr_mut().color.b * skeleton.c_ptr_mut().color.b;
-            color.a *= slot.c_ptr_mut().color.a * skeleton.c_ptr_mut().color.a;
+            color *= slot.color() * skeleton.color();
 
             renderables.push(SimpleRenderable {
                 slot_index: slot_index as usize,
