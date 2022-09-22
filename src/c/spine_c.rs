@@ -25542,7 +25542,7 @@ static mut debugMallocFunc: Option<
 static mut freeFunc: Option<unsafe extern "C" fn(*mut c_void) -> ()> =
     Some(spine_free as unsafe extern "C" fn(*mut c_void) -> ());
 static mut randomFunc: Option<unsafe extern "C" fn() -> c_float> = unsafe {
-    Some(::core::mem::transmute::<
+    Some(core::mem::transmute::<
         unsafe extern "C" fn() -> c_float,
         unsafe extern "C" fn() -> c_float,
     >(_spInternalRandom))
