@@ -93,6 +93,22 @@ impl Skeleton {
         CTmpMut::new(self, unsafe { Bone::new_from_ptr(self.c_ptr_mut().root) })
     }
 
+    pub fn find_bone(&self, name: &str) -> Option<CTmpRef<Skeleton, Bone>> {
+        self.bones().find(|bone| bone.data().name() == name)
+    }
+
+    pub fn find_bone_mut(&mut self, name: &str) -> Option<CTmpMut<Skeleton, Bone>> {
+        self.bones_mut().find(|bone| bone.data().name() == name)
+    }
+
+    pub fn find_slot(&self, name: &str) -> Option<CTmpRef<Skeleton, Slot>> {
+        self.slots().find(|slot| slot.data().name() == name)
+    }
+
+    pub fn find_slot_mut(&mut self, name: &str) -> Option<CTmpMut<Skeleton, Slot>> {
+        self.slots_mut().find(|slot| slot.data().name() == name)
+    }
+
     // TODO: iterators for ik, transform, path constraints
 
     c_accessor_tmp_ptr!(data, data_mut, data, SkeletonData, spSkeletonData);
