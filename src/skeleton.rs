@@ -6,7 +6,7 @@ use crate::{
         spBone, spSkeleton, spSkeletonData, spSkeleton_create, spSkeleton_dispose,
         spSkeleton_setBonesToSetupPose, spSkeleton_setSkin, spSkeleton_setSkinByName,
         spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose, spSkeleton_updateCache,
-        spSkeleton_updateWorldTransform, spSlot,
+        spSkeleton_updateWorldTransform, spSkin, spSlot,
     },
     c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::Error,
@@ -155,6 +155,7 @@ impl Skeleton {
         drawOrder,
         slots_count
     );
+    c_accessor_tmp_ptr_optional!(skin, skin_mut, skin, Skin, spSkin);
     c_ptr!(c_skeleton, spSkeleton);
 }
 
