@@ -118,14 +118,6 @@ impl SimpleDrawer {
                             indices.push(*mesh_attachment.triangles().offset(i));
                             indices.push(*mesh_attachment.triangles().offset(i + 1));
                             indices.push(*mesh_attachment.triangles().offset(i + 2));
-                            let index = *mesh_attachment.triangles().offset(i);
-                            uvs[index as usize * 2] = [
-                                *mesh_attachment.c_ptr_mut().uvs.offset(index as isize * 2),
-                                *mesh_attachment
-                                    .c_ptr_mut()
-                                    .uvs
-                                    .offset(index as isize * 2 + 1),
-                            ];
                             copy_uvs!(i);
                         }
                     }
