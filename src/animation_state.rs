@@ -395,10 +395,6 @@ impl TrackEntry {
         unsafe { spTrackEntry_getTrackComplete(self.c_ptr()) }
     }
 
-    pub fn handle(&self, animation_state: &AnimationState) -> TrackEntryHandle {
-        TrackEntryHandle::new(self.track_index(), self.c_ptr(), animation_state.c_ptr())
-    }
-
     fn handle_valid(handle: &TrackEntryHandle) -> bool {
         let track_count = unsafe { (*handle.c_parent.0).tracksCount };
         if handle.index < track_count {
@@ -459,6 +455,18 @@ c_handle_indexed_decl!(
     spAnimationState
 );
 
+impl<'a> CTmpRef<'a, AnimationState, TrackEntry> {
+    pub fn handle(&self) -> TrackEntryHandle {
+        TrackEntryHandle::new(self.track_index(), self.c_ptr(), self.parent.c_ptr())
+    }
+}
+
+impl<'a> CTmpMut<'a, AnimationState, TrackEntry> {
+    pub fn handle(&self) -> TrackEntryHandle {
+        TrackEntryHandle::new(self.track_index(), self.c_ptr(), self.parent.c_ptr())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::tests::test_spineboy_instance;
@@ -489,10 +497,7 @@ mod tests {
         let (_, mut animation_state) = test_spineboy_instance();
         let _ = animation_state.set_animation_by_name(0, "idle", true);
 
-        let track_handle = animation_state
-            .track_at_index(0)
-            .unwrap()
-            .handle(&animation_state);
+        let track_handle = animation_state.track_at_index(0).unwrap().handle();
 
         assert!(track_handle.get(&animation_state).is_some());
         animation_state.clear_track(0);
@@ -504,10 +509,7 @@ mod tests {
         let (_, mut animation_state) = test_spineboy_instance();
         let _ = animation_state.set_animation_by_name(0, "idle", true);
 
-        let track_handle = animation_state
-            .track_at_index(0)
-            .unwrap()
-            .handle(&animation_state);
+        let track_handle = animation_state.track_at_index(0).unwrap().handle();
 
         assert!(track_handle.get(&animation_state).is_some());
         let _ = animation_state.set_animation_by_name(0, "run", true);

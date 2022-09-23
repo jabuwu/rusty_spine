@@ -11,8 +11,8 @@ pub trait NewFromPtr<C> {
 }
 
 pub struct CTmpRef<'a, P, T> {
-    data: T,
-    parent: &'a P,
+    pub(crate) data: T,
+    pub(crate) parent: &'a P,
 }
 
 impl<'a, P, T> CTmpRef<'a, P, T> {
@@ -42,8 +42,8 @@ impl<'a, P, T: std::fmt::Debug> std::fmt::Debug for CTmpRef<'a, P, T> {
 }
 
 pub struct CTmpMut<'a, P, T> {
-    data: T,
-    parent: &'a mut P,
+    pub(crate) data: T,
+    pub(crate) parent: &'a mut P,
 }
 
 impl<'a, P, T> CTmpMut<'a, P, T> {
