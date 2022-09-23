@@ -12,6 +12,9 @@ mod skeleton_controller;
 #[cfg(feature = "draw_functions")]
 pub use skeleton_controller::*;
 
+#[cfg(feature = "egui_debugger")]
+pub mod debugger;
+
 mod animation;
 mod animation_state;
 mod animation_state_data;

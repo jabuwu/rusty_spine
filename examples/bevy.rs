@@ -17,6 +17,12 @@ use rusty_spine::{
     SkeletonControllerSettings, SkeletonJson,
 };
 
+#[cfg(feature = "egui_debugger")]
+use {
+    bevy_egui::{EguiContext, EguiPlugin},
+    rusty_spine::debugger::egui::egui_spine_debugger,
+};
+
 #[derive(Component)]
 pub struct Spine {
     controller: SkeletonController,
@@ -86,8 +92,8 @@ fn main() {
         );
         page.renderer_object().dispose::<SpineTexture>();
     });
-    App::new()
-        .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
+    let mut app = App::new();
+    app.insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .insert_resource(PersistentImageHandles {
             handles: image_handles,
             remember: image_remember,
@@ -190,8 +196,10 @@ fn main() {
         .add_startup_system(startup)
         .add_system(demo_load)
         .add_system(demo_next)
-        .add_system(spine_update)
-        .run();
+        .add_system(spine_update);
+    #[cfg(feature = "egui_debugger")]
+    app.add_plugin(EguiPlugin).add_system(spine_debugger);
+    app.run();
 }
 
 fn startup(
@@ -389,4 +397,17 @@ fn load_skeleton(atlas: &Vec<u8>, json: &Vec<u8>, dir: &str) -> Result<SkeletonC
             SkeletonControllerSettings::new().with_cull_direction(CullDirection::CounterClockwise),
         ),
     )
+}
+
+#[cfg(feature = "egui_debugger")]
+fn spine_debugger(mut egui_context: ResMut<EguiContext>, mut spine_query: Query<&mut Spine>) {
+    for mut spine in spine_query.iter_mut() {
+        let Spine { controller, .. } = spine.as_mut();
+        let SkeletonController {
+            skeleton,
+            animation_state,
+            ..
+        } = controller;
+        egui_spine_debugger(egui_context.ctx_mut(), "Spine", skeleton, animation_state);
+    }
 }
