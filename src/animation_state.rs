@@ -14,7 +14,7 @@ use crate::{
         spAnimationState_setEmptyAnimations, spAnimationState_update, spEvent, spEventType,
         spTrackEntry, spTrackEntry_getAnimationTime, spTrackEntry_getTrackComplete,
     },
-    c_interface::{CTmpRef, NewFromPtr, SyncPtr},
+    c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::Error,
     event::Event,
     skeleton::Skeleton,
@@ -79,14 +79,17 @@ impl AnimationState {
         track_index: i32,
         animation_name: &str,
         looping: bool,
-    ) {
+    ) -> CTmpMut<Self, TrackEntry> {
         let c_animation_name = CString::new(animation_name).unwrap();
-        spAnimationState_setAnimationByName(
-            self.c_ptr(),
-            track_index,
-            c_animation_name.as_ptr(),
-            looping as i32,
-        );
+        CTmpMut::new(
+            self,
+            TrackEntry::new_from_ptr(spAnimationState_setAnimationByName(
+                self.c_ptr(),
+                track_index,
+                c_animation_name.as_ptr(),
+                looping as i32,
+            )),
+        )
     }
 
     pub fn set_animation_by_name(
@@ -94,7 +97,7 @@ impl AnimationState {
         track_index: i32,
         animation_name: &str,
         looping: bool,
-    ) -> Result<(), Error> {
+    ) -> Result<CTmpMut<Self, TrackEntry>, Error> {
         if self
             .data()
             .skeleton_data()
@@ -102,21 +105,30 @@ impl AnimationState {
             .find(|animation| animation.name() == animation_name)
             .is_some()
         {
-            unsafe { self.set_animation_by_name_unchecked(track_index, animation_name, looping) };
-            Ok(())
+            Ok(unsafe {
+                self.set_animation_by_name_unchecked(track_index, animation_name, looping)
+            })
         } else {
             Err(Error::NotFound)
         }
     }
 
-    pub fn set_animation(&mut self, track_index: i32, animation: &Animation, looping: bool) {
+    pub fn set_animation(
+        &mut self,
+        track_index: i32,
+        animation: &Animation,
+        looping: bool,
+    ) -> CTmpMut<Self, TrackEntry> {
         unsafe {
-            spAnimationState_setAnimation(
-                self.c_ptr(),
-                track_index,
-                animation.c_ptr(),
-                looping as i32,
-            );
+            CTmpMut::new(
+                self,
+                TrackEntry::new_from_ptr(spAnimationState_setAnimation(
+                    self.c_ptr(),
+                    track_index,
+                    animation.c_ptr(),
+                    looping as i32,
+                )),
+            )
         }
     }
 
@@ -126,15 +138,18 @@ impl AnimationState {
         animation_name: &str,
         looping: bool,
         delay: f32,
-    ) {
+    ) -> CTmpMut<Self, TrackEntry> {
         let c_animation_name = CString::new(animation_name).unwrap();
-        spAnimationState_addAnimationByName(
-            self.c_ptr(),
-            track_index,
-            c_animation_name.as_ptr(),
-            looping as i32,
-            delay,
-        );
+        CTmpMut::new(
+            self,
+            TrackEntry::new_from_ptr(spAnimationState_addAnimationByName(
+                self.c_ptr(),
+                track_index,
+                c_animation_name.as_ptr(),
+                looping as i32,
+                delay,
+            )),
+        )
     }
 
     pub fn add_animation_by_name(
@@ -143,7 +158,7 @@ impl AnimationState {
         animation_name: &str,
         looping: bool,
         delay: f32,
-    ) -> Result<(), Error> {
+    ) -> Result<CTmpMut<Self, TrackEntry>, Error> {
         if self
             .data()
             .skeleton_data()
@@ -151,10 +166,9 @@ impl AnimationState {
             .find(|animation| animation.name() == animation_name)
             .is_some()
         {
-            unsafe {
+            Ok(unsafe {
                 self.add_animation_by_name_unchecked(track_index, animation_name, looping, delay)
-            };
-            Ok(())
+            })
         } else {
             Err(Error::NotFound)
         }
@@ -166,27 +180,54 @@ impl AnimationState {
         animation: &Animation,
         looping: bool,
         delay: f32,
-    ) {
+    ) -> CTmpMut<Self, TrackEntry> {
         unsafe {
-            spAnimationState_addAnimation(
-                self.c_ptr(),
-                track_index,
-                animation.c_ptr(),
-                looping as i32,
-                delay,
-            );
+            CTmpMut::new(
+                self,
+                TrackEntry::new_from_ptr(spAnimationState_addAnimation(
+                    self.c_ptr(),
+                    track_index,
+                    animation.c_ptr(),
+                    looping as i32,
+                    delay,
+                )),
+            )
         }
     }
 
-    pub fn set_empty_animation(&mut self, track_index: i32, mix_duration: f32) {
+    pub fn set_empty_animation(
+        &mut self,
+        track_index: i32,
+        mix_duration: f32,
+    ) -> CTmpMut<Self, TrackEntry> {
         unsafe {
-            spAnimationState_setEmptyAnimation(self.c_ptr(), track_index, mix_duration);
+            CTmpMut::new(
+                self,
+                TrackEntry::new_from_ptr(spAnimationState_setEmptyAnimation(
+                    self.c_ptr(),
+                    track_index,
+                    mix_duration,
+                )),
+            )
         }
     }
 
-    pub fn add_empty_animation(&mut self, track_index: i32, mix_duration: f32, delay: f32) {
+    pub fn add_empty_animation(
+        &mut self,
+        track_index: i32,
+        mix_duration: f32,
+        delay: f32,
+    ) -> CTmpMut<Self, TrackEntry> {
         unsafe {
-            spAnimationState_addEmptyAnimation(self.c_ptr(), track_index, mix_duration, delay);
+            CTmpMut::new(
+                self,
+                TrackEntry::new_from_ptr(spAnimationState_addEmptyAnimation(
+                    self.c_ptr(),
+                    track_index,
+                    mix_duration,
+                    delay,
+                )),
+            )
         }
     }
 
@@ -393,6 +434,7 @@ impl TrackEntry {
     c_accessor_mut!(mix_duration, set_mix_duration, mixDuration, f32);
     c_accessor!(interrupt_alpha, interruptAlpha, f32);
     c_accessor!(total_alpha, totalAlpha, f32);
+    c_accessor_renderer_object!();
     c_ptr!(c_track_entry, spTrackEntry);
 
     /*TODO
@@ -406,7 +448,6 @@ impl TrackEntry {
     spTrackEntryArray *timelineHoldMix;
     float *timelinesRotation;
     int timelinesRotationCount;
-    void *rendererObject;
     void *userData;*/
 }
 
