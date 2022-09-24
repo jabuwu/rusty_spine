@@ -5,7 +5,6 @@ use std::{
 };
 
 use crate::{
-    atlas::Atlas,
     c::{
         spSkeletonJson, spSkeletonJson_create, spSkeletonJson_dispose,
         spSkeletonJson_readSkeletonData, spSkeletonJson_readSkeletonDataFile,
@@ -13,6 +12,7 @@ use crate::{
     c_interface::SyncPtr,
     error::Error,
     skeleton_data::SkeletonData,
+    Atlas,
 };
 
 /// A loader for Spine json files.
@@ -24,6 +24,22 @@ pub struct SkeletonJson {
 }
 
 impl SkeletonJson {
+    /// Create a new JSON loader using the default atlas attachment loader.
+    ///
+    /// ```
+    /// use std::sync::Arc;
+    /// use rusty_spine::{AnimationState, AnimationStateData, Atlas, Error, Skeleton, SkeletonJson};
+    ///
+    /// fn load_skeleton() -> Result<(Skeleton, AnimationState), Error> {
+    ///     let atlas = Arc::new(Atlas::new_from_file("spineboy.atlas")?);
+    ///     let skeleton_json = SkeletonJson::new(atlas);
+    ///     let skeleton_data = Arc::new(skeleton_json.read_skeleton_data_file("spineboy.json")?);
+    ///     let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
+    ///     let skeleton = Skeleton::new(skeleton_data);
+    ///     let animation_state = AnimationState::new(animation_state_data);
+    ///     Ok((skeleton, animation_state))
+    /// }
+    /// ```
     pub fn new(atlas: Arc<Atlas>) -> Self {
         let c_skeleton_json = unsafe { spSkeletonJson_create(atlas.c_ptr()) };
         Self {

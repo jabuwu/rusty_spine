@@ -54,7 +54,28 @@ impl Slot {
     // TODO: accessors
 }
 
-c_handle_decl!(SlotHandle, Slot, Skeleton, spSlot, spSkeleton);
+c_handle_decl!(
+    /// A storeable reference to a [Slot](struct.Slot.html).
+    ///
+    /// Can be acquired from any instance of [Slot](struct.Slot.html).
+    ///
+    /// ```
+    /// # #[path="./doctests.rs"]
+    /// # mod doctests;
+    /// # use rusty_spine::{AnimationState, EventType, SlotHandle};
+    /// # let (skeleton, _) = doctests::test_spineboy_instance();
+    /// let slot_handles: Vec<SlotHandle> = skeleton.slots().map(|slot| slot.handle()).collect();
+    /// for slot_handle in slot_handles.iter() {
+    ///     let slot = slot_handle.get(&skeleton).unwrap();
+    ///     println!("{}", slot.data().name());
+    /// }
+    /// ```
+    SlotHandle,
+    Slot,
+    Skeleton,
+    spSlot,
+    spSkeleton
+);
 
 /// Static slot data imported from Spine.
 #[derive(Debug)]

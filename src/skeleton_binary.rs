@@ -5,7 +5,6 @@ use std::{
 };
 
 use crate::{
-    atlas::Atlas,
     c::{
         c_uchar, spSkeletonBinary, spSkeletonBinary_create, spSkeletonBinary_dispose,
         spSkeletonBinary_readSkeletonData, spSkeletonBinary_readSkeletonDataFile,
@@ -13,6 +12,7 @@ use crate::{
     c_interface::SyncPtr,
     error::Error,
     skeleton_data::SkeletonData,
+    Atlas,
 };
 
 /// A loader for Spine binary files.
@@ -24,6 +24,22 @@ pub struct SkeletonBinary {
 }
 
 impl SkeletonBinary {
+    /// Create a new Binary loader using the default atlas attachment loader.
+    ///
+    /// ```
+    /// use std::sync::Arc;
+    /// use rusty_spine::{AnimationState, AnimationStateData, Atlas, Error, Skeleton, SkeletonBinary};
+    ///
+    /// fn load_skeleton() -> Result<(Skeleton, AnimationState), Error> {
+    ///     let atlas = Arc::new(Atlas::new_from_file("spineboy.atlas")?);
+    ///     let skeleton_binary = SkeletonBinary::new(atlas);
+    ///     let skeleton_data = Arc::new(skeleton_binary.read_skeleton_data_file("spineboy.skel")?);
+    ///     let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
+    ///     let skeleton = Skeleton::new(skeleton_data);
+    ///     let animation_state = AnimationState::new(animation_state_data);
+    ///     Ok((skeleton, animation_state))
+    /// }
+    /// ```
     pub fn new(atlas: Arc<Atlas>) -> Self {
         let c_skeleton_binary = unsafe { spSkeletonBinary_create(atlas.c_ptr()) };
         Self {

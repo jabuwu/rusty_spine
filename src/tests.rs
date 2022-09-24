@@ -29,7 +29,7 @@ pub fn test_spineboy_instance_data() -> (Arc<SkeletonData>, Arc<AnimationStateDa
 
 pub fn test_spineboy_instance() -> (Skeleton, AnimationState) {
     let (skeleton_data, animation_state_data) = test_spineboy_instance_data();
-    let skeleton = Skeleton::new(skeleton_data).unwrap();
+    let skeleton = Skeleton::new(skeleton_data);
     let animation_state = AnimationState::new(animation_state_data);
     (skeleton, animation_state)
 }

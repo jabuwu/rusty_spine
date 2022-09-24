@@ -1,3 +1,5 @@
+//! Direct access to the [Spine C Runtime](http://en.esotericsoftware.com/spine-c).
+//!
 #[cfg(not(feature = "libc"))]
 #[macro_use]
 mod wasm;

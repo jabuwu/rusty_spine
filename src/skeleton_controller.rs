@@ -59,7 +59,7 @@ impl SkeletonController {
         skeleton_data: Arc<SkeletonData>,
         animation_state_data: Arc<AnimationStateData>,
     ) -> Self {
-        let mut skeleton = Skeleton::new(skeleton_data).unwrap();
+        let mut skeleton = Skeleton::new(skeleton_data);
         unsafe {
             spSkeleton_setToSetupPose(skeleton.c_ptr());
         }

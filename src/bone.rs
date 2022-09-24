@@ -178,7 +178,7 @@ impl Bone {
 c_handle_decl!(
     /// A storeable reference to a [Bone](struct.Bone.html).
     ///
-    /// Can be acquired from any reference to a [Bone](struct.Bone.html).
+    /// Can be acquired from any instance of [Bone](struct.Bone.html).
     ///
     /// ```
     /// # #[path="./doctests.rs"]

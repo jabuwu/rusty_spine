@@ -1,4 +1,7 @@
 //! Spine runtime for Rust (and wasm!) transpiled from the official C Runtime.
+//!
+//! To load a [Skeleton](struct.Skeleton.html), see [SkeletonJson](struct.SkeletonJson.html) or
+//! [SkeletonBinary](struct.SkeletonBinary.html).
 
 #[macro_use]
 pub mod c_interface;
@@ -18,7 +21,8 @@ pub mod debugger;
 mod animation;
 mod animation_state;
 mod animation_state_data;
-mod atlas;
+#[path = "atlas.rs"]
+mod atlas_mod;
 mod attachment;
 mod bone;
 mod bounding_box_attachment;
@@ -42,7 +46,7 @@ mod texture_region;
 pub use animation::*;
 pub use animation_state::*;
 pub use animation_state_data::*;
-pub use atlas::*;
+pub use atlas_mod::{atlas, Atlas};
 pub use attachment::*;
 pub use bone::*;
 pub use bounding_box_attachment::*;

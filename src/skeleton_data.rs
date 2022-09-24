@@ -2,14 +2,15 @@ use std::sync::Arc;
 
 use crate::{
     animation::Animation,
-    atlas::Atlas,
     bone::BoneData,
     c::{spAnimation, spBoneData, spSkeletonData, spSkeletonData_dispose, spSkin, spSlotData},
     c_interface::{NewFromPtr, SyncPtr},
     skin::Skin,
     slot::SlotData,
+    Atlas,
 };
 
+/// Static skeleton data imported from Spine.
 #[derive(Debug)]
 pub struct SkeletonData {
     c_skeleton_data: SyncPtr<spSkeletonData>,

@@ -23,13 +23,17 @@ pub struct Skeleton {
 }
 
 impl Skeleton {
-    pub fn new(skeleton_data: Arc<SkeletonData>) -> Result<Self, Error> {
+    /// Create a new instance of the skeleton loaded in [SkeletonData](struct.SkeletonData.html).
+    ///
+    /// See [SkeletonJson](struct.SkeletonJson.html) or
+    /// [SkeletonBinary](struct.SkeletonBinary.html) for a complete example of loading a skeleton.
+    pub fn new(skeleton_data: Arc<SkeletonData>) -> Self {
         let c_skeleton = unsafe { spSkeleton_create(skeleton_data.c_ptr()) };
-        Ok(Self {
+        Self {
             c_skeleton: SyncPtr(c_skeleton),
             owns_memory: true,
             _skeleton_data: skeleton_data,
-        })
+        }
     }
 
     pub fn update_cache(&mut self) {
