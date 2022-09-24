@@ -148,7 +148,7 @@ impl Bone {
     c_accessor_bool_mut!(sorted, set_sorted, sorted);
     c_accessor_bool_mut!(active, set_active, active);
     c_accessor_tmp_ptr!(data, data_mut, data, BoneData, spBoneData);
-    c_accessor_tmp_ptr!(parent, parent_mut, parent, Bone, spBone);
+    c_accessor_tmp_ptr_optional!(parent, parent_mut, parent, Bone, spBone);
     c_accessor!(children_count, childrenCount, i32);
     c_accessor_array!(
         children,
