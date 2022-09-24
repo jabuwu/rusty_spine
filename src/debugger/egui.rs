@@ -184,7 +184,7 @@ pub fn egui_spine_debugger(
                         }
                     });
                 if selected != current_skin {
-                    skeleton.set_skin_by_name(&selected);
+                    skeleton.set_skin_by_name(&selected).unwrap();
                 }
             });
 
@@ -208,10 +208,13 @@ pub fn egui_spine_debugger(
             }
         });
 
+    let mut remove_bone = None;
     for bone_window in bone_windows.iter() {
         if let Some(mut bone) = bone_window.get_mut(skeleton) {
+            let mut open = true;
             egui::Window::new(bone.data().name())
                 .id(Id::new(format!("{:?}", bone.c_ptr())))
+                .open(&mut open)
                 .show(ctx, |ui| {
                     ui.label("Translation");
                     ui.horizontal(|ui| {
@@ -232,6 +235,15 @@ pub fn egui_spine_debugger(
                         bone.set_scale_y(scale_y);
                     });
                 });
+            if !open {
+                remove_bone = Some(bone_window);
+            }
+        }
+    }
+
+    if let Some(remove) = remove_bone {
+        if let Some(index) = bone_windows.iter().position(|handle| handle == remove) {
+            bone_windows.remove(index);
         }
     }
 
