@@ -691,7 +691,8 @@ macro_rules! c_vertex_attachment_accessors {
 }
 
 macro_rules! c_handle_decl {
-    ($name:ident, $type:ident, $parent:ident, $c_type:ident, $c_parent:ident) => {
+    ($(#[$($attrss:tt)*])* $name:ident, $type:ident, $parent:ident, $c_type:ident, $c_parent:ident) => {
+        $(#[$($attrss)*])*
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub struct $name {
             c_item: crate::c_interface::SyncPtr<$c_type>,
@@ -706,6 +707,7 @@ macro_rules! c_handle_decl {
                 }
             }
 
+            /// Safely acquired the item, verifying its existence using its parent.
             pub fn get<'a>(
                 &self,
                 parent: &'a $parent,
@@ -719,6 +721,7 @@ macro_rules! c_handle_decl {
                 }
             }
 
+            /// Safely acquired the item, verifying its existence using its parent.
             pub fn get_mut<'a>(
                 &self,
                 parent: &'a mut $parent,
@@ -732,6 +735,8 @@ macro_rules! c_handle_decl {
                 }
             }
 
+            /// Acquire the item without any checks. This is a direct pointer access which is fast
+            /// but will segfault if the data has been disposed of already.
             pub unsafe fn get_unchecked<'a>(&self) -> $type {
                 <$type>::new_from_ptr(self.c_item.0)
             }
@@ -740,7 +745,8 @@ macro_rules! c_handle_decl {
 }
 
 macro_rules! c_handle_indexed_decl {
-    ($name:ident, $type:ty, $parent:ty, $c_type:ident, $c_parent:ident) => {
+    ($(#[$($attrss:tt)*])* $name:ident, $type:ty, $parent:ty, $c_type:ident, $c_parent:ident) => {
+        $(#[$($attrss)*])*
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub struct $name {
             index: i32,
@@ -761,6 +767,7 @@ macro_rules! c_handle_indexed_decl {
                 }
             }
 
+            /// Safely acquired the item, verifying its existence using its parent.
             pub fn get<'a>(
                 &self,
                 parent: &'a $parent,
@@ -778,6 +785,7 @@ macro_rules! c_handle_indexed_decl {
                 }
             }
 
+            /// Safely acquired the item, verifying its existence using its parent.
             pub fn get_mut<'a>(
                 &self,
                 parent: &'a mut $parent,
@@ -795,6 +803,8 @@ macro_rules! c_handle_indexed_decl {
                 }
             }
 
+            /// Acquire the item without any checks. This is a direct pointer access which is fast
+            /// but will segfault if the data has been disposed of already.
             pub unsafe fn get_unchecked<'a>(&self) -> $type {
                 <$type>::new_from_ptr(self.c_item.0)
             }

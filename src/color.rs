@@ -2,6 +2,7 @@ use std::ops::{Mul, MulAssign};
 
 use crate::c::c_float;
 
+/// RGBA F32 color that is byte-compatible with the Spine runtime.
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 #[repr(C)]
 pub struct Color {

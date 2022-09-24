@@ -62,6 +62,7 @@ impl Event {
     c_ptr!(c_event, spEvent);
 }
 
+/// Static event data imported from Spine.
 #[derive(Debug)]
 pub struct EventData {
     c_event_data: SyncPtr<spEventData>,

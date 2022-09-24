@@ -56,6 +56,7 @@ impl Slot {
 
 c_handle_decl!(SlotHandle, Slot, Skeleton, spSlot, spSkeleton);
 
+/// Static slot data imported from Spine.
 #[derive(Debug)]
 pub struct SlotData {
     c_slot_data: SyncPtr<spSlotData>,

@@ -448,6 +448,24 @@ impl TrackEntry {
 }
 
 c_handle_indexed_decl!(
+    /// A storeable reference to a [TrackEntry](struct.TrackEntry.html).
+    ///
+    /// Can be acquired from a
+    /// [CTmpRef<AnimationState, TrackEntry>](c_interface/struct.CTmpRef.html) or
+    /// [CTmpMut<AnimationState, TrackEntry>](c_interface/struct.CTmpMut.html) acquired from an
+    /// [AnimationState](struct.AnimationState.html) instance.
+    ///
+    /// ```
+    /// # #[path="./doctests.rs"]
+    /// # mod doctests;
+    /// # use rusty_spine::{AnimationState, EventType, TrackEntryHandle};
+    /// # let (_, animation_state) = doctests::test_spineboy_instance();
+    /// let track_entry_handles: Vec<TrackEntryHandle> = animation_state.tracks().map(|track| track.unwrap().handle()).collect();
+    /// for track_entry_handle in track_entry_handles.iter() {
+    ///     let track_entry = track_entry_handle.get(&animation_state).unwrap();
+    ///     println!("{}", track_entry.animation().name());
+    /// }
+    /// ```
     TrackEntryHandle,
     TrackEntry,
     AnimationState,

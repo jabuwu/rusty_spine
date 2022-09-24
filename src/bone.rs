@@ -153,8 +153,8 @@ impl Bone {
     c_accessor_array!(
         children,
         children_mut,
-        childrenat_index,
-        childrenat_index_mut,
+        children_at_index,
+        children_at_index_mut,
         Bone,
         Bone,
         spBone,
@@ -175,8 +175,30 @@ impl Bone {
     c_ptr!(c_bone, spBone);
 }
 
-c_handle_decl!(BoneHandle, Bone, Skeleton, spBone, spSkeleton);
+c_handle_decl!(
+    /// A storeable reference to a [Bone](struct.Bone.html).
+    ///
+    /// Can be acquired from any reference to a [Bone](struct.Bone.html).
+    ///
+    /// ```
+    /// # #[path="./doctests.rs"]
+    /// # mod doctests;
+    /// # use rusty_spine::{AnimationState, EventType, BoneHandle};
+    /// # let (skeleton, _) = doctests::test_spineboy_instance();
+    /// let bone_handles: Vec<BoneHandle> = skeleton.bones().map(|bone| bone.handle()).collect();
+    /// for bone_handle in bone_handles.iter() {
+    ///     let bone = bone_handle.get(&skeleton).unwrap();
+    ///     println!("{}", bone.data().name());
+    /// }
+    /// ```
+    BoneHandle,
+    Bone,
+    Skeleton,
+    spBone,
+    spSkeleton
+);
 
+/// Static bone data imported from Spine.
 #[derive(Debug)]
 pub struct BoneData {
     c_bone_data: SyncPtr<spBoneData>,
