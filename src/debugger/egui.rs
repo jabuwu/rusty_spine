@@ -351,17 +351,20 @@ fn egui_draw_slots(
                     if root && slot_handles.is_empty() {
                         ui.label(bone.data().name());
                     }
-                    for slot_handle in slot_handles.iter() {
-                        if let Some(slot) = slot_handle.get(skeleton) {
-                            if let Some(attachment) = egui_slot_dropdown(ui, *slot_handle, skeleton)
-                            {
-                                commands.push(Command::SetAttachment {
-                                    slot_index: slot.data().index(),
-                                    attachment,
-                                });
+                    ui.vertical(|ui| {
+                        for slot_handle in slot_handles.iter() {
+                            if let Some(slot) = slot_handle.get(skeleton) {
+                                if let Some(attachment) =
+                                    egui_slot_dropdown(ui, *slot_handle, skeleton)
+                                {
+                                    commands.push(Command::SetAttachment {
+                                        slot_index: slot.data().index(),
+                                        attachment,
+                                    });
+                                }
                             }
                         }
-                    }
+                    });
                 })
                 .body(|ui| {
                     for child_handle in child_handles.into_iter() {
@@ -376,16 +379,19 @@ fn egui_draw_slots(
                     }
                 });
             } else {
-                for slot_handle in slot_handles.iter() {
-                    if let Some(slot) = slot_handle.get(skeleton) {
-                        if let Some(attachment) = egui_slot_dropdown(ui, *slot_handle, skeleton) {
-                            commands.push(Command::SetAttachment {
-                                slot_index: slot.data().index(),
-                                attachment,
-                            });
+                ui.vertical(|ui| {
+                    for slot_handle in slot_handles.iter() {
+                        if let Some(slot) = slot_handle.get(skeleton) {
+                            if let Some(attachment) = egui_slot_dropdown(ui, *slot_handle, skeleton)
+                            {
+                                commands.push(Command::SetAttachment {
+                                    slot_index: slot.data().index(),
+                                    attachment,
+                                });
+                            }
                         }
                     }
-                }
+                });
             }
         } else {
             for child_handle in child_handles.into_iter() {
