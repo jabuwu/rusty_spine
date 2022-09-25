@@ -11,6 +11,16 @@ use crate::{
     Skeleton,
 };
 
+/// A bone within the [Skeleton](struct.Skeleton.html) hierarchy.
+///
+/// Bones can be acquired from a [Skeleton](struct.Skeleton.html) and a safe
+/// [BoneHandle](struct.BoneHandle.html) can be obtained using the
+/// [handle](struct.Bone.html#method.handle) method to store long-term references to a specific
+/// bone.
+///
+/// The hierarchy can be traversed using [parent](struct.Bone.html#method.parent) and
+/// [children](struct.Bone.html#method.children), and specific bones can be located using
+/// [Skeleton::find_bone](struct.Skeleton.html#method.find_bone).
 #[derive(Debug)]
 pub struct Bone {
     c_bone: SyncPtr<spBone>,
@@ -67,6 +77,12 @@ impl Bone {
         }
     }
 
+    pub fn update_applied_transform(&mut self) {
+        unsafe {
+            spBone_updateAppliedTransform(self.c_ptr());
+        }
+    }
+
     pub fn get_world_rotation_x(&self) -> f32 {
         unsafe { spBone_getWorldRotationX(self.c_ptr()) }
     }
@@ -81,12 +97,6 @@ impl Bone {
 
     pub fn get_world_scale_y(&self) -> f32 {
         unsafe { spBone_getWorldScaleY(self.c_ptr()) }
-    }
-
-    pub fn update_applied_transform(&mut self) {
-        unsafe {
-            spBone_updateAppliedTransform(self.c_ptr());
-        }
     }
 
     pub fn world_to_local(&self, world_x: f32, world_y: f32) -> (f32, f32) {
@@ -151,6 +161,36 @@ impl Bone {
     c_accessor_tmp_ptr_optional!(parent, parent_mut, parent, Bone, spBone);
     c_accessor!(children_count, childrenCount, i32);
     c_accessor_array!(
+        /// An iterator over the children of this bone.
+        ///
+        /// ```
+        /// # #[path="./doctests.rs"]
+        /// # mod doctests;
+        /// use rusty_spine::{BoneHandle, Skeleton};
+        ///
+        /// fn traverse_bones(
+        ///     bone_handle: BoneHandle,
+        ///     skeleton: &Skeleton,
+        ///     ident: usize,
+        /// ) {
+        ///     if let Some(bone) = bone_handle.get(skeleton) {
+        ///         println!(
+        ///             "{:ident$}{name}",
+        ///             "",
+        ///             ident = ident,
+        ///             name = bone.data().name()
+        ///         );
+        ///         for child in bone.children() {
+        ///             traverse_bones(child.handle(), skeleton, ident + 2);
+        ///         }
+        ///     }
+        /// }
+        ///
+        /// // Traverse all bones in a skeleton
+        /// # let (skeleton, animation_state) = doctests::test_spineboy_instance();
+        /// let root_bone = skeleton.bone_root().handle();
+        /// traverse_bones(root_bone, &skeleton, 0);
+        /// ```
         children,
         children_mut,
         children_at_index,

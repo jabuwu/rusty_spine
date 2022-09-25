@@ -34,9 +34,10 @@ impl SkeletonBinary {
     ///     let atlas = Arc::new(Atlas::new_from_file("spineboy.atlas")?);
     ///     let skeleton_binary = SkeletonBinary::new(atlas);
     ///     let skeleton_data = Arc::new(skeleton_binary.read_skeleton_data_file("spineboy.skel")?);
-    ///     let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
+    ///     let animation_state_data = AnimationStateData::new(skeleton_data.clone());
+    ///     // ... prepare animation state (see AnimationStateData docs) ...
     ///     let skeleton = Skeleton::new(skeleton_data);
-    ///     let animation_state = AnimationState::new(animation_state_data);
+    ///     let animation_state = AnimationState::new(Arc::new(animation_state_data));
     ///     Ok((skeleton, animation_state))
     /// }
     /// ```

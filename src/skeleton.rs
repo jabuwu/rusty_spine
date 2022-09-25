@@ -15,6 +15,7 @@ use crate::{
     slot::Slot,
 };
 
+/// A live Skeleton instance created from [SkeletonData](struct.SkeletonData.html).
 #[derive(Debug)]
 pub struct Skeleton {
     c_skeleton: SyncPtr<spSkeleton>,

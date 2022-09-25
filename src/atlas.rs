@@ -85,6 +85,14 @@ impl Atlas {
         }
     }
 
+    pub fn find_page(&self, name: &str) -> Option<CTmpRef<Self, AtlasPage>> {
+        self.pages().find(|page| page.name() == name)
+    }
+
+    pub fn find_page_mut(&mut self, name: &str) -> Option<CTmpMut<Self, AtlasPage>> {
+        self.pages_mut().find(|page| page.name() == name)
+    }
+
     pub fn regions(&self) -> AtlasRegionIterator {
         AtlasRegionIterator {
             _atlas: self,
@@ -97,6 +105,14 @@ impl Atlas {
             _atlas: self,
             region: unsafe { self.c_ptr_mut().regions },
         }
+    }
+
+    pub fn find_region(&self, name: &str) -> Option<CTmpRef<Self, AtlasRegion>> {
+        self.regions().find(|region| region.name() == name)
+    }
+
+    pub fn find_region_mut(&mut self, name: &str) -> Option<CTmpMut<Self, AtlasRegion>> {
+        self.regions_mut().find(|region| region.name() == name)
     }
 
     c_accessor_renderer_object!();

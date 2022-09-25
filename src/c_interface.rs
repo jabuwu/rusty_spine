@@ -538,7 +538,8 @@ macro_rules! c_accessor_passthrough {
 }
 
 macro_rules! c_accessor_array {
-    ($rust:ident, $rust_mut:ident, $rust_index:ident, $rust_index_mut:ident, $parent_type:ty, $type:ty, $c_type:ty, $c:ident, $count_fn:ident) => {
+    ($(#[$($attrss:tt)*])* $rust:ident, $rust_mut:ident, $rust_index:ident, $rust_index_mut:ident, $parent_type:ty, $type:ty, $c_type:ty, $c:ident, $count_fn:ident) => {
+        $(#[$($attrss)*])*
         pub fn $rust(&self) -> crate::c_interface::CTmpPtrIterator<$parent_type, $type, $c_type> {
             crate::c_interface::CTmpPtrIterator::new(
                 self,

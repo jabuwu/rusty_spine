@@ -2,6 +2,11 @@
 //!
 //! To load a [Skeleton](struct.Skeleton.html), see [SkeletonJson](struct.SkeletonJson.html) or
 //! [SkeletonBinary](struct.SkeletonBinary.html).
+//!
+//! To set automatic mix durations between animations, see
+//! [AnimationStateData](struct.AnimationStateData.html).
+//!
+//! To find and manage bones, see [Bone](struct.Bone.html).
 
 #[macro_use]
 pub mod c_interface;

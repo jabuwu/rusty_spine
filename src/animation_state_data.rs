@@ -11,6 +11,28 @@ use crate::{
     skeleton_data::SkeletonData,
 };
 
+/// Animation settings used to instantiate [AnimationState](struct.AnimationState.html).
+///
+/// Mix durations can be applied to automatically blend between animations.  For example, to
+/// smoothly mix between a `walk` and `run` animation for `0.2` seconds:
+///
+/// ```
+/// # #[path="./doctests.rs"]
+/// # mod doctests;
+/// # let mut animation_state_data = doctests::test_spineboy_animation_state_data();
+/// animation_state_data.set_mix_by_name("walk", "run", 0.2);
+/// ```
+///
+/// This operation is one way, so to blend back and forth between the two animations, two mix
+/// durations must be specified:
+///
+/// ```
+/// # #[path="./doctests.rs"]
+/// # mod doctests;
+/// # let mut animation_state_data = doctests::test_spineboy_animation_state_data();
+/// animation_state_data.set_mix_by_name("walk", "run", 0.2);
+/// animation_state_data.set_mix_by_name("run", "walk", 0.2);
+/// ```
 #[derive(Debug)]
 pub struct AnimationStateData {
     c_animation_state_data: SyncPtr<spAnimationStateData>,
