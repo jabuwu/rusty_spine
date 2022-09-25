@@ -1,13 +1,24 @@
 use egui::*;
 use egui_extras::*;
 
-use crate::{AnimationState, BoneHandle, Skeleton};
+use crate::{AnimationState, Attachment, BoneHandle, Skeleton, SlotHandle};
 
 enum Command {
-    SetAnimationByName { track_index: i32, name: String },
-    SetEmptyAnimation { track_index: i32 },
-    ClearTrack { track_index: i32 },
+    SetAnimationByName {
+        track_index: i32,
+        name: String,
+    },
+    SetEmptyAnimation {
+        track_index: i32,
+    },
+    ClearTrack {
+        track_index: i32,
+    },
     SetToSetupPose,
+    SetAttachment {
+        slot_index: i32,
+        attachment: Option<Attachment>,
+    },
 }
 
 pub fn egui_spine_debugger(
@@ -151,12 +162,23 @@ pub fn egui_spine_debugger(
 
             ui.add_space(16.);
             ui.heading("Bones");
-            egui_draw_bone(
+            egui_draw_bones(
                 ui,
                 skeleton.bone_root().handle(),
                 skeleton,
                 animation_state,
                 &mut bone_windows,
+            );
+
+            ui.add_space(16.);
+            ui.heading("Slots");
+            egui_draw_slots(
+                ui,
+                skeleton.bone_root().handle(),
+                skeleton,
+                animation_state,
+                &mut commands,
+                true,
             );
 
             ui.add_space(16.);
@@ -204,6 +226,15 @@ pub fn egui_spine_debugger(
                     Command::SetToSetupPose => {
                         skeleton.set_to_setup_pose();
                     }
+                    Command::SetAttachment {
+                        slot_index,
+                        attachment,
+                    } => unsafe {
+                        skeleton
+                            .slot_at_index_mut(slot_index as usize)
+                            .unwrap()
+                            .set_attachment(attachment);
+                    },
                 }
             }
         });
@@ -251,7 +282,7 @@ pub fn egui_spine_debugger(
         .insert_temp(Id::new(format!("{}-bones", unique)), bone_windows);
 }
 
-fn egui_draw_bone(
+fn egui_draw_bones(
     ui: &mut Ui,
     bone_handle: BoneHandle,
     skeleton: &mut Skeleton,
@@ -277,7 +308,7 @@ fn egui_draw_bone(
                 })
                 .body(|ui| {
                     for child_handle in child_handles.into_iter() {
-                        egui_draw_bone(ui, child_handle, skeleton, animation_state, bone_windows);
+                        egui_draw_bones(ui, child_handle, skeleton, animation_state, bone_windows);
                     }
                 });
         } else {
@@ -290,4 +321,153 @@ fn egui_draw_bone(
             }
         }
     }
+}
+
+fn egui_draw_slots(
+    ui: &mut Ui,
+    bone_handle: BoneHandle,
+    skeleton: &mut Skeleton,
+    animation_state: &mut AnimationState,
+    commands: &mut Vec<Command>,
+    root: bool,
+) {
+    if let Some(bone) = bone_handle.get(&skeleton) {
+        let bone_name = bone.data().name().to_owned();
+        let child_handles: Vec<BoneHandle> = bone.children().map(|bone| bone.handle()).collect();
+        let slot_handles: Vec<SlotHandle> = skeleton
+            .slots()
+            .filter(|slot| slot.bone().handle() == bone_handle)
+            .map(|slot| slot.handle())
+            .collect();
+        if !slot_handles.is_empty() || root {
+            if has_slot_children(bone_handle, skeleton, true) || root {
+                let id = ui.make_persistent_id(format!("bone-slot-{}", bone_name.clone()));
+                egui::collapsing_header::CollapsingState::load_with_default_open(
+                    ui.ctx(),
+                    id,
+                    false,
+                )
+                .show_header(ui, |ui| {
+                    if root && slot_handles.is_empty() {
+                        ui.label(bone.data().name());
+                    }
+                    for slot_handle in slot_handles.iter() {
+                        if let Some(slot) = slot_handle.get(skeleton) {
+                            if let Some(attachment) = egui_slot_dropdown(ui, *slot_handle, skeleton)
+                            {
+                                commands.push(Command::SetAttachment {
+                                    slot_index: slot.data().index(),
+                                    attachment,
+                                });
+                            }
+                        }
+                    }
+                })
+                .body(|ui| {
+                    for child_handle in child_handles.into_iter() {
+                        egui_draw_slots(
+                            ui,
+                            child_handle,
+                            skeleton,
+                            animation_state,
+                            commands,
+                            false,
+                        );
+                    }
+                });
+            } else {
+                for slot_handle in slot_handles.iter() {
+                    if let Some(slot) = slot_handle.get(skeleton) {
+                        if let Some(attachment) = egui_slot_dropdown(ui, *slot_handle, skeleton) {
+                            commands.push(Command::SetAttachment {
+                                slot_index: slot.data().index(),
+                                attachment,
+                            });
+                        }
+                    }
+                }
+            }
+        } else {
+            for child_handle in child_handles.into_iter() {
+                egui_draw_slots(ui, child_handle, skeleton, animation_state, commands, false);
+            }
+        }
+    }
+}
+
+fn has_slot_children(bone_handle: BoneHandle, skeleton: &Skeleton, root: bool) -> bool {
+    if let Some(bone) = bone_handle.get(&skeleton) {
+        let child_handles: Vec<BoneHandle> = bone.children().map(|bone| bone.handle()).collect();
+        let slot_handles: Vec<SlotHandle> = skeleton
+            .slots()
+            .filter(|slot| slot.bone().handle() == bone_handle)
+            .map(|slot| slot.handle())
+            .collect();
+        if !slot_handles.is_empty() && !root {
+            return true;
+        }
+        for child_handle in child_handles.iter() {
+            if has_slot_children(*child_handle, skeleton, false) {
+                return true;
+            }
+        }
+        false
+    } else {
+        false
+    }
+}
+
+fn egui_slot_dropdown(
+    ui: &mut Ui,
+    slot_handle: SlotHandle,
+    skeleton: &Skeleton,
+) -> Option<Option<Attachment>> {
+    let skin_handle = skeleton
+        .skin()
+        .map(|skin| skin.handle())
+        .unwrap_or(skeleton.data().default_skin().handle());
+    let mut set_attachment_name = None;
+    if let Some(slot) = slot_handle.get(skeleton) {
+        let current = if let Some(attachment) = slot.attachment() {
+            attachment.name().to_owned()
+        } else {
+            "<none>".to_owned()
+        };
+
+        let mut attachments = vec![];
+        if let Some(skin) = skin_handle.get(&skeleton.data()) {
+            for attachment_entry in skin.attachments() {
+                if attachment_entry.slot_index == slot.data().index() {
+                    attachments.push(attachment_entry.attachment);
+                }
+            }
+        }
+
+        let mut selected = current.clone();
+        egui::ComboBox::from_label(slot.data().name())
+            .selected_text(current.clone())
+            .show_ui(ui, |ui| {
+                ui.selectable_value(&mut selected, "<none>".to_owned(), "<none>");
+                for attachment in attachments.iter() {
+                    ui.selectable_value(
+                        &mut selected,
+                        attachment.name().to_owned(),
+                        attachment.name(),
+                    );
+                }
+            });
+        if selected != current {
+            if selected == "<none>" {
+                set_attachment_name = Some(None);
+            } else {
+                for attachment in attachments.into_iter() {
+                    if attachment.name() == selected {
+                        set_attachment_name = Some(Some(attachment));
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    set_attachment_name
 }
