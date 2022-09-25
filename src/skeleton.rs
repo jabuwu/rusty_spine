@@ -4,15 +4,18 @@ use crate::{
     bone::Bone,
     c::{
         spBone, spSkeleton, spSkeletonData, spSkeleton_create, spSkeleton_dispose,
-        spSkeleton_setBonesToSetupPose, spSkeleton_setSkin, spSkeleton_setSkinByName,
-        spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose, spSkeleton_updateCache,
-        spSkeleton_updateWorldTransform, spSkin, spSlot,
+        spSkeleton_getAttachmentForSlotIndex, spSkeleton_getAttachmentForSlotName,
+        spSkeleton_setAttachment, spSkeleton_setBonesToSetupPose, spSkeleton_setSkin,
+        spSkeleton_setSkinByName, spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose,
+        spSkeleton_updateCache, spSkeleton_updateWorldTransform,
+        spSkeleton_updateWorldTransformWith, spSkin, spSlot,
     },
     c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::Error,
     skeleton_data::SkeletonData,
     skin::Skin,
     slot::Slot,
+    Attachment,
 };
 
 /// A live Skeleton instance created from [SkeletonData](struct.SkeletonData.html).
@@ -47,6 +50,10 @@ impl Skeleton {
         unsafe {
             spSkeleton_updateWorldTransform(self.c_ptr());
         }
+    }
+
+    pub unsafe fn update_world_transform_with(&mut self, parent: &Bone) {
+        spSkeleton_updateWorldTransformWith(self.c_ptr(), parent.c_ptr());
     }
 
     pub fn set_to_setup_pose(&mut self) {
@@ -114,6 +121,65 @@ impl Skeleton {
         self.slots_mut().find(|slot| slot.data().name() == name)
     }
 
+    pub fn set_attachment(&mut self, slot_name: &str, attachment_name: Option<&str>) -> bool {
+        let c_slot_name = CString::new(slot_name).unwrap();
+        if let Some(attachment_name) = attachment_name {
+            let c_attachment_name = CString::new(attachment_name).unwrap();
+            unsafe {
+                spSkeleton_setAttachment(
+                    self.c_ptr(),
+                    c_slot_name.as_ptr(),
+                    c_attachment_name.as_ptr(),
+                ) != 0
+            }
+        } else {
+            unsafe {
+                spSkeleton_setAttachment(self.c_ptr(), c_slot_name.as_ptr(), std::ptr::null()) != 0
+            }
+        }
+    }
+
+    pub fn get_attachment_for_slot_name(
+        &mut self,
+        slot_name: &str,
+        attachment_name: &str,
+    ) -> Option<Attachment> {
+        let c_slot_name = CString::new(slot_name).unwrap();
+        let c_attachment_name = CString::new(attachment_name).unwrap();
+        unsafe {
+            let c_attachment = spSkeleton_getAttachmentForSlotName(
+                self.c_ptr(),
+                c_slot_name.as_ptr(),
+                c_attachment_name.as_ptr(),
+            );
+            if !c_attachment.is_null() {
+                Some(Attachment::new_from_ptr(c_attachment))
+            } else {
+                None
+            }
+        }
+    }
+
+    pub fn get_attachment_for_slot_index(
+        &mut self,
+        slot_index: i32,
+        attachment_name: &str,
+    ) -> Option<Attachment> {
+        let c_attachment_name = CString::new(attachment_name).unwrap();
+        unsafe {
+            let c_attachment = spSkeleton_getAttachmentForSlotIndex(
+                self.c_ptr(),
+                slot_index,
+                c_attachment_name.as_ptr(),
+            );
+            if !c_attachment.is_null() {
+                Some(Attachment::new_from_ptr(c_attachment))
+            } else {
+                None
+            }
+        }
+    }
+
     // TODO: iterators for ik, transform, path constraints
 
     c_accessor_tmp_ptr!(data, data_mut, data, SkeletonData, spSkeletonData);
@@ -173,32 +239,3 @@ impl Drop for Skeleton {
         }
     }
 }
-
-/*
-/* Sets the skin used to look up attachments before looking in the SkeletonData defaultSkin. Attachments from the new skin are
- * attached if the corresponding attachment from the old skin was attached. If there was no old skin, each slot's setup mode
- * attachment is attached from the new skin.
- * @param skin May be 0.*/
-SP_API void spSkeleton_setSkin(spSkeleton *self, spSkin *skin);
-/* Returns 0 if the skin was not found. See spSkeleton_setSkin.
- * @param skinName May be 0. */
-SP_API int spSkeleton_setSkinByName(spSkeleton *self, const char *skinName);
-
-/* Returns 0 if the slot or attachment was not found. */
-SP_API spAttachment *
-spSkeleton_getAttachmentForSlotName(const spSkeleton *self, const char *slotName, const char *attachmentName);
-/* Returns 0 if the slot or attachment was not found. */
-SP_API spAttachment *
-spSkeleton_getAttachmentForSlotIndex(const spSkeleton *self, int slotIndex, const char *attachmentName);
-/* Returns 0 if the slot or attachment was not found.
- * @param attachmentName May be 0. */
-SP_API int spSkeleton_setAttachment(spSkeleton *self, const char *slotName, const char *attachmentName);
-
-/* Returns 0 if the IK constraint was not found. */
-SP_API spIkConstraint *spSkeleton_findIkConstraint(const spSkeleton *self, const char *constraintName);
-
-/* Returns 0 if the transform constraint was not found. */
-SP_API spTransformConstraint *spSkeleton_findTransformConstraint(const spSkeleton *self, const char *constraintName);
-
-/* Returns 0 if the path constraint was not found. */
-SP_API spPathConstraint *spSkeleton_findPathConstraint(const spSkeleton *self, const char *constraintName);*/
