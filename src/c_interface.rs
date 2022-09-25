@@ -23,6 +23,10 @@ impl<'a, P, T> CTmpRef<'a, P, T> {
     pub fn unwrap_parent_child(&mut self) -> (&P, &T) {
         (self.parent, &self.data)
     }
+
+    pub fn as_ref(&self) -> &T {
+        &self.data
+    }
 }
 
 impl<'a, P, T> Deref for CTmpRef<'a, P, T> {
@@ -53,6 +57,14 @@ impl<'a, P, T> CTmpMut<'a, P, T> {
 
     pub fn unwrap_parent_child(&mut self) -> (&mut P, &mut T) {
         (self.parent, &mut self.data)
+    }
+
+    pub fn as_ref(&self) -> &T {
+        &self.data
+    }
+
+    pub fn as_mut(&mut self) -> &mut T {
+        &mut self.data
     }
 }
 

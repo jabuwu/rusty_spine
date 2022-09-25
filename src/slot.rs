@@ -2,8 +2,8 @@ use crate::{
     attachment::Attachment,
     bone::Bone,
     c::{
-        spAttachment, spBone, spSkeleton, spSlot, spSlotData, spSlot_setAttachment,
-        spSlot_setToSetupPose,
+        spAttachment, spBone, spSkeleton, spSlot, spSlotData, spSlotData_setAttachmentName,
+        spSlot_setAttachment, spSlot_setToSetupPose,
     },
     c_interface::{NewFromPtr, SyncPtr},
     Skeleton,
@@ -23,9 +23,11 @@ impl NewFromPtr<spSlot> for Slot {
 }
 
 impl Slot {
-    pub fn set_attachment(&mut self, attachment: &Attachment) {
-        unsafe {
+    pub unsafe fn set_attachment(&mut self, attachment: Option<Attachment>) {
+        if let Some(attachment) = attachment {
             spSlot_setAttachment(self.c_ptr(), attachment.c_ptr());
+        } else {
+            spSlot_setAttachment(self.c_ptr(), std::ptr::null_mut());
         }
     }
 
@@ -93,6 +95,7 @@ impl NewFromPtr<spSlotData> for SlotData {
 
 impl SlotData {
     c_accessor_string!(name, name);
+    c_accessor!(index, index, i32);
     c_ptr!(c_slot_data, spSlotData);
     // TODO: accessors
 }

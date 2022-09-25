@@ -89,6 +89,7 @@ impl SkeletonData {
         skins,
         skins_count
     );
+    c_accessor_tmp_ptr!(default_skin, default_skin_mut, defaultSkin, Skin, spSkin);
     c_accessor_array!(
         animations,
         animations_mut,

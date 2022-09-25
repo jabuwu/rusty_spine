@@ -1,8 +1,8 @@
 use crate::{
     bounding_box_attachment::BoundingBoxAttachment,
     c::{
-        spAttachment, spAttachmentType, spBoundingBoxAttachment, spClippingAttachment,
-        spMeshAttachment, spPointAttachment, spRegionAttachment,
+        spAttachment, spAttachmentType, spAttachment_dispose, spBoundingBoxAttachment,
+        spClippingAttachment, spMeshAttachment, spPointAttachment, spRegionAttachment,
     },
     c_interface::{NewFromPtr, SyncPtr},
     clipping_attachment::ClippingAttachment,
@@ -18,6 +18,7 @@ pub struct Attachment {
 
 impl NewFromPtr<spAttachment> for Attachment {
     unsafe fn new_from_ptr(c_attachment: *const spAttachment) -> Self {
+        (*(c_attachment as *mut spAttachment)).refCount += 1;
         Self {
             c_attachment: SyncPtr(c_attachment as *mut spAttachment),
         }
@@ -80,6 +81,20 @@ impl Attachment {
     c_accessor_string!(name, name);
     c_accessor_enum_no_set!(attachment_type, type_0, AttachmentType);
     c_ptr!(c_attachment, spAttachment);
+}
+
+impl Clone for Attachment {
+    fn clone(&self) -> Self {
+        unsafe { Attachment::new_from_ptr(self.c_ptr()) }
+    }
+}
+
+impl Drop for Attachment {
+    fn drop(&mut self) {
+        unsafe {
+            spAttachment_dispose(self.c_ptr());
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
