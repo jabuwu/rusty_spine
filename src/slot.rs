@@ -2,8 +2,8 @@ use crate::{
     attachment::Attachment,
     bone::Bone,
     c::{
-        spAttachment, spBone, spSkeleton, spSlot, spSlotData, spSlotData_setAttachmentName,
-        spSlot_setAttachment, spSlot_setToSetupPose,
+        spAttachment, spBone, spSkeleton, spSlot, spSlotData, spSlot_setAttachment,
+        spSlot_setToSetupPose,
     },
     c_interface::{NewFromPtr, SyncPtr},
     Skeleton,
