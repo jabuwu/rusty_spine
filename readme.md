@@ -1,10 +1,10 @@
 # rusty_spine
 
-Spine runtime for Rust (and wasm!) transpiled from the official C Runtime.
+Spine runtime for Rust (and wasm!) transpiled from the official C Runtime. Supports Spine 4.1.
 
 ```
 [dependencies]
-rusty_spine = "0.1.3"
+rusty_spine = "0.2.0"
 ```
 
 [Online demo!](https://jabuwu.github.io/rusty_spine/)
