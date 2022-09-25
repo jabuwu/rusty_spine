@@ -1,9 +1,16 @@
 use crate::{
-    c::{c_ushort, spAttachment, spMeshAttachment, spTextureRegion, spVertexAttachment},
+    c::{
+        c_float, c_ushort, spAttachment, spMeshAttachment, spMeshAttachment_newLinkedMesh,
+        spMeshAttachment_updateRegion, spTextureRegion, spVertexAttachment,
+    },
     c_interface::{NewFromPtr, SyncPtr},
     texture_region::TextureRegion,
+    Attachment,
 };
 
+/// A deforming mesh attachment.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#MeshAttachment)
 #[derive(Debug)]
 pub struct MeshAttachment {
     c_mesh_attachment: SyncPtr<spMeshAttachment>,
@@ -26,6 +33,14 @@ impl MeshAttachment {
         unsafe { &self.c_ptr_ref().super_0 }
     }
 
+    pub unsafe fn new_linked_mesh(&self) -> Attachment {
+        Attachment::new_from_ptr(spMeshAttachment_newLinkedMesh(self.c_ptr()) as *const spAttachment)
+    }
+
+    pub unsafe fn update_region(&mut self) {
+        spMeshAttachment_updateRegion(self.c_ptr());
+    }
+
     c_attachment_accessors!();
     c_vertex_attachment_accessors!();
     c_accessor_string!(path, path);
@@ -33,9 +48,8 @@ impl MeshAttachment {
     c_accessor!(hull_length, hullLength, i32);
     c_accessor!(width, width, f32);
     c_accessor!(height, height, f32);
-    c_accessor!(triangles_count, trianglesCount, i32);
     c_accessor_renderer_object!();
-    c_accessor_tmp_ptr!(region, region_mut, region, TextureRegion, spTextureRegion);
+    c_accessor_tmp_ptr_optional!(region, region_mut, region, TextureRegion, spTextureRegion);
     c_accessor_tmp_ptr!(
         parent_mesh,
         parent_mesh_mut,
@@ -43,10 +57,12 @@ impl MeshAttachment {
         MeshAttachment,
         spMeshAttachment
     );
-
-    // TODO: better accessor than passthrough?
+    c_accessor!(triangles_count, trianglesCount, i32);
     c_accessor_passthrough!(triangles, triangles, *mut c_ushort);
-
-    // TODO: sequence, regionUVs, uvs, parentMesh, edges
+    c_accessor!(edges_count, edgesCount, i32);
+    c_accessor_passthrough!(edges, edges, *mut i32);
+    c_accessor_passthrough!(uvs, uvs, *mut c_float);
+    c_accessor_passthrough!(region_uvs, regionUVs, *mut c_float);
     c_ptr!(c_mesh_attachment, spMeshAttachment);
+    // TODO: sequence accessor
 }

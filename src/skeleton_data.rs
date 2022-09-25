@@ -11,6 +11,8 @@ use crate::{
 };
 
 /// Static skeleton data imported from Spine.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#SkeletonData)
 #[derive(Debug)]
 pub struct SkeletonData {
     c_skeleton_data: SyncPtr<spSkeletonData>,

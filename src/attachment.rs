@@ -11,7 +11,9 @@ use crate::{
     region_attachment::RegionAttachment,
 };
 
-/// Slot attachments
+/// Slot attachments.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Attachment)
 ///
 /// Attachments are reference counted and can be stored and worked with directly, however, some of
 /// the underlying data that attachments point to may be cleared. For this reason, attachments
@@ -85,7 +87,7 @@ impl Attachment {
     }
 
     c_accessor_string!(name, name);
-    c_accessor_enum_no_set!(attachment_type, type_0, AttachmentType);
+    c_accessor_enum!(attachment_type, type_0, AttachmentType);
     c_ptr!(c_attachment, spAttachment);
 }
 

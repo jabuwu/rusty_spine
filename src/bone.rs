@@ -13,6 +13,8 @@ use crate::{
 
 /// A bone within the [Skeleton](struct.Skeleton.html) hierarchy.
 ///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Bone)
+///
 /// Bones can be acquired from a [Skeleton](struct.Skeleton.html) and a safe
 /// [BoneHandle](struct.BoneHandle.html) can be obtained using the
 /// [handle](struct.Bone.html#method.handle) method to store long-term references to a specific
@@ -83,19 +85,19 @@ impl Bone {
         }
     }
 
-    pub fn get_world_rotation_x(&self) -> f32 {
+    pub fn world_rotation_x(&self) -> f32 {
         unsafe { spBone_getWorldRotationX(self.c_ptr()) }
     }
 
-    pub fn get_world_rotation_y(&self) -> f32 {
+    pub fn world_rotation_y(&self) -> f32 {
         unsafe { spBone_getWorldRotationY(self.c_ptr()) }
     }
 
-    pub fn get_world_scale_x(&self) -> f32 {
+    pub fn world_scale_x(&self) -> f32 {
         unsafe { spBone_getWorldScaleX(self.c_ptr()) }
     }
 
-    pub fn get_world_scale_y(&self) -> f32 {
+    pub fn world_scale_y(&self) -> f32 {
         unsafe { spBone_getWorldScaleY(self.c_ptr()) }
     }
 
@@ -155,8 +157,8 @@ impl Bone {
     c_accessor_mut!(d, set_d, d, f32);
     c_accessor_mut!(world_x, set_world_x, worldX, f32);
     c_accessor_mut!(world_y, set_world_y, worldY, f32);
-    c_accessor_bool_mut!(sorted, set_sorted, sorted);
-    c_accessor_bool_mut!(active, set_active, active);
+    c_accessor_bool!(sorted, sorted);
+    c_accessor_bool!(active, active);
     c_accessor_tmp_ptr!(data, data_mut, data, BoneData, spBoneData);
     c_accessor_tmp_ptr_optional!(parent, parent_mut, parent, Bone, spBone);
     c_accessor!(children_count, childrenCount, i32);
@@ -256,17 +258,22 @@ impl BoneData {
     c_ptr!(c_bone_data, spBoneData);
     c_accessor_string!(name, name);
     c_accessor!(index, index, i32);
-    c_accessor!(length, length, f32);
-    c_accessor!(x, x, f32);
-    c_accessor!(y, y, f32);
-    c_accessor!(rotation, rotation, f32);
-    c_accessor!(scale_x, scaleX, f32);
-    c_accessor!(scale_y, scaleY, f32);
-    c_accessor!(shear_x, shearX, f32);
-    c_accessor!(shear_y, shearY, f32);
-    c_accessor_color!(color, color);
-    c_accessor_bool!(skin_required, skinRequired);
-    c_accessor_enum!(transform_mode, transformMode, TransformMode);
+    c_accessor_mut!(length, set_length, length, f32);
+    c_accessor_mut!(x, set_x, x, f32);
+    c_accessor_mut!(y, set_y, y, f32);
+    c_accessor_mut!(rotation, set_rotation, rotation, f32);
+    c_accessor_mut!(scale_x, set_scale_x, scaleX, f32);
+    c_accessor_mut!(scale_y, set_scale_y, scaleY, f32);
+    c_accessor_mut!(shear_x, set_shear_x, shearX, f32);
+    c_accessor_mut!(shear_y, set_shear_y, shearY, f32);
+    c_accessor_color_mut!(color, color_mut, color);
+    c_accessor_bool_mut!(skin_required, set_skin_required, skinRequired);
+    c_accessor_enum_mut!(
+        transform_mode,
+        set_transform_mode,
+        transformMode,
+        TransformMode
+    );
     c_accessor_tmp_ptr_optional!(parent, parent_mut, parent, BoneData, spBoneData);
 }
 

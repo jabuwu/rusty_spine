@@ -431,10 +431,17 @@ macro_rules! c_accessor_color_mut {
     };
 }
 
-macro_rules! c_accessor_enum_no_set {
-    ($rust:ident, $c:ident, $type:ty) => {
-        pub fn $rust(&self) -> $type {
-            unsafe { self.c_ptr_ref().$c.into() }
+macro_rules! c_accessor_color_optional {
+    ($rust:ident, $c:ident) => {
+        pub fn $rust(&self) -> Option<crate::color::Color> {
+            unsafe {
+                let ptr = *(&self.c_ptr_ref().$c);
+                if !ptr.is_null() {
+                    Some(*(ptr as *const crate::c::spColor as *const crate::color::Color))
+                } else {
+                    None
+                }
+            }
         }
     };
 }
@@ -443,6 +450,17 @@ macro_rules! c_accessor_enum {
     ($rust:ident, $c:ident, $type:ty) => {
         pub fn $rust(&self) -> $type {
             unsafe { self.c_ptr_ref().$c.into() }
+        }
+    };
+}
+
+macro_rules! c_accessor_enum_mut {
+    ($rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
+        c_accessor_enum!($rust, $c, $type);
+        pub fn $rust_set(&self, value: $type) {
+            unsafe {
+                (*self.c_ptr()).$c = value as u32;
+            }
         }
     };
 }
@@ -650,6 +668,27 @@ macro_rules! c_accessor_array_nullable {
     };
 }
 
+macro_rules! c_accessor_slice_optional {
+    ($rust:ident, $c:ident, $type:ty, $len:literal) => {
+        #[inline]
+        pub fn $rust(&self) -> Option<$type> {
+            #[allow(unused_unsafe)]
+            unsafe {
+                let ptr = self.c_ptr_ref().$c;
+                if !ptr.is_null() {
+                    Some(
+                        std::slice::from_raw_parts(self.c_ptr_ref().$c, $len)
+                            .try_into()
+                            .unwrap(),
+                    )
+                } else {
+                    None
+                }
+            }
+        }
+    };
+}
+
 macro_rules! c_attachment_accessors {
     () => {
         #[inline]
@@ -670,7 +709,6 @@ macro_rules! c_attachment_accessors {
 
 macro_rules! c_vertex_attachment_accessors {
     () => {
-        // TODO: fill accessors
         #[inline]
         pub unsafe fn compute_world_vertices(
             &self,
@@ -700,6 +738,8 @@ macro_rules! c_vertex_attachment_accessors {
             i32
         );
         c_accessor_for!(vertex_attachment, id, id, i32);
+
+        // TODO: accessor for bones, timelineAttachment, vertices
     };
 }
 

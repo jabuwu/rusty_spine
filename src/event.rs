@@ -5,6 +5,8 @@ use crate::{
 
 /// Events fired from animations.
 ///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Event)
+///
 /// To receive events, set a listener on [AnimationState](struct.AnimationState.html)
 /// ```
 /// # #[path="./doctests.rs"]
@@ -63,6 +65,8 @@ impl Event {
 }
 
 /// Static event data imported from Spine.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#EventData)
 #[derive(Debug)]
 pub struct EventData {
     c_event_data: SyncPtr<spEventData>,

@@ -19,6 +19,8 @@ use crate::{
 };
 
 /// A live Skeleton instance created from [SkeletonData](struct.SkeletonData.html).
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Skeleton)
 #[derive(Debug)]
 pub struct Skeleton {
     c_skeleton: SyncPtr<spSkeleton>,

@@ -4,6 +4,9 @@ use crate::{
     Attachment, Skeleton, SkeletonData,
 };
 
+/// A container for attachments which can be applied to a skeleton.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Skin)
 #[derive(Debug)]
 pub struct Skin {
     c_skin: SyncPtr<spSkin>,

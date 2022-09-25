@@ -3,6 +3,9 @@ use crate::{
     c_interface::{NewFromPtr, SyncPtr},
 };
 
+/// An attachment made up of vertices for use in collision detection, hitboxes, etc.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#BoundingBoxAttachment)
 #[derive(Debug)]
 pub struct BoundingBoxAttachment {
     c_bounding_box_attachment: SyncPtr<spBoundingBoxAttachment>,

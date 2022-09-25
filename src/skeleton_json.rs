@@ -16,6 +16,8 @@ use crate::{
 };
 
 /// A loader for Spine json files.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#SkeletonJson)
 #[derive(Debug)]
 pub struct SkeletonJson {
     c_skeleton_json: SyncPtr<spSkeletonJson>,

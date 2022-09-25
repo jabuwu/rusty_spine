@@ -20,6 +20,9 @@ use crate::{
     skeleton::Skeleton,
 };
 
+/// The live animation state for a skeleton, allowing animation layering and crossfading.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#AnimationState)
 #[derive(Debug)]
 pub struct AnimationState {
     c_animation_state: SyncPtr<spAnimationState>,
@@ -316,7 +319,6 @@ impl AnimationState {
         tracks_count
     );
     c_accessor_mut!(timescale, set_timescale, timeScale, f32);
-    c_accessor!(unkeyed_state, unkeyedState, i32);
     c_accessor_renderer_object!();
 
     pub fn dispose_statics() {
@@ -387,11 +389,11 @@ impl NewFromPtr<spTrackEntry> for TrackEntry {
 }
 
 impl TrackEntry {
-    pub fn get_animation_time(&self) -> f32 {
+    pub fn animation_time(&self) -> f32 {
         unsafe { spTrackEntry_getAnimationTime(self.c_ptr()) }
     }
 
-    pub fn get_track_complete(&self) -> f32 {
+    pub fn track_complete(&self) -> f32 {
         unsafe { spTrackEntry_getTrackComplete(self.c_ptr()) }
     }
 
@@ -411,40 +413,47 @@ impl TrackEntry {
     }
 
     c_accessor_tmp_ptr!(animation, animation_mut, animation, Animation, spAnimation);
+    c_accessor_tmp_ptr!(previous, previous_mut, previous, TrackEntry, spTrackEntry);
+    c_accessor_tmp_ptr!(next, next_mut, next, TrackEntry, spTrackEntry);
+    c_accessor_tmp_ptr!(
+        mixing_from,
+        mixing_from_mut,
+        mixingFrom,
+        TrackEntry,
+        spTrackEntry
+    );
+    c_accessor_tmp_ptr!(mixing_to, mixing_to_mut, mixingTo, TrackEntry, spTrackEntry);
     c_accessor!(track_index, trackIndex, i32);
     c_accessor_bool_mut!(looping, set_looping, loop_0);
     c_accessor_bool_mut!(hold_previous, set_hold_previous, holdPrevious);
     c_accessor_bool_mut!(reverse, set_reverse, reverse);
     c_accessor_bool_mut!(shortest_rotation, set_shortest_rotation, shortestRotation);
-    c_accessor!(event_threshold, eventThreshold, f32);
-    c_accessor!(attachment_threshold, attachmentThreshold, f32);
-    c_accessor!(draw_order_threshold, drawOrderThreshold, f32);
-    c_accessor!(delay, delay, f32);
-    c_accessor!(track_time, trackTime, f32);
-    c_accessor!(track_last, trackLast, f32);
-    c_accessor!(next_track_last, nextTrackLast, f32);
-    c_accessor!(track_end, trackEnd, f32);
+    c_accessor_mut!(event_threshold, set_event_threshold, eventThreshold, f32);
+    c_accessor_mut!(
+        attachment_threshold,
+        set_attachment_threshold,
+        attachmentThreshold,
+        f32
+    );
+    c_accessor_mut!(
+        draw_order_threshold,
+        set_draw_order_threshold,
+        drawOrderThreshold,
+        f32
+    );
+    c_accessor_mut!(animation_start, set_animation_start, animationStart, f32);
+    c_accessor_mut!(animation_end, set_animation_end, animationEnd, f32);
+    c_accessor_mut!(animation_last, set_animation_last, animationLast, f32);
+    c_accessor_mut!(delay, set_delay, delay, f32);
+    c_accessor_mut!(track_time, set_track_time, trackTime, f32);
+    c_accessor_mut!(track_end, set_track_end, trackEnd, f32);
     c_accessor_mut!(timescale, set_timescale, timeScale, f32);
     c_accessor_mut!(alpha, set_alpha, alpha, f32);
-    c_accessor!(mix_time, mixTime, f32);
+    c_accessor_mut!(mix_time, set_mix_time, mixTime, f32);
     c_accessor_mut!(mix_duration, set_mix_duration, mixDuration, f32);
-    c_accessor!(interrupt_alpha, interruptAlpha, f32);
     c_accessor!(total_alpha, totalAlpha, f32);
     c_accessor_renderer_object!();
     c_ptr!(c_track_entry, spTrackEntry);
-
-    /*TODO
-    spTrackEntry *previous;
-    spTrackEntry *next;
-    spTrackEntry *mixingFrom;
-    spTrackEntry *mixingTo;
-    spAnimationStateListener listener;
-    spMixBlend mixBlend;
-    spIntArray *timelineMode;
-    spTrackEntryArray *timelineHoldMix;
-    float *timelinesRotation;
-    int timelinesRotationCount;
-    void *userData;*/
 }
 
 c_handle_indexed_decl!(

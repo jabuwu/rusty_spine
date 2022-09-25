@@ -13,6 +13,8 @@ use crate::{
 
 /// Animation settings used to instantiate [AnimationState](struct.AnimationState.html).
 ///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#AnimationStateData)
+///
 /// Mix durations can be applied to automatically blend between animations.  For example, to
 /// smoothly mix between a `walk` and `run` animation for `0.2` seconds:
 ///
@@ -90,7 +92,7 @@ impl AnimationStateData {
         SkeletonData,
         spSkeletonData
     );
-    c_accessor!(default_mix, defaultMix, f32);
+    c_accessor_mut!(default_mix, set_default_mix, defaultMix, f32);
     c_accessor_passthrough!(entries, entries, *const c_void);
     c_ptr!(c_animation_state_data, spAnimationStateData);
 }

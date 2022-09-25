@@ -1,14 +1,19 @@
+use std::ffi::CString;
+
 use crate::{
     attachment::Attachment,
     bone::Bone,
     c::{
-        spAttachment, spBone, spSkeleton, spSlot, spSlotData, spSlot_setAttachment,
-        spSlot_setToSetupPose,
+        spAttachment, spBlendMode, spBone, spBoneData, spSkeleton, spSlot, spSlotData,
+        spSlotData_setAttachmentName, spSlot_setAttachment, spSlot_setToSetupPose,
     },
     c_interface::{NewFromPtr, SyncPtr},
-    Skeleton,
+    BoneData, Skeleton,
 };
 
+/// A slot for an attachment.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Slot)
 #[derive(Debug)]
 pub struct Slot {
     c_slot: SyncPtr<spSlot>,
@@ -96,8 +101,37 @@ impl NewFromPtr<spSlotData> for SlotData {
 }
 
 impl SlotData {
-    c_accessor_string!(name, name);
+    pub fn set_attachment_name(&mut self, attachment_name: &str) {
+        let c_attachment_name = CString::new(attachment_name).unwrap();
+        unsafe { spSlotData_setAttachmentName(self.c_ptr(), c_attachment_name.as_ptr()) }
+    }
+
     c_accessor!(index, index, i32);
+    c_accessor_string!(name, name);
+    c_accessor_tmp_ptr!(bone_data, bone_data_mut, boneData, BoneData, spBoneData);
+    c_accessor_string!(attachment_name, attachmentName);
+    c_accessor_color_mut!(color, color_mut, color);
+    c_accessor_color_optional!(dark_color, darkColor);
+    c_accessor_enum_mut!(blend_mode, set_blend_mode, blendMode, BlendMode);
     c_ptr!(c_slot_data, spSlotData);
-    // TODO: accessors
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BlendMode {
+    Normal = 0,
+    Additive = 1,
+    Multiply = 2,
+    Screen = 3,
+}
+
+impl From<spBlendMode> for BlendMode {
+    fn from(attachment_type: spBlendMode) -> Self {
+        match attachment_type {
+            0 => Self::Normal,
+            1 => Self::Additive,
+            2 => Self::Multiply,
+            3 => Self::Screen,
+            _ => Self::Normal,
+        }
+    }
 }

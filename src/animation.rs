@@ -3,6 +3,9 @@ use crate::{
     c_interface::{NewFromPtr, SyncPtr},
 };
 
+/// Stores timelines for animating a skeleton.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Animation)
 #[derive(Debug)]
 pub struct Animation {
     c_animation: SyncPtr<spAnimation>,

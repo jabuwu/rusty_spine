@@ -16,6 +16,8 @@ use crate::{
 };
 
 /// A loader for Spine binary files.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#SkeletonBinary)
 #[derive(Debug)]
 pub struct SkeletonBinary {
     c_skeleton_binary: SyncPtr<spSkeletonBinary>,

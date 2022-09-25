@@ -14,6 +14,9 @@ use crate::{
 
 use atlas::*;
 
+/// An atlas loaded from Spine's `.atlas` file format.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Atlas)
 #[derive(Debug)]
 pub struct Atlas {
     c_atlas: SyncPtr<spAtlas>,
@@ -298,8 +301,8 @@ pub mod atlas {
         c_accessor!(x, x, i32);
         c_accessor!(y, y, i32);
         c_accessor!(index, index, i32);
-        c_accessor_passthrough!(splits, splits, *mut c_int);
-        c_accessor_passthrough!(pads, pads, *mut c_int);
+        c_accessor_slice_optional!(splits, splits, &[c_int; 4], 4);
+        c_accessor_slice_optional!(pads, pads, &[c_int; 4], 4);
         c_accessor_tmp_ptr!(page, page_mut, page, AtlasPage, spAtlasPage);
 
         pub fn key_values(&self) -> Vec<KeyValue> {

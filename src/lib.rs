@@ -1,12 +1,14 @@
-//! Spine runtime for Rust (and wasm!) transpiled from the official C Runtime.
+//! Spine runtime for Rust (and wasm!) transpiled from the official C Runtime. Supports Spine 4.1.
 //!
 //! To load a [Skeleton](struct.Skeleton.html), see [SkeletonJson](struct.SkeletonJson.html) or
 //! [SkeletonBinary](struct.SkeletonBinary.html).
 //!
-//! To set automatic mix durations between animations, see
+//! To set automatic mix durations (crossfading) between animations, see
 //! [AnimationStateData](struct.AnimationStateData.html).
 //!
 //! To find and manage bones, see [Bone](struct.Bone.html).
+//!
+//! To receive animation events, see [Event](struct.Event.html).
 
 #[macro_use]
 pub mod c_interface;
@@ -36,6 +38,7 @@ mod color;
 mod error;
 mod event;
 mod mesh_attachment;
+mod path_attachment;
 mod point_attachment;
 mod region_attachment;
 mod renderer_object;
@@ -60,6 +63,7 @@ pub use color::*;
 pub use error::*;
 pub use event::*;
 pub use mesh_attachment::*;
+pub use path_attachment::*;
 pub use point_attachment::*;
 pub use region_attachment::*;
 pub use renderer_object::*;

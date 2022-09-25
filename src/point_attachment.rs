@@ -7,6 +7,9 @@ use crate::{
     c_interface::{NewFromPtr, SyncPtr},
 };
 
+/// A lightweight, single point attachment with a position and rotation.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#PointAttachment)
 #[derive(Debug)]
 pub struct PointAttachment {
     c_point_attachment: SyncPtr<spPointAttachment>,
@@ -40,5 +43,8 @@ impl PointAttachment {
 
     c_attachment_accessors!();
     c_accessor_color!(color, color);
+    c_accessor_mut!(rotation, set_rotation, rotation, f32);
+    c_accessor_mut!(x, set_x, x, f32);
+    c_accessor_mut!(y, set_y, x, f32);
     c_ptr!(c_point_attachment, spPointAttachment);
 }
