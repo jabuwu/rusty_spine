@@ -11,6 +11,12 @@ use crate::{
     region_attachment::RegionAttachment,
 };
 
+/// Slot attachments
+///
+/// Attachments are reference counted and can be stored and worked with directly, however, some of
+/// the underlying data that attachments point to may be cleared. For this reason, attachments
+/// should be used with caution, and only used so long as the SkeletonData they came from remains
+/// valid, and only attached to the slot they are meant for.
 #[derive(Debug)]
 pub struct Attachment {
     c_attachment: SyncPtr<spAttachment>,
