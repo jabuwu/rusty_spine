@@ -231,7 +231,7 @@ pub fn egui_spine_debugger(
                         attachment,
                     } => unsafe {
                         skeleton
-                            .slot_at_index_mut(slot_index as usize)
+                            .slot_at_index_mut(slot_index)
                             .unwrap()
                             .set_attachment(attachment);
                     },
