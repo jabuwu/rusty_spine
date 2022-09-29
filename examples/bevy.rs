@@ -188,7 +188,7 @@ fn main() {
                 position: Vec2::new(0., 0.),
                 scale: 0.75,
                 skin: None,
-                note: "the coin does not render correctly without backface culling disabled and blend modes\nboth of which require a custom renderer in bevy".to_owned(),
+                note: "the coin does not render correctly without custom materials\nsee the bevy_spine crate for a more complete bevy integration".to_owned(),
             },
         ]))
         .add_event::<DemoLoad>()
