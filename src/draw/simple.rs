@@ -6,7 +6,7 @@ use crate::{
 use super::CullDirection;
 
 pub struct SimpleRenderable {
-    pub slot_index: usize,
+    pub slot_index: i32,
     pub vertices: Vec<[f32; 2]>,
     pub uvs: Vec<[f32; 2]>,
     pub indices: Vec<u16>,
@@ -33,7 +33,7 @@ impl SimpleDrawer {
         let mut world_vertices = vec![];
         world_vertices.resize(1000, 0.);
         for slot_index in 0..skeleton.slots_count() {
-            let slot = skeleton.draw_order_at_index(slot_index as usize).unwrap();
+            let slot = skeleton.draw_order_at_index(slot_index).unwrap();
             if !slot.bone().active() {
                 if let Some(clipper) = clipper.as_deref_mut() {
                     clipper.clip_end(&slot);
@@ -248,7 +248,7 @@ impl SimpleDrawer {
             color *= slot.color() * skeleton.color();
 
             renderables.push(SimpleRenderable {
-                slot_index: slot_index as usize,
+                slot_index: slot_index,
                 vertices,
                 uvs,
                 indices,

@@ -39,7 +39,7 @@ impl CombinedDrawer {
         let mut vertex_base: u16 = 0;
         let mut index_base: u16 = 0;
         for slot_index in 0..skeleton.slots_count() {
-            let slot = skeleton.draw_order_at_index(slot_index as usize).unwrap();
+            let slot = skeleton.draw_order_at_index(slot_index).unwrap();
             if !slot.bone().active() {
                 if let Some(clipper) = clipper.as_deref_mut() {
                     clipper.clip_end(&slot);
