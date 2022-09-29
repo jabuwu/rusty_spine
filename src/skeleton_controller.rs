@@ -98,7 +98,7 @@ impl SkeletonController {
                 color: renderable.color,
                 dark_color: renderable.dark_color,
                 blend_mode: renderable.blend_mode,
-                premultiplied_alpha: false,
+                premultiplied_alpha: self.settings.premultiplied_alpha,
                 attachment_renderer_object: renderable.attachment_renderer_object,
             })
             .collect()
