@@ -5,10 +5,11 @@ use crate::{
     animation_state_data::AnimationStateData,
     c::{c_void, spSkeleton_setToSetupPose},
     color::Color,
-    draw::{BlendMode, CullDirection, SimpleDrawer},
+    draw::{CullDirection, SimpleDrawer},
     skeleton::Skeleton,
     skeleton_clipping::SkeletonClipping,
     skeleton_data::SkeletonData,
+    BlendMode,
 };
 
 #[derive(Debug)]
@@ -95,8 +96,9 @@ impl SkeletonController {
                 uvs: take(&mut renderable.uvs),
                 indices: take(&mut renderable.indices),
                 color: renderable.color,
+                dark_color: renderable.dark_color,
                 blend_mode: renderable.blend_mode,
-                premultiplied_alpha: self.settings.premultiplied_alpha,
+                premultiplied_alpha: false,
                 attachment_renderer_object: renderable.attachment_renderer_object,
             })
             .collect()
@@ -110,6 +112,7 @@ pub struct SkeletonRenderable {
     pub uvs: Vec<[f32; 2]>,
     pub indices: Vec<u16>,
     pub color: Color,
+    pub dark_color: Option<Color>,
     pub blend_mode: BlendMode,
     pub premultiplied_alpha: bool,
     pub attachment_renderer_object: Option<*const c_void>,

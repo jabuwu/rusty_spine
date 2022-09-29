@@ -49,6 +49,7 @@ impl Slot {
     }
 
     c_accessor_color_mut!(color, color_mut, color);
+    c_accessor_color_optional!(dark_color, darkColor);
     c_accessor_tmp_ptr!(data, data_mut, data, SlotData, spSlotData);
     c_accessor_tmp_ptr!(bone, bone_mut, bone, Bone, spBone);
     c_accessor_tmp_ptr_optional!(
@@ -59,8 +60,9 @@ impl Slot {
         spAttachment
     );
     c_ptr!(c_slot, spSlot);
+    c_accessor!(sequence_index, sequenceIndex, i32);
 
-    // TODO: accessors
+    // TODO: accessors for deform
 }
 
 c_handle_decl!(

@@ -13,6 +13,10 @@ pub struct Color {
 }
 
 impl Color {
+    pub fn new_rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
+        Self { r, g, b, a }
+    }
+
     pub fn set_r(&mut self, r: c_float) -> &mut Self {
         self.r = r;
         self

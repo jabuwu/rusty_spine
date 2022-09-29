@@ -1,9 +1,9 @@
 use crate::{
     c::{c_void, spMeshAttachment_updateRegion, spSkeletonClipping_clipTriangles},
-    Color, Skeleton, SkeletonClipping,
+    BlendMode, Color, Skeleton, SkeletonClipping,
 };
 
-use super::{BlendMode, CullDirection};
+use super::CullDirection;
 
 pub struct SimpleRenderable {
     pub slot_index: usize,
@@ -11,6 +11,7 @@ pub struct SimpleRenderable {
     pub uvs: Vec<[f32; 2]>,
     pub indices: Vec<u16>,
     pub color: Color,
+    pub dark_color: Option<Color>,
     pub blend_mode: BlendMode,
     pub attachment_renderer_object: Option<*const c_void>,
 }
@@ -252,7 +253,8 @@ impl SimpleDrawer {
                 uvs,
                 indices,
                 color,
-                blend_mode: BlendMode::Normal,
+                dark_color: slot.dark_color(),
+                blend_mode: slot.data().blend_mode(),
                 attachment_renderer_object,
             });
             if let Some(clipper) = clipper.as_deref_mut() {

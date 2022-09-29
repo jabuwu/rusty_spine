@@ -1,6 +1,6 @@
 use crate::{
     c::{c_void, spSkeletonClipping_clipTriangles},
-    Skeleton, SkeletonClipping,
+    Color, Skeleton, SkeletonClipping,
 };
 
 use super::CullDirection;
@@ -9,6 +9,7 @@ pub struct CombinedRenderable {
     pub vertices: Vec<[f32; 2]>,
     pub uvs: Vec<[f32; 2]>,
     pub colors: Vec<[f32; 4]>,
+    pub dark_colors: Vec<[f32; 4]>,
     pub indices: Vec<u16>,
     pub attachment_renderer_object: Option<*const c_void>,
 }
@@ -30,6 +31,7 @@ impl CombinedDrawer {
         let mut vertices = vec![];
         let mut uvs = vec![];
         let mut colors = vec![];
+        let mut dark_colors = vec![];
         let mut indices = vec![];
         let mut attachment_renderer_object = None;
         let mut world_vertices = vec![];
@@ -110,19 +112,24 @@ impl CombinedDrawer {
                     uvs,
                     indices,
                     colors,
+                    dark_colors,
                     attachment_renderer_object,
                 });
                 vertices = vec![];
                 uvs = vec![];
                 colors = vec![];
+                dark_colors = vec![];
                 indices = vec![];
                 vertex_base = 0;
                 index_base = 0;
             }
             attachment_renderer_object = next_attachment_renderer_object;
 
-            let color = if let Some(mesh_attachment) = slot.attachment().and_then(|a| a.as_mesh()) {
+            let (color, dark_color) = if let Some(mesh_attachment) =
+                slot.attachment().and_then(|a| a.as_mesh())
+            {
                 let color = mesh_attachment.color() * slot.color() * skeleton.color();
+                let dark_color = Color::new_rgba(0., 0., 0., 1.);
 
                 uvs.resize(
                     vertex_base as usize + mesh_attachment.world_vertices_length() as usize,
@@ -135,6 +142,7 @@ impl CombinedDrawer {
                     ]);
 
                     colors.push([color.r, color.g, color.b, color.a]);
+                    dark_colors.push([dark_color.r, dark_color.g, dark_color.b, dark_color.a]);
                 }
 
                 // UVs need to be copied from the indices. I'm not entirely sure why, but it can lead to crashes otherwise.
@@ -187,9 +195,10 @@ impl CombinedDrawer {
                     }
                 }
 
-                color
+                (color, dark_color)
             } else if let Some(region_attachment) = slot.attachment().and_then(|a| a.as_region()) {
                 let color = region_attachment.color() * slot.color() * skeleton.color();
+                let dark_color = Color::new_rgba(0., 0., 0., 1.);
 
                 for i in 0..4 {
                     vertices.push([
@@ -205,6 +214,7 @@ impl CombinedDrawer {
                     }
 
                     colors.push([color.r, color.g, color.b, color.a]);
+                    dark_colors.push([dark_color.r, dark_color.g, dark_color.b, dark_color.a]);
                 }
 
                 if matches!(self.cull_direction, CullDirection::CounterClockwise) {
@@ -223,7 +233,7 @@ impl CombinedDrawer {
                     indices.push(vertex_base + 0);
                 }
 
-                color
+                (color, dark_color)
             } else {
                 unreachable!();
             };
@@ -253,6 +263,10 @@ impl CombinedDrawer {
                         colors.resize(
                             vertex_base as usize + (clipped_vertices_size / 2),
                             [color.r, color.g, color.b, color.a],
+                        );
+                        dark_colors.resize(
+                            vertex_base as usize + (clipped_vertices_size / 2),
+                            [dark_color.r, dark_color.g, dark_color.b, dark_color.a],
                         );
                         indices.resize(index_base as usize + clipped_triangles_size, 0);
                         std::ptr::copy_nonoverlapping(
@@ -293,6 +307,7 @@ impl CombinedDrawer {
                 uvs,
                 indices,
                 colors,
+                dark_colors,
                 attachment_renderer_object,
             });
         }
