@@ -18,6 +18,9 @@ use crate::{
     Attachment,
 };
 
+#[cfg(feature = "mint")]
+use mint::Vector2;
+
 /// A live Skeleton instance created from [SkeletonData](struct.SkeletonData.html).
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Skeleton)
@@ -230,6 +233,35 @@ impl Skeleton {
     );
     c_accessor_tmp_ptr_optional!(skin, skin_mut, skin, Skin, spSkin);
     c_ptr!(c_skeleton, spSkeleton);
+}
+
+#[cfg(feature = "mint")]
+impl Skeleton {
+    pub fn position(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.x(),
+            y: self.y(),
+        }
+    }
+
+    pub fn set_position(&mut self, position: impl Into<Vector2<f32>>) {
+        let position: Vector2<f32> = position.into();
+        self.set_x(position.x);
+        self.set_y(position.y);
+    }
+
+    pub fn scale(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.scale_x(),
+            y: self.scale_y(),
+        }
+    }
+
+    pub fn set_scale(&mut self, scale: impl Into<Vector2<f32>>) {
+        let scale: Vector2<f32> = scale.into();
+        self.set_scale_x(scale.x);
+        self.set_scale_y(scale.y);
+    }
 }
 
 impl Drop for Skeleton {

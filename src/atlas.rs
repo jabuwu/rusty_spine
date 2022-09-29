@@ -14,6 +14,9 @@ use crate::{
 
 use atlas::*;
 
+#[cfg(feature = "mint")]
+use mint::Vector2;
+
 /// An atlas loaded from Spine's `.atlas` file format.
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Atlas)
@@ -161,6 +164,16 @@ pub mod atlas {
         c_accessor_bool!(pma, pma);
         c_accessor_renderer_object!();
         c_ptr!(c_atlas_page, spAtlasPage);
+    }
+
+    #[cfg(feature = "mint")]
+    impl AtlasPage {
+        pub fn size(&self) -> Vector2<i32> {
+            Vector2 {
+                x: self.width(),
+                y: self.height(),
+            }
+        }
     }
 
     pub struct AtlasPageIterator<'a> {
@@ -343,6 +356,16 @@ pub mod atlas {
                 Some(CTmpRef::new(self._atlas, page))
             } else {
                 None
+            }
+        }
+    }
+
+    #[cfg(feature = "mint")]
+    impl AtlasRegion {
+        pub fn position(&self) -> Vector2<i32> {
+            Vector2 {
+                x: self.x(),
+                y: self.y(),
             }
         }
     }

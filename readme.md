@@ -48,3 +48,9 @@ Default: no
 Provides an [egui](https://github.com/emilk/egui) debugger window for viewing skeleton and animation state. See it in action by running the `bevy` example with this feature enabled:
 
 `cargo run --release --example bevy --features egui_debugger`
+
+### mint
+
+Default: yes
+
+Provides additional math functions using [mint](https://docs.rs/mint).

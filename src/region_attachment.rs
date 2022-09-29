@@ -8,6 +8,9 @@ use crate::{
     texture_region::TextureRegion,
 };
 
+#[cfg(feature = "mint")]
+use mint::Vector2;
+
 /// An attachment which draws a texture.
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#RegionAttachment)
@@ -64,4 +67,28 @@ impl RegionAttachment {
     c_ptr!(c_region_attachment, spRegionAttachment);
 
     // TODO: sequence accessor
+}
+
+#[cfg(feature = "mint")]
+impl RegionAttachment {
+    pub fn position(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.x(),
+            y: self.y(),
+        }
+    }
+
+    pub fn scale(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.scale_x(),
+            y: self.scale_y(),
+        }
+    }
+
+    pub fn size(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.width(),
+            y: self.height(),
+        }
+    }
 }

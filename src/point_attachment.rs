@@ -7,6 +7,9 @@ use crate::{
     c_interface::{NewFromPtr, SyncPtr},
 };
 
+#[cfg(feature = "mint")]
+use mint::Vector2;
+
 /// A lightweight, single point attachment with a position and rotation.
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#PointAttachment)
@@ -47,4 +50,14 @@ impl PointAttachment {
     c_accessor_mut!(x, set_x, x, f32);
     c_accessor_mut!(y, set_y, x, f32);
     c_ptr!(c_point_attachment, spPointAttachment);
+}
+
+#[cfg(feature = "mint")]
+impl PointAttachment {
+    pub fn position(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.x(),
+            y: self.y(),
+        }
+    }
 }

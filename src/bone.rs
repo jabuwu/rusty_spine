@@ -11,6 +11,9 @@ use crate::{
     Skeleton,
 };
 
+#[cfg(feature = "mint")]
+use mint::Vector2;
+
 /// A bone within the [Skeleton](struct.Skeleton.html) hierarchy.
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Bone)
@@ -217,6 +220,114 @@ impl Bone {
     c_ptr!(c_bone, spBone);
 }
 
+#[cfg(feature = "mint")]
+impl Bone {
+    pub fn position(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.x(),
+            y: self.y(),
+        }
+    }
+
+    pub fn set_position(&mut self, position: impl Into<Vector2<f32>>) {
+        let position: Vector2<f32> = position.into();
+        self.set_x(position.x);
+        self.set_y(position.y);
+    }
+
+    pub fn world_position(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.world_x(),
+            y: self.world_y(),
+        }
+    }
+
+    pub fn set_world_position(&mut self, position: impl Into<Vector2<f32>>) {
+        let position: Vector2<f32> = position.into();
+        self.set_world_x(position.x);
+        self.set_world_y(position.y);
+    }
+
+    pub fn applied_position(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.world_x(),
+            y: self.world_y(),
+        }
+    }
+
+    pub fn set_applied_position(&mut self, position: impl Into<Vector2<f32>>) {
+        let position: Vector2<f32> = position.into();
+        self.set_applied_x(position.x);
+        self.set_applied_y(position.y);
+    }
+
+    pub fn scale(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.scale_x(),
+            y: self.scale_y(),
+        }
+    }
+
+    pub fn set_scale(&mut self, scale: impl Into<Vector2<f32>>) {
+        let scale: Vector2<f32> = scale.into();
+        self.set_scale_x(scale.x);
+        self.set_scale_y(scale.y);
+    }
+
+    pub fn world_scale(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.world_x(),
+            y: self.world_y(),
+        }
+    }
+
+    pub fn applied_scale(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.applied_scale_x(),
+            y: self.applied_scale_y(),
+        }
+    }
+
+    pub fn set_applied_scale(&mut self, scale: impl Into<Vector2<f32>>) {
+        let scale: Vector2<f32> = scale.into();
+        self.set_applied_scale_x(scale.x);
+        self.set_applied_scale_y(scale.y);
+    }
+
+    pub fn shear(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.shear_x(),
+            y: self.shear_y(),
+        }
+    }
+
+    pub fn set_shear(&mut self, shear: impl Into<Vector2<f32>>) {
+        let shear: Vector2<f32> = shear.into();
+        self.set_shear_x(shear.x);
+        self.set_shear_y(shear.y);
+    }
+
+    pub fn applied_shear(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.applied_shear_x(),
+            y: self.applied_shear_y(),
+        }
+    }
+
+    pub fn set_applied_shear(&mut self, shear: impl Into<Vector2<f32>>) {
+        let shear: Vector2<f32> = shear.into();
+        self.set_applied_shear_x(shear.x);
+        self.set_applied_shear_y(shear.y);
+    }
+
+    pub fn world_rotation(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.world_rotation_x(),
+            y: self.world_rotation_y(),
+        }
+    }
+}
+
 c_handle_decl!(
     /// A storeable reference to a [Bone](struct.Bone.html).
     ///
@@ -275,6 +386,48 @@ impl BoneData {
         TransformMode
     );
     c_accessor_tmp_ptr_optional!(parent, parent_mut, parent, BoneData, spBoneData);
+}
+
+#[cfg(feature = "mint")]
+impl BoneData {
+    pub fn position(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.x(),
+            y: self.y(),
+        }
+    }
+
+    pub fn set_position(&mut self, position: impl Into<Vector2<f32>>) {
+        let position: Vector2<f32> = position.into();
+        self.set_x(position.x);
+        self.set_y(position.y);
+    }
+
+    pub fn scale(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.scale_x(),
+            y: self.scale_y(),
+        }
+    }
+
+    pub fn set_scale(&mut self, scale: impl Into<Vector2<f32>>) {
+        let scale: Vector2<f32> = scale.into();
+        self.set_scale_x(scale.x);
+        self.set_scale_y(scale.y);
+    }
+
+    pub fn shear(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.shear_x(),
+            y: self.shear_y(),
+        }
+    }
+
+    pub fn set_shear(&mut self, shear: impl Into<Vector2<f32>>) {
+        let shear: Vector2<f32> = shear.into();
+        self.set_shear_x(shear.x);
+        self.set_shear_y(shear.y);
+    }
 }
 
 pub enum TransformMode {

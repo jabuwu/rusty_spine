@@ -10,6 +10,9 @@ use crate::{
     Atlas,
 };
 
+#[cfg(feature = "mint")]
+use mint::Vector2;
+
 /// Static skeleton data imported from Spine.
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#SkeletonData)
@@ -106,6 +109,23 @@ impl SkeletonData {
     c_ptr!(c_skeleton_data, spSkeletonData);
 
     // TODO: accessors and methods for the arrays in spSkeletonData
+}
+
+#[cfg(feature = "mint")]
+impl SkeletonData {
+    pub fn position(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.x(),
+            y: self.y(),
+        }
+    }
+
+    pub fn size(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.width(),
+            y: self.height(),
+        }
+    }
 }
 
 impl Drop for SkeletonData {

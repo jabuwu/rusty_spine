@@ -3,6 +3,9 @@ use crate::{
     c_interface::{NewFromPtr, SyncPtr},
 };
 
+#[cfg(feature = "mint")]
+use mint::Vector2;
+
 #[derive(Debug)]
 pub struct TextureRegion {
     c_texture_region: SyncPtr<spTextureRegion>,
@@ -30,4 +33,41 @@ impl TextureRegion {
     c_accessor!(original_height, originalHeight, i32);
     c_accessor_renderer_object!();
     c_ptr!(c_texture_region, spTextureRegion);
+}
+
+#[cfg(feature = "mint")]
+impl TextureRegion {
+    pub fn uvs(&self) -> (Vector2<f32>, Vector2<f32>) {
+        (
+            Vector2 {
+                x: self.u(),
+                y: self.v(),
+            },
+            Vector2 {
+                x: self.u2(),
+                y: self.v2(),
+            },
+        )
+    }
+
+    pub fn offset(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.offset_x(),
+            y: self.offset_y(),
+        }
+    }
+
+    pub fn size(&self) -> Vector2<i32> {
+        Vector2 {
+            x: self.width(),
+            y: self.height(),
+        }
+    }
+
+    pub fn original_size(&self) -> Vector2<i32> {
+        Vector2 {
+            x: self.original_width(),
+            y: self.original_height(),
+        }
+    }
 }

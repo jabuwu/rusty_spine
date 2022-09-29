@@ -8,6 +8,9 @@ use crate::{
     Attachment,
 };
 
+#[cfg(feature = "mint")]
+use mint::Vector2;
+
 /// A deforming mesh attachment.
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#MeshAttachment)
@@ -65,4 +68,14 @@ impl MeshAttachment {
     c_accessor_passthrough!(region_uvs, regionUVs, *mut c_float);
     c_ptr!(c_mesh_attachment, spMeshAttachment);
     // TODO: sequence accessor
+}
+
+#[cfg(feature = "mint")]
+impl MeshAttachment {
+    pub fn size(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.width(),
+            y: self.height(),
+        }
+    }
 }
