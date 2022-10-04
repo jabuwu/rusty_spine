@@ -11,13 +11,14 @@ pub struct SimpleRenderable {
     pub uvs: Vec<[f32; 2]>,
     pub indices: Vec<u16>,
     pub color: Color,
-    pub dark_color: Option<Color>,
+    pub dark_color: Color,
     pub blend_mode: BlendMode,
     pub attachment_renderer_object: Option<*const c_void>,
 }
 
 pub struct SimpleDrawer {
     pub cull_direction: CullDirection,
+    pub premultiplied_alpha: bool,
 }
 
 /// A simple drawer with no optimizations.
@@ -246,14 +247,25 @@ impl SimpleDrawer {
             };
 
             color *= slot.color() * skeleton.color();
+            if self.premultiplied_alpha {
+                color.premultiply_alpha();
+            }
+
+            let mut dark_color = slot
+                .dark_color()
+                .unwrap_or(Color::new_rgba(0.0, 0.0, 0.0, 0.0));
+            if self.premultiplied_alpha {
+                dark_color.premultiply_alpha();
+                dark_color.a = 1.0;
+            }
 
             renderables.push(SimpleRenderable {
-                slot_index: slot_index,
+                slot_index,
                 vertices,
                 uvs,
                 indices,
                 color,
-                dark_color: slot.dark_color(),
+                dark_color,
                 blend_mode: slot.data().blend_mode(),
                 attachment_renderer_object,
             });

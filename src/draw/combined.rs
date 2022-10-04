@@ -16,6 +16,7 @@ pub struct CombinedRenderable {
 
 pub struct CombinedDrawer {
     pub cull_direction: CullDirection,
+    pub premultiplied_alpha: bool,
 }
 
 /// A combined drawer with a mesh combining optimization.
@@ -128,8 +129,13 @@ impl CombinedDrawer {
             let (color, dark_color) = if let Some(mesh_attachment) =
                 slot.attachment().and_then(|a| a.as_mesh())
             {
-                let color = mesh_attachment.color() * slot.color() * skeleton.color();
-                let dark_color = Color::new_rgba(0., 0., 0., 1.);
+                let mut color = mesh_attachment.color() * slot.color() * skeleton.color();
+                let mut dark_color = Color::new_rgba(0., 0., 0., 0.);
+                if self.premultiplied_alpha {
+                    color.premultiply_alpha();
+                    dark_color.premultiply_alpha();
+                    dark_color.a = 1.;
+                }
 
                 uvs.resize(
                     vertex_base as usize + mesh_attachment.world_vertices_length() as usize,
@@ -197,8 +203,13 @@ impl CombinedDrawer {
 
                 (color, dark_color)
             } else if let Some(region_attachment) = slot.attachment().and_then(|a| a.as_region()) {
-                let color = region_attachment.color() * slot.color() * skeleton.color();
-                let dark_color = Color::new_rgba(0., 0., 0., 1.);
+                let mut color = region_attachment.color() * slot.color() * skeleton.color();
+                let mut dark_color = Color::new_rgba(0., 0., 0., 0.);
+                if self.premultiplied_alpha {
+                    color.premultiply_alpha();
+                    dark_color.premultiply_alpha();
+                    dark_color.a = 1.;
+                }
 
                 for i in 0..4 {
                     vertices.push([

@@ -102,6 +102,12 @@ impl Color {
         self.a = self.r.clamp(0., 1.);
         self
     }
+
+    pub fn premultiply_alpha(&mut self) {
+        self.r *= self.a;
+        self.g *= self.a;
+        self.b *= self.a;
+    }
 }
 
 impl Mul<Color> for Color {

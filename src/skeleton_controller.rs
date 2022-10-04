@@ -86,6 +86,7 @@ impl SkeletonController {
     pub fn renderables(&mut self) -> Vec<SkeletonRenderable> {
         let renderables = SimpleDrawer {
             cull_direction: self.settings.cull_direction,
+            premultiplied_alpha: self.settings.premultiplied_alpha,
         }
         .draw(&mut self.skeleton, Some(&mut self.clipper));
         renderables
@@ -112,7 +113,7 @@ pub struct SkeletonRenderable {
     pub uvs: Vec<[f32; 2]>,
     pub indices: Vec<u16>,
     pub color: Color,
-    pub dark_color: Option<Color>,
+    pub dark_color: Color,
     pub blend_mode: BlendMode,
     pub premultiplied_alpha: bool,
     pub attachment_renderer_object: Option<*const c_void>,
