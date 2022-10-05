@@ -2809,7 +2809,7 @@ dependencies = [
 
 [[package]]
 name = "rusty_spine"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "bevy",
  "bevy_egui",
