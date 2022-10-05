@@ -255,8 +255,8 @@ impl SimpleDrawer {
                 .dark_color()
                 .unwrap_or(Color::new_rgba(0.0, 0.0, 0.0, 0.0));
             if self.premultiplied_alpha {
-                dark_color.premultiply_alpha();
                 dark_color.a = 1.0;
+                dark_color.premultiply_alpha();
             }
 
             renderables.push(SimpleRenderable {

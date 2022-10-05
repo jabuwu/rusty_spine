@@ -207,8 +207,8 @@ impl CombinedDrawer {
                 let mut dark_color = Color::new_rgba(0., 0., 0., 0.);
                 if self.premultiplied_alpha {
                     color.premultiply_alpha();
-                    dark_color.premultiply_alpha();
                     dark_color.a = 1.;
+                    dark_color.premultiply_alpha();
                 }
 
                 for i in 0..4 {
