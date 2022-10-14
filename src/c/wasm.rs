@@ -916,6 +916,7 @@ fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
     new_str
 }
 
+#[cfg_attr(feature="spine38", allow(dead_code))]
 pub(crate) fn printf(c_format: *const c_char, args: Vec<Box<dyn Any>>) {
     let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
     print!("{}", fmt(format, args));
@@ -939,6 +940,7 @@ pub(crate) fn sscanf(c_str: *const c_char, c_format: *const c_char, args: *mut c
     }
 }
 
+#[cfg_attr(feature="spine38", allow(unused_macros))]
 macro_rules! spine_printf {
     ($format:expr) => {
         crate::c::wasm::printf($format, vec![]);

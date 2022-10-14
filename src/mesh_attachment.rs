@@ -1,15 +1,23 @@
 use crate::{
     c::{
         c_float, c_ushort, spAttachment, spMeshAttachment, spMeshAttachment_newLinkedMesh,
-        spMeshAttachment_updateRegion, spTextureRegion, spVertexAttachment,
+        spVertexAttachment,
     },
     c_interface::{NewFromPtr, SyncPtr},
-    texture_region::TextureRegion,
     Attachment,
+};
+
+#[cfg(not(feature="spine38"))]
+use crate::{
+    c::{
+        spMeshAttachment_updateRegion, spTextureRegion
+    },
+    texture_region::TextureRegion,
 };
 
 #[cfg(feature = "mint")]
 use mint::Vector2;
+use crate::c::spMeshAttachment_updateUVs;
 
 /// A deforming mesh attachment.
 ///
@@ -40,9 +48,13 @@ impl MeshAttachment {
         Attachment::new_from_ptr(spMeshAttachment_newLinkedMesh(self.c_ptr()) as *const spAttachment)
     }
 
+    #[cfg(not(feature="spine38"))]
     pub unsafe fn update_region(&mut self) {
         spMeshAttachment_updateRegion(self.c_ptr());
     }
+
+    #[cfg(feature="spine38")]
+    pub unsafe fn update_uvs(&mut self) { spMeshAttachment_updateUVs(self.c_ptr()); }
 
     c_attachment_accessors!();
     c_vertex_attachment_accessors!();
@@ -52,6 +64,7 @@ impl MeshAttachment {
     c_accessor!(width, width, f32);
     c_accessor!(height, height, f32);
     c_accessor_renderer_object!();
+    #[cfg(not(feature="spine38"))]
     c_accessor_tmp_ptr_optional!(region, region_mut, region, TextureRegion, spTextureRegion);
     c_accessor_tmp_ptr!(
         parent_mesh,

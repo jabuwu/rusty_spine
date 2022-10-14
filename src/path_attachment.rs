@@ -31,6 +31,7 @@ impl PathAttachment {
     c_attachment_accessors!();
     c_vertex_attachment_accessors!();
     c_accessor_bool_mut!(closed, set_closed, closed);
+    #[cfg(not(feature="spine38"))]
     c_accessor_color_mut!(color, color_mut, color);
     c_accessor_bool_mut!(constant_speed, set_constant_speed, constantSpeed);
     c_accessor_passthrough!(lengths, lengths, *mut c_float);

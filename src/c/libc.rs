@@ -116,6 +116,7 @@ unsafe fn spine_memset(s: *mut c_void, c: c_int, n: size_t) -> *mut c_void {
     libc::memset(s, c, n)
 }
 
+#[cfg_attr(feature="spine38", allow(unused_macros))]
 macro_rules! spine_printf {
     ($format:expr) => {
         libc::printf($format);
