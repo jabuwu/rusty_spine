@@ -528,6 +528,7 @@ macro_rules! c_accessor_tmp_ptr_optional {
     };
 }
 
+#[cfg_attr(feature="spine38", allow(unused_macros))]
 macro_rules! c_accessor_super {
     ($rust:ident, $rust_mut:ident, $type:ty, $c_type:ident) => {
         pub fn $rust(&self) -> crate::c_interface::CTmpRef<Self, $type> {

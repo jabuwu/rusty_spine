@@ -1660,13 +1660,13 @@ pub unsafe extern "C" fn _spBaseTimeline_create(
 pub unsafe extern "C" fn _spRotateTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut bone: *mut spBone = 0 as *mut spBone;
     let mut frame: c_int = 0;
@@ -1847,13 +1847,13 @@ static mut TRANSLATE_Y: c_int = 2 as c_int;
 pub unsafe extern "C" fn _spTranslateTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut bone: *mut spBone = 0 as *mut spBone;
     let mut frame: c_int = 0;
@@ -1972,10 +1972,10 @@ pub unsafe extern "C" fn spTranslateTimeline_setFrame(
 pub unsafe extern "C" fn _spScaleTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
     mut direction: spMixDirection,
@@ -2057,11 +2057,11 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                             * (if bx < 0 as c_int as c_float {
                                 -1.0f32
                             } else {
-                                (if bx > 0 as c_int as c_float {
+                                if bx > 0 as c_int as c_float {
                                     1.0f32
                                 } else {
                                     0.0f32
-                                })
+                                }
                             }) - bx) * alpha;
                     (*bone)
                         .scaleY = by
@@ -2069,11 +2069,11 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                             * (if by < 0 as c_int as c_float {
                                 -1.0f32
                             } else {
-                                (if by > 0 as c_int as c_float {
+                                if by > 0 as c_int as c_float {
                                     1.0f32
                                 } else {
                                     0.0f32
-                                })
+                                }
                             }) - by) * alpha;
                 }
                 1 | 2 => {
@@ -2085,11 +2085,11 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                             * (if bx < 0 as c_int as c_float {
                                 -1.0f32
                             } else {
-                                (if bx > 0 as c_int as c_float {
+                                if bx > 0 as c_int as c_float {
                                     1.0f32
                                 } else {
                                     0.0f32
-                                })
+                                }
                             }) - bx) * alpha;
                     (*bone)
                         .scaleY = by
@@ -2097,11 +2097,11 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                             * (if by < 0 as c_int as c_float {
                                 -1.0f32
                             } else {
-                                (if by > 0 as c_int as c_float {
+                                if by > 0 as c_int as c_float {
                                     1.0f32
                                 } else {
                                     0.0f32
-                                })
+                                }
                             }) - by) * alpha;
                 }
                 3 => {
@@ -2113,11 +2113,11 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                             * (if bx < 0 as c_int as c_float {
                                 -1.0f32
                             } else {
-                                (if bx > 0 as c_int as c_float {
+                                if bx > 0 as c_int as c_float {
                                     1.0f32
                                 } else {
                                     0.0f32
-                                })
+                                }
                             }) - (*(*bone).data).scaleX) * alpha;
                     (*bone)
                         .scaleY = by
@@ -2125,11 +2125,11 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                             * (if by < 0 as c_int as c_float {
                                 -1.0f32
                             } else {
-                                (if by > 0 as c_int as c_float {
+                                if by > 0 as c_int as c_float {
                                     1.0f32
                                 } else {
                                     0.0f32
-                                })
+                                }
                             }) - (*(*bone).data).scaleY) * alpha;
                 }
                 _ => {}
@@ -2145,11 +2145,11 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                         * (if x < 0 as c_int as c_float {
                             -1.0f32
                         } else {
-                            (if x > 0 as c_int as c_float {
+                            if x > 0 as c_int as c_float {
                                 1.0f32
                             } else {
                                 0.0f32
-                            })
+                            }
                         });
                     by = (if (*(*bone).data).scaleY < 0 as c_int as c_float {
                         -(*(*bone).data).scaleY
@@ -2159,11 +2159,11 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                         * (if y < 0 as c_int as c_float {
                             -1.0f32
                         } else {
-                            (if y > 0 as c_int as c_float {
+                            if y > 0 as c_int as c_float {
                                 1.0f32
                             } else {
                                 0.0f32
-                            })
+                            }
                         });
                     (*bone).scaleX = bx + (x - bx) * alpha;
                     (*bone).scaleY = by + (y - by) * alpha;
@@ -2177,11 +2177,11 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                         * (if x < 0 as c_int as c_float {
                             -1.0f32
                         } else {
-                            (if x > 0 as c_int as c_float {
+                            if x > 0 as c_int as c_float {
                                 1.0f32
                             } else {
                                 0.0f32
-                            })
+                            }
                         });
                     by = (if (*bone).scaleY < 0 as c_int as c_float {
                         -(*bone).scaleY
@@ -2191,11 +2191,11 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                         * (if y < 0 as c_int as c_float {
                             -1.0f32
                         } else {
-                            (if y > 0 as c_int as c_float {
+                            if y > 0 as c_int as c_float {
                                 1.0f32
                             } else {
                                 0.0f32
-                            })
+                            }
                         });
                     (*bone).scaleX = bx + (x - bx) * alpha;
                     (*bone).scaleY = by + (y - by) * alpha;
@@ -2304,13 +2304,13 @@ pub unsafe extern "C" fn spScaleTimeline_setFrame(
 pub unsafe extern "C" fn _spShearTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut bone: *mut spBone = 0 as *mut spBone;
     let mut frame: c_int = 0;
@@ -2436,13 +2436,13 @@ static mut COLOR_A: c_int = 4 as c_int;
 pub unsafe extern "C" fn _spColorTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut slot: *mut spSlot = 0 as *mut spSlot;
     let mut frame: c_int = 0;
@@ -2600,13 +2600,13 @@ static mut TWOCOLOR_B2: c_int = 7 as c_int;
 pub unsafe extern "C" fn _spTwoColorTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut slot: *mut spSlot = 0 as *mut spSlot;
     let mut frame: c_int = 0;
@@ -2819,11 +2819,11 @@ unsafe extern "C" fn _spSetAttachment(
 pub unsafe extern "C" fn _spAttachmentTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
-    mut alpha: c_float,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
+    mut _alpha: c_float,
     mut blend: spMixBlend,
     mut direction: spMixDirection,
 ) {
@@ -2981,13 +2981,13 @@ pub unsafe extern "C" fn spAttachmentTimeline_setFrame(
 pub unsafe extern "C" fn _spDeformTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut frame: c_int = 0;
     let mut i: c_int = 0;
@@ -3491,7 +3491,7 @@ pub unsafe extern "C" fn _spEventTimeline_apply(
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spEventTimeline_getPropertyId(
-    mut timeline: *const spTimeline,
+    mut _timeline: *const spTimeline,
 ) -> c_int {
     return (SP_TIMELINE_EVENT as c_int) << 24 as c_int;
 }
@@ -3576,11 +3576,11 @@ pub unsafe extern "C" fn spEventTimeline_setFrame(
 pub unsafe extern "C" fn _spDrawOrderTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
-    mut alpha: c_float,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
+    mut _alpha: c_float,
     mut blend: spMixBlend,
     mut direction: spMixDirection,
 ) {
@@ -3641,7 +3641,7 @@ pub unsafe extern "C" fn _spDrawOrderTimeline_apply(
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spDrawOrderTimeline_getPropertyId(
-    mut timeline: *const spTimeline,
+    mut _timeline: *const spTimeline,
 ) -> c_int {
     return (SP_TIMELINE_DRAWORDER as c_int) << 24 as c_int;
 }
@@ -3760,10 +3760,10 @@ static mut IKCONSTRAINT_STRETCH: c_int = 5 as c_int;
 pub unsafe extern "C" fn _spIkConstraintTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
     mut direction: spMixDirection,
@@ -4049,13 +4049,13 @@ static mut TRANSFORMCONSTRAINT_SHEAR: c_int = 4 as c_int;
 pub unsafe extern "C" fn _spTransformConstraintTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut frame: c_int = 0;
     let mut frameTime: c_float = 0.;
@@ -4216,13 +4216,13 @@ static mut PATHCONSTRAINTPOSITION_VALUE: c_int = 1 as c_int;
 pub unsafe extern "C" fn _spPathConstraintPositionTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut frame: c_int = 0;
     let mut frameTime: c_float = 0.;
@@ -4336,13 +4336,13 @@ static mut PATHCONSTRAINTSPACING_VALUE: c_int = 1 as c_int;
 pub unsafe extern "C" fn _spPathConstraintSpacingTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut frame: c_int = 0;
     let mut frameTime: c_float = 0.;
@@ -4457,13 +4457,13 @@ static mut PATHCONSTRAINTMIX_TRANSLATE: c_int = 2 as c_int;
 pub unsafe extern "C" fn _spPathConstraintMixTimeline_apply(
     mut timeline: *const spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut frame: c_int = 0;
     let mut frameTime: c_float = 0.;
@@ -5778,7 +5778,7 @@ pub unsafe extern "C" fn _spAnimationState_applyAttachmentTimeline(
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spAnimationState_applyRotateTimeline(
-    mut self_0: *mut spAnimationState,
+    mut _self_0: *mut spAnimationState,
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
     mut time: c_float,
@@ -5825,19 +5825,20 @@ pub unsafe extern "C" fn _spAnimationState_applyRotateTimeline(
         return;
     }
     if time < *frames.offset(0 as c_int as isize) {
-        's_88: {
+        {
             match blend as c_uint {
                 0 => {
                     (*bone).rotation = (*(*bone).data).rotation;
+                    return;
                 }
                 1 => {
                     r1 = (*bone).rotation;
                     r2 = (*(*bone).data).rotation;
-                    break 's_88;
                 }
-                _ => {}
+                _ => {
+                    return
+                }
             }
-            return;
         }
     } else {
         r1 = if blend as c_uint
@@ -5909,12 +5910,12 @@ pub unsafe extern "C" fn _spAnimationState_applyRotateTimeline(
         if (if lastDiff < 0 as c_int as c_float {
             -1.0f32
         } else {
-            (if lastDiff > 0 as c_int as c_float { 1.0f32 } else { 0.0f32 })
+            if lastDiff > 0 as c_int as c_float { 1.0f32 } else { 0.0f32 }
         })
             != (if diff < 0 as c_int as c_float {
                 -1.0f32
             } else {
-                (if diff > 0 as c_int as c_float { 1.0f32 } else { 0.0f32 })
+                if diff > 0 as c_int as c_float { 1.0f32 } else { 0.0f32 }
             })
             && (if lastDiff < 0 as c_int as c_float {
                 -lastDiff
@@ -5933,11 +5934,11 @@ pub unsafe extern "C" fn _spAnimationState_applyRotateTimeline(
                         * (if lastTotal < 0 as c_int as c_float {
                             -1.0f32
                         } else {
-                            (if lastTotal > 0 as c_int as c_float {
+                            if lastTotal > 0 as c_int as c_float {
                                 1.0f32
                             } else {
                                 0.0f32
-                            })
+                            }
                         });
             }
             dir = current;
@@ -5949,11 +5950,11 @@ pub unsafe extern "C" fn _spAnimationState_applyRotateTimeline(
                     * (if lastTotal < 0 as c_int as c_float {
                         -1.0f32
                     } else {
-                        (if lastTotal > 0 as c_int as c_float {
+                        if lastTotal > 0 as c_int as c_float {
                             1.0f32
                         } else {
                             0.0f32
-                        })
+                        }
                     });
         }
         *timelinesRotation.offset(i as isize) = total;
@@ -8303,7 +8304,7 @@ pub unsafe extern "C" fn spAtlas_findRegion(
 #[no_mangle]
 pub unsafe extern "C" fn _spAtlasAttachmentLoader_createAttachment(
     mut loader: *mut spAttachmentLoader,
-    mut skin: *mut spSkin,
+    mut _skin: *mut spSkin,
     mut type_0: spAttachmentType,
     mut name: *const c_char,
     mut path: *const c_char,
@@ -9994,6 +9995,8 @@ unsafe extern "C" fn parse_number(
     if *ptr as c_int == 'e' as i32 || *ptr as c_int == 'E' as i32 {
         let mut exponent: c_double = 0 as c_int as c_double;
         let mut expNegative: c_int = 0 as c_int;
+        // rustc complains about this whether it's initialized or not
+        #[allow(unused_variables)]
         let mut n_0: c_int = 0 as c_int;
         ptr = ptr.offset(1);
         if *ptr as c_int == '-' as i32 {
@@ -15979,7 +15982,7 @@ pub unsafe extern "C" fn _clip(
 pub unsafe extern "C" fn spSkeletonClipping_clipTriangles(
     mut self_0: *mut spSkeletonClipping,
     mut vertices: *mut c_float,
-    mut verticesLength: c_int,
+    mut _verticesLength: c_int,
     mut triangles: *mut c_ushort,
     mut trianglesLength: c_int,
     mut uvs: *mut c_float,
@@ -22066,18 +22069,18 @@ pub unsafe extern "C" fn spVertexAttachment_copyTo(
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spJitterVertexEffect_begin(
-    mut self_0: *mut spVertexEffect,
-    mut skeleton: *mut spSkeleton,
+    mut _self_0: *mut spVertexEffect,
+    mut _skeleton: *mut spSkeleton,
 ) {}
 #[no_mangle]
 pub unsafe extern "C" fn _spJitterVertexEffect_transform(
     mut self_0: *mut spVertexEffect,
     mut x: *mut c_float,
     mut y: *mut c_float,
-    mut u: *mut c_float,
-    mut v: *mut c_float,
-    mut light: *mut spColor,
-    mut dark: *mut spColor,
+    mut _u: *mut c_float,
+    mut _v: *mut c_float,
+    mut _light: *mut spColor,
+    mut _dark: *mut spColor,
 ) {
     let mut internal: *mut spJitterVertexEffect = self_0 as *mut spJitterVertexEffect;
     let mut jitterX: c_float = (*internal).jitterX;
@@ -22086,7 +22089,7 @@ pub unsafe extern "C" fn _spJitterVertexEffect_transform(
     *y += _spMath_randomTriangular(-jitterX, jitterY);
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spJitterVertexEffect_end(mut self_0: *mut spVertexEffect) {}
+pub unsafe extern "C" fn _spJitterVertexEffect_end(mut _self_0: *mut spVertexEffect) {}
 #[no_mangle]
 pub unsafe extern "C" fn spJitterVertexEffect_create(
     mut jitterX: c_float,
@@ -22147,10 +22150,10 @@ pub unsafe extern "C" fn _spSwirlVertexEffect_transform(
     mut self_0: *mut spVertexEffect,
     mut positionX: *mut c_float,
     mut positionY: *mut c_float,
-    mut u: *mut c_float,
-    mut v: *mut c_float,
-    mut light: *mut spColor,
-    mut dark: *mut spColor,
+    mut _u: *mut c_float,
+    mut _v: *mut c_float,
+    mut _light: *mut spColor,
+    mut _dark: *mut spColor,
 ) {
     let mut internal: *mut spSwirlVertexEffect = self_0 as *mut spSwirlVertexEffect;
     let mut radAngle: c_float = (*internal).angle
@@ -22175,7 +22178,7 @@ pub unsafe extern "C" fn _spSwirlVertexEffect_transform(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spSwirlVertexEffect_end(mut self_0: *mut spVertexEffect) {}
+pub unsafe extern "C" fn _spSwirlVertexEffect_end(mut _self_0: *mut spVertexEffect) {}
 #[no_mangle]
 pub unsafe extern "C" fn spSwirlVertexEffect_create(
     mut radius: c_float,
@@ -22224,12 +22227,12 @@ pub unsafe extern "C" fn spSwirlVertexEffect_dispose(
 pub unsafe extern "C" fn _spInternalRandom() -> c_float {
     return spine_rand() as c_float / 2147483647 as c_int as c_float;
 }
-static mut mallocFunc: Option::<unsafe extern "C" fn(size_t) -> *mut c_void> = unsafe {
+static mut mallocFunc: Option::<unsafe extern "C" fn(size_t) -> *mut c_void> = {
     Some(spine_malloc as unsafe extern "C" fn(size_t) -> *mut c_void)
 };
 static mut reallocFunc: Option::<
     unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void,
-> = unsafe {
+> = {
     Some(
         spine_realloc
             as unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void,
@@ -22238,7 +22241,7 @@ static mut reallocFunc: Option::<
 static mut debugMallocFunc: Option::<
     unsafe extern "C" fn(size_t, *const c_char, c_int) -> *mut c_void,
 > = None;
-static mut freeFunc: Option::<unsafe extern "C" fn(*mut c_void) -> ()> = unsafe {
+static mut freeFunc: Option::<unsafe extern "C" fn(*mut c_void) -> ()> = {
     Some(spine_free as unsafe extern "C" fn(*mut c_void) -> ())
 };
 static mut randomFunc: Option::<unsafe extern "C" fn() -> c_float> = unsafe {
@@ -22335,7 +22338,8 @@ pub unsafe extern "C" fn _spReadFile(
     mut length: *mut c_int,
 ) -> *mut c_char {
     let mut data: *mut c_char = 0 as *mut c_char;
-    let mut result: size_t = 0;
+    #[allow(unused_variables)]
+    let mut result: size_t;
     let mut file: *mut FILE = spine_fopen(
         path,
         b"rb\0" as *const u8 as *const c_char,
@@ -22426,4 +22430,3 @@ type _IO_wide_data = u8;
 type _IO_codecvt = u8;
 type _IO_marker = u8;
 pub use crate::c::environment::types::*;
-    

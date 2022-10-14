@@ -1,15 +1,24 @@
 use crate::{
     c::{
         c_float, spAttachment, spRegionAttachment, spRegionAttachment_computeWorldVertices,
+    },
+    c_interface::SyncPtr};
+
+#[cfg(feature="spine38")]
+use crate::bone::Bone;
+
+#[cfg(not(feature="spine38"))]
+use crate::{
+    slot::Slot,
+    c::{
         spRegionAttachment_updateRegion, spTextureRegion,
     },
-    c_interface::SyncPtr,
-    slot::Slot,
     texture_region::TextureRegion,
 };
 
 #[cfg(feature = "mint")]
 use mint::Vector2;
+use crate::c::spRegionAttachment_updateOffset;
 
 /// An attachment which draws a texture.
 ///
@@ -30,6 +39,7 @@ impl RegionAttachment {
         unsafe { &self.c_ptr_ref().super_0 }
     }
 
+    #[cfg(not(feature="spine38"))]
     pub unsafe fn compute_world_vertices(
         &self,
         slot: &Slot,
@@ -46,8 +56,31 @@ impl RegionAttachment {
         );
     }
 
+    #[cfg(feature="spine38")]
+    pub unsafe fn compute_world_vertices(
+        &self,
+        bone: &Bone,
+        vertices: &mut [f32],
+        offset: i32,
+        stride: i32,
+    ) {
+        spRegionAttachment_computeWorldVertices(
+            self.c_ptr() as *const spRegionAttachment as *mut spRegionAttachment,
+            bone.c_ptr(),
+            vertices.as_mut_ptr(),
+            offset,
+            stride,
+        );
+    }
+
+    #[cfg(not(feature="spine38"))]
     pub unsafe fn update_region(&mut self) {
         spRegionAttachment_updateRegion(self.c_ptr());
+    }
+
+    #[cfg(feature="spine38")]
+    pub unsafe fn update_offset(&mut self) {
+        spRegionAttachment_updateOffset(self.c_ptr());
     }
 
     c_attachment_accessors!();
@@ -63,6 +96,7 @@ impl RegionAttachment {
     c_accessor_passthrough!(uvs, uvs, [c_float; 8]);
     c_accessor_passthrough!(offset, offset, [c_float; 8]);
     c_accessor_renderer_object!();
+    #[cfg(not(feature="spine38"))]
     c_accessor_tmp_ptr_optional!(region, region_mut, region, TextureRegion, spTextureRegion);
     c_ptr!(c_region_attachment, spRegionAttachment);
 
