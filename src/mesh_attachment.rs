@@ -15,9 +15,11 @@ use crate::{
     texture_region::TextureRegion,
 };
 
+#[cfg(feature="spine38")]
+use crate::c::spMeshAttachment_updateUVs;
+
 #[cfg(feature = "mint")]
 use mint::Vector2;
-use crate::c::spMeshAttachment_updateUVs;
 
 /// A deforming mesh attachment.
 ///
