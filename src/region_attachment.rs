@@ -5,20 +5,22 @@ use crate::{
     c_interface::SyncPtr};
 
 #[cfg(feature="spine38")]
-use crate::bone::Bone;
+use crate::{
+    c::spRegionAttachment_updateOffset,
+    bone::Bone
+};
 
 #[cfg(not(feature="spine38"))]
 use crate::{
     slot::Slot,
     c::{
-        spRegionAttachment_updateRegion, spTextureRegion,
+        spRegionAttachment_updateRegion, spTextureRegion
     },
     texture_region::TextureRegion,
 };
 
 #[cfg(feature = "mint")]
 use mint::Vector2;
-use crate::c::spRegionAttachment_updateOffset;
 
 /// An attachment which draws a texture.
 ///
