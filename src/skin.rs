@@ -1,12 +1,12 @@
-use std::ffi::CString;
 use crate::{
     c::{
-        spSkeletonData, spSkin, spSkin_getAttachments, spSkin_create, spSkin_addSkin,
-        spSkin_copySkin, spSkin_dispose,
+        spSkeletonData, spSkin, spSkin_addSkin, spSkin_copySkin, spSkin_create, spSkin_dispose,
+        spSkin_getAttachments,
     },
     c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     Attachment, Skeleton, SkeletonData,
 };
+use std::ffi::CString;
 
 /// A container for attachments which can be applied to a skeleton.
 ///
@@ -21,16 +21,17 @@ impl NewFromPtr<spSkin> for Skin {
     unsafe fn new_from_ptr(c_skin: *const spSkin) -> Self {
         Self {
             c_skin: SyncPtr(c_skin as *mut spSkin),
-            owns_memory: true
+            owns_memory: false,
         }
     }
 }
 
 impl Skin {
     pub fn new(name: &str) -> Skin {
-        let name_c = CString::new(name).unwrap();
-        unsafe {
-            Skin::new_from_ptr(spSkin_create(name_c.as_ptr()))
+        let c_name = CString::new(name).unwrap();
+        Self {
+            c_skin: SyncPtr(unsafe { spSkin_create(c_name.as_ptr()) }),
+            owns_memory: true,
         }
     }
 

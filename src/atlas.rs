@@ -30,7 +30,7 @@ impl NewFromPtr<spAtlas> for Atlas {
     unsafe fn new_from_ptr(c_atlas: *const spAtlas) -> Atlas {
         Atlas {
             c_atlas: SyncPtr(c_atlas as *mut spAtlas),
-            owns_memory: true,
+            owns_memory: false,
         }
     }
 }
@@ -55,7 +55,10 @@ impl Atlas {
                 null_mut(),
             )
         };
-        Ok(unsafe { Self::new_from_ptr(c_atlas) })
+        Ok(Self {
+            c_atlas: SyncPtr(c_atlas),
+            owns_memory: true,
+        })
     }
 
     /// Create an Atlas from a file.
@@ -69,7 +72,10 @@ impl Atlas {
         let c_path = CString::new(path.as_ref().to_str().unwrap())?;
         let c_atlas = unsafe { spAtlas_createFromFile(c_path.as_ptr(), null_mut()) };
         if !c_atlas.is_null() {
-            Ok(unsafe { Self::new_from_ptr(c_atlas) })
+            Ok(Self {
+                c_atlas: SyncPtr(c_atlas),
+                owns_memory: true,
+            })
         } else {
             Err(Error::FailedToReadFile(
                 path.as_ref().to_str().unwrap().to_owned(),
