@@ -1,6 +1,6 @@
 # rusty_spine
 
-Spine runtime for Rust (and wasm!) transpiled from the official C Runtime. Supports [Spine 4.1](http://esotericsoftware.com/).
+Spine runtime for Rust (and wasm!) transpiled from the official C Runtime. Supports [Spine 3.8 and 4.1](http://esotericsoftware.com/).
 
 ```
 [dependencies]
@@ -54,3 +54,9 @@ Provides an [egui](https://github.com/emilk/egui) debugger window for viewing sk
 Default: yes
 
 Provides additional math functions using [mint](https://docs.rs/mint).
+
+### spine38
+
+Default: no
+
+Builds a Spine 3.8-compatible runtime instead of a 4.1-compatible one. Enable this feature if you are loading files saved with Spine 3.8.x instead of 4.1.x.
