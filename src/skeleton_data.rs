@@ -47,9 +47,9 @@ impl SkeletonData {
 
     c_accessor_string!(version, version);
     c_accessor_string!(hash, hash);
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     c_accessor_string!(images_path, imagesPath);
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     c_accessor_string!(audio_path, audioPath);
     c_accessor!(x, x, f32);
     c_accessor!(y, y, f32);

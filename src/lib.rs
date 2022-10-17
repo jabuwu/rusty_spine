@@ -49,7 +49,7 @@ mod skeleton_data;
 mod skeleton_json;
 mod skin;
 mod slot;
-#[cfg(not(feature="spine38"))]
+#[cfg(not(feature = "spine38"))]
 mod texture_region;
 
 pub use animation::*;
@@ -75,7 +75,7 @@ pub use skeleton_data::*;
 pub use skeleton_json::*;
 pub use skin::*;
 pub use slot::*;
-#[cfg(not(feature="spine38"))]
+#[cfg(not(feature = "spine38"))]
 pub use texture_region::*;
 
 #[cfg(test)]

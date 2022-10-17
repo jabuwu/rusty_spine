@@ -32,7 +32,7 @@ impl BoundingBoxAttachment {
 
     c_attachment_accessors!();
     c_vertex_attachment_accessors!();
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     c_accessor_color!(color, color);
     c_ptr!(c_bounding_box_attachment, spBoundingBoxAttachment);
 }

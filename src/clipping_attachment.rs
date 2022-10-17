@@ -27,7 +27,7 @@ impl ClippingAttachment {
 
     c_attachment_accessors!();
     c_ptr!(c_clipping_attachment, spClippingAttachment);
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     c_accessor_color_mut!(color, color_mut, color);
     c_accessor_tmp_ptr!(end_slot, end_slot_mut, endSlot, SlotData, spSlotData);
 }

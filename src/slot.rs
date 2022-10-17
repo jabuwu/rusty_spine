@@ -60,7 +60,7 @@ impl Slot {
         spAttachment
     );
     c_ptr!(c_slot, spSlot);
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     c_accessor!(sequence_index, sequenceIndex, i32);
 
     // TODO: accessors for deform
