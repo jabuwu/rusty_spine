@@ -3,10 +3,10 @@ use crate::{
     BlendMode, Color, Skeleton, SkeletonClipping,
 };
 
-#[cfg(feature="spine38")]
+#[cfg(feature = "spine38")]
 use crate::c::spMeshAttachment_updateUVs;
 
-#[cfg(not(feature="spine38"))]
+#[cfg(not(feature = "spine38"))]
 use crate::c::spMeshAttachment_updateRegion;
 
 use super::CullDirection;
@@ -54,12 +54,12 @@ impl SimpleDrawer {
             let mut color;
 
             if let Some(mesh_attachment) = slot.attachment().and_then(|a| a.as_mesh()) {
-                #[cfg(feature="spine38")]
+                #[cfg(feature = "spine38")]
                 unsafe {
                     spMeshAttachment_updateUVs(mesh_attachment.c_ptr());
                 };
 
-                #[cfg(not(feature="spine38"))]
+                #[cfg(not(feature = "spine38"))]
                 unsafe {
                     spMeshAttachment_updateRegion(mesh_attachment.c_ptr());
                 };
@@ -141,13 +141,18 @@ impl SimpleDrawer {
 
                 let mut world_vertices = vec![];
                 world_vertices.resize(1000, 0.);
-                #[cfg(not(feature="spine38"))]
+                #[cfg(not(feature = "spine38"))]
                 unsafe {
                     region_attachment.compute_world_vertices(&slot, &mut world_vertices, 0, 2);
                 }
-                #[cfg(feature="spine38")]
+                #[cfg(feature = "spine38")]
                 unsafe {
-                    region_attachment.compute_world_vertices(&slot.bone(), &mut world_vertices, 0, 2);
+                    region_attachment.compute_world_vertices(
+                        &slot.bone(),
+                        &mut world_vertices,
+                        0,
+                        2,
+                    );
                 }
 
                 vertices.reserve(4);

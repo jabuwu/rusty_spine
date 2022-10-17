@@ -74,11 +74,16 @@ impl CombinedDrawer {
                     );
                 }
             } else if let Some(region_attachment) = slot.attachment().and_then(|a| a.as_region()) {
-                #[cfg(feature="spine38")]
+                #[cfg(feature = "spine38")]
                 unsafe {
-                    region_attachment.compute_world_vertices(&slot.bone(), &mut world_vertices, 0, 2);
+                    region_attachment.compute_world_vertices(
+                        &slot.bone(),
+                        &mut world_vertices,
+                        0,
+                        2,
+                    );
                 }
-                #[cfg(not(feature="spine38"))]
+                #[cfg(not(feature = "spine38"))]
                 unsafe {
                     region_attachment.compute_world_vertices(&slot, &mut world_vertices, 0, 2);
                 }

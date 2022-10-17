@@ -17,12 +17,8 @@ use crate::{
     Attachment,
 };
 
-#[cfg(not(feature="spine38"))]
-use crate::{
-    c::{
-        spSkeleton_updateWorldTransformWith
-    }
-};
+#[cfg(not(feature = "spine38"))]
+use crate::c::spSkeleton_updateWorldTransformWith;
 
 #[cfg(feature = "mint")]
 use mint::Vector2;
@@ -63,7 +59,7 @@ impl Skeleton {
         }
     }
 
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     pub unsafe fn update_world_transform_with(&mut self, parent: &Bone) {
         spSkeleton_updateWorldTransformWith(self.c_ptr(), parent.c_ptr());
     }

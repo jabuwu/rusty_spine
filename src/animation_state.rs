@@ -7,12 +7,11 @@ use crate::{
         c_void, spAnimation, spAnimationState, spAnimationStateData, spAnimationState_addAnimation,
         spAnimationState_addAnimationByName, spAnimationState_addEmptyAnimation,
         spAnimationState_apply, spAnimationState_clearListenerNotifications,
-        spAnimationState_clearTrack, spAnimationState_clearTracks,
-        spAnimationState_create, spAnimationState_dispose, spAnimationState_disposeStatics,
-        spAnimationState_getCurrent, spAnimationState_setAnimation,
-        spAnimationState_setAnimationByName, spAnimationState_setEmptyAnimation,
-        spAnimationState_setEmptyAnimations, spAnimationState_update, spEvent, spEventType,
-        spTrackEntry, spTrackEntry_getAnimationTime,
+        spAnimationState_clearTrack, spAnimationState_clearTracks, spAnimationState_create,
+        spAnimationState_dispose, spAnimationState_disposeStatics, spAnimationState_getCurrent,
+        spAnimationState_setAnimation, spAnimationState_setAnimationByName,
+        spAnimationState_setEmptyAnimation, spAnimationState_setEmptyAnimations,
+        spAnimationState_update, spEvent, spEventType, spTrackEntry, spTrackEntry_getAnimationTime,
     },
     c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::Error,
@@ -20,12 +19,8 @@ use crate::{
     skeleton::Skeleton,
 };
 
-#[cfg(not(feature="spine38"))]
-use crate::{
-    c::{
-        spAnimationState_clearNext, spTrackEntry_getTrackComplete
-    }
-};
+#[cfg(not(feature = "spine38"))]
+use crate::c::{spAnimationState_clearNext, spTrackEntry_getTrackComplete};
 
 /// The live animation state for a skeleton, allowing animation layering and crossfading.
 ///
@@ -300,7 +295,7 @@ impl AnimationState {
         }
     }
 
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     pub fn clear_next(&mut self, entry: &TrackEntry) {
         unsafe {
             spAnimationState_clearNext(self.c_ptr(), entry.c_ptr());
@@ -401,7 +396,7 @@ impl TrackEntry {
         unsafe { spTrackEntry_getAnimationTime(self.c_ptr()) }
     }
 
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     pub fn track_complete(&self) -> f32 {
         unsafe { spTrackEntry_getTrackComplete(self.c_ptr()) }
     }
@@ -422,7 +417,7 @@ impl TrackEntry {
     }
 
     c_accessor_tmp_ptr!(animation, animation_mut, animation, Animation, spAnimation);
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     c_accessor_tmp_ptr!(previous, previous_mut, previous, TrackEntry, spTrackEntry);
     c_accessor_tmp_ptr!(next, next_mut, next, TrackEntry, spTrackEntry);
     c_accessor_tmp_ptr!(
@@ -436,9 +431,9 @@ impl TrackEntry {
     c_accessor!(track_index, trackIndex, i32);
     c_accessor_bool_mut!(looping, set_looping, loop_0);
     c_accessor_bool_mut!(hold_previous, set_hold_previous, holdPrevious);
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     c_accessor_bool_mut!(reverse, set_reverse, reverse);
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     c_accessor_bool_mut!(shortest_rotation, set_shortest_rotation, shortestRotation);
     c_accessor_mut!(event_threshold, set_event_threshold, eventThreshold, f32);
     c_accessor_mut!(

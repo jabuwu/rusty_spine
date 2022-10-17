@@ -1,21 +1,15 @@
 use crate::{
-    c::{
-        c_float, spAttachment, spRegionAttachment, spRegionAttachment_computeWorldVertices,
-    },
-    c_interface::SyncPtr};
-
-#[cfg(feature="spine38")]
-use crate::{
-    c::spRegionAttachment_updateOffset,
-    bone::Bone
+    c::{c_float, spAttachment, spRegionAttachment, spRegionAttachment_computeWorldVertices},
+    c_interface::SyncPtr,
 };
 
-#[cfg(not(feature="spine38"))]
+#[cfg(feature = "spine38")]
+use crate::{bone::Bone, c::spRegionAttachment_updateOffset};
+
+#[cfg(not(feature = "spine38"))]
 use crate::{
+    c::{spRegionAttachment_updateRegion, spTextureRegion},
     slot::Slot,
-    c::{
-        spRegionAttachment_updateRegion, spTextureRegion
-    },
     texture_region::TextureRegion,
 };
 
@@ -41,7 +35,7 @@ impl RegionAttachment {
         unsafe { &self.c_ptr_ref().super_0 }
     }
 
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     pub unsafe fn compute_world_vertices(
         &self,
         slot: &Slot,
@@ -58,7 +52,7 @@ impl RegionAttachment {
         );
     }
 
-    #[cfg(feature="spine38")]
+    #[cfg(feature = "spine38")]
     pub unsafe fn compute_world_vertices(
         &self,
         bone: &Bone,
@@ -75,12 +69,12 @@ impl RegionAttachment {
         );
     }
 
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     pub unsafe fn update_region(&mut self) {
         spRegionAttachment_updateRegion(self.c_ptr());
     }
 
-    #[cfg(feature="spine38")]
+    #[cfg(feature = "spine38")]
     pub unsafe fn update_offset(&mut self) {
         spRegionAttachment_updateOffset(self.c_ptr());
     }
@@ -98,7 +92,7 @@ impl RegionAttachment {
     c_accessor_passthrough!(uvs, uvs, [c_float; 8]);
     c_accessor_passthrough!(offset, offset, [c_float; 8]);
     c_accessor_renderer_object!();
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     c_accessor_tmp_ptr_optional!(region, region_mut, region, TextureRegion, spTextureRegion);
     c_ptr!(c_region_attachment, spRegionAttachment);
 

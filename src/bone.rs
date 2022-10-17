@@ -2,21 +2,16 @@ use crate::{
     c::{
         spBone, spBoneData, spBone_getWorldRotationX, spBone_getWorldRotationY,
         spBone_getWorldScaleX, spBone_getWorldScaleY, spBone_isYDown, spBone_localToWorld,
-        spBone_rotateWorld, spBone_setToSetupPose, spBone_setYDown,
-        spBone_updateAppliedTransform, spBone_updateWorldTransform,
-        spBone_updateWorldTransformWith, spBone_worldToLocal, spBone_worldToLocalRotation,
-        spSkeleton, spTransformMode,
+        spBone_rotateWorld, spBone_setToSetupPose, spBone_setYDown, spBone_updateAppliedTransform,
+        spBone_updateWorldTransform, spBone_updateWorldTransformWith, spBone_worldToLocal,
+        spBone_worldToLocalRotation, spSkeleton, spTransformMode,
     },
     c_interface::{NewFromPtr, SyncPtr},
     Skeleton,
 };
 
-#[cfg(not(feature="spine38"))]
-use crate::{
-    c::{
-        spBone_update
-    }
-};
+#[cfg(not(feature = "spine38"))]
+use crate::c::spBone_update;
 
 #[cfg(feature = "mint")]
 use mint::Vector2;
@@ -53,7 +48,7 @@ impl Bone {
         }
     }
 
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     pub fn update(&mut self) {
         unsafe {
             spBone_update(self.c_ptr());
@@ -385,7 +380,7 @@ impl BoneData {
     c_accessor_mut!(scale_y, set_scale_y, scaleY, f32);
     c_accessor_mut!(shear_x, set_shear_x, shearX, f32);
     c_accessor_mut!(shear_y, set_shear_y, shearY, f32);
-    #[cfg(not(feature="spine38"))]
+    #[cfg(not(feature = "spine38"))]
     c_accessor_color_mut!(color, color_mut, color);
     c_accessor_bool_mut!(skin_required, set_skin_required, skinRequired);
     c_accessor_enum_mut!(

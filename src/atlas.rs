@@ -1,9 +1,7 @@
-use std::ffi::{CString};
+use std::ffi::CString;
 use std::{path::Path, ptr::null_mut};
 
-use crate::c::{
-    spAtlasFilter, spAtlasFormat, spAtlasRegion, spAtlasWrap, spAtlas_createFromFile,
-};
+use crate::c::{spAtlasFilter, spAtlasFormat, spAtlasRegion, spAtlasWrap, spAtlas_createFromFile};
 use crate::c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr};
 use crate::{
     c::{c_int, spAtlas, spAtlasPage, spAtlas_create, spAtlas_dispose},
@@ -16,12 +14,7 @@ use atlas::*;
 use std::ffi::CStr;
 
 #[cfg(not(feature = "spine38"))]
-use crate::{
-    c::{
-        spTextureRegion,
-    },
-    texture_region::TextureRegion,
-};
+use crate::{c::spTextureRegion, texture_region::TextureRegion};
 
 #[cfg(feature = "mint")]
 use mint::Vector2;
@@ -170,7 +163,7 @@ pub mod atlas {
         c_accessor_enum!(v_wrap, vWrap, AtlasWrap);
         c_accessor!(width, width, i32);
         c_accessor!(height, height, i32);
-        #[cfg(not(feature="spine38"))]
+        #[cfg(not(feature = "spine38"))]
         c_accessor_bool!(pma, pma);
         c_accessor_renderer_object!();
         c_ptr!(c_atlas_page, spAtlasPage);
@@ -314,7 +307,7 @@ pub mod atlas {
     }
 
     impl AtlasRegion {
-        #[cfg(not(feature="spine38"))]
+        #[cfg(not(feature = "spine38"))]
         c_accessor_super!(
             texture_region,
             texture_region_mut,
@@ -329,7 +322,7 @@ pub mod atlas {
         c_accessor_slice_optional!(pads, pads, &[c_int; 4], 4);
         c_accessor_tmp_ptr!(page, page_mut, page, AtlasPage, spAtlasPage);
 
-        #[cfg(not(feature="spine38"))]
+        #[cfg(not(feature = "spine38"))]
         pub fn key_values(&self) -> Vec<KeyValue> {
             let mut vec = vec![];
             unsafe {
