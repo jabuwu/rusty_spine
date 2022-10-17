@@ -4,10 +4,19 @@ use rusty_spine::{
     AnimationState, AnimationStateData, Atlas, Skeleton, SkeletonData, SkeletonJson,
 };
 
+#[cfg(not(feature="spine38"))]
 pub const TEST_SPINEBOY_ATLAS_BYTES: &'static [u8] =
     include_bytes!("../assets/spineboy/export/spineboy.atlas");
+#[cfg(not(feature="spine38"))]
 pub const TEST_SPINEBOY_JSON_BYTES: &'static [u8] =
     include_bytes!("../assets/spineboy/export/spineboy-pro.json");
+
+#[cfg(feature="spine38")]
+pub const TEST_SPINEBOY_ATLAS_BYTES: &'static [u8] =
+    include_bytes!("../assets/spineboy-3.8/export/spineboy.atlas");
+#[cfg(feature="spine38")]
+pub const TEST_SPINEBOY_JSON_BYTES: &'static [u8] =
+    include_bytes!("../assets/spineboy-3.8/export/spineboy-pro.json");
 
 pub fn test_spineboy_atlas() -> Atlas {
     Atlas::new(TEST_SPINEBOY_ATLAS_BYTES, "").unwrap()
