@@ -741,6 +741,18 @@ macro_rules! c_vertex_attachment_accessors {
             );
         }
 
+        #[cfg(feature = "mint")]
+        pub fn vertices_vec2(&self) -> &[mint::Vector2<f32>] {
+            unsafe {
+                std::slice::from_raw_parts(
+                    self.vertex_attachment().vertices as *mut mint::Vector2<f32>,
+                    self.vertex_attachment().verticesCount as usize / 2,
+                )
+                .try_into()
+                .unwrap()
+            }
+        }
+
         c_accessor_for!(
             vertex_attachment,
             world_vertices_length,
