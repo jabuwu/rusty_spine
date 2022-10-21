@@ -668,7 +668,21 @@ macro_rules! c_accessor_array_nullable {
     };
 }
 
-macro_rules! c_accessor_slice_optional {
+macro_rules! c_accessor_slice_for {
+    ($for:ident, $rust:ident, $c:ident, $type:ty, $len:ident) => {
+        #[inline]
+        pub fn $rust(&self) -> $type {
+            #[allow(unused_unsafe)]
+            unsafe {
+                std::slice::from_raw_parts(self.$for().$c, self.$for().$len as usize)
+                    .try_into()
+                    .unwrap()
+            }
+        }
+    };
+}
+
+macro_rules! c_accessor_fixed_slice_optional {
     ($rust:ident, $c:ident, $type:ty, $len:literal) => {
         #[inline]
         pub fn $rust(&self) -> Option<$type> {
@@ -676,11 +690,7 @@ macro_rules! c_accessor_slice_optional {
             unsafe {
                 let ptr = self.c_ptr_ref().$c;
                 if !ptr.is_null() {
-                    Some(
-                        std::slice::from_raw_parts(self.c_ptr_ref().$c, $len)
-                            .try_into()
-                            .unwrap(),
-                    )
+                    Some(std::slice::from_raw_parts(ptr, $len).try_into().unwrap())
                 } else {
                     None
                 }
@@ -739,7 +749,10 @@ macro_rules! c_vertex_attachment_accessors {
         );
         c_accessor_for!(vertex_attachment, id, id, i32);
 
-        // TODO: accessor for bones, timelineAttachment, vertices
+        c_accessor_slice_for!(vertex_attachment, bones, bones, &[i32], bonesCount);
+        c_accessor_slice_for!(vertex_attachment, vertices, vertices, &[f32], verticesCount);
+
+        // TODO: accessor for timelineAttachment
     };
 }
 
