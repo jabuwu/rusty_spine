@@ -124,6 +124,7 @@ pub fn fix_source(name: &str, mut src: String) -> String {
         src = replace_identifier(src, "readTimeline", "readTimelineJson", 0);
         src = replace_identifier(src, "readTimeline2", "readTimeline2Json", 0);
         src = replace_identifier(src, "readSequence", "readSequenceJson", 0);
+        src = replace_identifier(src, "readCurve", "readCurveJson", 0);
         src = replace_identifier(src, "_readVertices", "_readVerticesJson", 0);
         src = replace_identifier(src, "string_starts_with", "string_starts_with_json", 0);
         src
@@ -133,8 +134,12 @@ pub fn fix_source(name: &str, mut src: String) -> String {
         src = replace_identifier(src, "readTimeline", "readTimelineBinary", 0);
         src = replace_identifier(src, "readTimeline2", "readTimeline2Binary", 0);
         src = replace_identifier(src, "readSequence", "readSequenceBinary", 0);
+        src = replace_identifier(src, "readCurve", "readCurveBinary", 0);
         src = replace_identifier(src, "_readVertices", "_readVerticesBinary", 0);
         src = replace_identifier(src, "string_starts_with", "string_starts_with_binary", 0);
+        src
+    } else if name == "AnimationState.c" {
+        src = replace_identifier(src, "binarySearch1", "binarySearch1_state", 0);
         src
     } else {
         src

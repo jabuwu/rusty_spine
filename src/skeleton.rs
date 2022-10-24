@@ -7,8 +7,7 @@ use crate::{
         spSkeleton_getAttachmentForSlotIndex, spSkeleton_getAttachmentForSlotName,
         spSkeleton_setAttachment, spSkeleton_setBonesToSetupPose, spSkeleton_setSkin,
         spSkeleton_setSkinByName, spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose,
-        spSkeleton_updateCache, spSkeleton_updateWorldTransform,
-        spSkeleton_updateWorldTransformWith, spSkin, spSlot,
+        spSkeleton_updateCache, spSkeleton_updateWorldTransform, spSkin, spSlot,
     },
     c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::Error,
@@ -17,6 +16,9 @@ use crate::{
     slot::Slot,
     Attachment,
 };
+
+#[cfg(not(feature = "spine38"))]
+use crate::c::spSkeleton_updateWorldTransformWith;
 
 #[cfg(feature = "mint")]
 use mint::Vector2;
@@ -57,6 +59,7 @@ impl Skeleton {
         }
     }
 
+    #[cfg(not(feature = "spine38"))]
     pub unsafe fn update_world_transform_with(&mut self, parent: &Bone) {
         spSkeleton_updateWorldTransformWith(self.c_ptr(), parent.c_ptr());
     }
