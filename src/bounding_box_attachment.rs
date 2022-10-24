@@ -35,3 +35,9 @@ impl BoundingBoxAttachment {
     c_accessor_color!(color, color);
     c_ptr!(c_bounding_box_attachment, spBoundingBoxAttachment);
 }
+
+/// Functions available if using the `mint` feature.
+#[cfg(feature = "mint")]
+impl BoundingBoxAttachment {
+    c_vertex_attachment_accessors_mint!();
+}

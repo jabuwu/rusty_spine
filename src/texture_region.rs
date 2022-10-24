@@ -35,6 +35,7 @@ impl TextureRegion {
     c_ptr!(c_texture_region, spTextureRegion);
 }
 
+/// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl TextureRegion {
     pub fn uvs(&self) -> (Vector2<f32>, Vector2<f32>) {

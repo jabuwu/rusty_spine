@@ -230,6 +230,7 @@ impl Skeleton {
     c_ptr!(c_skeleton, spSkeleton);
 }
 
+/// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl Skeleton {
     pub fn position(&self) -> Vector2<f32> {

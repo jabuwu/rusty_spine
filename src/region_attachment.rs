@@ -69,6 +69,7 @@ impl RegionAttachment {
     // TODO: sequence accessor
 }
 
+/// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl RegionAttachment {
     pub fn position(&self) -> Vector2<f32> {

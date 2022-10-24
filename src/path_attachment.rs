@@ -36,3 +36,9 @@ impl PathAttachment {
     c_accessor_passthrough!(lengths, lengths, *mut c_float);
     c_ptr!(c_path_attachment, spPathAttachment);
 }
+
+/// Functions available if using the `mint` feature.
+#[cfg(feature = "mint")]
+impl PathAttachment {
+    c_vertex_attachment_accessors_mint!();
+}

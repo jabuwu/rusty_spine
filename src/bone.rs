@@ -83,28 +83,6 @@ impl Bone {
         }
     }
 
-    #[cfg(feature = "mint")]
-    pub fn update_world_transform_with2(
-        &mut self,
-        position: mint::Vector2<f32>,
-        rotation: f32,
-        scale: mint::Vector2<f32>,
-        shear: mint::Vector2<f32>,
-    ) {
-        unsafe {
-            spBone_updateWorldTransformWith(
-                self.c_ptr(),
-                position.x,
-                position.y,
-                rotation,
-                scale.x,
-                scale.y,
-                shear.x,
-                shear.y,
-            );
-        }
-    }
-
     pub fn update_applied_transform(&mut self) {
         unsafe {
             spBone_updateAppliedTransform(self.c_ptr());
@@ -243,6 +221,7 @@ impl Bone {
     c_ptr!(c_bone, spBone);
 }
 
+/// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl Bone {
     pub fn position(&self) -> Vector2<f32> {
@@ -349,6 +328,27 @@ impl Bone {
             y: self.world_rotation_y(),
         }
     }
+
+    pub fn update_world_transform_with2(
+        &mut self,
+        position: mint::Vector2<f32>,
+        rotation: f32,
+        scale: mint::Vector2<f32>,
+        shear: mint::Vector2<f32>,
+    ) {
+        unsafe {
+            spBone_updateWorldTransformWith(
+                self.c_ptr(),
+                position.x,
+                position.y,
+                rotation,
+                scale.x,
+                scale.y,
+                shear.x,
+                shear.y,
+            );
+        }
+    }
 }
 
 c_handle_decl!(
@@ -411,6 +411,7 @@ impl BoneData {
     c_accessor_tmp_ptr_optional!(parent, parent_mut, parent, BoneData, spBoneData);
 }
 
+/// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl BoneData {
     pub fn position(&self) -> Vector2<f32> {

@@ -111,6 +111,7 @@ impl SkeletonData {
     // TODO: accessors and methods for the arrays in spSkeletonData
 }
 
+/// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl SkeletonData {
     pub fn position(&self) -> Vector2<f32> {

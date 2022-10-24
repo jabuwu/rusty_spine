@@ -765,8 +765,13 @@ macro_rules! c_vertex_attachment_accessors {
             verticesCount
         );
 
+        // TODO: accessor for timelineAttachment
+    };
+}
+
+macro_rules! c_vertex_attachment_accessors_mint {
+    () => {
         /// Gets the vertices of the attachment as a Vector2 slice.
-        #[cfg(feature = "mint")]
         pub fn vertices2(&self) -> &[mint::Vector2<f32>] {
             unsafe {
                 std::slice::from_raw_parts(
@@ -777,8 +782,6 @@ macro_rules! c_vertex_attachment_accessors {
                 .unwrap()
             }
         }
-
-        // TODO: accessor for timelineAttachment
     };
 }
 

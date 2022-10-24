@@ -172,6 +172,7 @@ pub mod atlas {
         c_ptr!(c_atlas_page, spAtlasPage);
     }
 
+    /// Functions available if using the `mint` feature.
     #[cfg(feature = "mint")]
     impl AtlasPage {
         pub fn size(&self) -> Vector2<i32> {
@@ -367,6 +368,7 @@ pub mod atlas {
         }
     }
 
+    /// Functions available if using the `mint` feature.
     #[cfg(feature = "mint")]
     impl AtlasRegion {
         pub fn position(&self) -> Vector2<i32> {

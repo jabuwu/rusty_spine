@@ -52,6 +52,7 @@ impl PointAttachment {
     c_ptr!(c_point_attachment, spPointAttachment);
 }
 
+/// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl PointAttachment {
     pub fn position(&self) -> Vector2<f32> {

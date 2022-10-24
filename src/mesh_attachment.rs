@@ -70,6 +70,7 @@ impl MeshAttachment {
     // TODO: sequence accessor
 }
 
+/// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl MeshAttachment {
     pub fn size(&self) -> Vector2<f32> {
@@ -78,4 +79,6 @@ impl MeshAttachment {
             y: self.height(),
         }
     }
+
+    c_vertex_attachment_accessors_mint!();
 }
