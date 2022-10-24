@@ -58,6 +58,7 @@ impl Bone {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn update_world_transform_with(
         &mut self,
         x: f32,
@@ -78,6 +79,28 @@ impl Bone {
                 scale_y,
                 shear_x,
                 shear_y,
+            );
+        }
+    }
+
+    #[cfg(feature = "mint")]
+    pub fn update_world_transform_with2(
+        &mut self,
+        position: mint::Vector2<f32>,
+        rotation: f32,
+        scale: mint::Vector2<f32>,
+        shear: mint::Vector2<f32>,
+    ) {
+        unsafe {
+            spBone_updateWorldTransformWith(
+                self.c_ptr(),
+                position.x,
+                position.y,
+                rotation,
+                scale.x,
+                scale.y,
+                shear.x,
+                shear.y,
             );
         }
     }

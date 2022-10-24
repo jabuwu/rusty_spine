@@ -15,6 +15,12 @@ pub struct SkeletonClipping {
     owns_memory: bool,
 }
 
+impl Default for SkeletonClipping {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SkeletonClipping {
     pub fn new() -> Self {
         Self {

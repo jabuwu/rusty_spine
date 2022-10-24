@@ -213,6 +213,7 @@ pub mod atlas {
             if !self.page.is_null() {
                 let page = unsafe { AtlasPage::new_from_ptr(self.page) };
                 self.page = unsafe { (*self.page).next };
+                #[allow(clippy::cast_ref_to_mut)]
                 Some(CTmpMut::new(
                     unsafe { &mut *(self._atlas as *const Atlas as *mut Atlas) },
                     page,
@@ -331,7 +332,7 @@ pub mod atlas {
                 for i in 0..array.size {
                     let item = &*array.items.offset(i as isize);
                     let name = String::from(CStr::from_ptr(item.name).to_str().unwrap());
-                    let values = item.values.clone();
+                    let values = item.values;
                     vec.push(KeyValue { name, values });
                 }
             }
@@ -388,6 +389,7 @@ pub mod atlas {
             if !self.region.is_null() {
                 let page = unsafe { AtlasRegion::new_from_ptr(self.region) };
                 self.region = unsafe { (*self.region).next };
+                #[allow(clippy::cast_ref_to_mut)]
                 Some(CTmpMut::new(
                     unsafe { &mut *(self._atlas as *const Atlas as *mut Atlas) },
                     page,

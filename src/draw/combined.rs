@@ -217,12 +217,10 @@ impl CombinedDrawer {
                         world_vertices[i as usize * 2 + 1],
                     ]);
 
-                    unsafe {
-                        uvs.push([
-                            region_attachment.uvs()[i as usize * 2],
-                            region_attachment.uvs()[i as usize * 2 + 1],
-                        ]);
-                    }
+                    uvs.push([
+                        region_attachment.uvs()[i as usize * 2],
+                        region_attachment.uvs()[i as usize * 2 + 1],
+                    ]);
 
                     colors.push([color.r, color.g, color.b, color.a]);
                     dark_colors.push([dark_color.r, dark_color.g, dark_color.b, dark_color.a]);
@@ -231,17 +229,17 @@ impl CombinedDrawer {
                 if matches!(self.cull_direction, CullDirection::CounterClockwise) {
                     indices.push(vertex_base + 2);
                     indices.push(vertex_base + 1);
-                    indices.push(vertex_base + 0);
-                    indices.push(vertex_base + 0);
+                    indices.push(vertex_base);
+                    indices.push(vertex_base);
                     indices.push(vertex_base + 3);
                     indices.push(vertex_base + 2);
                 } else {
-                    indices.push(vertex_base + 0);
+                    indices.push(vertex_base);
                     indices.push(vertex_base + 1);
                     indices.push(vertex_base + 2);
                     indices.push(vertex_base + 2);
                     indices.push(vertex_base + 3);
-                    indices.push(vertex_base + 0);
+                    indices.push(vertex_base);
                 }
 
                 (color, dark_color)
@@ -312,7 +310,7 @@ impl CombinedDrawer {
             }
         }
 
-        if indices.len() > 0 {
+        if !indices.is_empty() {
             renderables.push(CombinedRenderable {
                 vertices,
                 uvs,
@@ -323,7 +321,7 @@ impl CombinedDrawer {
             });
         }
 
-        if let Some(clipper) = clipper.as_deref_mut() {
+        if let Some(clipper) = clipper {
             clipper.clip_end2();
         }
         renderables

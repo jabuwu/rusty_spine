@@ -89,12 +89,7 @@ impl Skeleton {
     }
 
     pub fn set_skin_by_name(&mut self, skin_name: &str) -> Result<(), Error> {
-        if self
-            .data()
-            .skins()
-            .find(|skin| skin.name() == skin_name)
-            .is_some()
-        {
+        if self.data().skins().any(|skin| skin.name() == skin_name) {
             unsafe { self.set_skin_by_name_unchecked(skin_name) };
             Ok(())
         } else {

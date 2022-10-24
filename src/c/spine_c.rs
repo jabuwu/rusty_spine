@@ -1,4 +1,5 @@
 #![allow(
+    clippy::all,
     dead_code,
     mutable_transmutes,
     non_camel_case_types,

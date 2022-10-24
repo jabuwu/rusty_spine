@@ -141,12 +141,10 @@ impl SimpleDrawer {
                         world_vertices[i as usize * 2 + 1],
                     ]);
 
-                    unsafe {
-                        uvs.push([
-                            region_attachment.uvs()[i as usize * 2],
-                            region_attachment.uvs()[i as usize * 2 + 1],
-                        ]);
-                    }
+                    uvs.push([
+                        region_attachment.uvs()[i as usize * 2],
+                        region_attachment.uvs()[i as usize * 2 + 1],
+                    ]);
                 }
 
                 indices.reserve(6);
@@ -220,31 +218,30 @@ impl SimpleDrawer {
                 }
             }
 
-            let attachment_renderer_object = if let Some(mesh_attachment) =
-                slot.attachment().and_then(|a| a.as_mesh())
-            {
-                Some(unsafe {
-                    mesh_attachment
-                        .renderer_object()
-                        .get_atlas_region()
-                        .unwrap()
-                        .page()
-                        .c_ptr_ref()
-                        .rendererObject as *const c_void
-                })
-            } else if let Some(region_attachment) = slot.attachment().and_then(|a| a.as_region()) {
-                Some(unsafe {
-                    region_attachment
-                        .renderer_object()
-                        .get_atlas_region()
-                        .unwrap()
-                        .page()
-                        .c_ptr_ref()
-                        .rendererObject as *const c_void
-                })
-            } else {
-                None
-            };
+            let attachment_renderer_object =
+                if let Some(mesh_attachment) = slot.attachment().and_then(|a| a.as_mesh()) {
+                    Some(unsafe {
+                        mesh_attachment
+                            .renderer_object()
+                            .get_atlas_region()
+                            .unwrap()
+                            .page()
+                            .c_ptr_ref()
+                            .rendererObject as *const c_void
+                    })
+                } else {
+                    slot.attachment()
+                        .and_then(|a| a.as_region())
+                        .map(|region_attachment| unsafe {
+                            region_attachment
+                                .renderer_object()
+                                .get_atlas_region()
+                                .unwrap()
+                                .page()
+                                .c_ptr_ref()
+                                .rendererObject as *const c_void
+                        })
+                };
 
             color *= slot.color() * skeleton.color();
             if self.premultiplied_alpha {
@@ -253,7 +250,7 @@ impl SimpleDrawer {
 
             let mut dark_color = slot
                 .dark_color()
-                .unwrap_or(Color::new_rgba(0.0, 0.0, 0.0, 0.0));
+                .unwrap_or_else(|| Color::new_rgba(0.0, 0.0, 0.0, 0.0));
             if self.premultiplied_alpha {
                 dark_color.a = 1.0;
                 dark_color.premultiply_alpha();
@@ -274,7 +271,7 @@ impl SimpleDrawer {
             }
         }
 
-        if let Some(clipper) = clipper.as_deref_mut() {
+        if let Some(clipper) = clipper {
             clipper.clip_end2();
         }
         renderables

@@ -27,11 +27,15 @@ use crate::{
     c::{c_char, spAtlasPage},
 };
 
+type CreateTextureCb = Box<dyn Fn(&mut AtlasPage, &str)>;
+type DisposeTextureCb = Box<dyn Fn(&mut AtlasPage)>;
+type ReadFileCb = Box<dyn Fn(&str) -> Option<Vec<u8>>>;
+
 #[derive(Default)]
 pub(crate) struct Extension {
-    create_texture_cb: Option<Box<dyn Fn(&mut AtlasPage, &str)>>,
-    dispose_texture_cb: Option<Box<dyn Fn(&mut AtlasPage)>>,
-    read_file_cb: Option<Box<dyn Fn(&str) -> Option<Vec<u8>>>>,
+    create_texture_cb: Option<CreateTextureCb>,
+    dispose_texture_cb: Option<DisposeTextureCb>,
+    read_file_cb: Option<ReadFileCb>,
 }
 
 impl Extension {
@@ -56,14 +60,12 @@ impl Extension {
 /// ```
 /// struct SpineTexture(pub String);
 ///
-/// fn main() {
-///     rusty_spine::extension::set_create_texture_cb(|atlas_page, path| {
-///         atlas_page.renderer_object().set(SpineTexture(path.to_owned()));
-///     });
-///     rusty_spine::extension::set_dispose_texture_cb(|atlas_page| unsafe {
-///         atlas_page.renderer_object().dispose::<SpineTexture>();
-///     });
-/// }
+/// rusty_spine::extension::set_create_texture_cb(|atlas_page, path| {
+///     atlas_page.renderer_object().set(SpineTexture(path.to_owned()));
+/// });
+/// rusty_spine::extension::set_dispose_texture_cb(|atlas_page| unsafe {
+///     atlas_page.renderer_object().dispose::<SpineTexture>();
+/// });
 /// ```
 pub fn set_create_texture_cb<F>(create_texture_cb: F)
 where
@@ -94,11 +96,9 @@ where
 /// `std::fs::read` is provided if this callback remains unset.
 ///
 /// ```
-/// fn main() {
-///     rusty_spine::extension::set_read_file_cb(|path| {
-///         std::fs::read(path).ok()
-///     });
-/// }
+/// rusty_spine::extension::set_read_file_cb(|path| {
+///     std::fs::read(path).ok()
+/// });
 /// ```
 pub fn set_read_file_cb<F>(read_file_cb: F)
 where

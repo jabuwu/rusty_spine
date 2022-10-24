@@ -130,7 +130,7 @@ impl Allocator {
 
 #[no_mangle]
 pub unsafe extern "C" fn spine_isspace(c: c_int) -> c_int {
-    return if c == '\t' as i32
+    if c == '\t' as i32
         || c == '\n' as i32
         || c == '\u{b}' as i32
         || c == '\u{c}' as i32
@@ -140,30 +140,30 @@ pub unsafe extern "C" fn spine_isspace(c: c_int) -> c_int {
         1 as c_int
     } else {
         0 as c_int
-    };
+    }
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn spine_isdigit(c: c_int) -> c_int {
-    return ((c as c_uint).wrapping_sub('0' as i32 as c_uint) < 10 as c_int as c_uint) as c_int;
+    ((c as c_uint).wrapping_sub('0' as i32 as c_uint) < 10 as c_int as c_uint) as c_int
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn spine_isalpha(c: c_int) -> c_int {
-    return if c >= 'a' as i32 && c <= 'z' as i32 || c >= 'A' as i32 && c <= 'Z' as i32 {
+    if c >= 'a' as i32 && c <= 'z' as i32 || c >= 'A' as i32 && c <= 'Z' as i32 {
         1 as c_int
     } else {
         0 as c_int
-    };
+    }
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn spine_isupper(c: c_int) -> c_int {
-    return if c >= 'A' as i32 && c <= 'Z' as i32 {
+    if c >= 'A' as i32 && c <= 'Z' as i32 {
         1 as c_int
     } else {
         0 as c_int
-    };
+    }
 }
 
 #[no_mangle]
@@ -173,7 +173,7 @@ pub unsafe extern "C" fn spine_strlen(str: *const c_char) -> c_ulong {
     while *s != 0 {
         s = s.offset(1);
     }
-    return s.offset_from(str) as c_long as c_ulong;
+    s.offset_from(str) as c_long as c_ulong
 }
 
 #[no_mangle]
@@ -181,7 +181,7 @@ pub unsafe extern "C" fn spine_strcmp(mut s1: *const c_char, mut s2: *const c_ch
     loop {
         let fresh0 = s2;
         s2 = s2.offset(1);
-        if !(*s1 as c_int == *fresh0 as c_int) {
+        if !*s1 as c_int != *fresh0 as c_int {
             break;
         }
         let fresh1 = s1;
@@ -191,7 +191,7 @@ pub unsafe extern "C" fn spine_strcmp(mut s1: *const c_char, mut s2: *const c_ch
         }
     }
     s2 = s2.offset(-1);
-    return *(s1 as *mut c_uchar) as c_int - *(s2 as *mut c_uchar) as c_int;
+    *(s1 as *mut c_uchar) as c_int - *(s2 as *mut c_uchar) as c_int
 }
 
 #[no_mangle]
@@ -216,11 +216,11 @@ pub unsafe extern "C" fn spine_strncmp(
             break;
         }
         n = n.wrapping_sub(1);
-        if !(n != 0 as c_int as c_ulong) {
+        if n == 0 as c_int as c_ulong {
             break;
         }
     }
-    return 0 as c_int;
+    0 as c_int
 }
 
 static mut CHARMAP: [c_uchar; 256] = [
@@ -489,7 +489,7 @@ pub unsafe extern "C" fn spine_strcasecmp(s1: *const c_char, s2: *const c_char) 
     loop {
         let fresh0 = us2;
         us2 = us2.offset(1);
-        if !(*cm.offset(*us1 as isize) as c_int == *cm.offset(*fresh0 as isize) as c_int) {
+        if *cm.offset(*us1 as isize) as c_int != *cm.offset(*fresh0 as isize) as c_int {
             break;
         }
         let fresh1 = us1;
@@ -499,7 +499,7 @@ pub unsafe extern "C" fn spine_strcasecmp(s1: *const c_char, s2: *const c_char) 
         }
     }
     us2 = us2.offset(-1);
-    return *cm.offset(*us1 as isize) as c_int - *cm.offset(*us2 as isize) as c_int;
+    *cm.offset(*us1 as isize) as c_int - *cm.offset(*us2 as isize) as c_int
 }
 
 #[no_mangle]
@@ -507,13 +507,13 @@ pub unsafe extern "C" fn spine_strcpy(mut to: *mut c_char, mut from: *const c_ch
     let save: *mut c_char = to;
     loop {
         *to = *from;
-        if !(*to as c_int != '\0' as i32) {
+        if *to as c_int == '\0' as i32 {
             break;
         }
         from = from.offset(1);
         to = to.offset(1);
     }
-    return save;
+    save
 }
 
 #[no_mangle]
@@ -537,13 +537,13 @@ pub unsafe extern "C" fn spine_strncat(
             }
             d = d.offset(1);
             n = n.wrapping_sub(1);
-            if !(n != 0 as c_int as c_ulong) {
+            if n == 0 as c_int as c_ulong {
                 break;
             }
         }
         *d = 0 as c_int as c_char;
     }
-    return dst;
+    dst
 }
 
 #[no_mangle]
@@ -564,7 +564,7 @@ pub unsafe extern "C" fn spine_strtol(
         let fresh0 = s;
         s = s.offset(1);
         c = *fresh0 as c_uchar as c_int;
-        if !(spine_isspace(c) != 0) {
+        if spine_isspace(c) == 0 {
             break;
         }
     }
@@ -616,7 +616,7 @@ pub unsafe extern "C" fn spine_strtol(
         if spine_isdigit(c) != 0 {
             c -= '0' as i32;
         } else {
-            if !(spine_isalpha(c) != 0) {
+            if spine_isalpha(c) == 0 {
                 break;
             }
             c -= if spine_isupper(c) != 0 {
@@ -628,7 +628,7 @@ pub unsafe extern "C" fn spine_strtol(
         if c >= base {
             break;
         }
-        if !(any < 0 as c_int) {
+        if any >= 0 as c_int {
             if neg != 0 {
                 if acc < cutoff || acc == cutoff && c > cutlim {
                     any = -(1 as c_int);
@@ -658,7 +658,7 @@ pub unsafe extern "C" fn spine_strtol(
             nptr
         }) as *mut c_char;
     }
-    return acc;
+    acc
 }
 
 #[no_mangle]
@@ -669,17 +669,17 @@ pub unsafe extern "C" fn spine_strtoul(
 ) -> c_ulong {
     let mut s: *const c_char;
     let mut acc: c_ulong;
-    let cutoff: c_ulong;
+    let cutoff: c_ulong = (18446744073709551615 as c_ulong).wrapping_div(base as c_ulong);
     let mut c: c_int;
     let neg: c_int;
     let mut any: c_int;
-    let cutlim: c_int;
+    let cutlim: c_int = (18446744073709551615 as c_ulong).wrapping_rem(base as c_ulong) as c_int;
     s = nptr;
     loop {
         let fresh0 = s;
         s = s.offset(1);
         c = *fresh0 as c_uchar as c_int;
-        if !(spine_isspace(c) != 0) {
+        if spine_isspace(c) == 0 {
             break;
         }
     }
@@ -711,15 +711,13 @@ pub unsafe extern "C" fn spine_strtoul(
             10 as c_int
         };
     }
-    cutoff = (18446744073709551615 as c_ulong).wrapping_div(base as c_ulong);
-    cutlim = (18446744073709551615 as c_ulong).wrapping_rem(base as c_ulong) as c_int;
     acc = 0 as c_int as c_ulong;
     any = 0 as c_int;
     loop {
         if spine_isdigit(c) != 0 {
             c -= '0' as i32;
         } else {
-            if !(spine_isalpha(c) != 0) {
+            if spine_isalpha(c) == 0 {
                 break;
             }
             c -= if spine_isupper(c) != 0 {
@@ -731,7 +729,7 @@ pub unsafe extern "C" fn spine_strtoul(
         if c >= base {
             break;
         }
-        if !(any < 0 as c_int) {
+        if any >= 0 as c_int {
             if acc > cutoff || acc == cutoff && c > cutlim {
                 any = -(1 as c_int);
                 acc = 18446744073709551615 as c_ulong;
@@ -755,13 +753,12 @@ pub unsafe extern "C" fn spine_strtoul(
             nptr
         }) as *mut c_char;
     }
-    return acc;
+    acc
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn spine_strrchr(mut p: *const c_char, ch: c_int) -> *mut c_char {
-    let mut save: *mut c_char;
-    save = 0 as *mut c_char;
+    let mut save: *mut c_char = std::ptr::null_mut::<c_char>();
     loop {
         if *p as c_int == ch {
             save = p as *mut c_char;
@@ -876,8 +873,7 @@ fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
                     }
                     's' => {
                         if let Some(s) = arg.downcast_ref::<*const c_char>() {
-                            new_str +=
-                                &format!("{}", unsafe { CStr::from_ptr(*s).to_str().unwrap() });
+                            new_str += unsafe { CStr::from_ptr(*s).to_str().unwrap() };
                         } else {
                             panic!("Unsupported printf argument type");
                         }

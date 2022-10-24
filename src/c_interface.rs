@@ -1,5 +1,7 @@
 //! Helper structs for interacting with C pointers in safe rust.
 
+#![allow(clippy::all)]
+
 use std::{
     hash::Hash,
     marker::PhantomData,
@@ -331,7 +333,7 @@ macro_rules! c_ptr {
         }
 
         #[inline]
-        #[allow(dead_code)]
+        #[allow(dead_code, clippy::mut_from_ref)]
         pub(crate) unsafe fn c_ptr_mut(&self) -> &mut $c_type {
             &mut *self.$member.0
         }
@@ -532,6 +534,7 @@ macro_rules! c_accessor_super {
     ($rust:ident, $rust_mut:ident, $type:ty, $c_type:ident) => {
         pub fn $rust(&self) -> crate::c_interface::CTmpRef<Self, $type> {
             crate::c_interface::CTmpRef::new(self, unsafe {
+                #[allow(clippy::unnecessary_mut_passed)]
                 <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
                     &mut self.c_ptr_mut().super_0,
                 )
@@ -539,6 +542,7 @@ macro_rules! c_accessor_super {
         }
         pub fn $rust_mut(&mut self) -> crate::c_interface::CTmpMut<Self, $type> {
             crate::c_interface::CTmpMut::new(self, unsafe {
+                #[allow(clippy::unnecessary_mut_passed)]
                 <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
                     &mut self.c_ptr_mut().super_0,
                 )
@@ -549,8 +553,8 @@ macro_rules! c_accessor_super {
 
 macro_rules! c_accessor_passthrough {
     ($rust:ident, $c:ident, $type:ty) => {
-        pub unsafe fn $rust(&self) -> $type {
-            self.c_ptr_ref().$c
+        pub fn $rust(&self) -> $type {
+            unsafe { self.c_ptr_ref().$c }
         }
     };
 }
@@ -635,7 +639,7 @@ macro_rules! c_accessor_array_nullable {
             index: usize,
         ) -> Option<crate::c_interface::CTmpRef<Self, $type>> {
             if index < self.$count_fn() as usize {
-                let ptr = unsafe { *self.c_ptr_ref().$c.offset(index as isize) };
+                let ptr = unsafe { *self.c_ptr_ref().$c.add(index) };
                 if !ptr.is_null() {
                     Some(crate::c_interface::CTmpRef::new(self, unsafe {
                         <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
@@ -653,7 +657,7 @@ macro_rules! c_accessor_array_nullable {
             index: usize,
         ) -> Option<crate::c_interface::CTmpMut<Self, $type>> {
             if index < self.$count_fn() as usize {
-                let ptr = unsafe { *self.c_ptr_ref().$c.offset(index as isize) };
+                let ptr = unsafe { *self.c_ptr_ref().$c.add(index) };
                 if !ptr.is_null() {
                     Some(crate::c_interface::CTmpMut::new(self, unsafe {
                         <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(ptr)
@@ -742,7 +746,7 @@ macro_rules! c_vertex_attachment_accessors {
         }
 
         #[cfg(feature = "mint")]
-        pub fn vertices_vec2(&self) -> &[mint::Vector2<f32>] {
+        pub fn vertices2(&self) -> &[mint::Vector2<f32>] {
             unsafe {
                 std::slice::from_raw_parts(
                     self.vertex_attachment().vertices as *mut mint::Vector2<f32>,
@@ -813,6 +817,8 @@ macro_rules! c_handle_decl {
                 }
             }
 
+            /// # Safety
+            ///
             /// Acquire the item without any checks. This is a direct pointer access which is fast
             /// but will segfault if the data has been disposed of already.
             pub unsafe fn get_unchecked<'a>(&self) -> $type {
@@ -881,6 +887,8 @@ macro_rules! c_handle_indexed_decl {
                 }
             }
 
+            /// # Safety
+            ///
             /// Acquire the item without any checks. This is a direct pointer access which is fast
             /// but will segfault if the data has been disposed of already.
             pub unsafe fn get_unchecked<'a>(&self) -> $type {

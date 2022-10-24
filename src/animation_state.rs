@@ -77,6 +77,11 @@ impl AnimationState {
         }
     }
 
+    /// # Safety
+    ///
+    /// This function should only be called with valid animation names. It is faster than the safe
+    /// alternative, [`AnimationState::set_animation_by_name`], but will likely segfault if the
+    /// animation does not exist.
     pub unsafe fn set_animation_by_name_unchecked(
         &mut self,
         track_index: i32,
@@ -105,8 +110,7 @@ impl AnimationState {
             .data()
             .skeleton_data()
             .animations()
-            .find(|animation| animation.name() == animation_name)
-            .is_some()
+            .any(|animation| animation.name() == animation_name)
         {
             Ok(unsafe {
                 self.set_animation_by_name_unchecked(track_index, animation_name, looping)
@@ -135,6 +139,11 @@ impl AnimationState {
         }
     }
 
+    /// # Safety
+    ///
+    /// This function should only be called with valid animation names. It is faster than the safe
+    /// alternative, [`AnimationState::add_animation_by_name`], but will likely segfault if the
+    /// animation does not exist.
     pub unsafe fn add_animation_by_name_unchecked(
         &mut self,
         track_index: i32,
@@ -166,8 +175,7 @@ impl AnimationState {
             .data()
             .skeleton_data()
             .animations()
-            .find(|animation| animation.name() == animation_name)
-            .is_some()
+            .any(|animation| animation.name() == animation_name)
         {
             Ok(unsafe {
                 self.add_animation_by_name_unchecked(track_index, animation_name, looping, delay)
@@ -253,7 +261,7 @@ impl AnimationState {
 
     pub fn set_listener<F>(&mut self, listener: F)
     where
-        F: Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>) + 'static,
+        F: AnimationStateListenerCb,
     {
         extern "C" fn c_listener(
             c_animation_state: *mut spAnimationState,
@@ -345,9 +353,18 @@ impl Drop for AnimationState {
     }
 }
 
+pub trait AnimationStateListenerCb:
+    Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>) + 'static
+{
+}
+impl<T> AnimationStateListenerCb for T where
+    T: Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>) + 'static
+{
+}
+
 #[derive(Default)]
 struct AnimationStateUserData {
-    listener: Option<Box<dyn Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>)>>,
+    listener: Option<Box<dyn AnimationStateListenerCb>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -402,11 +419,7 @@ impl TrackEntry {
         if handle.index < track_count {
             let track_at_index =
                 unsafe { *(*handle.c_parent.0).tracks.offset(handle.index as isize) };
-            if track_at_index == handle.c_item.0 {
-                true
-            } else {
-                false
-            }
+            track_at_index == handle.c_item.0
         } else {
             false
         }
