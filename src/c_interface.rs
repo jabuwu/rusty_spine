@@ -673,7 +673,8 @@ macro_rules! c_accessor_array_nullable {
 }
 
 macro_rules! c_accessor_slice_for {
-    ($for:ident, $rust:ident, $c:ident, $type:ty, $len:ident) => {
+    ($(#[$($attrss:tt)*])* $for:ident, $rust:ident, $c:ident, $type:ty, $len:ident) => {
+        $(#[$($attrss)*])*
         #[inline]
         pub fn $rust(&self) -> $type {
             #[allow(unused_unsafe)]
@@ -745,6 +746,26 @@ macro_rules! c_vertex_attachment_accessors {
             );
         }
 
+        c_accessor_for!(
+            vertex_attachment,
+            world_vertices_length,
+            worldVerticesLength,
+            i32
+        );
+        c_accessor_for!(vertex_attachment, id, id, i32);
+
+        c_accessor_slice_for!(vertex_attachment, bones, bones, &[i32], bonesCount);
+        c_accessor_slice_for!(
+            /// Gets the raw float array slice representing the vertices of the attachment. If using
+            /// the `mint` feature, the [`Self::vertices2`] function may be more convenient to use.
+            vertex_attachment,
+            vertices,
+            vertices,
+            &[f32],
+            verticesCount
+        );
+
+        /// Gets the vertices of the attachment as a Vector2 slice.
         #[cfg(feature = "mint")]
         pub fn vertices2(&self) -> &[mint::Vector2<f32>] {
             unsafe {
@@ -756,17 +777,6 @@ macro_rules! c_vertex_attachment_accessors {
                 .unwrap()
             }
         }
-
-        c_accessor_for!(
-            vertex_attachment,
-            world_vertices_length,
-            worldVerticesLength,
-            i32
-        );
-        c_accessor_for!(vertex_attachment, id, id, i32);
-
-        c_accessor_slice_for!(vertex_attachment, bones, bones, &[i32], bonesCount);
-        c_accessor_slice_for!(vertex_attachment, vertices, vertices, &[f32], verticesCount);
 
         // TODO: accessor for timelineAttachment
     };
