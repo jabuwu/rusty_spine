@@ -181,7 +181,7 @@ pub unsafe extern "C" fn spine_strcmp(mut s1: *const c_char, mut s2: *const c_ch
     loop {
         let fresh0 = s2;
         s2 = s2.offset(1);
-        if !*s1 as c_int != *fresh0 as c_int {
+        if *s1 as c_int != *fresh0 as c_int {
             break;
         }
         let fresh1 = s1;

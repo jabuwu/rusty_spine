@@ -261,7 +261,7 @@ impl AnimationState {
 
     pub fn set_listener<F>(&mut self, listener: F)
     where
-        F: AnimationStateListenerCb,
+        F: Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>) + 'static,
     {
         extern "C" fn c_listener(
             c_animation_state: *mut spAnimationState,
@@ -353,18 +353,12 @@ impl Drop for AnimationState {
     }
 }
 
-pub trait AnimationStateListenerCb:
-    Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>) + 'static
-{
-}
-impl<T> AnimationStateListenerCb for T where
-    T: Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>) + 'static
-{
-}
+type AnimationStateListenerCb =
+    Box<dyn Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>)>;
 
 #[derive(Default)]
 struct AnimationStateUserData {
-    listener: Option<Box<dyn AnimationStateListenerCb>>,
+    listener: Option<AnimationStateListenerCb>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
