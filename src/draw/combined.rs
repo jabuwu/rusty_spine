@@ -141,11 +141,16 @@ impl CombinedDrawer {
                 slot.attachment().and_then(|a| a.as_mesh())
             {
                 let mut color = mesh_attachment.color() * slot.color() * skeleton.color();
-                let mut dark_color = Color::new_rgba(0., 0., 0., 0.);
                 if self.premultiplied_alpha {
                     color.premultiply_alpha();
+                }
+
+                let mut dark_color = slot
+                    .dark_color()
+                    .unwrap_or_else(|| Color::new_rgba(0.0, 0.0, 0.0, 0.0));
+                if self.premultiplied_alpha {
+                    dark_color.a = 1.0;
                     dark_color.premultiply_alpha();
-                    dark_color.a = 1.;
                 }
 
                 uvs.resize(
@@ -215,10 +220,15 @@ impl CombinedDrawer {
                 (color, dark_color)
             } else if let Some(region_attachment) = slot.attachment().and_then(|a| a.as_region()) {
                 let mut color = region_attachment.color() * slot.color() * skeleton.color();
-                let mut dark_color = Color::new_rgba(0., 0., 0., 0.);
                 if self.premultiplied_alpha {
                     color.premultiply_alpha();
-                    dark_color.a = 1.;
+                }
+
+                let mut dark_color = slot
+                    .dark_color()
+                    .unwrap_or_else(|| Color::new_rgba(0.0, 0.0, 0.0, 0.0));
+                if self.premultiplied_alpha {
+                    dark_color.a = 1.0;
                     dark_color.premultiply_alpha();
                 }
 
