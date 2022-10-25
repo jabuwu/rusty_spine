@@ -5,7 +5,7 @@ use crate::{
     animation_state_data::AnimationStateData,
     c::{c_void, spSkeleton_setToSetupPose},
     color::Color,
-    draw::{CullDirection, SimpleDrawer},
+    draw::{CombinedDrawer, CullDirection, SimpleDrawer},
     skeleton::Skeleton,
     skeleton_clipping::SkeletonClipping,
     skeleton_data::SkeletonData,
@@ -104,6 +104,27 @@ impl SkeletonController {
             })
             .collect()
     }
+
+    pub fn combined_renderables(&mut self) -> Vec<SkeletonCombinedRenderable> {
+        let renderables = CombinedDrawer {
+            cull_direction: self.settings.cull_direction,
+            premultiplied_alpha: self.settings.premultiplied_alpha,
+        }
+        .draw(&mut self.skeleton, Some(&mut self.clipper));
+        renderables
+            .into_iter()
+            .map(|mut renderable| SkeletonCombinedRenderable {
+                vertices: take(&mut renderable.vertices),
+                uvs: take(&mut renderable.uvs),
+                indices: take(&mut renderable.indices),
+                colors: renderable.colors,
+                dark_colors: renderable.dark_colors,
+                blend_mode: renderable.blend_mode,
+                premultiplied_alpha: self.settings.premultiplied_alpha,
+                attachment_renderer_object: renderable.attachment_renderer_object,
+            })
+            .collect()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -114,6 +135,18 @@ pub struct SkeletonRenderable {
     pub indices: Vec<u16>,
     pub color: Color,
     pub dark_color: Color,
+    pub blend_mode: BlendMode,
+    pub premultiplied_alpha: bool,
+    pub attachment_renderer_object: Option<*const c_void>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SkeletonCombinedRenderable {
+    pub vertices: Vec<[f32; 2]>,
+    pub uvs: Vec<[f32; 2]>,
+    pub indices: Vec<u16>,
+    pub colors: Vec<[f32; 4]>,
+    pub dark_colors: Vec<[f32; 4]>,
     pub blend_mode: BlendMode,
     pub premultiplied_alpha: bool,
     pub attachment_renderer_object: Option<*const c_void>,

@@ -1,6 +1,6 @@
 use crate::{
     c::{c_void, spSkeletonClipping_clipTriangles},
-    Color, Skeleton, SkeletonClipping,
+    BlendMode, Color, Skeleton, SkeletonClipping,
 };
 
 use super::CullDirection;
@@ -11,6 +11,7 @@ pub struct CombinedRenderable {
     pub colors: Vec<[f32; 4]>,
     pub dark_colors: Vec<[f32; 4]>,
     pub indices: Vec<u16>,
+    pub blend_mode: BlendMode,
     pub attachment_renderer_object: Option<*const c_void>,
 }
 
@@ -34,6 +35,7 @@ impl CombinedDrawer {
         let mut colors = vec![];
         let mut dark_colors = vec![];
         let mut indices = vec![];
+        let mut blend_mode = BlendMode::Normal;
         let mut attachment_renderer_object = None;
         let mut world_vertices = vec![];
         world_vertices.resize(1000, 0.);
@@ -79,6 +81,7 @@ impl CombinedDrawer {
                 }
             }
 
+            let next_blend_mode = slot.data().blend_mode();
             let next_attachment_renderer_object = if let Some(mesh_attachment) =
                 slot.attachment().and_then(|a| a.as_mesh())
             {
@@ -107,13 +110,20 @@ impl CombinedDrawer {
                 unreachable!();
             };
 
-            if attachment_renderer_object != next_attachment_renderer_object {
+            if slot_index == 0 {
+                blend_mode = next_blend_mode;
+                attachment_renderer_object = next_attachment_renderer_object;
+            }
+            if blend_mode != next_blend_mode
+                || attachment_renderer_object != next_attachment_renderer_object
+            {
                 renderables.push(CombinedRenderable {
                     vertices,
                     uvs,
                     indices,
                     colors,
                     dark_colors,
+                    blend_mode,
                     attachment_renderer_object,
                 });
                 vertices = vec![];
@@ -124,6 +134,7 @@ impl CombinedDrawer {
                 vertex_base = 0;
                 index_base = 0;
             }
+            blend_mode = next_blend_mode;
             attachment_renderer_object = next_attachment_renderer_object;
 
             let (color, dark_color) = if let Some(mesh_attachment) =
@@ -317,6 +328,7 @@ impl CombinedDrawer {
                 indices,
                 colors,
                 dark_colors,
+                blend_mode,
                 attachment_renderer_object,
             });
         }
