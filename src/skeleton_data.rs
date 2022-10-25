@@ -4,7 +4,7 @@ use crate::{
     animation::Animation,
     bone::BoneData,
     c::{spAnimation, spBoneData, spSkeletonData, spSkeletonData_dispose, spSkin, spSlotData},
-    c_interface::{NewFromPtr, SyncPtr},
+    c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     skin::Skin,
     slot::SlotData,
     Atlas,
@@ -43,6 +43,39 @@ impl SkeletonData {
             owns_memory: true,
             _atlas: atlas,
         }
+    }
+
+    pub fn find_bone(&self, name: &str) -> Option<CTmpRef<SkeletonData, BoneData>> {
+        self.bones().find(|bone| bone.name() == name)
+    }
+
+    pub fn find_bone_mut(&mut self, name: &str) -> Option<CTmpMut<SkeletonData, BoneData>> {
+        self.bones_mut().find(|bone| bone.name() == name)
+    }
+
+    pub fn find_slot(&self, name: &str) -> Option<CTmpRef<SkeletonData, SlotData>> {
+        self.slots().find(|slot| slot.name() == name)
+    }
+
+    pub fn find_slot_mut(&mut self, name: &str) -> Option<CTmpMut<SkeletonData, SlotData>> {
+        self.slots_mut().find(|slot| slot.name() == name)
+    }
+
+    pub fn find_skin(&self, name: &str) -> Option<CTmpRef<SkeletonData, Skin>> {
+        self.skins().find(|skin| skin.name() == name)
+    }
+
+    pub fn find_skin_mut(&mut self, name: &str) -> Option<CTmpMut<SkeletonData, Skin>> {
+        self.skins_mut().find(|skin| skin.name() == name)
+    }
+
+    pub fn find_animation(&self, name: &str) -> Option<CTmpRef<SkeletonData, Animation>> {
+        self.animations().find(|animation| animation.name() == name)
+    }
+
+    pub fn find_animation_mut(&mut self, name: &str) -> Option<CTmpMut<SkeletonData, Animation>> {
+        self.animations_mut()
+            .find(|animation| animation.name() == name)
     }
 
     c_accessor_string!(version, version);
