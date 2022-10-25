@@ -52,7 +52,7 @@ struct DemoLoad(usize);
 #[derive(Component)]
 struct NoteText;
 
-fn make_cube(mesh: &mut Mesh) {
+fn make_empty(mesh: &mut Mesh) {
     let indices = Indices::U32(vec![]);
 
     let positions: Vec<[f32; 3]> = vec![];
@@ -277,7 +277,7 @@ fn demo_load(
             .with_children(|parent| {
                 for slot in controller.skeleton.slots() {
                     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
-                    make_cube(&mut mesh);
+                    make_empty(&mut mesh);
                     let mesh = meshes.add(mesh);
                     slots.insert(
                         slot.data().name().to_owned(),
