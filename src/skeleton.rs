@@ -29,6 +29,7 @@ pub struct Skeleton {
     c_skeleton: SyncPtr<spSkeleton>,
     owns_memory: bool,
     _skeleton_data: Arc<SkeletonData>,
+    _skin: Option<Skin>, // keep-alive for user created skins
 }
 
 impl Skeleton {
@@ -42,6 +43,7 @@ impl Skeleton {
             c_skeleton: SyncPtr(c_skeleton),
             owns_memory: true,
             _skeleton_data: skeleton_data,
+            _skin: None, // keep alive user-created skins
         }
     }
 
@@ -80,12 +82,25 @@ impl Skeleton {
     }
 
     pub fn set_skin(&mut self, skin: &Skin) {
-        unsafe { spSkeleton_setSkin(self.c_ptr(), skin.c_ptr()) };
+        if skin.owns_memory {
+            let cloned_skin = skin.clone();
+            unsafe { spSkeleton_setSkin(self.c_ptr(), cloned_skin.c_ptr()) };
+            self._skin = Some(cloned_skin);
+        } else {
+            unsafe { spSkeleton_setSkin(self.c_ptr(), skin.c_ptr()) };
+            self._skin = None;
+        }
+        self.set_to_setup_pose();
+    }
+
+    pub unsafe fn set_skin_unchecked(&mut self, skin: &Skin) {
+        spSkeleton_setSkin(self.c_ptr(), skin.c_ptr());
     }
 
     pub unsafe fn set_skin_by_name_unchecked(&mut self, skin_name: &str) {
         let c_skin_name = CString::new(skin_name).unwrap();
         spSkeleton_setSkinByName(self.c_ptr(), c_skin_name.as_ptr());
+        self._skin = None;
     }
 
     pub fn set_skin_by_name(&mut self, skin_name: &str) -> Result<(), Error> {

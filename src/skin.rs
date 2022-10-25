@@ -14,7 +14,7 @@ use std::ffi::CString;
 #[derive(Debug)]
 pub struct Skin {
     c_skin: SyncPtr<spSkin>,
-    owns_memory: bool,
+    pub(crate) owns_memory: bool,
 }
 
 impl NewFromPtr<spSkin> for Skin {
@@ -65,6 +65,14 @@ impl Skin {
     c_accessor_string!(name, name);
     c_ptr!(c_skin, spSkin);
     // TODO: accessors
+}
+
+impl Clone for Skin {
+    fn clone(&self) -> Self {
+        let mut clone = Skin::new(self.name());
+        clone.copy_skin(self);
+        clone
+    }
 }
 
 impl Drop for Skin {
