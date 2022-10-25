@@ -401,13 +401,41 @@ fn load_skeleton(atlas: &Vec<u8>, json: &Vec<u8>, dir: &str) -> Result<SkeletonC
 
 #[cfg(feature = "egui_debugger")]
 fn spine_debugger(mut egui_context: ResMut<EguiContext>, mut spine_query: Query<&mut Spine>) {
+    use rusty_spine::debugger::egui::SpineDebuggerCombinedRenderables;
+    use rusty_spine::debugger::egui::SpineDebuggerSimpleRenderables;
+    use rusty_spine::draw::CombinedDrawer;
+    use rusty_spine::draw::SimpleDrawer;
+
     for mut spine in spine_query.iter_mut() {
         let Spine { controller, .. } = spine.as_mut();
         let SkeletonController {
             skeleton,
             animation_state,
+            clipper,
             ..
         } = controller;
-        egui_spine_debugger(egui_context.ctx_mut(), "Spine", skeleton, animation_state);
+        let simple_renderable_stats = Box::new(SpineDebuggerSimpleRenderables::new(
+            SimpleDrawer {
+                cull_direction: CullDirection::Clockwise,
+                premultiplied_alpha: false,
+            },
+            skeleton,
+            Some(clipper),
+        ));
+        let combined_renderable_stats = Box::new(SpineDebuggerCombinedRenderables::new(
+            CombinedDrawer {
+                cull_direction: CullDirection::Clockwise,
+                premultiplied_alpha: false,
+            },
+            skeleton,
+            Some(clipper),
+        ));
+        egui_spine_debugger(
+            egui_context.ctx_mut(),
+            "Spine",
+            skeleton,
+            animation_state,
+            vec![simple_renderable_stats, combined_renderable_stats],
+        );
     }
 }

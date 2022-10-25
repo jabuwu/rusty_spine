@@ -1,7 +1,10 @@
 use egui::*;
 use egui_extras::*;
 
-use crate::{AnimationState, Attachment, BoneHandle, Skeleton, SlotHandle};
+use crate::{
+    draw::{CombinedDrawer, SimpleDrawer},
+    AnimationState, Attachment, BoneHandle, Skeleton, SkeletonClipping, SlotHandle,
+};
 
 enum Command {
     SetAnimationByName {
@@ -26,6 +29,7 @@ pub fn egui_spine_debugger(
     title: impl Into<WidgetText>,
     skeleton: &mut Skeleton,
     animation_state: &mut AnimationState,
+    stats: Vec<Box<dyn SpineDebuggerInfo>>,
 ) {
     let unique = format!("{:?}{:?}", skeleton.c_ptr(), animation_state.c_ptr());
     let mut bone_windows = ctx
@@ -180,6 +184,18 @@ pub fn egui_spine_debugger(
                 &mut commands,
                 true,
             );
+
+            ui.add_space(16.);
+            ui.heading("Info");
+            ui.collapsing("Skeleton", |ui| {
+                ui.label(format!("Version: {}", skeleton.data().version()));
+                ui.label(format!("Hash: {}", skeleton.data().hash()));
+            });
+            for stat in stats.iter() {
+                ui.collapsing(stat.title(), |ui| {
+                    stat.show(ui);
+                });
+            }
 
             ui.add_space(16.);
             ui.horizontal(|ui| {
@@ -476,4 +492,63 @@ fn egui_slot_dropdown(
         }
     }
     set_attachment_name
+}
+
+pub trait SpineDebuggerInfo {
+    fn title(&self) -> String;
+    fn show(&self, ui: &mut Ui);
+}
+
+pub struct SpineDebuggerSimpleRenderables {
+    meshes: usize,
+}
+
+impl SpineDebuggerSimpleRenderables {
+    pub fn new(
+        drawer: SimpleDrawer,
+        skeleton: &mut Skeleton,
+        clipper: Option<&mut SkeletonClipping>,
+    ) -> Self {
+        let renderables = drawer.draw(skeleton, clipper);
+        Self {
+            meshes: renderables.len(),
+        }
+    }
+}
+
+impl SpineDebuggerInfo for SpineDebuggerSimpleRenderables {
+    fn title(&self) -> String {
+        "Simple Renderables".to_owned()
+    }
+
+    fn show(&self, ui: &mut Ui) {
+        ui.label(format!("Meshes: {}", self.meshes));
+    }
+}
+
+pub struct SpineDebuggerCombinedRenderables {
+    meshes: usize,
+}
+
+impl SpineDebuggerCombinedRenderables {
+    pub fn new(
+        drawer: CombinedDrawer,
+        skeleton: &mut Skeleton,
+        clipper: Option<&mut SkeletonClipping>,
+    ) -> Self {
+        let renderables = drawer.draw(skeleton, clipper);
+        Self {
+            meshes: renderables.len(),
+        }
+    }
+}
+
+impl SpineDebuggerInfo for SpineDebuggerCombinedRenderables {
+    fn title(&self) -> String {
+        "Combined Renderables".to_owned()
+    }
+
+    fn show(&self, ui: &mut Ui) {
+        ui.label(format!("Meshes: {}", self.meshes));
+    }
 }
