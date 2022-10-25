@@ -13,7 +13,7 @@ rusty_spine = "0.3.1"
 
 A Rust API is provided on top of the C API, because working with C APIs directly in Rust is tedious and error prone. It's made to be as thin a wrapper as possible.
 
-The Rust API is unstable and changes often.
+The Rust API is unstable and changes often. Most features are accessible through rust with the most noteable exclusion being the [Timeline API](http://en.esotericsoftware.com/spine-api-reference#Timeline). Most projects do not need this API, but if your's does, please open an issue.
 
 [Rust API Documentation](https://docs.rs/rusty_spine/latest/rusty_spine/index.html)
 
@@ -22,6 +22,10 @@ The Rust API is unstable and changes often.
 If you wish to use the C API directly (either because the Rust API lacks a feature or for performance reasons), it is available under the `rusty_spine::c` import. [See the C example](https://github.com/jabuwu/rusty_spine/blob/main/examples/c.rs).
 
 [C API Documentation](http://en.esotericsoftware.com/spine-c)
+
+## Engine Integrations
+
+- [Bevy](https://github.com/jabuwu/bevy_spine)
 
 ## License
 
