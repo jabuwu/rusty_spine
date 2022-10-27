@@ -4,11 +4,14 @@ use crate::{
     attachment::Attachment,
     bone::Bone,
     c::{
-        spAttachment, spBlendMode, spBone, spBoneData, spSkeleton, spSlot, spSlotData,
-        spSlotData_setAttachmentName, spSlot_setAttachment, spSlot_setToSetupPose,
+        spAttachment, spBlendMode, spBone, spBoneData, spBoundingBoxAttachment,
+        spClippingAttachment, spMeshAttachment, spPointAttachment, spRegionAttachment, spSkeleton,
+        spSlot, spSlotData, spSlotData_setAttachmentName, spSlot_setAttachment,
+        spSlot_setToSetupPose,
     },
-    c_interface::{NewFromPtr, SyncPtr},
-    BoneData, Skeleton,
+    c_interface::{CTmpRef, NewFromPtr, SyncPtr},
+    AttachmentType, BoneData, BoundingBoxAttachment, ClippingAttachment, MeshAttachment,
+    PointAttachment, RegionAttachment, Skeleton,
 };
 
 /// A slot for an attachment.
@@ -25,6 +28,26 @@ impl NewFromPtr<spSlot> for Slot {
             c_slot: SyncPtr(c_slot as *mut spSlot),
         }
     }
+}
+
+macro_rules! attachment_accessor {
+    ($fn:ident, $fn_mut:ident, $type:ident, $c_type:ident, $attachment_type:expr) => {
+        pub fn $fn(&self) -> Option<CTmpRef<Self, $type>> {
+            let attachment = unsafe { self.c_ptr_ref().attachment };
+            if !attachment.is_null() {
+                if AttachmentType::from(unsafe { (*attachment).type_0 }) == $attachment_type {
+                    #[allow(unused_unsafe)]
+                    Some(CTmpRef::new(self, unsafe {
+                        ($type::new_from_ptr(attachment as *mut $c_type))
+                    }))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        }
+    };
 }
 
 impl Slot {
@@ -47,6 +70,46 @@ impl Slot {
     pub fn handle(&self) -> SlotHandle {
         SlotHandle::new(self.c_ptr(), unsafe { self.bone().c_ptr_mut().skeleton })
     }
+
+    attachment_accessor!(
+        region_attachment,
+        region_attachment_mut,
+        RegionAttachment,
+        spRegionAttachment,
+        AttachmentType::Region
+    );
+
+    attachment_accessor!(
+        bounding_box_attachment,
+        bounding_box_attachment_mut,
+        BoundingBoxAttachment,
+        spBoundingBoxAttachment,
+        AttachmentType::BoundingBox
+    );
+
+    attachment_accessor!(
+        mesh_attachment,
+        mesh_attachment_mut,
+        MeshAttachment,
+        spMeshAttachment,
+        AttachmentType::Mesh
+    );
+
+    attachment_accessor!(
+        point_attachment,
+        point_attachment_mut,
+        PointAttachment,
+        spPointAttachment,
+        AttachmentType::Point
+    );
+
+    attachment_accessor!(
+        clipping_attachment,
+        clipping_attachment_mut,
+        ClippingAttachment,
+        spClippingAttachment,
+        AttachmentType::Clipping
+    );
 
     c_accessor_color_mut!(color, color_mut, color);
     c_accessor_color_optional!(dark_color, darkColor);
