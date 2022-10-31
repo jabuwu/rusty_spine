@@ -108,6 +108,24 @@ impl Color {
         self.g *= self.a;
         self.b *= self.a;
     }
+
+    pub fn linear_to_nonlinear(&self) -> Color {
+        Color {
+            r: linear_to_nonlinear(self.r),
+            g: linear_to_nonlinear(self.g),
+            b: linear_to_nonlinear(self.b),
+            a: self.a,
+        }
+    }
+
+    pub fn nonlinear_to_linear(&self) -> Color {
+        Color {
+            r: nonlinear_to_linear(self.r),
+            g: nonlinear_to_linear(self.g),
+            b: nonlinear_to_linear(self.b),
+            a: self.a,
+        }
+    }
 }
 
 impl Mul<Color> for Color {
@@ -129,5 +147,25 @@ impl MulAssign<Color> for Color {
         self.g *= rhs.g;
         self.b *= rhs.b;
         self.a *= rhs.a;
+    }
+}
+
+fn linear_to_nonlinear(x: f32) -> f32 {
+    if x <= 0.0 {
+        x
+    } else if x <= 0.0031308 {
+        x * 12.92
+    } else {
+        (1.055 * x.powf(1.0 / 2.4)) - 0.055
+    }
+}
+
+fn nonlinear_to_linear(x: f32) -> f32 {
+    if x <= 0.0 {
+        x
+    } else if x <= 0.04045 {
+        x / 12.92
+    } else {
+        ((x + 0.055) / 1.055).powf(2.4)
     }
 }

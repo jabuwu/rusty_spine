@@ -3,7 +3,7 @@ use crate::{
     BlendMode, Color, Skeleton, SkeletonClipping,
 };
 
-use super::CullDirection;
+use super::{ColorSpace, CullDirection};
 
 pub struct CombinedRenderable {
     pub vertices: Vec<[f32; 2]>,
@@ -18,6 +18,7 @@ pub struct CombinedRenderable {
 pub struct CombinedDrawer {
     pub cull_direction: CullDirection,
     pub premultiplied_alpha: bool,
+    pub color_space: ColorSpace,
 }
 
 /// A combined drawer with a mesh combining optimization.
@@ -144,6 +145,10 @@ impl CombinedDrawer {
                 if self.premultiplied_alpha {
                     color.premultiply_alpha();
                 }
+                color = match self.color_space {
+                    ColorSpace::SRGB => color,
+                    ColorSpace::Linear => color.nonlinear_to_linear(),
+                };
 
                 let mut dark_color = slot
                     .dark_color()
@@ -152,6 +157,10 @@ impl CombinedDrawer {
                     dark_color.a = 1.0;
                     dark_color.premultiply_alpha();
                 }
+                dark_color = match self.color_space {
+                    ColorSpace::SRGB => dark_color,
+                    ColorSpace::Linear => dark_color.nonlinear_to_linear(),
+                };
 
                 uvs.resize(
                     vertex_base as usize + mesh_attachment.world_vertices_length() as usize,
@@ -223,6 +232,10 @@ impl CombinedDrawer {
                 if self.premultiplied_alpha {
                     color.premultiply_alpha();
                 }
+                color = match self.color_space {
+                    ColorSpace::SRGB => color,
+                    ColorSpace::Linear => color.nonlinear_to_linear(),
+                };
 
                 let mut dark_color = slot
                     .dark_color()
@@ -231,6 +244,10 @@ impl CombinedDrawer {
                     dark_color.a = 1.0;
                     dark_color.premultiply_alpha();
                 }
+                dark_color = match self.color_space {
+                    ColorSpace::SRGB => dark_color,
+                    ColorSpace::Linear => dark_color.nonlinear_to_linear(),
+                };
 
                 for i in 0..4 {
                     vertices.push([

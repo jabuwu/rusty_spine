@@ -3,7 +3,7 @@ use crate::{
     BlendMode, Color, Skeleton, SkeletonClipping,
 };
 
-use super::CullDirection;
+use super::{ColorSpace, CullDirection};
 
 pub struct SimpleRenderable {
     pub slot_index: i32,
@@ -19,6 +19,7 @@ pub struct SimpleRenderable {
 pub struct SimpleDrawer {
     pub cull_direction: CullDirection,
     pub premultiplied_alpha: bool,
+    pub color_space: ColorSpace,
 }
 
 /// A simple drawer with no optimizations.
@@ -247,6 +248,10 @@ impl SimpleDrawer {
             if self.premultiplied_alpha {
                 color.premultiply_alpha();
             }
+            color = match self.color_space {
+                ColorSpace::SRGB => color,
+                ColorSpace::Linear => color.nonlinear_to_linear(),
+            };
 
             let mut dark_color = slot
                 .dark_color()
@@ -255,6 +260,10 @@ impl SimpleDrawer {
                 dark_color.a = 1.0;
                 dark_color.premultiply_alpha();
             }
+            dark_color = match self.color_space {
+                ColorSpace::SRGB => dark_color,
+                ColorSpace::Linear => dark_color.nonlinear_to_linear(),
+            };
 
             renderables.push(SimpleRenderable {
                 slot_index,

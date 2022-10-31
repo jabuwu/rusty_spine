@@ -9,3 +9,9 @@ pub enum CullDirection {
     Clockwise,
     CounterClockwise,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ColorSpace {
+    SRGB,
+    Linear,
+}

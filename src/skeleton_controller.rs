@@ -5,7 +5,7 @@ use crate::{
     animation_state_data::AnimationStateData,
     c::{c_void, spSkeleton_setToSetupPose},
     color::Color,
-    draw::{CombinedDrawer, CullDirection, SimpleDrawer},
+    draw::{ColorSpace, CombinedDrawer, CullDirection, SimpleDrawer},
     skeleton::Skeleton,
     skeleton_clipping::SkeletonClipping,
     skeleton_data::SkeletonData,
@@ -24,6 +24,7 @@ pub struct SkeletonController {
 pub struct SkeletonControllerSettings {
     pub premultiplied_alpha: bool,
     pub cull_direction: CullDirection,
+    pub color_space: ColorSpace,
 }
 
 impl Default for SkeletonControllerSettings {
@@ -31,6 +32,7 @@ impl Default for SkeletonControllerSettings {
         Self {
             premultiplied_alpha: false,
             cull_direction: CullDirection::Clockwise,
+            color_space: ColorSpace::Linear,
         }
     }
 }
@@ -87,6 +89,7 @@ impl SkeletonController {
         let renderables = SimpleDrawer {
             cull_direction: self.settings.cull_direction,
             premultiplied_alpha: self.settings.premultiplied_alpha,
+            color_space: self.settings.color_space,
         }
         .draw(&mut self.skeleton, Some(&mut self.clipper));
         renderables
@@ -109,6 +112,7 @@ impl SkeletonController {
         let renderables = CombinedDrawer {
             cull_direction: self.settings.cull_direction,
             premultiplied_alpha: self.settings.premultiplied_alpha,
+            color_space: self.settings.color_space,
         }
         .draw(&mut self.skeleton, Some(&mut self.clipper));
         renderables
