@@ -19,7 +19,7 @@ The Rust API is unstable and changes often. Most features are accessible through
 
 ## C API
 
-If you wish to use the C API directly (either because the Rust API lacks a feature or for performance reasons), it is available under the `rusty_spine::c` import. [See the C example](https://github.com/jabuwu/rusty_spine/blob/main/examples/c.rs).
+If you wish to use the C API directly (either because the Rust API lacks a feature or for performance reasons), it is available under the [rusty_spine::c](https://docs.rs/rusty_spine/latest/rusty_spine/c/index.html) import. [See the C example](https://github.com/jabuwu/rusty_spine/blob/main/examples/c.rs).
 
 [C API Documentation](http://en.esotericsoftware.com/spine-c)
 
