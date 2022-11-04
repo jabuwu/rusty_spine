@@ -11,7 +11,10 @@ use crate::{
     skeleton_data::SkeletonData,
 };
 
-/// Animation settings used to instantiate [AnimationState](struct.AnimationState.html).
+#[allow(unused_imports)]
+use crate::AnimationState;
+
+/// Animation settings used to instantiate [`AnimationState`].
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#AnimationStateData)
 ///

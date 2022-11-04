@@ -85,7 +85,31 @@ impl Drop for Skin {
     }
 }
 
-c_handle_decl!(SkinHandle, Skin, SkeletonData, spSkin, spSkeletonData);
+c_handle_decl!(
+    /// A storeable reference to a [`Skin`].
+    ///
+    /// Can be acquired from a
+    /// [`CTmpRef<SkeletonData, Skin>`], [`CTmpMut<SkeletonData, Skin>`],
+    /// [`CTmpRef<Skeleton, Skin>`], or [`CTmpMut<Skeleton, Skin>`].
+    ///
+    /// ```
+    /// # #[path="./doctests.rs"]
+    /// # mod doctests;
+    /// # use rusty_spine::{AnimationState, EventType, SkinHandle};
+    /// # let (skeleton, _) = doctests::test_spineboy_instance();
+    /// let skeleton_data = skeleton.data();
+    /// let skin_handles: Vec<SkinHandle> = skeleton_data.skins().map(|skin| skin.handle()).collect();
+    /// for skin_handle in skin_handles.iter() {
+    ///     let skin = skin_handle.get(skeleton_data.as_ref()).unwrap();
+    ///     println!("{}", skin.name());
+    /// }
+    /// ```
+    SkinHandle,
+    Skin,
+    SkeletonData,
+    spSkin,
+    spSkeletonData
+);
 
 impl<'a> CTmpRef<'a, SkeletonData, Skin> {
     pub fn handle(&self) -> SkinHandle {

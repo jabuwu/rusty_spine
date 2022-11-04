@@ -14,18 +14,16 @@ use crate::{
 #[cfg(feature = "mint")]
 use mint::Vector2;
 
-/// A bone within the [Skeleton](struct.Skeleton.html) hierarchy.
+/// A bone within the [`Skeleton`] hierarchy.
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Bone)
 ///
-/// Bones can be acquired from a [Skeleton](struct.Skeleton.html) and a safe
-/// [BoneHandle](struct.BoneHandle.html) can be obtained using the
-/// [handle](struct.Bone.html#method.handle) method to store long-term references to a specific
+/// Bones can be acquired from a [`Skeleton`] and a safe [`BoneHandle`] can be obtained using the
+/// [`Bone::handle`] method to store long-term references to a specific
 /// bone.
 ///
-/// The hierarchy can be traversed using [parent](struct.Bone.html#method.parent) and
-/// [children](struct.Bone.html#method.children), and specific bones can be located using
-/// [Skeleton::find_bone](struct.Skeleton.html#method.find_bone).
+/// The hierarchy can be traversed using [`Bone::parent`] and [`Bone::children`], and specific
+/// bones can be located using [`Skeleton::find_bone`].
 #[derive(Debug)]
 pub struct Bone {
     c_bone: SyncPtr<spBone>,
@@ -352,9 +350,9 @@ impl Bone {
 }
 
 c_handle_decl!(
-    /// A storeable reference to a [Bone](struct.Bone.html).
+    /// A storeable reference to a [`Bone`].
     ///
-    /// Can be acquired from any instance of [Bone](struct.Bone.html).
+    /// Can be acquired from any instance of [`Bone`].
     ///
     /// ```
     /// # #[path="./doctests.rs"]

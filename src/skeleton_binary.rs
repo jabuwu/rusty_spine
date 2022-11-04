@@ -10,7 +10,7 @@ use crate::{
         spSkeletonBinary_readSkeletonData, spSkeletonBinary_readSkeletonDataFile,
     },
     c_interface::SyncPtr,
-    error::Error,
+    error::SpineError,
     skeleton_data::SkeletonData,
     Atlas,
 };
@@ -30,9 +30,9 @@ impl SkeletonBinary {
     ///
     /// ```
     /// use std::sync::Arc;
-    /// use rusty_spine::{AnimationState, AnimationStateData, Atlas, Error, Skeleton, SkeletonBinary};
+    /// use rusty_spine::{AnimationState, AnimationStateData, Atlas, SpineError, Skeleton, SkeletonBinary};
     ///
-    /// fn load_skeleton() -> Result<(Skeleton, AnimationState), Error> {
+    /// fn load_skeleton() -> Result<(Skeleton, AnimationState), SpineError> {
     ///     let atlas = Arc::new(Atlas::new_from_file("spineboy.atlas")?);
     ///     let skeleton_binary = SkeletonBinary::new(atlas);
     ///     let skeleton_data = Arc::new(skeleton_binary.read_skeleton_data_file("spineboy.skel")?);
@@ -52,7 +52,13 @@ impl SkeletonBinary {
         }
     }
 
-    pub fn read_skeleton_data(&self, data: &[u8]) -> Result<SkeletonData, Error> {
+    /// Read the Spine skeleton binary data in-memory. See [`SkeletonBinary::new`] for a full
+    /// example.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SpineError::ParsingFailed`] if parsing of the binary data failed.
+    pub fn read_skeleton_data(&self, data: &[u8]) -> Result<SkeletonData, SpineError> {
         let c_skeleton_data = unsafe {
             spSkeletonBinary_readSkeletonData(
                 self.c_skeleton_binary.0,
@@ -64,11 +70,21 @@ impl SkeletonBinary {
             Ok(SkeletonData::new(c_skeleton_data, self.atlas.clone()))
         } else {
             let c_error = unsafe { CStr::from_ptr((*self.c_skeleton_binary.0).error) };
-            Err(Error::new_from_spine(c_error.to_str().unwrap()))
+            Err(SpineError::new_from_spine(c_error.to_str().unwrap()))
         }
     }
 
-    pub fn read_skeleton_data_file<P: AsRef<Path>>(&self, path: P) -> Result<SkeletonData, Error> {
+    /// Read the Spine skeleton binary data from a file. See [`SkeletonBinary::new`] for a full
+    /// example.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SpineError::ParsingFailed`] if parsing of the binary data failed. Returns
+    /// [`SpineError::NulError`] if `path` contains an internal 0 byte.
+    pub fn read_skeleton_data_file<P: AsRef<Path>>(
+        &self,
+        path: P,
+    ) -> Result<SkeletonData, SpineError> {
         let c_path = CString::new(path.as_ref().to_str().unwrap())?;
         let c_skeleton_data = unsafe {
             spSkeletonBinary_readSkeletonDataFile(self.c_skeleton_binary.0, c_path.as_ptr())
@@ -77,7 +93,7 @@ impl SkeletonBinary {
             Ok(SkeletonData::new(c_skeleton_data, self.atlas.clone()))
         } else {
             let c_error = unsafe { CStr::from_ptr((*self.c_skeleton_binary.0).error) };
-            Err(Error::new_from_spine(c_error.to_str().unwrap()))
+            Err(SpineError::new_from_spine(c_error.to_str().unwrap()))
         }
     }
 

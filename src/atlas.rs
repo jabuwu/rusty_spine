@@ -9,7 +9,7 @@ use crate::c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr};
 use crate::texture_region::TextureRegion;
 use crate::{
     c::{c_int, spAtlas, spAtlasPage, spAtlas_create, spAtlas_dispose},
-    error::Error,
+    error::SpineError,
 };
 
 use atlas::*;
@@ -37,6 +37,7 @@ impl NewFromPtr<spAtlas> for Atlas {
 
 impl Atlas {
     /// Create an Atlas from an in-memory vector.
+    ///
     /// ```
     /// use rusty_spine::Atlas;
     /// fn load_atlas() -> Atlas {
@@ -44,7 +45,13 @@ impl Atlas {
     ///     Atlas::new(&atlas_file, "").unwrap()
     /// }
     /// ```
-    pub fn new<P: AsRef<Path>>(data: &[u8], dir: P) -> Result<Atlas, Error> {
+    ///
+    /// # Errors
+    ///
+    /// Returns the [`SpineError::NulError`] if `dir` or `data` contain an internal 0 byte. This
+    /// function does not error if the atlas file is invalid or malformed. The file is parsed
+    /// line-by-line and invalid lines are simply ignored.
+    pub fn new<P: AsRef<Path>>(data: &[u8], dir: P) -> Result<Atlas, SpineError> {
         let c_data = CString::new(data)?;
         let c_dir = CString::new(dir.as_ref().to_str().unwrap())?;
         let c_atlas = unsafe {
@@ -64,11 +71,17 @@ impl Atlas {
     /// Create an Atlas from a file.
     /// ```
     /// use rusty_spine::Atlas;
-    /// fn load_atlas() -> Result<Atlas, rusty_spine::Error>{
+    /// fn load_atlas() -> Result<Atlas, rusty_spine::SpineError>{
     ///     Ok(Atlas::new_from_file("skeleton.json")?)
     /// }
     /// ```
-    pub fn new_from_file<P: AsRef<Path>>(path: P) -> Result<Atlas, Error> {
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SpineError::FailedToReadFile`] if the file could not be read, returns
+    /// [`SpineError::NulError`] if `path` contains an internal 0 byte or if the loaded atlas
+    /// contains a 0 byte.
+    pub fn new_from_file<P: AsRef<Path>>(path: P) -> Result<Atlas, SpineError> {
         let c_path = CString::new(path.as_ref().to_str().unwrap())?;
         let c_atlas = unsafe { spAtlas_createFromFile(c_path.as_ptr(), null_mut()) };
         if !c_atlas.is_null() {
@@ -77,9 +90,9 @@ impl Atlas {
                 owns_memory: true,
             })
         } else {
-            Err(Error::FailedToReadFile(
-                path.as_ref().to_str().unwrap().to_owned(),
-            ))
+            Err(SpineError::FailedToReadFile {
+                file: path.as_ref().to_str().unwrap().to_owned(),
+            })
         }
     }
 
@@ -142,6 +155,10 @@ impl Drop for Atlas {
 }
 
 pub mod atlas {
+    //! Types related to atlases.
+    //!
+    //! To load an atlas file, see [`Atlas`].
+
     use super::*;
 
     #[derive(Debug)]

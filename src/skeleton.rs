@@ -11,17 +11,20 @@ use crate::{
         spSkeleton_updateWorldTransformWith, spSkin, spSlot,
     },
     c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
-    error::Error,
+    error::SpineError,
     skeleton_data::SkeletonData,
     skin::Skin,
     slot::Slot,
     Attachment,
 };
 
+#[allow(unused_imports)]
+use crate::{SkeletonBinary, SkeletonJson};
+
 #[cfg(feature = "mint")]
 use mint::Vector2;
 
-/// A live Skeleton instance created from [SkeletonData](struct.SkeletonData.html).
+/// A live Skeleton instance created from [`SkeletonData`].
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Skeleton)
 #[derive(Debug)]
@@ -33,10 +36,9 @@ pub struct Skeleton {
 }
 
 impl Skeleton {
-    /// Create a new instance of the skeleton loaded in [SkeletonData](struct.SkeletonData.html).
+    /// Create a new instance of the skeleton loaded in [`SkeletonData`].
     ///
-    /// See [SkeletonJson](struct.SkeletonJson.html) or
-    /// [SkeletonBinary](struct.SkeletonBinary.html) for a complete example of loading a skeleton.
+    /// See [`SkeletonJson`] or [`SkeletonBinary`] for a complete example of loading a skeleton.
     pub fn new(skeleton_data: Arc<SkeletonData>) -> Self {
         let c_skeleton = unsafe { spSkeleton_create(skeleton_data.c_ptr()) };
         Self {
@@ -81,6 +83,9 @@ impl Skeleton {
         }
     }
 
+    /// Set the skeleton's skin. If the skin is a user-created one (via [`Skin::new`]), then a
+    /// clone is created and used instead, to help ensure memory safety. If this behavior is not
+    /// desired then [`Skeleton::set_skin_unchecked`] can be used instead.
     pub fn set_skin(&mut self, skin: &Skin) {
         if skin.owns_memory {
             let cloned_skin = skin.clone();
@@ -93,22 +98,37 @@ impl Skeleton {
         self.set_to_setup_pose();
     }
 
+    /// Set the skeleton's skin.
+    ///
+    /// # Safety
+    ///
+    /// The [`Skin`] struct will destroy the underlying C representation of the skin in its [`Drop`]
+    /// implementation. Skins assigned to a skeleton must live as long as the skeletons using them
+    /// or else the skeleton may cause a segfault.
     pub unsafe fn set_skin_unchecked(&mut self, skin: &Skin) {
         spSkeleton_setSkin(self.c_ptr(), skin.c_ptr());
     }
 
+    /// Set the skeleton's skin by name.
+    ///
+    /// # Safety
+    ///
+    /// This function should only be called with valid skin names. It is faster than the safe
+    /// alternative, [`Skeleton::set_skin_by_name`], but will likely segfault if the skin does not
+    /// exist.
     pub unsafe fn set_skin_by_name_unchecked(&mut self, skin_name: &str) {
         let c_skin_name = CString::new(skin_name).unwrap();
         spSkeleton_setSkinByName(self.c_ptr(), c_skin_name.as_ptr());
         self._skin = None;
     }
 
-    pub fn set_skin_by_name(&mut self, skin_name: &str) -> Result<(), Error> {
+    /// Set the skeleton's skin by name.
+    pub fn set_skin_by_name(&mut self, skin_name: &str) -> Result<(), SpineError> {
         if self.data().skins().any(|skin| skin.name() == skin_name) {
             unsafe { self.set_skin_by_name_unchecked(skin_name) };
             Ok(())
         } else {
-            Err(Error::NotFound)
+            Err(SpineError::new_not_found("Skin", skin_name))
         }
     }
 

@@ -5,27 +5,52 @@ use crate::{
 
 use super::{ColorSpace, CullDirection};
 
-pub struct SimpleRenderable {
-    pub slot_index: i32,
-    pub vertices: Vec<[f32; 2]>,
-    pub uvs: Vec<[f32; 2]>,
-    pub indices: Vec<u16>,
-    pub color: Color,
-    pub dark_color: Color,
-    pub blend_mode: BlendMode,
-    pub attachment_renderer_object: Option<*const c_void>,
-}
+#[allow(unused_imports)]
+use crate::extension;
 
-pub struct SimpleDrawer {
-    pub cull_direction: CullDirection,
-    pub premultiplied_alpha: bool,
-    pub color_space: ColorSpace,
+/// Renderables generated from [`SimpleDrawer::draw`].
+#[derive(Clone)]
+pub struct SimpleRenderable {
+    /// The index of the slot in [`Skeleton`] that this renderable represents.
+    pub slot_index: i32,
+    /// A list of vertex attributes for a mesh.
+    pub vertices: Vec<[f32; 2]>,
+    /// A list of UV attributes for a mesh.
+    pub uvs: Vec<[f32; 2]>,
+    /// A list of indices for a mesh.
+    pub indices: Vec<u16>,
+    /// The color tint of the mesh.
+    pub color: Color,
+    /// The dark color tint of the mesh.
+    /// See the [Spine User Guide](http://en.esotericsoftware.com/spine-slots#Tint-black).
+    pub dark_color: Color,
+    /// The blend mode to use when drawing this mesh.
+    pub blend_mode: BlendMode,
+    /// The attachment's renderer object as a raw pointer. Usually represents the texture created
+    /// from [`extension::set_create_texture_cb`].
+    pub attachment_renderer_object: Option<*const c_void>,
 }
 
 /// A simple drawer with no optimizations.
 ///
 /// Assumes use of the default atlas attachment loader.
+///
+/// See [`SimpleDrawer::draw`]
+pub struct SimpleDrawer {
+    /// The cull direction to use for the vertices.
+    pub cull_direction: CullDirection,
+    /// Set to `true` if the textures are expected to have premultiplied alpha.
+    pub premultiplied_alpha: bool,
+    /// The color space to use for the colors returned in [`SimpleRenderable`].
+    pub color_space: ColorSpace,
+}
+
 impl SimpleDrawer {
+    /// This function returns a list of [`SimpleRenderable`] structs containing all the necessary
+    /// data to create and render meshes. One renderable is created for each visible attachment on
+    /// the skeleton. If a [`SkeletonClipping`] is provided, meshes will be properly clipped. The
+    /// renderables are expected to be rendered in the order provided with the first renderable
+    /// being drawn behind all the others.
     pub fn draw(
         &self,
         skeleton: &mut Skeleton,

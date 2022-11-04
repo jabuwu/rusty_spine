@@ -10,7 +10,7 @@ use crate::{
         spSkeletonJson_readSkeletonData, spSkeletonJson_readSkeletonDataFile,
     },
     c_interface::SyncPtr,
-    error::Error,
+    error::SpineError,
     skeleton_data::SkeletonData,
     Atlas,
 };
@@ -30,9 +30,9 @@ impl SkeletonJson {
     ///
     /// ```
     /// use std::sync::Arc;
-    /// use rusty_spine::{AnimationState, AnimationStateData, Atlas, Error, Skeleton, SkeletonJson};
+    /// use rusty_spine::{AnimationState, AnimationStateData, Atlas, SpineError, Skeleton, SkeletonJson};
     ///
-    /// fn load_skeleton() -> Result<(Skeleton, AnimationState), Error> {
+    /// fn load_skeleton() -> Result<(Skeleton, AnimationState), SpineError> {
     ///     let atlas = Arc::new(Atlas::new_from_file("spineboy.atlas")?);
     ///     let skeleton_json = SkeletonJson::new(atlas);
     ///     let skeleton_data = Arc::new(skeleton_json.read_skeleton_data_file("spineboy.json")?);
@@ -52,7 +52,12 @@ impl SkeletonJson {
         }
     }
 
-    pub fn read_skeleton_data(&self, json: &[u8]) -> Result<SkeletonData, Error> {
+    /// Read the Spine skeleton json data in-memory. See [`SkeletonJson::new`] for a full example.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SpineError::ParsingFailed`] if parsing of the json data failed.
+    pub fn read_skeleton_data(&self, json: &[u8]) -> Result<SkeletonData, SpineError> {
         let c_json = CString::new(json)?;
         let c_skeleton_data =
             unsafe { spSkeletonJson_readSkeletonData(self.c_skeleton_json.0, c_json.as_ptr()) };
@@ -60,11 +65,20 @@ impl SkeletonJson {
             Ok(SkeletonData::new(c_skeleton_data, self.atlas.clone()))
         } else {
             let c_error = unsafe { CStr::from_ptr((*self.c_skeleton_json.0).error) };
-            Err(Error::new_from_spine(c_error.to_str().unwrap()))
+            Err(SpineError::new_from_spine(c_error.to_str().unwrap()))
         }
     }
 
-    pub fn read_skeleton_data_file<P: AsRef<Path>>(&self, path: P) -> Result<SkeletonData, Error> {
+    /// Read the Spine skeleton json data from a file. See [`SkeletonJson::new`] for a full example.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SpineError::ParsingFailed`] if parsing of the json data failed. Returns
+    /// [`SpineError::NulError`] if `path` contains an internal 0 byte.
+    pub fn read_skeleton_data_file<P: AsRef<Path>>(
+        &self,
+        path: P,
+    ) -> Result<SkeletonData, SpineError> {
         let c_path = CString::new(path.as_ref().to_str().unwrap())?;
         let c_skeleton_data =
             unsafe { spSkeletonJson_readSkeletonDataFile(self.c_skeleton_json.0, c_path.as_ptr()) };
@@ -72,7 +86,7 @@ impl SkeletonJson {
             Ok(SkeletonData::new(c_skeleton_data, self.atlas.clone()))
         } else {
             let c_error = unsafe { CStr::from_ptr((*self.c_skeleton_json.0).error) };
-            Err(Error::new_from_spine(c_error.to_str().unwrap()))
+            Err(SpineError::new_from_spine(c_error.to_str().unwrap()))
         }
     }
 

@@ -15,7 +15,7 @@ use crate::{
         spTrackEntry, spTrackEntry_getAnimationTime, spTrackEntry_getTrackComplete,
     },
     c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
-    error::Error,
+    error::SpineError,
     event::Event,
     skeleton::Skeleton,
 };
@@ -65,18 +65,23 @@ impl AnimationState {
         unsafe { spAnimationState_apply(self.c_animation_state.0, skeleton.c_ptr()) != 0 }
     }
 
+    /// Clears all animations in all track entries in this animation state.
     pub fn clear_tracks(&mut self) {
         unsafe {
             spAnimationState_clearTracks(self.c_ptr());
         }
     }
 
+    /// Clears animations for the given track entry index in this animation state.
     pub fn clear_track(&mut self, track_index: i32) {
         unsafe {
             spAnimationState_clearTrack(self.c_ptr(), track_index);
         }
     }
 
+    /// Sets the animation for the given track by name, clearing any queued tracks, and returning
+    /// the track index. If the track index doesn't exist then it will be created.
+    ///
     /// # Safety
     ///
     /// This function should only be called with valid animation names. It is faster than the safe
@@ -100,12 +105,18 @@ impl AnimationState {
         )
     }
 
+    /// Sets the animation for the given track by name, clearing any queued tracks, and returning
+    /// the track index. If the track index doesn't exist then it will be created.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SpineError::NotFound`] if an animation doesn't exist with the given name.
     pub fn set_animation_by_name(
         &mut self,
         track_index: i32,
         animation_name: &str,
         looping: bool,
-    ) -> Result<CTmpMut<Self, TrackEntry>, Error> {
+    ) -> Result<CTmpMut<Self, TrackEntry>, SpineError> {
         if self
             .data()
             .skeleton_data()
@@ -116,10 +127,12 @@ impl AnimationState {
                 self.set_animation_by_name_unchecked(track_index, animation_name, looping)
             })
         } else {
-            Err(Error::NotFound)
+            Err(SpineError::new_not_found("Animation", animation_name))
         }
     }
 
+    /// Sets the animation for the given track, clearning any queued tracks, and returning the
+    /// track index. If the track index doesn't exist then it will be created.
     pub fn set_animation(
         &mut self,
         track_index: i32,
@@ -139,6 +152,9 @@ impl AnimationState {
         }
     }
 
+    /// Queues the animation in the given track by name, returning the track index. If the track
+    /// index doesn't exist then it will be created.
+    ///
     /// # Safety
     ///
     /// This function should only be called with valid animation names. It is faster than the safe
@@ -164,13 +180,19 @@ impl AnimationState {
         )
     }
 
+    /// Queues the animation in the given track by name, returning the track index. If the track
+    /// index doesn't exist then it will be created.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SpineError::NotFound`] if an animation doesn't exist with the given name.
     pub fn add_animation_by_name(
         &mut self,
         track_index: i32,
         animation_name: &str,
         looping: bool,
         delay: f32,
-    ) -> Result<CTmpMut<Self, TrackEntry>, Error> {
+    ) -> Result<CTmpMut<Self, TrackEntry>, SpineError> {
         if self
             .data()
             .skeleton_data()
@@ -181,10 +203,12 @@ impl AnimationState {
                 self.add_animation_by_name_unchecked(track_index, animation_name, looping, delay)
             })
         } else {
-            Err(Error::NotFound)
+            Err(SpineError::new_not_found("Animation", animation_name))
         }
     }
 
+    /// Queues the animation in the given track, returning the track index. If the track index
+    /// doesn't exist then it will be created.
     pub fn add_animation(
         &mut self,
         track_index: i32,
@@ -259,6 +283,8 @@ impl AnimationState {
         }
     }
 
+    /// Set the event listener on this animation state. An animation state can only have one event
+    /// listener at a time. See the documentation for [`Event`] for more information.
     pub fn set_listener<F>(&mut self, listener: F)
     where
         F: Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>) + 'static,
@@ -464,12 +490,11 @@ impl TrackEntry {
 }
 
 c_handle_indexed_decl!(
-    /// A storeable reference to a [TrackEntry](struct.TrackEntry.html).
+    /// A storeable reference to a [`TrackEntry`].
     ///
     /// Can be acquired from a
-    /// [CTmpRef<AnimationState, TrackEntry>](c_interface/struct.CTmpRef.html) or
-    /// [CTmpMut<AnimationState, TrackEntry>](c_interface/struct.CTmpMut.html) acquired from an
-    /// [AnimationState](struct.AnimationState.html) instance.
+    /// [`CTmpRef<AnimationState, TrackEntry>`] or [`CTmpMut<AnimationState, TrackEntry>`] acquired
+    /// from an [`AnimationState`] instance.
     ///
     /// ```
     /// # #[path="./doctests.rs"]

@@ -1,3 +1,5 @@
+//! Provides [`SkeletonController`], a helper struct for updating and drawing Spine skeletons.
+
 use std::{mem::take, sync::Arc};
 
 use crate::{

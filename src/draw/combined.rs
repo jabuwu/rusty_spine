@@ -5,26 +5,50 @@ use crate::{
 
 use super::{ColorSpace, CullDirection};
 
+#[allow(unused_imports)]
+use crate::{draw::SimpleDrawer, extension};
+
+/// Renderables generated from [`CombinedDrawer::draw`].
 pub struct CombinedRenderable {
+    /// A list of vertex attributes for a mesh.
     pub vertices: Vec<[f32; 2]>,
+    /// A list of UV attributes for a mesh.
     pub uvs: Vec<[f32; 2]>,
+    /// A list of color attributes for a mesh.
     pub colors: Vec<[f32; 4]>,
+    /// A list of dark color attributes for a mesh.
+    /// See the [Spine User Guide](http://en.esotericsoftware.com/spine-slots#Tint-black).
     pub dark_colors: Vec<[f32; 4]>,
+    /// A list of indices for a mesh.
     pub indices: Vec<u16>,
+    /// The blend mode to use when drawing this mesh.
     pub blend_mode: BlendMode,
+    /// The attachment's renderer object as a raw pointer. Usually represents the texture created
+    /// from [`extension::set_create_texture_cb`].
     pub attachment_renderer_object: Option<*const c_void>,
 }
 
+/// A combined drawer with a mesh combining optimization.
+///
+/// Assumes use of the default atlas attachment loader.
+///
+/// See [`CombinedDrawer::draw`]
 pub struct CombinedDrawer {
     pub cull_direction: CullDirection,
     pub premultiplied_alpha: bool,
     pub color_space: ColorSpace,
 }
 
-/// A combined drawer with a mesh combining optimization.
-///
-/// Assumes use of the default atlas attachment loader.
 impl CombinedDrawer {
+    /// This function returns a list of [`CombinedRenderable`] structs containing all the necessary
+    /// data to create and render meshes. Attachments are batched together into a single renderable
+    /// so long as their blend mode or renderer object is not different from the previous
+    /// attachment. If a [`SkeletonClipping`] is provided, meshes will be properly clipped. The
+    /// renderables are expected to be rendered in the order provided with the first renderable
+    /// being drawn behind all the others.
+    ///
+    /// This drawer can provide a significant performance advantage over the [`SimpleDrawer`] in
+    /// most cases.
     pub fn draw(
         &self,
         skeleton: &mut Skeleton,

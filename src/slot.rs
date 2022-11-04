@@ -129,9 +129,9 @@ impl Slot {
 }
 
 c_handle_decl!(
-    /// A storeable reference to a [Slot](struct.Slot.html).
+    /// A storeable reference to a [`Slot`].
     ///
-    /// Can be acquired from any instance of [Slot](struct.Slot.html).
+    /// Can be acquired from any instance of [`Slot`].
     ///
     /// ```
     /// # #[path="./doctests.rs"]

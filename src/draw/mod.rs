@@ -1,3 +1,11 @@
+//! Helpers types for drawing Spine skeletons.
+//!
+//! Drawers generate mesh information ready to be used in graphics libraries and game engines.
+//!
+//! Two implementations are currently provided:
+//! - [`SimpleDrawer`]
+//! - [`CombinedDrawer`]
+
 mod combined;
 mod simple;
 

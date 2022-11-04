@@ -13,8 +13,9 @@ use bevy::{
     sprite::Mesh2dHandle,
 };
 use rusty_spine::{
-    draw::CullDirection, AnimationStateData, Atlas, Error, SkeletonController,
-    SkeletonControllerSettings, SkeletonJson,
+    controller::{SkeletonController, SkeletonControllerSettings},
+    draw::CullDirection,
+    AnimationStateData, Atlas, SkeletonJson, SpineError,
 };
 
 #[cfg(feature = "egui_debugger")]
@@ -387,7 +388,11 @@ fn spine_update(
     }
 }
 
-fn load_skeleton(atlas: &Vec<u8>, json: &Vec<u8>, dir: &str) -> Result<SkeletonController, Error> {
+fn load_skeleton(
+    atlas: &Vec<u8>,
+    json: &Vec<u8>,
+    dir: &str,
+) -> Result<SkeletonController, SpineError> {
     let atlas = Arc::new(Atlas::new(atlas, dir)?);
     let skeleton_json = SkeletonJson::new(atlas.clone());
     let skeleton_data = Arc::new(skeleton_json.read_skeleton_data(json)?);

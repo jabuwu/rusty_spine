@@ -3,11 +3,14 @@ use crate::{
     c_interface::{NewFromPtr, SyncPtr},
 };
 
+#[allow(unused_imports)]
+use crate::AnimationState;
+
 /// Events fired from animations.
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Event)
 ///
-/// To receive events, set a listener on [AnimationState](struct.AnimationState.html)
+/// To receive events, set a listener on [`AnimationState`].
 /// ```
 /// # #[path="./doctests.rs"]
 /// # mod doctests;

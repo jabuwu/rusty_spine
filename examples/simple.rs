@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use rusty_spine::*;
+use rusty_spine::{controller::*, *};
 
 fn main() {
     let atlas_path = "assets/spineboy/export/spineboy.atlas";

@@ -78,7 +78,7 @@ where
 
 /// Set `_spAtlasPage_disposeTexture`
 ///
-/// For an example, see [set_create_texture_cb](fn.set_create_texture_cb.html).
+/// For an example, see [`set_create_texture_cb`].
 pub fn set_dispose_texture_cb<F>(dispose_texture_cb: F)
 where
     F: Fn(&mut AtlasPage) + 'static,

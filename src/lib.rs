@@ -1,14 +1,13 @@
 //! Spine runtime for Rust (and wasm!) transpiled from the official C Runtime. Supports Spine 4.1.
 //!
-//! To load a [Skeleton](struct.Skeleton.html), see [SkeletonJson](struct.SkeletonJson.html) or
-//! [SkeletonBinary](struct.SkeletonBinary.html).
+//! To load a [`Skeleton`], see [`SkeletonJson`] or [`SkeletonBinary`].
 //!
 //! To set automatic mix durations (crossfading) between animations, see
-//! [AnimationStateData](struct.AnimationStateData.html).
+//! [`AnimationStateData`].
 //!
-//! To find and manage bones, see [Bone](struct.Bone.html).
+//! To find and manage bones, see [`Bone`].
 //!
-//! To receive animation events, see [Event](struct.Event.html).
+//! To receive animation events, see [`Event`].
 
 #[macro_use]
 pub mod c_interface;
@@ -16,11 +15,9 @@ pub mod c;
 pub mod extension;
 
 #[cfg(feature = "draw_functions")]
+pub mod controller;
+#[cfg(feature = "draw_functions")]
 pub mod draw;
-#[cfg(feature = "draw_functions")]
-mod skeleton_controller;
-#[cfg(feature = "draw_functions")]
-pub use skeleton_controller::*;
 
 #[cfg(feature = "egui_debugger")]
 pub mod debugger;
