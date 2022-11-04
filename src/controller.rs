@@ -34,7 +34,7 @@ impl Default for SkeletonControllerSettings {
         Self {
             premultiplied_alpha: false,
             cull_direction: CullDirection::Clockwise,
-            color_space: ColorSpace::Linear,
+            color_space: ColorSpace::SRGB,
         }
     }
 }
@@ -54,6 +54,13 @@ impl SkeletonControllerSettings {
     pub fn with_cull_direction(self, cull_direction: CullDirection) -> Self {
         Self {
             cull_direction,
+            ..self
+        }
+    }
+
+    pub fn with_color_space(self, color_space: ColorSpace) -> Self {
+        Self {
+            color_space,
             ..self
         }
     }
