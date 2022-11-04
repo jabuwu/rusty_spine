@@ -25,7 +25,7 @@ If you wish to use the C API directly (either because the Rust API lacks a featu
 
 ## Engine Integrations
 
-- [Bevy](https://github.com/jabuwu/bevy_spine)
+- [Bevy](https://github.com/jabuwu/bevy_spine) - ([WASM Demo](https://jabuwu.github.io/bevy_spine_demos/))
 
 ## License
 
