@@ -19,9 +19,6 @@ pub mod controller;
 #[cfg(feature = "draw_functions")]
 pub mod draw;
 
-#[cfg(feature = "egui_debugger")]
-pub mod debugger;
-
 mod animation;
 mod animation_state;
 mod animation_state_data;

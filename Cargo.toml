@@ -13,14 +13,11 @@ exclude = [
 
 [dependencies]
 libc = { version = "0.2", optional = true }
-egui = { version = "0.19", optional = true }
-egui_extras = { version = "0.19", optional = true }
 mint = { version = "0.5", optional = true }
 
 [dev-dependencies]
 transpiler = { path = "./transpiler" }
-bevy = "0.8"
-bevy_egui = "0.16"
+bevy = "0.9"
 glam = { version = "0.21", features = [ "mint" ] }
 
 [profile.dev.package."*"]
@@ -30,4 +27,3 @@ opt-level = 3
 default = [ "draw_functions", "mint" ]
 use_libc = [ "libc" ]
 draw_functions = []
-egui_debugger = [ "egui", "egui_extras" ]

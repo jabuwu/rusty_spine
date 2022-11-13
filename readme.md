@@ -45,14 +45,6 @@ Default: yes
 
 Provides [helper functions](https://github.com/jabuwu/rusty_spine/tree/main/src/draw) for generating mesh data, as well as the `SkeletonController` helper struct.
 
-### egui_debugger
-
-Default: no
-
-Provides an [egui](https://github.com/emilk/egui) debugger window for viewing skeleton and animation state. See it in action by running the `bevy` example with this feature enabled:
-
-`cargo run --release --example bevy --features egui_debugger`
-
 ### mint
 
 Default: yes

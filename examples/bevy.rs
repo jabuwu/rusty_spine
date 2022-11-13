@@ -18,12 +18,6 @@ use rusty_spine::{
     AnimationStateData, Atlas, SkeletonJson, SpineError,
 };
 
-#[cfg(feature = "egui_debugger")]
-use {
-    bevy_egui::{EguiContext, EguiPlugin},
-    rusty_spine::debugger::egui::egui_spine_debugger,
-};
-
 #[derive(Component)]
 pub struct Spine {
     controller: SkeletonController,
@@ -45,6 +39,7 @@ struct Demo {
     note: String,
 }
 
+#[derive(Resource)]
 struct Demos(Vec<Demo>);
 
 #[derive(Clone)]
@@ -66,6 +61,7 @@ fn make_empty(mesh: &mut Mesh) {
     mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
 }
 
+#[derive(Resource)]
 struct PersistentImageHandles {
     handles: Arc<Mutex<Vec<(String, Handle<Image>)>>>,
     remember: Arc<Mutex<Vec<String>>>,
@@ -93,8 +89,7 @@ fn main() {
         );
         page.renderer_object().dispose::<SpineTexture>();
     });
-    let mut app = App::new();
-    app.insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
+    App::new().insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .insert_resource(PersistentImageHandles {
             handles: image_handles,
             remember: image_remember,
@@ -197,10 +192,7 @@ fn main() {
         .add_startup_system(startup)
         .add_system(demo_load)
         .add_system(demo_next)
-        .add_system(spine_update);
-    #[cfg(feature = "egui_debugger")]
-    app.add_plugin(EguiPlugin).add_system(spine_debugger);
-    app.run();
+        .add_system(spine_update).run();
 }
 
 fn startup(
@@ -208,9 +200,9 @@ fn startup(
     mut ev_demo_load: EventWriter<DemoLoad>,
     asset_server: Res<AssetServer>,
 ) {
-    commands.spawn_bundle(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default());
     ev_demo_load.send(DemoLoad(0));
-    commands.spawn_bundle(Text2dBundle {
+    commands.spawn(Text2dBundle {
         text: Text::from_section(
             "press space for next demo",
             TextStyle {
@@ -227,7 +219,7 @@ fn startup(
         ..Default::default()
     });
     commands
-        .spawn_bundle(Text2dBundle {
+        .spawn(Text2dBundle {
             text: Text::from_section(
                 "",
                 TextStyle {
@@ -269,7 +261,7 @@ fn demo_load(
         }
         let mut slots = HashMap::new();
         commands
-            .spawn_bundle((
+            .spawn((
                 Transform::from_scale(Vec3::ONE * demo.scale),
                 GlobalTransform::default(),
                 Visibility::default(),
@@ -283,7 +275,7 @@ fn demo_load(
                     slots.insert(
                         slot.data().name().to_owned(),
                         parent
-                            .spawn_bundle((
+                            .spawn((
                                 Mesh2dHandle(mesh.clone()),
                                 Transform::from_xyz(demo.position.x, demo.position.y, 0.),
                                 GlobalTransform::default(),
@@ -402,45 +394,4 @@ fn load_skeleton(
             SkeletonControllerSettings::new().with_cull_direction(CullDirection::CounterClockwise),
         ),
     )
-}
-
-#[cfg(feature = "egui_debugger")]
-fn spine_debugger(mut egui_context: ResMut<EguiContext>, mut spine_query: Query<&mut Spine>) {
-    use rusty_spine::debugger::egui::SpineDebuggerCombinedRenderables;
-    use rusty_spine::debugger::egui::SpineDebuggerSimpleRenderables;
-    use rusty_spine::draw::CombinedDrawer;
-    use rusty_spine::draw::SimpleDrawer;
-
-    for mut spine in spine_query.iter_mut() {
-        let Spine { controller, .. } = spine.as_mut();
-        let SkeletonController {
-            skeleton,
-            animation_state,
-            clipper,
-            ..
-        } = controller;
-        let simple_renderable_stats = Box::new(SpineDebuggerSimpleRenderables::new(
-            SimpleDrawer {
-                cull_direction: CullDirection::Clockwise,
-                premultiplied_alpha: false,
-            },
-            skeleton,
-            Some(clipper),
-        ));
-        let combined_renderable_stats = Box::new(SpineDebuggerCombinedRenderables::new(
-            CombinedDrawer {
-                cull_direction: CullDirection::Clockwise,
-                premultiplied_alpha: false,
-            },
-            skeleton,
-            Some(clipper),
-        ));
-        egui_spine_debugger(
-            egui_context.ctx_mut(),
-            "Spine",
-            skeleton,
-            animation_state,
-            vec![simple_renderable_stats, combined_renderable_stats],
-        );
-    }
 }
