@@ -93,7 +93,7 @@ c_handle_decl!(
     /// [`CTmpRef<Skeleton, Skin>`], or [`CTmpMut<Skeleton, Skin>`].
     ///
     /// ```
-    /// # #[path="./tests.rs"]
+    /// # #[path="./test.rs"]
     /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, SkinHandle};
     /// # let (skeleton, _) = test::TestAsset::spineboy().instance();

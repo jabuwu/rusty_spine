@@ -71,4 +71,4 @@ pub use slot::*;
 pub use texture_region::*;
 
 #[cfg(test)]
-pub mod tests;
+pub mod test;

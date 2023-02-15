@@ -12,7 +12,7 @@ use crate::AnimationState;
 ///
 /// To receive events, set a listener on [`AnimationState`].
 /// ```
-/// # #[path="./tests.rs"]
+/// # #[path="./test.rs"]
 /// # mod test;
 /// # use rusty_spine::{AnimationState, EventType};
 /// # let (_, mut animation_state) = test::TestAsset::spineboy().instance();

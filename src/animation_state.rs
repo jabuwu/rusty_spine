@@ -497,7 +497,7 @@ c_handle_indexed_decl!(
     /// from an [`AnimationState`] instance.
     ///
     /// ```
-    /// # #[path="./tests.rs"]
+    /// # #[path="./test.rs"]
     /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, TrackEntryHandle};
     /// # let (_, animation_state) = test::TestAsset::spineboy().instance();
@@ -528,7 +528,7 @@ impl<'a> CTmpMut<'a, AnimationState, TrackEntry> {
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::TestAsset;
+    use crate::test::TestAsset;
 
     #[test]
     fn track_entry_optional() {

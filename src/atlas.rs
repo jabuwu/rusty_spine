@@ -422,7 +422,7 @@ pub mod atlas {
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::TestAsset;
+    use crate::test::TestAsset;
 
     use super::Atlas;
 

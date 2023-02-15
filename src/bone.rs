@@ -168,7 +168,7 @@ impl Bone {
         /// An iterator over the children of this bone.
         ///
         /// ```
-        /// # #[path="./tests.rs"]
+        /// # #[path="./test.rs"]
         /// # mod test;
         /// use rusty_spine::{BoneHandle, Skeleton};
         ///
@@ -355,7 +355,7 @@ c_handle_decl!(
     /// Can be acquired from any instance of [`Bone`].
     ///
     /// ```
-    /// # #[path="./tests.rs"]
+    /// # #[path="./test.rs"]
     /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, BoneHandle};
     /// # let (skeleton, _) = test::TestAsset::spineboy().instance();

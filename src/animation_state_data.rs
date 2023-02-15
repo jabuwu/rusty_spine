@@ -22,7 +22,7 @@ use crate::AnimationState;
 /// smoothly mix between a `walk` and `run` animation for `0.2` seconds:
 ///
 /// ```
-/// # #[path="./tests.rs"]
+/// # #[path="./test.rs"]
 /// # mod test;
 /// # let mut animation_state_data = test::TestAsset::spineboy().animation_state_data();
 /// animation_state_data.set_mix_by_name("walk", "run", 0.2);
@@ -32,7 +32,7 @@ use crate::AnimationState;
 /// durations must be specified:
 ///
 /// ```
-/// # #[path="./tests.rs"]
+/// # #[path="./test.rs"]
 /// # mod test;
 /// # let mut animation_state_data = test::TestAsset::spineboy().animation_state_data();
 /// animation_state_data.set_mix_by_name("walk", "run", 0.2);

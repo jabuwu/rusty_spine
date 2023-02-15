@@ -134,7 +134,7 @@ c_handle_decl!(
     /// Can be acquired from any instance of [`Slot`].
     ///
     /// ```
-    /// # #[path="./tests.rs"]
+    /// # #[path="./test.rs"]
     /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, SlotHandle};
     /// # let (skeleton, _) = test::TestAsset::spineboy().instance();

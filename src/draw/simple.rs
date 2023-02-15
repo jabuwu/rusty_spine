@@ -309,7 +309,7 @@ impl SimpleDrawer {
 
 #[cfg(test)]
 mod test {
-    use crate::tests::TestAsset;
+    use crate::test::TestAsset;
 
     use super::*;
 
