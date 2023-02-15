@@ -422,16 +422,18 @@ pub mod atlas {
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::TEST_SPINEBOY_ATLAS_FILE;
+    use crate::tests::TestAsset;
 
     use super::Atlas;
 
     #[test]
     fn new_from_file() {
-        let atlas = Atlas::new_from_file(TEST_SPINEBOY_ATLAS_FILE);
-        assert!(atlas.is_ok());
+        for test_example_asset in TestAsset::all().iter() {
+            let atlas = Atlas::new_from_file(test_example_asset.atlas_file);
+            assert!(atlas.is_ok());
+        }
 
-        let atlas = Atlas::new_from_file(format!("missing/{}", TEST_SPINEBOY_ATLAS_FILE));
+        let atlas = Atlas::new_from_file(format!("missing/{}", TestAsset::spineboy().atlas_file));
         assert!(atlas.is_err());
     }
 }

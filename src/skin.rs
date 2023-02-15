@@ -93,10 +93,10 @@ c_handle_decl!(
     /// [`CTmpRef<Skeleton, Skin>`], or [`CTmpMut<Skeleton, Skin>`].
     ///
     /// ```
-    /// # #[path="./doctests.rs"]
-    /// # mod doctests;
+    /// # #[path="./tests.rs"]
+    /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, SkinHandle};
-    /// # let (skeleton, _) = doctests::test_spineboy_instance();
+    /// # let (skeleton, _) = test::TestAsset::spineboy().instance();
     /// let skeleton_data = skeleton.data();
     /// let skin_handles: Vec<SkinHandle> = skeleton_data.skins().map(|skin| skin.handle()).collect();
     /// for skin_handle in skin_handles.iter() {

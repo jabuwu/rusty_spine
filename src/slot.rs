@@ -134,10 +134,10 @@ c_handle_decl!(
     /// Can be acquired from any instance of [`Slot`].
     ///
     /// ```
-    /// # #[path="./doctests.rs"]
-    /// # mod doctests;
+    /// # #[path="./tests.rs"]
+    /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, SlotHandle};
-    /// # let (skeleton, _) = doctests::test_spineboy_instance();
+    /// # let (skeleton, _) = test::TestAsset::spineboy().instance();
     /// let slot_handles: Vec<SlotHandle> = skeleton.slots().map(|slot| slot.handle()).collect();
     /// for slot_handle in slot_handles.iter() {
     ///     let slot = slot_handle.get(&skeleton).unwrap();

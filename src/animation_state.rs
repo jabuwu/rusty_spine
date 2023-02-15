@@ -497,10 +497,10 @@ c_handle_indexed_decl!(
     /// from an [`AnimationState`] instance.
     ///
     /// ```
-    /// # #[path="./doctests.rs"]
-    /// # mod doctests;
+    /// # #[path="./tests.rs"]
+    /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, TrackEntryHandle};
-    /// # let (_, animation_state) = doctests::test_spineboy_instance();
+    /// # let (_, animation_state) = test::TestAsset::spineboy().instance();
     /// let track_entry_handles: Vec<TrackEntryHandle> = animation_state.tracks().map(|track| track.unwrap().handle()).collect();
     /// for track_entry_handle in track_entry_handles.iter() {
     ///     let track_entry = track_entry_handle.get(&animation_state).unwrap();
@@ -528,11 +528,11 @@ impl<'a> CTmpMut<'a, AnimationState, TrackEntry> {
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::test_spineboy_instance;
+    use crate::tests::TestAsset;
 
     #[test]
     fn track_entry_optional() {
-        let (_, mut animation_state) = test_spineboy_instance();
+        let (_, mut animation_state) = TestAsset::spineboy().instance();
         let _ = animation_state.set_animation_by_name(0, "idle", true);
         let _ = animation_state.set_animation_by_name(2, "run", true);
 
@@ -553,7 +553,7 @@ mod tests {
 
     #[test]
     fn track_entry_invalidate_clear() {
-        let (_, mut animation_state) = test_spineboy_instance();
+        let (_, mut animation_state) = TestAsset::spineboy().instance();
         let _ = animation_state.set_animation_by_name(0, "idle", true);
 
         let track_handle = animation_state.track_at_index(0).unwrap().handle();
@@ -565,7 +565,7 @@ mod tests {
 
     #[test]
     fn track_entry_invalidate_change() {
-        let (_, mut animation_state) = test_spineboy_instance();
+        let (_, mut animation_state) = TestAsset::spineboy().instance();
         let _ = animation_state.set_animation_by_name(0, "idle", true);
 
         let track_handle = animation_state.track_at_index(0).unwrap().handle();

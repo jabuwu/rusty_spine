@@ -168,8 +168,8 @@ impl Bone {
         /// An iterator over the children of this bone.
         ///
         /// ```
-        /// # #[path="./doctests.rs"]
-        /// # mod doctests;
+        /// # #[path="./tests.rs"]
+        /// # mod test;
         /// use rusty_spine::{BoneHandle, Skeleton};
         ///
         /// fn traverse_bones(
@@ -191,7 +191,7 @@ impl Bone {
         /// }
         ///
         /// // Traverse all bones in a skeleton
-        /// # let (skeleton, animation_state) = doctests::test_spineboy_instance();
+        /// # let (skeleton, animation_state) = test::TestAsset::spineboy().instance();
         /// let root_bone = skeleton.bone_root().handle();
         /// traverse_bones(root_bone, &skeleton, 0);
         /// ```
@@ -355,10 +355,10 @@ c_handle_decl!(
     /// Can be acquired from any instance of [`Bone`].
     ///
     /// ```
-    /// # #[path="./doctests.rs"]
-    /// # mod doctests;
+    /// # #[path="./tests.rs"]
+    /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, BoneHandle};
-    /// # let (skeleton, _) = doctests::test_spineboy_instance();
+    /// # let (skeleton, _) = test::TestAsset::spineboy().instance();
     /// let bone_handles: Vec<BoneHandle> = skeleton.bones().map(|bone| bone.handle()).collect();
     /// for bone_handle in bone_handles.iter() {
     ///     let bone = bone_handle.get(&skeleton).unwrap();
