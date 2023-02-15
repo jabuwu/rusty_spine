@@ -1,5 +1,5 @@
 use crate::{
-    c::{c_void, spMeshAttachment_updateRegion, spSkeletonClipping_clipTriangles},
+    c::{c_void, spMeshAttachment_updateRegion},
     BlendMode, Color, Skeleton, SkeletonClipping,
 };
 
@@ -206,17 +206,12 @@ impl SimpleDrawer {
             if let Some(clipper) = clipper.as_deref_mut() {
                 if clipper.is_clipping() {
                     unsafe {
-                        spSkeletonClipping_clipTriangles(
-                            clipper.c_ptr(),
-                            vertices.as_mut_ptr() as *mut f32,
-                            vertices.len() as i32,
-                            indices.as_mut_ptr(),
-                            indices.len() as i32,
-                            uvs.as_mut_ptr() as *mut f32,
+                        clipper.clip_triangles(
+                            vertices.as_mut_slice(),
+                            indices.as_mut_slice(),
+                            uvs.as_mut_slice(),
                             2,
                         );
-                    }
-                    unsafe {
                         let clipped_vertices_size =
                             (*clipper.c_ptr_ref().clippedVertices).size as usize;
                         vertices.resize(clipped_vertices_size / 2, [0., 0.]);

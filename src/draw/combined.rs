@@ -1,7 +1,4 @@
-use crate::{
-    c::{c_void, spSkeletonClipping_clipTriangles},
-    BlendMode, Color, Skeleton, SkeletonClipping,
-};
+use crate::{c::c_void, BlendMode, Color, Skeleton, SkeletonClipping};
 
 use super::{ColorSpace, CullDirection};
 
@@ -315,17 +312,12 @@ impl CombinedDrawer {
                         indices[i as usize] -= vertex_base;
                     }
                     unsafe {
-                        spSkeletonClipping_clipTriangles(
-                            clipper.c_ptr(),
-                            &mut vertices[vertex_base as usize] as *mut f32,
-                            vertices.len() as i32 - vertex_base as i32,
-                            &mut indices[index_base as usize],
-                            indices.len() as i32 - index_base as i32,
-                            &mut uvs[vertex_base as usize] as *mut f32,
+                        clipper.clip_triangles(
+                            vertices.as_mut_slice(),
+                            indices.as_mut_slice(),
+                            uvs.as_mut_slice(),
                             2,
                         );
-                    }
-                    unsafe {
                         let clipped_triangles_size =
                             (*clipper.c_ptr_ref().clippedTriangles).size as usize;
                         let clipped_vertices_size =

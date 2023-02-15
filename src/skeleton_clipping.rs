@@ -1,14 +1,21 @@
 use crate::{
     c::{
         spClippingAttachment, spSkeletonClipping, spSkeletonClipping_clipEnd,
-        spSkeletonClipping_clipEnd2, spSkeletonClipping_clipStart, spSkeletonClipping_create,
-        spSkeletonClipping_dispose, spSkeletonClipping_isClipping,
+        spSkeletonClipping_clipEnd2, spSkeletonClipping_clipStart,
+        spSkeletonClipping_clipTriangles, spSkeletonClipping_create, spSkeletonClipping_dispose,
+        spSkeletonClipping_isClipping,
     },
     c_interface::SyncPtr,
     clipping_attachment::ClippingAttachment,
     slot::Slot,
 };
 
+#[cfg(doc)]
+use crate::draw::SimpleDrawer;
+
+/// Active state for [`ClippingAttachment`] during mesh generation.
+///
+/// For example usage, see the [`SimpleDrawer::draw`] implementation.
 #[derive(Debug)]
 pub struct SkeletonClipping {
     c_skeleton_clipping: SyncPtr<spSkeletonClipping>,
@@ -53,6 +60,24 @@ impl SkeletonClipping {
 
     pub fn is_clipping(&self) -> bool {
         unsafe { spSkeletonClipping_isClipping(self.c_ptr_mut()) != 0 }
+    }
+
+    pub unsafe fn clip_triangles(
+        &self,
+        vertices: &mut [[f32; 2]],
+        triangles: &mut [u16],
+        uvs: &mut [[f32; 2]],
+        stride: i32,
+    ) {
+        spSkeletonClipping_clipTriangles(
+            self.c_ptr(),
+            vertices.as_mut_ptr() as *mut f32,
+            vertices.len() as i32,
+            triangles.as_mut_ptr(),
+            triangles.len() as i32,
+            uvs.as_mut_ptr() as *mut f32,
+            stride,
+        );
     }
 
     c_ptr!(c_skeleton_clipping, spSkeletonClipping);
