@@ -139,3 +139,18 @@ pub struct AttachmentEntry {
     pub slot_index: i32,
     pub attachment: Attachment,
 }
+
+#[cfg(test)]
+mod test {
+    use crate::test::TestAsset;
+
+    use super::*;
+
+    /// Check that dropped skins don't segfault.
+    #[test]
+    fn skin_drop() {
+        let (skeleton, _) = TestAsset::spineboy().instance();
+        drop(skeleton.data().default_skin());
+        drop(Skin::new("test"));
+    }
+}
