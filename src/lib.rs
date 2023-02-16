@@ -1,5 +1,7 @@
 //! Spine runtime for Rust (and wasm!) transpiled from the official C Runtime. Supports Spine 4.1.
 //!
+//! For a very quick working example, see [`controller`].
+//!
 //! To load a [`Skeleton`], see [`SkeletonJson`] or [`SkeletonBinary`].
 //!
 //! To set automatic mix durations (crossfading) between animations, see

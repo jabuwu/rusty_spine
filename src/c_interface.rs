@@ -12,6 +12,12 @@ pub trait NewFromPtr<C> {
     unsafe fn new_from_ptr(c_ptr: *const C) -> Self;
 }
 
+/// A reference type to temporarily borrow two types at once, ensuring a parent's lifetime remains
+/// valid throughout the lifetime of the child.
+///
+/// A lot of relationships are implicitly represented throughout the codebase, since their actual
+/// relationship exists within transpiled C code. This struct allows creating a temporary link the
+/// borrow checker can use to ensure correctness.
 pub struct CTmpRef<'a, P, T> {
     pub(crate) data: T,
     pub(crate) parent: &'a P,
@@ -47,6 +53,7 @@ impl<'a, P, T: std::fmt::Debug> std::fmt::Debug for CTmpRef<'a, P, T> {
     }
 }
 
+/// A mutable version of [`CTmpRef`].
 pub struct CTmpMut<'a, P, T> {
     pub(crate) data: T,
     pub(crate) parent: &'a mut P,
@@ -92,6 +99,8 @@ impl<'a, P, T: std::fmt::Debug> std::fmt::Debug for CTmpMut<'a, P, T> {
     }
 }
 
+/// An iterator through a C array, maintaining a reference to a parent to ensure the data does not
+/// become invalid while iterating.
 pub struct CTmpPtrIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
@@ -135,6 +144,7 @@ where
     }
 }
 
+/// A mutable version of [`CTmpPtrIterator`].
 pub struct CTmpMutIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
@@ -181,6 +191,7 @@ where
     }
 }
 
+/// Similar to [`CTmpPtrIterator`], with some support for optional (null) items.
 pub struct CTmpPtrNullableIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
@@ -256,6 +267,7 @@ where
     }
 }
 
+/// Similar to [`CTmpMutIterator`], with some support for optional (null) items.
 pub struct CTmpMutNullableIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
