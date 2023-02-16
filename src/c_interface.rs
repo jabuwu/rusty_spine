@@ -294,6 +294,7 @@ where
     }
 }
 
+/// A wrapper over a raw pointer with the [`Send`] and [`Sync`] traits.
 #[derive(Clone, Copy)]
 pub struct SyncPtr<T>(pub *mut T);
 unsafe impl<T> Send for SyncPtr<T> {}
