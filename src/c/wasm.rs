@@ -54,7 +54,7 @@ pub mod types {
     #[allow(non_camel_case_types)]
     pub type c_schar = i8;
     #[allow(non_camel_case_types)]
-    pub type c_char = i8;
+    pub type c_char = std::ffi::c_char;
     #[allow(non_camel_case_types)]
     pub type c_uchar = u8;
     #[allow(non_camel_case_types)]
