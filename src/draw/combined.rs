@@ -313,9 +313,9 @@ impl CombinedDrawer {
                     }
                     unsafe {
                         clipper.clip_triangles(
-                            vertices.as_mut_slice(),
-                            indices.as_mut_slice(),
-                            uvs.as_mut_slice(),
+                            &mut vertices.as_mut_slice()[(vertex_base as usize)..],
+                            &mut indices.as_mut_slice()[(index_base as usize)..],
+                            &mut uvs.as_mut_slice()[(vertex_base as usize)..],
                             2,
                         );
                         let clipped_triangles_size =
