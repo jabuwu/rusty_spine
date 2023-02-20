@@ -1,9 +1,9 @@
 //! Direct access to the [Spine C Runtime](http://en.esotericsoftware.com/spine-c).
 //!
 //! Transpiled from spine-c commit
-//! [d9935741c2b84abea85e961489ed71b5b473aa64](https://github.com/EsotericSoftware/spine-runtimes/tree/d9935741c2b84abea85e961489ed71b5b473aa64)
+//! [de808262bb84f61f24627c96a50a25370390af76](https://github.com/EsotericSoftware/spine-runtimes/tree/de808262bb84f61f24627c96a50a25370390af76)
 //!
-//! Transpiled using c2rust commit [00ace7631ee3b5cc4447a0562c62b82eedd27812](https://github.com/immunant/c2rust/tree/00ace7631ee3b5cc4447a0562c62b82eedd27812)
+//! Transpiled using c2rust commit [0a2b64b4f83b42f08fe13c3d4fbd8b5b167f07a8](https://github.com/immunant/c2rust/tree/0a2b64b4f83b42f08fe13c3d4fbd8b5b167f07a8)
 #[cfg(not(feature = "libc"))]
 #[macro_use]
 mod wasm;
