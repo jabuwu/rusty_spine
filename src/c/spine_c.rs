@@ -12328,45 +12328,45 @@ unsafe extern "C" fn parse_string(mut item: *mut Json, mut str: *const c_char) -
                                             & 0xbf as c_int as c_uint)
                                             as c_char;
                                         uc >>= 6 as c_int;
-                                        current_block_38 = 1872546583673537734;
+                                        current_block_38 = 5539093206837080797;
                                     }
                                     3 => {
-                                        current_block_38 = 1872546583673537734;
+                                        current_block_38 = 5539093206837080797;
                                     }
                                     2 => {
-                                        current_block_38 = 14458908414828666963;
+                                        current_block_38 = 11976653012217591135;
                                     }
                                     1 => {
-                                        current_block_38 = 11653756310905352348;
+                                        current_block_38 = 10306735036990263469;
                                     }
                                     _ => {
                                         current_block_38 = 4567019141635105728;
                                     }
                                 }
                                 match current_block_38 {
-                                    1872546583673537734 => {
+                                    5539093206837080797 => {
                                         ptr2 = ptr2.offset(-1);
                                         *ptr2 = ((uc | 0x80 as c_int as c_uint)
                                             & 0xbf as c_int as c_uint)
                                             as c_char;
                                         uc >>= 6 as c_int;
-                                        current_block_38 = 14458908414828666963;
+                                        current_block_38 = 11976653012217591135;
                                     }
                                     _ => {}
                                 }
                                 match current_block_38 {
-                                    14458908414828666963 => {
+                                    11976653012217591135 => {
                                         ptr2 = ptr2.offset(-1);
                                         *ptr2 = ((uc | 0x80 as c_int as c_uint)
                                             & 0xbf as c_int as c_uint)
                                             as c_char;
                                         uc >>= 6 as c_int;
-                                        current_block_38 = 11653756310905352348;
+                                        current_block_38 = 10306735036990263469;
                                     }
                                     _ => {}
                                 }
                                 match current_block_38 {
-                                    11653756310905352348 => {
+                                    10306735036990263469 => {
                                         ptr2 = ptr2.offset(-1);
                                         *ptr2 =
                                             (uc | firstByteMark[len as usize] as c_uint) as c_char;
@@ -22637,500 +22637,514 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             {
                 (*skeletonData).defaultSkin = skin;
             }
-            attachmentsMap =
-                (*Json_getItem(skinMap, b"attachments\0" as *const u8 as *const c_char)).child;
-            while !attachmentsMap.is_null() {
-                let mut slot: *mut spSlotData =
-                    spSkeletonData_findSlot(skeletonData, (*attachmentsMap).name);
-                let mut attachmentMap: *mut Json = 0 as *mut Json;
-                attachmentMap = (*attachmentsMap).child;
-                while !attachmentMap.is_null() {
-                    let mut attachment: *mut spAttachment = 0 as *mut spAttachment;
-                    let mut skinAttachmentName: *const c_char = (*attachmentMap).name;
-                    let mut attachmentName: *const c_char = Json_getString(
-                        attachmentMap,
-                        b"name\0" as *const u8 as *const c_char,
-                        skinAttachmentName,
-                    );
-                    let mut path: *const c_char = Json_getString(
-                        attachmentMap,
-                        b"path\0" as *const u8 as *const c_char,
-                        attachmentName,
-                    );
-                    let mut color_1: *const c_char = 0 as *const c_char;
-                    let mut entry: *mut Json = 0 as *mut Json;
-                    let mut sequence: *mut spSequence = 0 as *mut spSequence;
-                    let mut typeString: *const c_char = Json_getString(
-                        attachmentMap,
-                        b"type\0" as *const u8 as *const c_char,
-                        b"region\0" as *const u8 as *const c_char,
-                    );
-                    let mut type_0: spAttachmentType = SP_ATTACHMENT_REGION;
-                    if spine_strcmp(typeString, b"region\0" as *const u8 as *const c_char)
-                        == 0 as c_int
-                    {
-                        type_0 = SP_ATTACHMENT_REGION;
-                    } else if spine_strcmp(typeString, b"mesh\0" as *const u8 as *const c_char)
-                        == 0 as c_int
-                    {
-                        type_0 = SP_ATTACHMENT_MESH;
-                    } else if spine_strcmp(
-                        typeString,
-                        b"linkedmesh\0" as *const u8 as *const c_char,
-                    ) == 0 as c_int
-                    {
-                        type_0 = SP_ATTACHMENT_LINKED_MESH;
-                    } else if spine_strcmp(
-                        typeString,
-                        b"boundingbox\0" as *const u8 as *const c_char,
-                    ) == 0 as c_int
-                    {
-                        type_0 = SP_ATTACHMENT_BOUNDING_BOX;
-                    } else if spine_strcmp(typeString, b"path\0" as *const u8 as *const c_char)
-                        == 0 as c_int
-                    {
-                        type_0 = SP_ATTACHMENT_PATH;
-                    } else if spine_strcmp(typeString, b"clipping\0" as *const u8 as *const c_char)
-                        == 0 as c_int
-                    {
-                        type_0 = SP_ATTACHMENT_CLIPPING;
-                    } else if spine_strcmp(typeString, b"point\0" as *const u8 as *const c_char)
-                        == 0 as c_int
-                    {
-                        type_0 = SP_ATTACHMENT_POINT;
-                    } else {
-                        spSkeletonData_dispose(skeletonData);
-                        _spSkeletonJson_setError(
-                            self_0,
-                            root,
-                            b"Unknown attachment type: \0" as *const u8 as *const c_char,
-                            typeString,
+            skinPart = Json_getItem(skinMap, b"attachments\0" as *const u8 as *const c_char);
+            if !skinPart.is_null() {
+                attachmentsMap = (*skinPart).child;
+                while !attachmentsMap.is_null() {
+                    let mut slot: *mut spSlotData =
+                        spSkeletonData_findSlot(skeletonData, (*attachmentsMap).name);
+                    let mut attachmentMap: *mut Json = 0 as *mut Json;
+                    attachmentMap = (*attachmentsMap).child;
+                    while !attachmentMap.is_null() {
+                        let mut attachment: *mut spAttachment = 0 as *mut spAttachment;
+                        let mut skinAttachmentName: *const c_char = (*attachmentMap).name;
+                        let mut attachmentName: *const c_char = Json_getString(
+                            attachmentMap,
+                            b"name\0" as *const u8 as *const c_char,
+                            skinAttachmentName,
                         );
-                        return 0 as *mut spSkeletonData;
-                    }
-                    sequence = readSequenceJson(Json_getItem(
-                        attachmentMap,
-                        b"sequence\0" as *const u8 as *const c_char,
-                    ));
-                    attachment = spAttachmentLoader_createAttachment(
-                        (*self_0).attachmentLoader,
-                        skin,
-                        type_0,
-                        attachmentName,
-                        path,
-                        sequence,
-                    );
-                    if attachment.is_null() {
-                        if !((*(*self_0).attachmentLoader).error1).is_null() {
+                        let mut path: *const c_char = Json_getString(
+                            attachmentMap,
+                            b"path\0" as *const u8 as *const c_char,
+                            attachmentName,
+                        );
+                        let mut color_1: *const c_char = 0 as *const c_char;
+                        let mut entry: *mut Json = 0 as *mut Json;
+                        let mut sequence: *mut spSequence = 0 as *mut spSequence;
+                        let mut typeString: *const c_char = Json_getString(
+                            attachmentMap,
+                            b"type\0" as *const u8 as *const c_char,
+                            b"region\0" as *const u8 as *const c_char,
+                        );
+                        let mut type_0: spAttachmentType = SP_ATTACHMENT_REGION;
+                        if spine_strcmp(typeString, b"region\0" as *const u8 as *const c_char)
+                            == 0 as c_int
+                        {
+                            type_0 = SP_ATTACHMENT_REGION;
+                        } else if spine_strcmp(typeString, b"mesh\0" as *const u8 as *const c_char)
+                            == 0 as c_int
+                        {
+                            type_0 = SP_ATTACHMENT_MESH;
+                        } else if spine_strcmp(
+                            typeString,
+                            b"linkedmesh\0" as *const u8 as *const c_char,
+                        ) == 0 as c_int
+                        {
+                            type_0 = SP_ATTACHMENT_LINKED_MESH;
+                        } else if spine_strcmp(
+                            typeString,
+                            b"boundingbox\0" as *const u8 as *const c_char,
+                        ) == 0 as c_int
+                        {
+                            type_0 = SP_ATTACHMENT_BOUNDING_BOX;
+                        } else if spine_strcmp(typeString, b"path\0" as *const u8 as *const c_char)
+                            == 0 as c_int
+                        {
+                            type_0 = SP_ATTACHMENT_PATH;
+                        } else if spine_strcmp(
+                            typeString,
+                            b"clipping\0" as *const u8 as *const c_char,
+                        ) == 0 as c_int
+                        {
+                            type_0 = SP_ATTACHMENT_CLIPPING;
+                        } else if spine_strcmp(typeString, b"point\0" as *const u8 as *const c_char)
+                            == 0 as c_int
+                        {
+                            type_0 = SP_ATTACHMENT_POINT;
+                        } else {
                             spSkeletonData_dispose(skeletonData);
                             _spSkeletonJson_setError(
                                 self_0,
                                 root,
-                                (*(*self_0).attachmentLoader).error1,
-                                (*(*self_0).attachmentLoader).error2,
+                                b"Unknown attachment type: \0" as *const u8 as *const c_char,
+                                typeString,
                             );
                             return 0 as *mut spSkeletonData;
                         }
-                    } else {
-                        match (*attachment).type_0 as c_uint {
-                            0 => {
-                                let mut region: *mut spRegionAttachment =
-                                    attachment as *mut spRegionAttachment;
-                                if !path.is_null() {
-                                    let ref mut fresh198 = *(&mut (*region).path
-                                        as *mut *const c_char
-                                        as *mut *mut c_char);
-                                    *fresh198 = _spMalloc(
-                                        (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
-                                            (spine_strlen(path))
-                                                .wrapping_add(1 as c_int as c_ulong),
-                                        ),
-                                        b"spine.c\0" as *const u8 as *const c_char,
-                                        12000 as c_int,
-                                    )
-                                        as *mut c_char;
-                                    spine_strcpy(*fresh198, path);
-                                }
-                                (*region).x = Json_getFloat(
-                                    attachmentMap,
-                                    b"x\0" as *const u8 as *const c_char,
-                                    0 as c_int as c_float,
-                                ) * (*self_0).scale;
-                                (*region).y = Json_getFloat(
-                                    attachmentMap,
-                                    b"y\0" as *const u8 as *const c_char,
-                                    0 as c_int as c_float,
-                                ) * (*self_0).scale;
-                                (*region).scaleX = Json_getFloat(
-                                    attachmentMap,
-                                    b"scaleX\0" as *const u8 as *const c_char,
-                                    1 as c_int as c_float,
+                        sequence = readSequenceJson(Json_getItem(
+                            attachmentMap,
+                            b"sequence\0" as *const u8 as *const c_char,
+                        ));
+                        attachment = spAttachmentLoader_createAttachment(
+                            (*self_0).attachmentLoader,
+                            skin,
+                            type_0,
+                            attachmentName,
+                            path,
+                            sequence,
+                        );
+                        if attachment.is_null() {
+                            if !((*(*self_0).attachmentLoader).error1).is_null() {
+                                spSkeletonData_dispose(skeletonData);
+                                _spSkeletonJson_setError(
+                                    self_0,
+                                    root,
+                                    (*(*self_0).attachmentLoader).error1,
+                                    (*(*self_0).attachmentLoader).error2,
                                 );
-                                (*region).scaleY = Json_getFloat(
-                                    attachmentMap,
-                                    b"scaleY\0" as *const u8 as *const c_char,
-                                    1 as c_int as c_float,
-                                );
-                                (*region).rotation = Json_getFloat(
-                                    attachmentMap,
-                                    b"rotation\0" as *const u8 as *const c_char,
-                                    0 as c_int as c_float,
-                                );
-                                (*region).width = Json_getFloat(
-                                    attachmentMap,
-                                    b"width\0" as *const u8 as *const c_char,
-                                    32 as c_int as c_float,
-                                ) * (*self_0).scale;
-                                (*region).height = Json_getFloat(
-                                    attachmentMap,
-                                    b"height\0" as *const u8 as *const c_char,
-                                    32 as c_int as c_float,
-                                ) * (*self_0).scale;
-                                (*region).sequence = sequence;
-                                color_1 = Json_getString(
-                                    attachmentMap,
-                                    b"color\0" as *const u8 as *const c_char,
-                                    0 as *const c_char,
-                                );
-                                if !color_1.is_null() {
-                                    spColor_setFromFloats(
-                                        &mut (*region).color,
-                                        toColor(color_1, 0 as c_int),
-                                        toColor(color_1, 1 as c_int),
-                                        toColor(color_1, 2 as c_int),
-                                        toColor(color_1, 3 as c_int),
-                                    );
-                                }
-                                if !((*region).region).is_null() {
-                                    spRegionAttachment_updateRegion(region);
-                                }
-                                spAttachmentLoader_configureAttachment(
-                                    (*self_0).attachmentLoader,
-                                    attachment,
-                                );
+                                return 0 as *mut spSkeletonData;
                             }
-                            2 | 3 => {
-                                let mut mesh: *mut spMeshAttachment =
-                                    attachment as *mut spMeshAttachment;
-                                let ref mut fresh199 =
-                                    *(&mut (*mesh).path as *mut *const c_char as *mut *mut c_char);
-                                *fresh199 = _spMalloc(
-                                    (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
-                                        (spine_strlen(path)).wrapping_add(1 as c_int as c_ulong),
-                                    ),
-                                    b"spine.c\0" as *const u8 as *const c_char,
-                                    12028 as c_int,
-                                ) as *mut c_char;
-                                spine_strcpy(*fresh199, path);
-                                color_1 = Json_getString(
-                                    attachmentMap,
-                                    b"color\0" as *const u8 as *const c_char,
-                                    0 as *const c_char,
-                                );
-                                if !color_1.is_null() {
-                                    spColor_setFromFloats(
-                                        &mut (*mesh).color,
-                                        toColor(color_1, 0 as c_int),
-                                        toColor(color_1, 1 as c_int),
-                                        toColor(color_1, 2 as c_int),
-                                        toColor(color_1, 3 as c_int),
-                                    );
-                                }
-                                (*mesh).width = Json_getFloat(
-                                    attachmentMap,
-                                    b"width\0" as *const u8 as *const c_char,
-                                    32 as c_int as c_float,
-                                ) * (*self_0).scale;
-                                (*mesh).height = Json_getFloat(
-                                    attachmentMap,
-                                    b"height\0" as *const u8 as *const c_char,
-                                    32 as c_int as c_float,
-                                ) * (*self_0).scale;
-                                (*mesh).sequence = sequence;
-                                entry = Json_getItem(
-                                    attachmentMap,
-                                    b"parent\0" as *const u8 as *const c_char,
-                                );
-                                if entry.is_null() {
-                                    let mut verticesLength: c_int = 0;
-                                    entry = Json_getItem(
-                                        attachmentMap,
-                                        b"triangles\0" as *const u8 as *const c_char,
-                                    );
-                                    (*mesh).trianglesCount = (*entry).size;
-                                    (*mesh).triangles = _spMalloc(
-                                        (::core::mem::size_of::<c_ushort>() as c_ulong)
-                                            .wrapping_mul((*entry).size as c_ulong),
-                                        b"spine.c\0" as *const u8 as *const c_char,
-                                        12048 as c_int,
-                                    )
-                                        as *mut c_ushort;
-                                    entry = (*entry).child;
-                                    ii = 0 as c_int;
-                                    while !entry.is_null() {
-                                        *((*mesh).triangles).offset(ii as isize) =
-                                            (*entry).valueInt as c_ushort;
-                                        entry = (*entry).next;
-                                        ii += 1;
-                                    }
-                                    entry = Json_getItem(
-                                        attachmentMap,
-                                        b"uvs\0" as *const u8 as *const c_char,
-                                    );
-                                    verticesLength = (*entry).size;
-                                    (*mesh).regionUVs = _spMalloc(
-                                        (::core::mem::size_of::<c_float>() as c_ulong)
-                                            .wrapping_mul(verticesLength as c_ulong),
-                                        b"spine.c\0" as *const u8 as *const c_char,
-                                        12054 as c_int,
-                                    )
-                                        as *mut c_float;
-                                    entry = (*entry).child;
-                                    ii = 0 as c_int;
-                                    while !entry.is_null() {
-                                        *((*mesh).regionUVs).offset(ii as isize) =
-                                            (*entry).valueFloat;
-                                        entry = (*entry).next;
-                                        ii += 1;
-                                    }
-                                    _readVerticesJson(
-                                        self_0,
-                                        attachmentMap,
-                                        &mut (*mesh).super_0,
-                                        verticesLength,
-                                    );
-                                    if !((*mesh).region).is_null() {
-                                        spMeshAttachment_updateRegion(mesh);
-                                    }
-                                    (*mesh).hullLength = Json_getInt(
-                                        attachmentMap,
-                                        b"hull\0" as *const u8 as *const c_char,
-                                        0 as c_int,
-                                    );
-                                    entry = Json_getItem(
-                                        attachmentMap,
-                                        b"edges\0" as *const u8 as *const c_char,
-                                    );
-                                    if !entry.is_null() {
-                                        (*mesh).edgesCount = (*entry).size;
-                                        (*mesh).edges = _spMalloc(
-                                            (::core::mem::size_of::<c_int>() as c_ulong)
-                                                .wrapping_mul((*entry).size as c_ulong),
+                        } else {
+                            match (*attachment).type_0 as c_uint {
+                                0 => {
+                                    let mut region: *mut spRegionAttachment =
+                                        attachment as *mut spRegionAttachment;
+                                    if !path.is_null() {
+                                        let ref mut fresh198 = *(&mut (*region).path
+                                            as *mut *const c_char
+                                            as *mut *mut c_char);
+                                        *fresh198 = _spMalloc(
+                                            (::core::mem::size_of::<c_char>() as c_ulong)
+                                                .wrapping_mul(
+                                                    (spine_strlen(path))
+                                                        .wrapping_add(1 as c_int as c_ulong),
+                                                ),
                                             b"spine.c\0" as *const u8 as *const c_char,
-                                            12067 as c_int,
+                                            12000 as c_int,
                                         )
-                                            as *mut c_int;
-                                        entry = (*entry).child;
-                                        ii = 0 as c_int;
-                                        while !entry.is_null() {
-                                            *((*mesh).edges).offset(ii as isize) =
-                                                (*entry).valueInt;
-                                            entry = (*entry).next;
-                                            ii += 1;
-                                        }
+                                            as *mut c_char;
+                                        spine_strcpy(*fresh198, path);
+                                    }
+                                    (*region).x = Json_getFloat(
+                                        attachmentMap,
+                                        b"x\0" as *const u8 as *const c_char,
+                                        0 as c_int as c_float,
+                                    ) * (*self_0).scale;
+                                    (*region).y = Json_getFloat(
+                                        attachmentMap,
+                                        b"y\0" as *const u8 as *const c_char,
+                                        0 as c_int as c_float,
+                                    ) * (*self_0).scale;
+                                    (*region).scaleX = Json_getFloat(
+                                        attachmentMap,
+                                        b"scaleX\0" as *const u8 as *const c_char,
+                                        1 as c_int as c_float,
+                                    );
+                                    (*region).scaleY = Json_getFloat(
+                                        attachmentMap,
+                                        b"scaleY\0" as *const u8 as *const c_char,
+                                        1 as c_int as c_float,
+                                    );
+                                    (*region).rotation = Json_getFloat(
+                                        attachmentMap,
+                                        b"rotation\0" as *const u8 as *const c_char,
+                                        0 as c_int as c_float,
+                                    );
+                                    (*region).width = Json_getFloat(
+                                        attachmentMap,
+                                        b"width\0" as *const u8 as *const c_char,
+                                        32 as c_int as c_float,
+                                    ) * (*self_0).scale;
+                                    (*region).height = Json_getFloat(
+                                        attachmentMap,
+                                        b"height\0" as *const u8 as *const c_char,
+                                        32 as c_int as c_float,
+                                    ) * (*self_0).scale;
+                                    (*region).sequence = sequence;
+                                    color_1 = Json_getString(
+                                        attachmentMap,
+                                        b"color\0" as *const u8 as *const c_char,
+                                        0 as *const c_char,
+                                    );
+                                    if !color_1.is_null() {
+                                        spColor_setFromFloats(
+                                            &mut (*region).color,
+                                            toColor(color_1, 0 as c_int),
+                                            toColor(color_1, 1 as c_int),
+                                            toColor(color_1, 2 as c_int),
+                                            toColor(color_1, 3 as c_int),
+                                        );
+                                    }
+                                    if !((*region).region).is_null() {
+                                        spRegionAttachment_updateRegion(region);
                                     }
                                     spAttachmentLoader_configureAttachment(
                                         (*self_0).attachmentLoader,
                                         attachment,
                                     );
-                                } else {
-                                    let mut inheritTimelines: c_int = Json_getInt(
+                                }
+                                2 | 3 => {
+                                    let mut mesh: *mut spMeshAttachment =
+                                        attachment as *mut spMeshAttachment;
+                                    let ref mut fresh199 = *(&mut (*mesh).path as *mut *const c_char
+                                        as *mut *mut c_char);
+                                    *fresh199 = _spMalloc(
+                                        (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
+                                            (spine_strlen(path))
+                                                .wrapping_add(1 as c_int as c_ulong),
+                                        ),
+                                        b"spine.c\0" as *const u8 as *const c_char,
+                                        12028 as c_int,
+                                    )
+                                        as *mut c_char;
+                                    spine_strcpy(*fresh199, path);
+                                    color_1 = Json_getString(
                                         attachmentMap,
-                                        b"timelines\0" as *const u8 as *const c_char,
+                                        b"color\0" as *const u8 as *const c_char,
+                                        0 as *const c_char,
+                                    );
+                                    if !color_1.is_null() {
+                                        spColor_setFromFloats(
+                                            &mut (*mesh).color,
+                                            toColor(color_1, 0 as c_int),
+                                            toColor(color_1, 1 as c_int),
+                                            toColor(color_1, 2 as c_int),
+                                            toColor(color_1, 3 as c_int),
+                                        );
+                                    }
+                                    (*mesh).width = Json_getFloat(
+                                        attachmentMap,
+                                        b"width\0" as *const u8 as *const c_char,
+                                        32 as c_int as c_float,
+                                    ) * (*self_0).scale;
+                                    (*mesh).height = Json_getFloat(
+                                        attachmentMap,
+                                        b"height\0" as *const u8 as *const c_char,
+                                        32 as c_int as c_float,
+                                    ) * (*self_0).scale;
+                                    (*mesh).sequence = sequence;
+                                    entry = Json_getItem(
+                                        attachmentMap,
+                                        b"parent\0" as *const u8 as *const c_char,
+                                    );
+                                    if entry.is_null() {
+                                        let mut verticesLength: c_int = 0;
+                                        entry = Json_getItem(
+                                            attachmentMap,
+                                            b"triangles\0" as *const u8 as *const c_char,
+                                        );
+                                        (*mesh).trianglesCount = (*entry).size;
+                                        (*mesh).triangles = _spMalloc(
+                                            (::core::mem::size_of::<c_ushort>() as c_ulong)
+                                                .wrapping_mul((*entry).size as c_ulong),
+                                            b"spine.c\0" as *const u8 as *const c_char,
+                                            12048 as c_int,
+                                        )
+                                            as *mut c_ushort;
+                                        entry = (*entry).child;
+                                        ii = 0 as c_int;
+                                        while !entry.is_null() {
+                                            *((*mesh).triangles).offset(ii as isize) =
+                                                (*entry).valueInt as c_ushort;
+                                            entry = (*entry).next;
+                                            ii += 1;
+                                        }
+                                        entry = Json_getItem(
+                                            attachmentMap,
+                                            b"uvs\0" as *const u8 as *const c_char,
+                                        );
+                                        verticesLength = (*entry).size;
+                                        (*mesh).regionUVs = _spMalloc(
+                                            (::core::mem::size_of::<c_float>() as c_ulong)
+                                                .wrapping_mul(verticesLength as c_ulong),
+                                            b"spine.c\0" as *const u8 as *const c_char,
+                                            12054 as c_int,
+                                        )
+                                            as *mut c_float;
+                                        entry = (*entry).child;
+                                        ii = 0 as c_int;
+                                        while !entry.is_null() {
+                                            *((*mesh).regionUVs).offset(ii as isize) =
+                                                (*entry).valueFloat;
+                                            entry = (*entry).next;
+                                            ii += 1;
+                                        }
+                                        _readVerticesJson(
+                                            self_0,
+                                            attachmentMap,
+                                            &mut (*mesh).super_0,
+                                            verticesLength,
+                                        );
+                                        if !((*mesh).region).is_null() {
+                                            spMeshAttachment_updateRegion(mesh);
+                                        }
+                                        (*mesh).hullLength = Json_getInt(
+                                            attachmentMap,
+                                            b"hull\0" as *const u8 as *const c_char,
+                                            0 as c_int,
+                                        );
+                                        entry = Json_getItem(
+                                            attachmentMap,
+                                            b"edges\0" as *const u8 as *const c_char,
+                                        );
+                                        if !entry.is_null() {
+                                            (*mesh).edgesCount = (*entry).size;
+                                            (*mesh).edges = _spMalloc(
+                                                (::core::mem::size_of::<c_int>() as c_ulong)
+                                                    .wrapping_mul((*entry).size as c_ulong),
+                                                b"spine.c\0" as *const u8 as *const c_char,
+                                                12067 as c_int,
+                                            )
+                                                as *mut c_int;
+                                            entry = (*entry).child;
+                                            ii = 0 as c_int;
+                                            while !entry.is_null() {
+                                                *((*mesh).edges).offset(ii as isize) =
+                                                    (*entry).valueInt;
+                                                entry = (*entry).next;
+                                                ii += 1;
+                                            }
+                                        }
+                                        spAttachmentLoader_configureAttachment(
+                                            (*self_0).attachmentLoader,
+                                            attachment,
+                                        );
+                                    } else {
+                                        let mut inheritTimelines: c_int = Json_getInt(
+                                            attachmentMap,
+                                            b"timelines\0" as *const u8 as *const c_char,
+                                            1 as c_int,
+                                        );
+                                        _spSkeletonJson_addLinkedMesh(
+                                            self_0,
+                                            attachment as *mut spMeshAttachment,
+                                            Json_getString(
+                                                attachmentMap,
+                                                b"skin\0" as *const u8 as *const c_char,
+                                                0 as *const c_char,
+                                            ),
+                                            (*slot).index,
+                                            (*entry).valueString,
+                                            inheritTimelines,
+                                        );
+                                    }
+                                }
+                                1 => {
+                                    let mut box_0: *mut spBoundingBoxAttachment =
+                                        attachment as *mut spBoundingBoxAttachment;
+                                    let mut vertexCount: c_int = Json_getInt(
+                                        attachmentMap,
+                                        b"vertexCount\0" as *const u8 as *const c_char,
+                                        0 as c_int,
+                                    ) << 1 as c_int;
+                                    _readVerticesJson(
+                                        self_0,
+                                        attachmentMap,
+                                        &mut (*box_0).super_0,
+                                        vertexCount,
+                                    );
+                                    (*box_0).super_0.verticesCount = vertexCount;
+                                    color_1 = Json_getString(
+                                        attachmentMap,
+                                        b"color\0" as *const u8 as *const c_char,
+                                        0 as *const c_char,
+                                    );
+                                    if !color_1.is_null() {
+                                        spColor_setFromFloats(
+                                            &mut (*box_0).color,
+                                            toColor(color_1, 0 as c_int),
+                                            toColor(color_1, 1 as c_int),
+                                            toColor(color_1, 2 as c_int),
+                                            toColor(color_1, 3 as c_int),
+                                        );
+                                    }
+                                    spAttachmentLoader_configureAttachment(
+                                        (*self_0).attachmentLoader,
+                                        attachment,
+                                    );
+                                }
+                                4 => {
+                                    let mut pathAttachment: *mut spPathAttachment =
+                                        attachment as *mut spPathAttachment;
+                                    let mut vertexCount_0: c_int = 0 as c_int;
+                                    (*pathAttachment).closed = Json_getInt(
+                                        attachmentMap,
+                                        b"closed\0" as *const u8 as *const c_char,
+                                        0 as c_int,
+                                    );
+                                    (*pathAttachment).constantSpeed = Json_getInt(
+                                        attachmentMap,
+                                        b"constantSpeed\0" as *const u8 as *const c_char,
                                         1 as c_int,
                                     );
-                                    _spSkeletonJson_addLinkedMesh(
+                                    vertexCount_0 = Json_getInt(
+                                        attachmentMap,
+                                        b"vertexCount\0" as *const u8 as *const c_char,
+                                        0 as c_int,
+                                    );
+                                    _readVerticesJson(
                                         self_0,
-                                        attachment as *mut spMeshAttachment,
-                                        Json_getString(
-                                            attachmentMap,
-                                            b"skin\0" as *const u8 as *const c_char,
-                                            0 as *const c_char,
-                                        ),
-                                        (*slot).index,
-                                        (*entry).valueString,
-                                        inheritTimelines,
+                                        attachmentMap,
+                                        &mut (*pathAttachment).super_0,
+                                        vertexCount_0 << 1 as c_int,
+                                    );
+                                    (*pathAttachment).lengthsLength = vertexCount_0 / 3 as c_int;
+                                    (*pathAttachment).lengths = _spMalloc(
+                                        (::core::mem::size_of::<c_float>() as c_ulong)
+                                            .wrapping_mul(
+                                                (*pathAttachment).lengthsLength as c_ulong,
+                                            ),
+                                        b"spine.c\0" as *const u8 as *const c_char,
+                                        12106 as c_int,
+                                    )
+                                        as *mut c_float;
+                                    curves = Json_getItem(
+                                        attachmentMap,
+                                        b"lengths\0" as *const u8 as *const c_char,
+                                    );
+                                    curves = (*curves).child;
+                                    ii = 0 as c_int;
+                                    while !curves.is_null() {
+                                        *((*pathAttachment).lengths).offset(ii as isize) =
+                                            (*curves).valueFloat * (*self_0).scale;
+                                        curves = (*curves).next;
+                                        ii += 1;
+                                    }
+                                    color_1 = Json_getString(
+                                        attachmentMap,
+                                        b"color\0" as *const u8 as *const c_char,
+                                        0 as *const c_char,
+                                    );
+                                    if !color_1.is_null() {
+                                        spColor_setFromFloats(
+                                            &mut (*pathAttachment).color,
+                                            toColor(color_1, 0 as c_int),
+                                            toColor(color_1, 1 as c_int),
+                                            toColor(color_1, 2 as c_int),
+                                            toColor(color_1, 3 as c_int),
+                                        );
+                                    }
+                                }
+                                5 => {
+                                    let mut point: *mut spPointAttachment =
+                                        attachment as *mut spPointAttachment;
+                                    (*point).x = Json_getFloat(
+                                        attachmentMap,
+                                        b"x\0" as *const u8 as *const c_char,
+                                        0 as c_int as c_float,
+                                    ) * (*self_0).scale;
+                                    (*point).y = Json_getFloat(
+                                        attachmentMap,
+                                        b"y\0" as *const u8 as *const c_char,
+                                        0 as c_int as c_float,
+                                    ) * (*self_0).scale;
+                                    (*point).rotation = Json_getFloat(
+                                        attachmentMap,
+                                        b"rotation\0" as *const u8 as *const c_char,
+                                        0 as c_int as c_float,
+                                    );
+                                    color_1 = Json_getString(
+                                        attachmentMap,
+                                        b"color\0" as *const u8 as *const c_char,
+                                        0 as *const c_char,
+                                    );
+                                    if !color_1.is_null() {
+                                        spColor_setFromFloats(
+                                            &mut (*point).color,
+                                            toColor(color_1, 0 as c_int),
+                                            toColor(color_1, 1 as c_int),
+                                            toColor(color_1, 2 as c_int),
+                                            toColor(color_1, 3 as c_int),
+                                        );
+                                    }
+                                }
+                                6 => {
+                                    let mut clip: *mut spClippingAttachment =
+                                        attachment as *mut spClippingAttachment;
+                                    let mut vertexCount_1: c_int = 0 as c_int;
+                                    let mut end: *const c_char = Json_getString(
+                                        attachmentMap,
+                                        b"end\0" as *const u8 as *const c_char,
+                                        0 as *const c_char,
+                                    );
+                                    if !end.is_null() {
+                                        let mut endSlot: *mut spSlotData =
+                                            spSkeletonData_findSlot(skeletonData, end);
+                                        (*clip).endSlot = endSlot;
+                                    }
+                                    vertexCount_1 = Json_getInt(
+                                        attachmentMap,
+                                        b"vertexCount\0" as *const u8 as *const c_char,
+                                        0 as c_int,
+                                    ) << 1 as c_int;
+                                    _readVerticesJson(
+                                        self_0,
+                                        attachmentMap,
+                                        &mut (*clip).super_0,
+                                        vertexCount_1,
+                                    );
+                                    color_1 = Json_getString(
+                                        attachmentMap,
+                                        b"color\0" as *const u8 as *const c_char,
+                                        0 as *const c_char,
+                                    );
+                                    if !color_1.is_null() {
+                                        spColor_setFromFloats(
+                                            &mut (*clip).color,
+                                            toColor(color_1, 0 as c_int),
+                                            toColor(color_1, 1 as c_int),
+                                            toColor(color_1, 2 as c_int),
+                                            toColor(color_1, 3 as c_int),
+                                        );
+                                    }
+                                    spAttachmentLoader_configureAttachment(
+                                        (*self_0).attachmentLoader,
+                                        attachment,
                                     );
                                 }
+                                _ => {}
                             }
-                            1 => {
-                                let mut box_0: *mut spBoundingBoxAttachment =
-                                    attachment as *mut spBoundingBoxAttachment;
-                                let mut vertexCount: c_int = Json_getInt(
-                                    attachmentMap,
-                                    b"vertexCount\0" as *const u8 as *const c_char,
-                                    0 as c_int,
-                                ) << 1 as c_int;
-                                _readVerticesJson(
-                                    self_0,
-                                    attachmentMap,
-                                    &mut (*box_0).super_0,
-                                    vertexCount,
-                                );
-                                (*box_0).super_0.verticesCount = vertexCount;
-                                color_1 = Json_getString(
-                                    attachmentMap,
-                                    b"color\0" as *const u8 as *const c_char,
-                                    0 as *const c_char,
-                                );
-                                if !color_1.is_null() {
-                                    spColor_setFromFloats(
-                                        &mut (*box_0).color,
-                                        toColor(color_1, 0 as c_int),
-                                        toColor(color_1, 1 as c_int),
-                                        toColor(color_1, 2 as c_int),
-                                        toColor(color_1, 3 as c_int),
-                                    );
-                                }
-                                spAttachmentLoader_configureAttachment(
-                                    (*self_0).attachmentLoader,
-                                    attachment,
-                                );
-                            }
-                            4 => {
-                                let mut pathAttachment: *mut spPathAttachment =
-                                    attachment as *mut spPathAttachment;
-                                let mut vertexCount_0: c_int = 0 as c_int;
-                                (*pathAttachment).closed = Json_getInt(
-                                    attachmentMap,
-                                    b"closed\0" as *const u8 as *const c_char,
-                                    0 as c_int,
-                                );
-                                (*pathAttachment).constantSpeed = Json_getInt(
-                                    attachmentMap,
-                                    b"constantSpeed\0" as *const u8 as *const c_char,
-                                    1 as c_int,
-                                );
-                                vertexCount_0 = Json_getInt(
-                                    attachmentMap,
-                                    b"vertexCount\0" as *const u8 as *const c_char,
-                                    0 as c_int,
-                                );
-                                _readVerticesJson(
-                                    self_0,
-                                    attachmentMap,
-                                    &mut (*pathAttachment).super_0,
-                                    vertexCount_0 << 1 as c_int,
-                                );
-                                (*pathAttachment).lengthsLength = vertexCount_0 / 3 as c_int;
-                                (*pathAttachment).lengths = _spMalloc(
-                                    (::core::mem::size_of::<c_float>() as c_ulong)
-                                        .wrapping_mul((*pathAttachment).lengthsLength as c_ulong),
-                                    b"spine.c\0" as *const u8 as *const c_char,
-                                    12106 as c_int,
-                                )
-                                    as *mut c_float;
-                                curves = Json_getItem(
-                                    attachmentMap,
-                                    b"lengths\0" as *const u8 as *const c_char,
-                                );
-                                curves = (*curves).child;
-                                ii = 0 as c_int;
-                                while !curves.is_null() {
-                                    *((*pathAttachment).lengths).offset(ii as isize) =
-                                        (*curves).valueFloat * (*self_0).scale;
-                                    curves = (*curves).next;
-                                    ii += 1;
-                                }
-                                color_1 = Json_getString(
-                                    attachmentMap,
-                                    b"color\0" as *const u8 as *const c_char,
-                                    0 as *const c_char,
-                                );
-                                if !color_1.is_null() {
-                                    spColor_setFromFloats(
-                                        &mut (*pathAttachment).color,
-                                        toColor(color_1, 0 as c_int),
-                                        toColor(color_1, 1 as c_int),
-                                        toColor(color_1, 2 as c_int),
-                                        toColor(color_1, 3 as c_int),
-                                    );
-                                }
-                            }
-                            5 => {
-                                let mut point: *mut spPointAttachment =
-                                    attachment as *mut spPointAttachment;
-                                (*point).x = Json_getFloat(
-                                    attachmentMap,
-                                    b"x\0" as *const u8 as *const c_char,
-                                    0 as c_int as c_float,
-                                ) * (*self_0).scale;
-                                (*point).y = Json_getFloat(
-                                    attachmentMap,
-                                    b"y\0" as *const u8 as *const c_char,
-                                    0 as c_int as c_float,
-                                ) * (*self_0).scale;
-                                (*point).rotation = Json_getFloat(
-                                    attachmentMap,
-                                    b"rotation\0" as *const u8 as *const c_char,
-                                    0 as c_int as c_float,
-                                );
-                                color_1 = Json_getString(
-                                    attachmentMap,
-                                    b"color\0" as *const u8 as *const c_char,
-                                    0 as *const c_char,
-                                );
-                                if !color_1.is_null() {
-                                    spColor_setFromFloats(
-                                        &mut (*point).color,
-                                        toColor(color_1, 0 as c_int),
-                                        toColor(color_1, 1 as c_int),
-                                        toColor(color_1, 2 as c_int),
-                                        toColor(color_1, 3 as c_int),
-                                    );
-                                }
-                            }
-                            6 => {
-                                let mut clip: *mut spClippingAttachment =
-                                    attachment as *mut spClippingAttachment;
-                                let mut vertexCount_1: c_int = 0 as c_int;
-                                let mut end: *const c_char = Json_getString(
-                                    attachmentMap,
-                                    b"end\0" as *const u8 as *const c_char,
-                                    0 as *const c_char,
-                                );
-                                if !end.is_null() {
-                                    let mut endSlot: *mut spSlotData =
-                                        spSkeletonData_findSlot(skeletonData, end);
-                                    (*clip).endSlot = endSlot;
-                                }
-                                vertexCount_1 = Json_getInt(
-                                    attachmentMap,
-                                    b"vertexCount\0" as *const u8 as *const c_char,
-                                    0 as c_int,
-                                ) << 1 as c_int;
-                                _readVerticesJson(
-                                    self_0,
-                                    attachmentMap,
-                                    &mut (*clip).super_0,
-                                    vertexCount_1,
-                                );
-                                color_1 = Json_getString(
-                                    attachmentMap,
-                                    b"color\0" as *const u8 as *const c_char,
-                                    0 as *const c_char,
-                                );
-                                if !color_1.is_null() {
-                                    spColor_setFromFloats(
-                                        &mut (*clip).color,
-                                        toColor(color_1, 0 as c_int),
-                                        toColor(color_1, 1 as c_int),
-                                        toColor(color_1, 2 as c_int),
-                                        toColor(color_1, 3 as c_int),
-                                    );
-                                }
-                                spAttachmentLoader_configureAttachment(
-                                    (*self_0).attachmentLoader,
-                                    attachment,
-                                );
-                            }
-                            _ => {}
+                            spSkin_setAttachment(
+                                skin,
+                                (*slot).index,
+                                skinAttachmentName,
+                                attachment,
+                            );
                         }
-                        spSkin_setAttachment(skin, (*slot).index, skinAttachmentName, attachment);
+                        attachmentMap = (*attachmentMap).next;
                     }
-                    attachmentMap = (*attachmentMap).next;
+                    attachmentsMap = (*attachmentsMap).next;
                 }
-                attachmentsMap = (*attachmentsMap).next;
             }
             skinMap = (*skinMap).next;
             i += 1;
@@ -23191,7 +23205,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             (::core::mem::size_of::<*mut spEventData>() as c_ulong)
                 .wrapping_mul((*events).size as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
-            12196 as c_int,
+            12197 as c_int,
         ) as *mut *mut spEventData;
         eventMap = (*events).child;
         i = 0 as c_int;
@@ -23217,7 +23231,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                         (spine_strlen(stringValue)).wrapping_add(1 as c_int as c_ulong),
                     ),
                     b"spine.c\0" as *const u8 as *const c_char,
-                    12202 as c_int,
+                    12203 as c_int,
                 ) as *mut c_char;
                 spine_strcpy(*fresh200, stringValue);
             }
@@ -23234,7 +23248,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                         (spine_strlen(audioPath)).wrapping_add(1 as c_int as c_ulong),
                     ),
                     b"spine.c\0" as *const u8 as *const c_char,
-                    12205 as c_int,
+                    12206 as c_int,
                 ) as *mut c_char;
                 spine_strcpy(*fresh201, audioPath);
                 (*eventData).volume = Json_getFloat(
@@ -23261,7 +23275,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             (::core::mem::size_of::<*mut spAnimation>() as c_ulong)
                 .wrapping_mul((*animations).size as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
-            12217 as c_int,
+            12218 as c_int,
         ) as *mut *mut spAnimation;
         animationMap = (*animations).child;
         while !animationMap.is_null() {
@@ -23289,7 +23303,7 @@ pub unsafe extern "C" fn spBoneDataArray_create(
         1 as c_int as size_t,
         ::core::mem::size_of::<spBoneDataArray>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12264 as c_int,
+        12265 as c_int,
     ) as *mut spBoneDataArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
@@ -23297,7 +23311,7 @@ pub unsafe extern "C" fn spBoneDataArray_create(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spBoneData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12264 as c_int,
+        12265 as c_int,
     ) as *mut *mut spBoneData;
     return array;
 }
@@ -23443,7 +23457,7 @@ pub unsafe extern "C" fn spIkConstraintDataArray_create(
         1 as c_int as size_t,
         ::core::mem::size_of::<spIkConstraintDataArray>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12266 as c_int,
+        12267 as c_int,
     ) as *mut spIkConstraintDataArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
@@ -23451,7 +23465,7 @@ pub unsafe extern "C" fn spIkConstraintDataArray_create(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spIkConstraintData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12266 as c_int,
+        12267 as c_int,
     ) as *mut *mut spIkConstraintData;
     return array;
 }
@@ -23601,7 +23615,7 @@ pub unsafe extern "C" fn spTransformConstraintDataArray_create(
         1 as c_int as size_t,
         ::core::mem::size_of::<spTransformConstraintDataArray>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12268 as c_int,
+        12269 as c_int,
     )
         as *mut spTransformConstraintDataArray;
     (*array).size = 0 as c_int;
@@ -23610,7 +23624,7 @@ pub unsafe extern "C" fn spTransformConstraintDataArray_create(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spTransformConstraintData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12268 as c_int,
+        12269 as c_int,
     ) as *mut *mut spTransformConstraintData;
     return array;
 }
@@ -23765,7 +23779,7 @@ pub unsafe extern "C" fn spPathConstraintDataArray_create(
         1 as c_int as size_t,
         ::core::mem::size_of::<spPathConstraintDataArray>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12270 as c_int,
+        12271 as c_int,
     ) as *mut spPathConstraintDataArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
@@ -23773,7 +23787,7 @@ pub unsafe extern "C" fn spPathConstraintDataArray_create(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spPathConstraintData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12270 as c_int,
+        12271 as c_int,
     ) as *mut *mut spPathConstraintData;
     return array;
 }
@@ -23929,7 +23943,7 @@ pub unsafe extern "C" fn _Entry_create(
         1 as c_int as size_t,
         ::core::mem::size_of::<_Entry>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12273 as c_int,
+        12274 as c_int,
     ) as *mut _Entry;
     (*self_0).slotIndex = slotIndex;
     let ref mut fresh213 = *(&mut (*self_0).name as *mut *const c_char as *mut *mut c_char);
@@ -23937,7 +23951,7 @@ pub unsafe extern "C" fn _Entry_create(
         (::core::mem::size_of::<c_char>() as c_ulong)
             .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
-        12275 as c_int,
+        12276 as c_int,
     ) as *mut c_char;
     spine_strcpy(*fresh213, name);
     (*self_0).attachment = attachment;
@@ -23956,7 +23970,7 @@ unsafe extern "C" fn _SkinHashTableEntry_create(
         1 as c_int as size_t,
         ::core::mem::size_of::<_SkinHashTableEntry>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12287 as c_int,
+        12288 as c_int,
     ) as *mut _SkinHashTableEntry;
     (*self_0).entry = entry;
     return self_0;
@@ -23971,7 +23985,7 @@ pub unsafe extern "C" fn spSkin_create(mut name: *const c_char) -> *mut spSkin {
         1 as c_int as size_t,
         ::core::mem::size_of::<_spSkin>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12299 as c_int,
+        12300 as c_int,
     ) as *mut _spSkin))
         .super_0;
     let ref mut fresh214 = *(&(*self_0).name as *const *const c_char as *mut *mut c_char);
@@ -23979,7 +23993,7 @@ pub unsafe extern "C" fn spSkin_create(mut name: *const c_char) -> *mut spSkin {
         (::core::mem::size_of::<c_char>() as c_ulong)
             .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
-        12300 as c_int,
+        12301 as c_int,
     ) as *mut c_char;
     spine_strcpy(*fresh214, name);
     (*self_0).bones = spBoneDataArray_create(4 as c_int);
@@ -24313,7 +24327,7 @@ pub unsafe extern "C" fn spSlot_create(
         1 as c_int as size_t,
         ::core::mem::size_of::<spSlot>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12545 as c_int,
+        12546 as c_int,
     ) as *mut spSlot;
     let ref mut fresh219 = *(&(*self_0).data as *const *mut spSlotData as *mut *mut spSlotData);
     *fresh219 = data;
@@ -24397,7 +24411,7 @@ pub unsafe extern "C" fn spSlotData_create(
         1 as c_int as size_t,
         ::core::mem::size_of::<spSlotData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12631 as c_int,
+        12632 as c_int,
     ) as *mut spSlotData;
     *(&(*self_0).index as *const c_int as *mut c_int) = index;
     let ref mut fresh223 = *(&(*self_0).name as *const *const c_char as *mut *mut c_char);
@@ -24405,7 +24419,7 @@ pub unsafe extern "C" fn spSlotData_create(
         (::core::mem::size_of::<c_char>() as c_ulong)
             .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
-        12633 as c_int,
+        12634 as c_int,
     ) as *mut c_char;
     spine_strcpy(*fresh223, name);
     let ref mut fresh224 =
@@ -24440,7 +24454,7 @@ pub unsafe extern "C" fn spSlotData_setAttachmentName(
             (::core::mem::size_of::<c_char>() as c_ulong)
                 .wrapping_mul((spine_strlen(attachmentName)).wrapping_add(1 as c_int as c_ulong)),
             b"spine.c\0" as *const u8 as *const c_char,
-            12649 as c_int,
+            12650 as c_int,
         ) as *mut c_char;
         spine_strcpy(*fresh225, attachmentName);
     } else {
@@ -24459,7 +24473,7 @@ pub unsafe extern "C" fn spTransformConstraint_create(
         1 as c_int as size_t,
         ::core::mem::size_of::<spTransformConstraint>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12688 as c_int,
+        12689 as c_int,
     ) as *mut spTransformConstraint;
     let ref mut fresh227 = *(&(*self_0).data as *const *mut spTransformConstraintData
         as *mut *mut spTransformConstraintData);
@@ -24476,7 +24490,7 @@ pub unsafe extern "C" fn spTransformConstraint_create(
         (::core::mem::size_of::<*mut spBone>() as c_ulong)
             .wrapping_mul((*self_0).bonesCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
-        12697 as c_int,
+        12698 as c_int,
     ) as *mut *mut spBone;
     i = 0 as c_int;
     while i < (*self_0).bonesCount {
@@ -24853,14 +24867,14 @@ pub unsafe extern "C" fn spTransformConstraintData_create(
         1 as c_int as size_t,
         ::core::mem::size_of::<spTransformConstraintData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12945 as c_int,
+        12946 as c_int,
     ) as *mut spTransformConstraintData;
     let ref mut fresh230 = *(&(*self_0).name as *const *const c_char as *mut *mut c_char);
     *fresh230 = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
             .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
-        12946 as c_int,
+        12947 as c_int,
     ) as *mut c_char;
     spine_strcpy(*fresh230, name);
     return self_0;
@@ -24879,7 +24893,7 @@ pub unsafe extern "C" fn spTriangulator_create() -> *mut spTriangulator {
         1 as c_int as size_t,
         ::core::mem::size_of::<spTriangulator>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
-        12989 as c_int,
+        12990 as c_int,
     ) as *mut spTriangulator;
     (*triangulator).convexPolygons = spArrayFloatArray_create(16 as c_int);
     (*triangulator).convexPolygonsIndices = spArrayShortArray_create(16 as c_int);
@@ -25482,7 +25496,7 @@ pub unsafe extern "C" fn spVertexAttachment_copyTo(
             (::core::mem::size_of::<c_int>() as c_ulong)
                 .wrapping_mul((*from).bonesCount as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
-            13450 as c_int,
+            13451 as c_int,
         ) as *mut c_int;
         spine_memcpy(
             (*to).bones as *mut c_void,
@@ -25503,7 +25517,7 @@ pub unsafe extern "C" fn spVertexAttachment_copyTo(
             (::core::mem::size_of::<c_float>() as c_ulong)
                 .wrapping_mul((*from).verticesCount as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
-            13462 as c_int,
+            13463 as c_int,
         ) as *mut c_float;
         spine_memcpy(
             (*to).vertices as *mut c_void,
@@ -25528,9 +25542,8 @@ static mut mallocFunc: Option<unsafe extern "C" fn(size_t) -> *mut c_void> =
     Some(spine_malloc as unsafe extern "C" fn(size_t) -> *mut c_void);
 static mut reallocFunc: Option<unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void> =
     Some(spine_realloc as unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void);
-static mut debugMallocFunc: Option<
-    unsafe extern "C" fn(size_t, *const c_char, c_int) -> *mut c_void,
-> = None;
+static mut debugMallocFunc: Option<extern "C" fn(size_t, *const c_char, c_int) -> *mut c_void> =
+    None;
 static mut freeFunc: Option<unsafe extern "C" fn(*mut c_void) -> ()> =
     Some(spine_free as unsafe extern "C" fn(*mut c_void) -> ());
 static mut randomFunc: Option<unsafe extern "C" fn() -> c_float> = unsafe {
@@ -25579,7 +25592,7 @@ pub unsafe extern "C" fn _spRandom() -> c_float {
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spSetDebugMalloc(
-    mut spine_malloc_0: Option<unsafe extern "C" fn(size_t, *const c_char, c_int) -> *mut c_void>,
+    mut spine_malloc_0: Option<extern "C" fn(size_t, *const c_char, c_int) -> *mut c_void>,
 ) {
     debugMallocFunc = spine_malloc_0;
 }
@@ -25622,7 +25635,7 @@ pub unsafe extern "C" fn _spReadFile(
     data = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(*length as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
-        13574 as c_int,
+        13575 as c_int,
     ) as *mut c_char;
     _result = spine_fread(
         data as *mut c_void,
