@@ -4,7 +4,7 @@ Spine runtime for Rust (and wasm!) transpiled from the official C Runtime. Suppo
 
 ```
 [dependencies]
-rusty_spine = "0.5.0"
+rusty_spine = "0.5"
 ```
 
 [Online demo!](https://jabuwu.github.io/rusty_spine/)
