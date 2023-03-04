@@ -56,7 +56,7 @@ impl Extension {
 ///
 /// The purpose of this callback is to allow loading textures in whichever engine is being used.
 /// The following example shows the intended usage by storing the texture on the renderer object
-/// of the AtlasPage which can be acquired later.
+/// of the [`AtlasPage`] which can be acquired later.
 /// ```
 /// struct SpineTexture(pub String);
 ///
@@ -66,6 +66,37 @@ impl Extension {
 /// rusty_spine::extension::set_dispose_texture_cb(|atlas_page| unsafe {
 ///     atlas_page.renderer_object().dispose::<SpineTexture>();
 /// });
+/// ```
+///
+/// If using the [`SimpleDrawer`](`crate::draw::SimpleDrawer`) or
+/// [`CombinedDrawer`](`crate::draw::CombinedDrawer`), the texture can be acquired from
+/// [`SimpleRenderable::attachment_renderer_object`](`crate::draw::SimpleRenderable::attachment_renderer_object`)
+/// or
+/// [`CombinedRenderable::attachment_renderer_object`](`crate::draw::CombinedRenderable::attachment_renderer_object`)
+/// respectively.
+///
+/// If using the [`SkeletonController`](`crate::controller::SkeletonController`), see
+/// [`SkeletonRenderable::attachment_renderer_object`](`crate::controller::SkeletonRenderable::attachment_renderer_object`)
+/// or
+/// [`SkeletonCombinedRenderable::attachment_renderer_object`](`crate::controller::SkeletonCombinedRenderable::attachment_renderer_object`)
+///
+/// ```
+/// # #[path="./test.rs"]
+/// # mod test;
+/// # use rusty_spine::{AnimationState, EventType, controller::SkeletonController};
+/// # let (mut skeleton_data, mut animation_state_data) = test::TestAsset::spineboy().instance_data();
+///
+/// struct SpineTexture(pub String); // from example above
+///
+/// // ...
+///
+/// let mut skeleton_controller = SkeletonController::new(skeleton_data, animation_state_data);
+/// let renderables = skeleton_controller.renderables();
+/// for renderable in renderables.iter() {
+///     if let Some(attachment_renderer_object) = renderable.attachment_renderer_object {
+///         let texture = unsafe { &mut *(attachment_renderer_object as *mut SpineTexture) };
+///     }
+/// }
 /// ```
 pub fn set_create_texture_cb<F>(create_texture_cb: F)
 where

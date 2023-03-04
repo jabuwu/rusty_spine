@@ -4,6 +4,8 @@
 //!
 //! To load a [`Skeleton`], see [`SkeletonJson`] or [`SkeletonBinary`].
 //!
+//! To load textures, see [`extension::set_create_texture_cb`].
+//!
 //! To set automatic mix durations (crossfading) between animations, see
 //! [`AnimationStateData`].
 //!
