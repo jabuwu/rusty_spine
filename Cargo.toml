@@ -19,6 +19,8 @@ mint = { version = "0.5", optional = true }
 transpiler = { path = "./transpiler" }
 miniquad = "0.3"
 image = { version = "0.24", default-features = false, features = [ "png" ] }
+glam = "0.23"
+enum-map = { version = "2.4", default-features = false }
 
 [profile.dev.package."*"]
 opt-level = 3

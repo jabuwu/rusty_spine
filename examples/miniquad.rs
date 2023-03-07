@@ -1,22 +1,16 @@
-use miniquad::*;
-use rusty_spine::{controller::*, *};
 use std::sync::Arc;
 
-#[repr(C)]
-struct Vec2 {
-    x: f32,
-    y: f32,
-}
+use enum_map::{enum_map, Enum, EnumMap};
+use glam::{Mat4, Vec2};
+use miniquad::*;
+use rusty_spine::{controller::*, *};
+
 #[repr(C)]
 struct Vertex {
     pos: Vec2,
     uv: Vec2,
-}
-
-struct Stage {
-    last_frame: f64,
-    pipeline: Pipeline,
-    skeleton_controller: SkeletonController,
+    color: Color,
+    dark_color: Color,
 }
 
 #[derive(Debug)]
@@ -25,58 +19,268 @@ enum SpineTexture {
     Loaded(Texture),
 }
 
+#[derive(Clone, Copy)]
+struct SpineDemo {
+    atlas_path: &'static str,
+    json_path: &'static str,
+    animation: &'static str,
+    position: Vec2,
+    scale: f32,
+    skin: Option<&'static str>,
+}
+
+struct Spine {
+    controller: SkeletonController,
+    world: Mat4,
+    premultiplied_alpha: bool,
+}
+
+impl Spine {
+    pub fn load(info: SpineDemo) -> Self {
+        let atlas = Arc::new(Atlas::new_from_file(info.atlas_path).unwrap());
+        let mut premultiplied_alpha = false;
+        for page in atlas.pages() {
+            if page.pma() {
+                premultiplied_alpha = true;
+            }
+        }
+        let skeleton_json = SkeletonJson::new(atlas);
+        let skeleton_data = Arc::new(
+            skeleton_json
+                .read_skeleton_data_file(info.json_path)
+                .unwrap(),
+        );
+        let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
+        let mut controller = SkeletonController::new(skeleton_data.clone(), animation_state_data);
+        controller
+            .animation_state
+            .set_animation_by_name(0, info.animation, true)
+            .expect(&format!("failed to start animation: {}", info.animation));
+        if let Some(skin) = info.skin {
+            controller
+                .skeleton
+                .set_skin_by_name(skin)
+                .expect(&format!("failed to set skin: {}", skin));
+        }
+        Self {
+            controller,
+            world: Mat4::from_translation(info.position.extend(0.))
+                * Mat4::from_scale(Vec2::splat(info.scale).extend(1.)),
+            premultiplied_alpha,
+        }
+    }
+}
+
+#[derive(Enum)]
+enum Pipelines {
+    Additive,
+    Multiply,
+    Normal,
+    Screen,
+    AdditivePma,
+    MultiplyPma,
+    NormalPma,
+    ScreenPma,
+}
+
+impl Pipelines {
+    fn from_pma_blend_mode(premultiplied_alpha: bool, blend_mode: BlendMode) -> Self {
+        match premultiplied_alpha {
+            false => match blend_mode {
+                BlendMode::Additive => Self::Additive,
+                BlendMode::Multiply => Self::Multiply,
+                BlendMode::Normal => Self::Normal,
+                BlendMode::Screen => Self::Screen,
+            },
+            true => match blend_mode {
+                BlendMode::Additive => Self::AdditivePma,
+                BlendMode::Multiply => Self::MultiplyPma,
+                BlendMode::Normal => Self::NormalPma,
+                BlendMode::Screen => Self::ScreenPma,
+            },
+        }
+    }
+}
+
+struct Stage {
+    spine: Spine,
+    spine_demos: Vec<SpineDemo>,
+    current_spine_demo: usize,
+    pipelines: EnumMap<Pipelines, Pipeline>,
+    last_frame: f64,
+    screen_size: Vec2,
+}
+
 impl Stage {
     pub fn new(ctx: &mut Context) -> Stage {
-        rusty_spine::extension::set_create_texture_cb(|atlas_page, path| {
-            atlas_page
-                .renderer_object()
-                .set(SpineTexture::NeedsToBeLoaded(path.to_owned()));
-        });
-        rusty_spine::extension::set_dispose_texture_cb(|atlas_page| unsafe {
-            atlas_page.renderer_object().dispose::<SpineTexture>();
-        });
-
-        let atlas_path = "assets/spineboy/export/spineboy-pma.atlas";
-        let json_path = "assets/spineboy/export/spineboy-pro.json";
-        let atlas = Arc::new(Atlas::new_from_file(atlas_path).unwrap());
-        let skeleton_json = SkeletonJson::new(atlas);
-        let skeleton_data = Arc::new(skeleton_json.read_skeleton_data_file(json_path).unwrap());
-        let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
-        let mut skeleton_controller =
-            SkeletonController::new(skeleton_data.clone(), animation_state_data);
-        let _ = skeleton_controller
-            .animation_state
-            .set_animation_by_name(0, "portal", true);
-
-        let shader = Shader::new(ctx, shader::VERTEX, shader::FRAGMENT, shader::meta()).unwrap();
-
-        let pipeline = Pipeline::with_params(
-            ctx,
-            &[BufferLayout::default()],
-            &[
-                VertexAttribute::new("pos", VertexFormat::Float2),
-                VertexAttribute::new("uv", VertexFormat::Float2),
-            ],
-            shader,
-            PipelineParams {
-                alpha_blend: Some(BlendState::new(
+        let params_map = enum_map! {
+            Pipelines::Additive => (
+                BlendState::new(Equation::Add, BlendFactor::One, BlendFactor::One),
+                BlendState::new(
                     Equation::Add,
                     BlendFactor::Value(BlendValue::SourceAlpha),
+                    BlendFactor::One,
+                ),
+            ),
+            Pipelines::Multiply => (
+                BlendState::new(
+                    Equation::Add,
                     BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                )),
-                color_blend: Some(BlendState::new(
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                ),
+                BlendState::new(
+                    Equation::Add,
+                    BlendFactor::Value(BlendValue::DestinationColor),
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                ),
+            ),
+            Pipelines::Normal => (
+                BlendState::new(
                     Equation::Add,
                     BlendFactor::One,
                     BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                )),
-                ..Default::default()
+                ),
+                BlendState::new(
+                    Equation::Add,
+                    BlendFactor::Value(BlendValue::SourceAlpha),
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                ),
+            ),
+            Pipelines::Screen => (
+                BlendState::new(
+                    Equation::Add,
+                    BlendFactor::OneMinusValue(BlendValue::SourceColor),
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                ),
+                BlendState::new(
+                    Equation::Add,
+                    BlendFactor::One,
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                ),
+            ),
+            Pipelines::AdditivePma => (
+                BlendState::new(Equation::Add, BlendFactor::One, BlendFactor::One),
+                BlendState::new(Equation::Add, BlendFactor::One, BlendFactor::One),
+            ),
+            Pipelines::MultiplyPma => (
+                BlendState::new(
+                    Equation::Add,
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                ),
+                BlendState::new(
+                    Equation::Add,
+                    BlendFactor::Value(BlendValue::DestinationColor),
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                ),
+            ),
+            Pipelines::NormalPma => (
+                BlendState::new(
+                    Equation::Add,
+                    BlendFactor::One,
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                ),
+                BlendState::new(
+                    Equation::Add,
+                    BlendFactor::One,
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                ),
+            ),
+            Pipelines::ScreenPma => (
+                BlendState::new(
+                    Equation::Add,
+                    BlendFactor::OneMinusValue(BlendValue::SourceColor),
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                ),
+                BlendState::new(
+                    Equation::Add,
+                    BlendFactor::One,
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                ),
+            )
+        };
+
+        let pipelines = params_map.map(|_, (alpha_blend, color_blend)| {
+            let shader =
+                Shader::new(ctx, shader::VERTEX, shader::FRAGMENT, shader::meta()).unwrap();
+            Pipeline::with_params(
+                ctx,
+                &[BufferLayout::default()],
+                &[
+                    VertexAttribute::new("pos", VertexFormat::Float2),
+                    VertexAttribute::new("uv", VertexFormat::Float2),
+                    VertexAttribute::new("color", VertexFormat::Float4),
+                    VertexAttribute::new("dark_color", VertexFormat::Float4),
+                ],
+                shader,
+                PipelineParams {
+                    alpha_blend: Some(alpha_blend),
+                    color_blend: Some(color_blend),
+                    ..Default::default()
+                },
+            )
+        });
+
+        let spine_demos = vec![
+            SpineDemo {
+                atlas_path: "assets/spineboy/export/spineboy-pma.atlas",
+                json_path: "assets/spineboy/export/spineboy-pro.json",
+                animation: "portal",
+                position: Vec2::new(0., -220.),
+                scale: 0.5,
+                skin: None,
             },
-        );
+            SpineDemo {
+                atlas_path: "assets/windmill/export/windmill.atlas",
+                json_path: "assets/windmill/export/windmill-ess.json",
+                animation: "animation",
+                position: Vec2::new(0., -80.),
+                scale: 0.5,
+                skin: None,
+            },
+            SpineDemo {
+                atlas_path: "assets/alien/export/alien.atlas",
+                json_path: "assets/alien/export/alien-pro.json",
+                animation: "death",
+                position: Vec2::new(0., -260.),
+                scale: 0.3,
+                skin: None,
+            },
+            SpineDemo {
+                atlas_path: "assets/dragon/export/dragon.atlas",
+                json_path: "assets/dragon/export/dragon-ess.json",
+                animation: "flying",
+                position: Vec2::new(0., -50.),
+                scale: 0.7,
+                skin: None,
+            },
+            SpineDemo {
+                atlas_path: "assets/goblins/export/goblins.atlas",
+                json_path: "assets/goblins/export/goblins-pro.json",
+                animation: "walk",
+                position: Vec2::new(0., -200.),
+                scale: 1.,
+                skin: Some("goblingirl"),
+            },
+            SpineDemo {
+                atlas_path: "assets/coin/export/coin.atlas",
+                json_path: "assets/coin/export/coin-pro.json",
+                animation: "animation",
+                position: Vec2::ZERO,
+                scale: 1.,
+                skin: None,
+            },
+        ];
+        let current_spine_demo = 0;
+        let spine = Spine::load(spine_demos[current_spine_demo]);
 
         Stage {
+            spine,
+            spine_demos,
+            current_spine_demo,
+            pipelines,
             last_frame: date::now(),
-            skeleton_controller,
-            pipeline,
+            screen_size: Vec2::new(800., 600.),
         }
     }
 }
@@ -85,28 +289,36 @@ impl EventHandler for Stage {
     fn update(&mut self, _ctx: &mut Context) {
         let now = date::now();
         let dt = ((now - self.last_frame) as f32).max(0.001);
-        self.skeleton_controller.update(dt);
+        self.spine.controller.update(dt);
         self.last_frame = now;
     }
 
     fn draw(&mut self, ctx: &mut Context) {
-        let renderables = self.skeleton_controller.renderables();
+        let renderables = self.spine.controller.combined_renderables();
 
         ctx.begin_default_pass(Default::default());
+        ctx.clear(Some((0., 0., 0., 1.)), None, None);
 
-        ctx.apply_pipeline(&self.pipeline);
         for renderable in renderables.into_iter() {
+            ctx.apply_pipeline(
+                &self.pipelines[Pipelines::from_pma_blend_mode(
+                    self.spine.premultiplied_alpha,
+                    renderable.blend_mode,
+                )],
+            );
             let mut vertices = vec![];
             for vertex_index in 0..renderable.vertices.len() {
                 vertices.push(Vertex {
                     pos: Vec2 {
-                        x: renderable.vertices[vertex_index][0] * 0.0015,
-                        y: renderable.vertices[vertex_index][1] * 0.0015,
+                        x: renderable.vertices[vertex_index][0],
+                        y: renderable.vertices[vertex_index][1],
                     },
                     uv: Vec2 {
                         x: renderable.uvs[vertex_index][0],
                         y: renderable.uvs[vertex_index][1],
                     },
+                    color: Color::from(renderable.colors[vertex_index]),
+                    dark_color: Color::from(renderable.dark_colors[vertex_index]),
                 });
             }
             let vertex_buffer = Buffer::immutable(ctx, BufferType::VertexBuffer, &vertices);
@@ -141,7 +353,15 @@ impl EventHandler for Stage {
 
             ctx.apply_bindings(&bindings);
             ctx.apply_uniforms(&shader::Uniforms {
-                offset: (0.1, -0.5),
+                world: self.spine.world,
+                view: Mat4::orthographic_rh_gl(
+                    self.screen_size.x * -0.5,
+                    self.screen_size.x * 0.5,
+                    self.screen_size.y * -0.5,
+                    self.screen_size.y * 0.5,
+                    0.,
+                    1.,
+                ),
             });
             ctx.draw(0, renderable.indices.len() as i32, 1);
         }
@@ -149,50 +369,93 @@ impl EventHandler for Stage {
 
         ctx.commit_frame();
     }
+
+    fn resize_event(&mut self, _ctx: &mut Context, width: f32, height: f32) {
+        self.screen_size = Vec2::new(width, height);
+    }
+
+    fn key_down_event(
+        &mut self,
+        _ctx: &mut Context,
+        keycode: KeyCode,
+        _keymods: KeyMods,
+        repeat: bool,
+    ) {
+        if !repeat && keycode == KeyCode::Space {
+            self.current_spine_demo = (self.current_spine_demo + 1) % self.spine_demos.len();
+            self.spine = Spine::load(self.spine_demos[self.current_spine_demo]);
+        }
+    }
 }
 
 fn main() {
+    rusty_spine::extension::set_create_texture_cb(|atlas_page, path| {
+        atlas_page
+            .renderer_object()
+            .set(SpineTexture::NeedsToBeLoaded(path.to_owned()));
+    });
+    rusty_spine::extension::set_dispose_texture_cb(|atlas_page| unsafe {
+        atlas_page.renderer_object().dispose::<SpineTexture>();
+    });
     miniquad::start(conf::Conf::default(), |mut ctx| {
         Box::new(Stage::new(&mut ctx))
     });
 }
 
 mod shader {
+    use glam::Mat4;
     use miniquad::*;
 
     pub const VERTEX: &str = r#"#version 100
     attribute vec2 pos;
     attribute vec2 uv;
+    attribute vec4 color;
+    attribute vec4 dark_color;
 
-    uniform vec2 offset;
+    uniform mat4 world;
+    uniform mat4 view;
 
-    varying lowp vec2 texcoord;
+    varying lowp vec2 f_texcoord;
+    varying lowp vec4 f_color;
+    varying lowp vec4 f_dark_color;
 
     void main() {
-        gl_Position = vec4(pos + offset, 0, 1);
-        texcoord = uv;
+        gl_Position = view * world * vec4(pos, 0, 1);
+        f_texcoord = uv;
+        f_color = color;
+        f_dark_color = dark_color;
     }"#;
 
     pub const FRAGMENT: &str = r#"#version 100
-    varying lowp vec2 texcoord;
+    varying lowp vec2 f_texcoord;
+    varying lowp vec4 f_color;
+    varying lowp vec4 f_dark_color;
 
     uniform sampler2D tex;
 
     void main() {
-        gl_FragColor = texture2D(tex, texcoord);
+        lowp vec4 tex_color = texture2D(tex, f_texcoord);
+        gl_FragColor = vec4(
+            ((tex_color.a - 1.0) * f_dark_color.a + 1.0 - tex_color.rgb) * f_dark_color.rgb + tex_color.rgb * f_color.rgb,
+            tex_color.a * f_color.a
+        );
     }"#;
 
     pub fn meta() -> ShaderMeta {
         ShaderMeta {
             images: vec!["tex".to_string()],
             uniforms: UniformBlockLayout {
-                uniforms: vec![UniformDesc::new("offset", UniformType::Float2)],
+                uniforms: vec![
+                    UniformDesc::new("world", UniformType::Mat4),
+                    UniformDesc::new("view", UniformType::Mat4),
+                ],
             },
         }
     }
 
     #[repr(C)]
     pub struct Uniforms {
-        pub offset: (f32, f32),
+        pub world: Mat4,
+        pub view: Mat4,
     }
 }
