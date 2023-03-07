@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use enum_map::{enum_map, Enum, EnumMap};
-use glam::{Mat4, Vec2};
+use glam::{Mat4, Vec2, Vec3};
 use miniquad::*;
 use rusty_spine::{controller::*, *};
 
@@ -38,12 +38,7 @@ struct Spine {
 impl Spine {
     pub fn load(info: SpineDemo) -> Self {
         let atlas = Arc::new(Atlas::new_from_file(info.atlas_path).unwrap());
-        let mut premultiplied_alpha = false;
-        for page in atlas.pages() {
-            if page.pma() {
-                premultiplied_alpha = true;
-            }
-        }
+        let premultiplied_alpha = atlas.pages().any(|page| page.pma());
         let skeleton_json = SkeletonJson::new(atlas);
         let skeleton_data = Arc::new(
             skeleton_json
@@ -109,6 +104,7 @@ struct Stage {
     pipelines: EnumMap<Pipelines, Pipeline>,
     last_frame: f64,
     screen_size: Vec2,
+    demo_text: text::TextMesh,
 }
 
 impl Stage {
@@ -281,6 +277,11 @@ impl Stage {
             pipelines,
             last_frame: date::now(),
             screen_size: Vec2::new(800., 600.),
+            demo_text: text::TextMesh::new(
+                ctx,
+                "Press space for next demo",
+                include_bytes!("../assets/FiraMono-Medium.ttf") as &[u8],
+            ),
         }
     }
 }
@@ -365,6 +366,24 @@ impl EventHandler for Stage {
             });
             ctx.draw(0, renderable.indices.len() as i32, 1);
         }
+
+        ctx.apply_pipeline(&self.pipelines[Pipelines::NormalPma]);
+        for bindings in self.demo_text.bindings.iter() {
+            ctx.apply_bindings(bindings);
+            ctx.apply_uniforms(&shader::Uniforms {
+                world: Mat4::from_translation(Vec3::new(0., self.screen_size.y * 0.5 - 30., 0.)),
+                view: Mat4::orthographic_rh_gl(
+                    self.screen_size.x * -0.5,
+                    self.screen_size.x * 0.5,
+                    self.screen_size.y * -0.5,
+                    self.screen_size.y * 0.5,
+                    0.,
+                    1.,
+                ),
+            });
+            ctx.draw(0, 6, 1);
+        }
+
         ctx.end_render_pass();
 
         ctx.commit_frame();
@@ -457,5 +476,89 @@ mod shader {
     pub struct Uniforms {
         pub world: Mat4,
         pub view: Mat4,
+    }
+}
+
+mod text {
+    use fontdue::{
+        layout::{CoordinateSystem, Layout, TextStyle},
+        Font,
+    };
+    use glam::Vec2;
+    use miniquad::*;
+    use rusty_spine::Color;
+
+    use super::Vertex;
+
+    pub struct TextMesh {
+        pub bindings: Vec<Bindings>,
+    }
+
+    impl TextMesh {
+        pub fn new(ctx: &mut Context, text: &'static str, ttf: &[u8]) -> Self {
+            let font = Font::from_bytes(ttf, fontdue::FontSettings::default()).unwrap();
+            let mut layout = Layout::new(CoordinateSystem::PositiveYUp);
+            layout.append(&[&font], &TextStyle::new(text, 25.0, 0));
+            let mut bindings = vec![];
+            let total_width = if let Some(last_glyph) = layout.glyphs().iter().last() {
+                last_glyph.x + last_glyph.width as f32
+            } else {
+                0.
+            };
+            for glyph in layout.glyphs() {
+                let (metrics, bitmap) = font.rasterize(glyph.parent, 25.0);
+                if metrics.width * metrics.height > 0 {
+                    let mut rgba: Vec<u8> = vec![];
+                    for coverage in bitmap.into_iter() {
+                        for _ in 0..4 {
+                            rgba.push(coverage);
+                        }
+                    }
+                    let texture = Texture::from_rgba8(
+                        ctx,
+                        metrics.width as u16,
+                        metrics.height as u16,
+                        &rgba,
+                    );
+                    let position = Vec2::new(glyph.x, glyph.y) - Vec2::new(total_width * 0.5, 0.);
+                    let size = Vec2::new(glyph.width as f32, glyph.height as f32);
+                    let vertices = [
+                        Vertex {
+                            pos: position + Vec2::new(0., 0.) * size,
+                            uv: Vec2::new(0., 1.),
+                            color: Color::new_rgba(1., 1., 1., 1.),
+                            dark_color: Color::new_rgba(0., 0., 0., 1.),
+                        },
+                        Vertex {
+                            pos: position + Vec2::new(0., 1.) * size,
+                            uv: Vec2::new(0., 0.),
+                            color: Color::new_rgba(1., 1., 1., 1.),
+                            dark_color: Color::new_rgba(0., 0., 0., 1.),
+                        },
+                        Vertex {
+                            pos: position + Vec2::new(1., 1.) * size,
+                            uv: Vec2::new(1., 0.),
+                            color: Color::new_rgba(1., 1., 1., 1.),
+                            dark_color: Color::new_rgba(0., 0., 0., 1.),
+                        },
+                        Vertex {
+                            pos: position + Vec2::new(1., 0.) * size,
+                            uv: Vec2::new(1., 1.),
+                            color: Color::new_rgba(1., 1., 1., 1.),
+                            dark_color: Color::new_rgba(0., 0., 0., 1.),
+                        },
+                    ];
+                    let indices = vec![0, 1, 2, 0, 2, 3];
+                    let vertex_buffer = Buffer::immutable(ctx, BufferType::VertexBuffer, &vertices);
+                    let index_buffer = Buffer::immutable(ctx, BufferType::IndexBuffer, &indices);
+                    bindings.push(Bindings {
+                        vertex_buffers: vec![vertex_buffer],
+                        index_buffer,
+                        images: vec![texture],
+                    });
+                }
+            }
+            Self { bindings }
+        }
     }
 }
