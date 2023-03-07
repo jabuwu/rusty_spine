@@ -150,6 +150,17 @@ impl MulAssign<Color> for Color {
     }
 }
 
+impl From<[f32; 4]> for Color {
+    fn from(value: [f32; 4]) -> Self {
+        Self {
+            r: value[0],
+            g: value[1],
+            b: value[2],
+            a: value[3],
+        }
+    }
+}
+
 fn linear_to_nonlinear(x: f32) -> f32 {
     if x <= 0.0 {
         x
