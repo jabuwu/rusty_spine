@@ -30,10 +30,10 @@
 //!
 //! # Dark Colors
 //!
-//! In addition to the usual vertex data (specifically: position, uv, and color), a dark color needs
-//! to be sent to the fragment shader (see [`shader::FRAGMENT`]). Dark colors can be animated and
-//! allow changing how darkened shades of a texture are lit. To see it in action, see the coin in
-//! this example.
+//! In addition to the usual vertex data (specifically: position, uv, and color - see [`Vertex`]), a
+//! dark color needs to be sent to the fragment shader (see [`shader::FRAGMENT`]). Dark colors can
+//! be animated and allow changing how darkened shades of a texture are lit. To see it in action,
+//! see the coin in this example.
 
 use std::sync::Arc;
 
@@ -45,12 +45,89 @@ use rusty_spine::{
     AnimationStateData, Atlas, BlendMode, Color, SkeletonBinary, SkeletonJson,
 };
 
+mod shader {
+    use glam::Mat4;
+    use miniquad::*;
+
+    pub const VERTEX: &str = r#"
+        #version 100
+        attribute vec2 position;
+        attribute vec2 uv;
+        attribute vec4 color;
+        attribute vec4 dark_color;
+
+        uniform mat4 world;
+        uniform mat4 view;
+
+        varying lowp vec2 f_texcoord;
+        varying lowp vec4 f_color;
+        varying lowp vec4 f_dark_color;
+
+        void main() {
+            gl_Position = view * world * vec4(position, 0, 1);
+            f_texcoord = uv;
+            f_color = color;
+            f_dark_color = dark_color;
+        }
+    "#;
+
+    pub const FRAGMENT: &str = r#"
+        #version 100
+        varying lowp vec2 f_texcoord;
+        varying lowp vec4 f_color;
+        varying lowp vec4 f_dark_color;
+
+        uniform sampler2D tex;
+
+        void main() {
+            lowp vec4 tex_color = texture2D(tex, f_texcoord);
+            gl_FragColor = vec4(
+                ((tex_color.a - 1.0) * f_dark_color.a + 1.0 - tex_color.rgb) * f_dark_color.rgb + tex_color.rgb * f_color.rgb,
+                tex_color.a * f_color.a
+            );
+        }
+    "#;
+
+    pub fn meta() -> ShaderMeta {
+        ShaderMeta {
+            images: vec!["tex".to_string()],
+            uniforms: UniformBlockLayout {
+                uniforms: vec![
+                    UniformDesc::new("world", UniformType::Mat4),
+                    UniformDesc::new("view", UniformType::Mat4),
+                ],
+            },
+        }
+    }
+
+    #[repr(C)]
+    pub struct Uniforms {
+        pub world: Mat4,
+        pub view: Mat4,
+    }
+}
+
 #[repr(C)]
 struct Vertex {
-    pos: Vec2,
+    position: Vec2,
     uv: Vec2,
     color: Color,
     dark_color: Color,
+}
+
+fn create_pipeline(ctx: &mut Context) -> Pipeline {
+    let shader = Shader::new(ctx, shader::VERTEX, shader::FRAGMENT, shader::meta()).unwrap();
+    Pipeline::new(
+        ctx,
+        &[BufferLayout::default()],
+        &[
+            VertexAttribute::new("position", VertexFormat::Float2),
+            VertexAttribute::new("uv", VertexFormat::Float2),
+            VertexAttribute::new("color", VertexFormat::Float4),
+            VertexAttribute::new("dark_color", VertexFormat::Float4),
+        ],
+        shader,
+    )
 }
 
 /// An instance of this enum is created for each loaded [`rusty_spine::atlas::AtlasPage`] upon
@@ -291,26 +368,13 @@ struct Stage {
     spine_demos: Vec<SpineDemo>,
     current_spine_demo: usize,
     pipeline: Pipeline,
-    last_frame: f64,
+    last_frame_time: f64,
     screen_size: Vec2,
     demo_text: text::TextMesh,
 }
 
 impl Stage {
-    pub fn new(ctx: &mut Context) -> Stage {
-        let shader = Shader::new(ctx, shader::VERTEX, shader::FRAGMENT, shader::meta()).unwrap();
-        let pipeline = Pipeline::new(
-            ctx,
-            &[BufferLayout::default()],
-            &[
-                VertexAttribute::new("pos", VertexFormat::Float2),
-                VertexAttribute::new("uv", VertexFormat::Float2),
-                VertexAttribute::new("color", VertexFormat::Float4),
-                VertexAttribute::new("dark_color", VertexFormat::Float4),
-            ],
-            shader,
-        );
-
+    fn new(ctx: &mut Context) -> Stage {
         let spine_demos = vec![
             SpineDemo {
                 atlas_path: "assets/spineboy/export/spineboy-pma.atlas",
@@ -369,6 +433,7 @@ impl Stage {
                 backface_culling: false,
             },
         ];
+
         let current_spine_demo = 0;
         let spine = Spine::load(spine_demos[current_spine_demo]);
 
@@ -376,8 +441,8 @@ impl Stage {
             spine,
             spine_demos,
             current_spine_demo,
-            pipeline,
-            last_frame: date::now(),
+            pipeline: create_pipeline(ctx),
+            last_frame_time: date::now(),
             screen_size: Vec2::new(800., 600.),
             demo_text: text::TextMesh::new(
                 ctx,
@@ -386,26 +451,40 @@ impl Stage {
             ),
         }
     }
+
+    fn view(&self) -> Mat4 {
+        Mat4::orthographic_rh_gl(
+            self.screen_size.x * -0.5,
+            self.screen_size.x * 0.5,
+            self.screen_size.y * -0.5,
+            self.screen_size.y * 0.5,
+            0.,
+            1.,
+        )
+    }
 }
 
 impl EventHandler for Stage {
     fn update(&mut self, _ctx: &mut Context) {
         let now = date::now();
-        let dt = ((now - self.last_frame) as f32).max(0.001);
+        let dt = ((now - self.last_frame_time) as f32).max(0.001);
         self.spine.controller.update(dt);
-        self.last_frame = now;
+        self.last_frame_time = now;
     }
 
     fn draw(&mut self, ctx: &mut Context) {
         let renderables = self.spine.controller.combined_renderables();
 
+        // Begin frame
         ctx.begin_default_pass(Default::default());
         ctx.clear(Some((0.1, 0.1, 0.1, 1.)), None, None);
-
         ctx.apply_pipeline(&self.pipeline);
+
+        // Apply backface culling only if this skeleton needs it
         ctx.set_cull_face(self.spine.cull_face);
 
         for renderable in renderables.into_iter() {
+            // Set blend state based on this renderable's blend mode
             let BlendStates {
                 alpha_blend,
                 color_blend,
@@ -413,10 +492,12 @@ impl EventHandler for Stage {
                 .blend_mode
                 .get_blend_states(self.spine.controller.settings.premultiplied_alpha);
             ctx.set_blend(Some(color_blend), Some(alpha_blend));
+
+            // Create the vertex and index buffers for miniquad
             let mut vertices = vec![];
             for vertex_index in 0..renderable.vertices.len() {
                 vertices.push(Vertex {
-                    pos: Vec2 {
+                    position: Vec2 {
                         x: renderable.vertices[vertex_index][0],
                         y: renderable.vertices[vertex_index][1],
                     },
@@ -431,7 +512,10 @@ impl EventHandler for Stage {
             let vertex_buffer = Buffer::immutable(ctx, BufferType::VertexBuffer, &vertices);
             let index_buffer = Buffer::immutable(ctx, BufferType::IndexBuffer, &renderable.indices);
 
+            // If there is no attachment (and therefore no texture), skip rendering this renderable
             let Some(attachment_renderer_object) = renderable.attachment_renderer_object else { continue };
+
+            // Load textures if they haven't been loaded already
             let spine_texture = unsafe { &mut *(attachment_renderer_object as *mut SpineTexture) };
             let texture = match spine_texture {
                 SpineTexture::NeedsToBeLoaded(path) => {
@@ -452,46 +536,32 @@ impl EventHandler for Stage {
                 }
                 SpineTexture::Loaded(texture) => texture.clone(),
             };
-            let bindings = Bindings {
+
+            // Draw this renderable
+            ctx.apply_bindings(&Bindings {
                 vertex_buffers: vec![vertex_buffer],
                 index_buffer,
                 images: vec![texture],
-            };
-
-            ctx.apply_bindings(&bindings);
+            });
             ctx.apply_uniforms(&shader::Uniforms {
                 world: self.spine.world,
-                view: Mat4::orthographic_rh_gl(
-                    self.screen_size.x * -0.5,
-                    self.screen_size.x * 0.5,
-                    self.screen_size.y * -0.5,
-                    self.screen_size.y * 0.5,
-                    0.,
-                    1.,
-                ),
+                view: self.view(),
             });
             ctx.draw(0, renderable.indices.len() as i32, 1);
         }
 
+        // Draw demo text
         ctx.apply_pipeline(&self.pipeline);
-        for bindings in self.demo_text.bindings.iter() {
-            ctx.apply_bindings(bindings);
-            ctx.apply_uniforms(&shader::Uniforms {
+        self.demo_text.draw(
+            ctx,
+            shader::Uniforms {
                 world: Mat4::from_translation(Vec3::new(0., self.screen_size.y * 0.5 - 30., 0.)),
-                view: Mat4::orthographic_rh_gl(
-                    self.screen_size.x * -0.5,
-                    self.screen_size.x * 0.5,
-                    self.screen_size.y * -0.5,
-                    self.screen_size.y * 0.5,
-                    0.,
-                    1.,
-                ),
-            });
-            ctx.draw(0, 6, 1);
-        }
+                view: self.view(),
+            },
+        );
 
+        // End frame
         ctx.end_render_pass();
-
         ctx.commit_frame();
     }
 
@@ -522,69 +592,14 @@ fn main() {
     rusty_spine::extension::set_dispose_texture_cb(|atlas_page| unsafe {
         atlas_page.renderer_object().dispose::<SpineTexture>();
     });
-    miniquad::start(conf::Conf::default(), |mut ctx| {
-        Box::new(Stage::new(&mut ctx))
-    });
+    let conf = conf::Conf {
+        window_title: "rusty_spine".to_owned(),
+        ..Default::default()
+    };
+    miniquad::start(conf, |mut ctx| Box::new(Stage::new(&mut ctx)));
 }
 
-mod shader {
-    use glam::Mat4;
-    use miniquad::*;
-
-    pub const VERTEX: &str = r#"#version 100
-    attribute vec2 pos;
-    attribute vec2 uv;
-    attribute vec4 color;
-    attribute vec4 dark_color;
-
-    uniform mat4 world;
-    uniform mat4 view;
-
-    varying lowp vec2 f_texcoord;
-    varying lowp vec4 f_color;
-    varying lowp vec4 f_dark_color;
-
-    void main() {
-        gl_Position = view * world * vec4(pos, 0, 1);
-        f_texcoord = uv;
-        f_color = color;
-        f_dark_color = dark_color;
-    }"#;
-
-    pub const FRAGMENT: &str = r#"#version 100
-    varying lowp vec2 f_texcoord;
-    varying lowp vec4 f_color;
-    varying lowp vec4 f_dark_color;
-
-    uniform sampler2D tex;
-
-    void main() {
-        lowp vec4 tex_color = texture2D(tex, f_texcoord);
-        gl_FragColor = vec4(
-            ((tex_color.a - 1.0) * f_dark_color.a + 1.0 - tex_color.rgb) * f_dark_color.rgb + tex_color.rgb * f_color.rgb,
-            tex_color.a * f_color.a
-        );
-    }"#;
-
-    pub fn meta() -> ShaderMeta {
-        ShaderMeta {
-            images: vec!["tex".to_string()],
-            uniforms: UniformBlockLayout {
-                uniforms: vec![
-                    UniformDesc::new("world", UniformType::Mat4),
-                    UniformDesc::new("view", UniformType::Mat4),
-                ],
-            },
-        }
-    }
-
-    #[repr(C)]
-    pub struct Uniforms {
-        pub world: Mat4,
-        pub view: Mat4,
-    }
-}
-
+/// Not part of the demo, just necessary to render some text. Can probably be simplified.
 mod text {
     use fontdue::{
         layout::{CoordinateSystem, Layout, TextStyle},
@@ -594,7 +609,7 @@ mod text {
     use miniquad::*;
     use rusty_spine::Color;
 
-    use super::Vertex;
+    use super::{shader, Vertex};
 
     pub struct TextMesh {
         pub bindings: Vec<Bindings>,
@@ -630,31 +645,31 @@ mod text {
                     let size = Vec2::new(glyph.width as f32, glyph.height as f32);
                     let vertices = [
                         Vertex {
-                            pos: position + Vec2::new(0., 0.) * size,
+                            position: position + Vec2::new(0., 0.) * size,
                             uv: Vec2::new(0., 1.),
                             color: Color::new_rgba(1., 1., 1., 1.),
                             dark_color: Color::new_rgba(0., 0., 0., 1.),
                         },
                         Vertex {
-                            pos: position + Vec2::new(0., 1.) * size,
+                            position: position + Vec2::new(0., 1.) * size,
                             uv: Vec2::new(0., 0.),
                             color: Color::new_rgba(1., 1., 1., 1.),
                             dark_color: Color::new_rgba(0., 0., 0., 1.),
                         },
                         Vertex {
-                            pos: position + Vec2::new(1., 1.) * size,
+                            position: position + Vec2::new(1., 1.) * size,
                             uv: Vec2::new(1., 0.),
                             color: Color::new_rgba(1., 1., 1., 1.),
                             dark_color: Color::new_rgba(0., 0., 0., 1.),
                         },
                         Vertex {
-                            pos: position + Vec2::new(1., 0.) * size,
+                            position: position + Vec2::new(1., 0.) * size,
                             uv: Vec2::new(1., 1.),
                             color: Color::new_rgba(1., 1., 1., 1.),
                             dark_color: Color::new_rgba(0., 0., 0., 1.),
                         },
                     ];
-                    let indices = vec![0, 1, 2, 0, 2, 3];
+                    let indices = vec![0, 2, 1, 0, 3, 2];
                     let vertex_buffer = Buffer::immutable(ctx, BufferType::VertexBuffer, &vertices);
                     let index_buffer = Buffer::immutable(ctx, BufferType::IndexBuffer, &indices);
                     bindings.push(Bindings {
@@ -665,6 +680,26 @@ mod text {
                 }
             }
             Self { bindings }
+        }
+
+        pub fn draw(&self, ctx: &mut Context, uniforms: shader::Uniforms) {
+            ctx.set_blend(
+                Some(BlendState::new(
+                    Equation::Add,
+                    BlendFactor::One,
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                )),
+                Some(BlendState::new(
+                    Equation::Add,
+                    BlendFactor::One,
+                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                )),
+            );
+            for bindings in self.bindings.iter() {
+                ctx.apply_bindings(bindings);
+                ctx.apply_uniforms(&uniforms);
+                ctx.draw(0, 6, 1);
+            }
         }
     }
 }
