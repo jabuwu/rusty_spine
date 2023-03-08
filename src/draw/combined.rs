@@ -264,6 +264,8 @@ impl CombinedDrawer {
                 if self.premultiplied_alpha {
                     dark_color.a = 1.0;
                     dark_color.premultiply_alpha();
+                } else {
+                    dark_color.a = 0.0;
                 }
                 dark_color = match self.color_space {
                     ColorSpace::SRGB => dark_color,
