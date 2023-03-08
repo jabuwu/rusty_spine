@@ -1,6 +1,42 @@
+//! Demonstrates a complete Spine integration using `miniquad`.
+//!
+//! To integrate Spine into a project, the following features must be supported:
+//!
+//! # Texture Creation & Disposal
+//!
+//! Callbacks must be set to handle texture loading upon loading a [`rusty_spine::Atlas`].
+//! See [`SpineTexture`].
+//!
+//! # Blend Modes
+//!
+//! Slots within Spine can be assigned a blend mode, and this value is exposed on the renderable
+//! object returned from [`rusty_spine::controller::SkeletonController::renderables`] or
+//! [`rusty_spine::controller::SkeletonController::combined_renderables`]. See [`BlendStates`] for
+//! how to handle these blend modes.
+//!
+//! # Premultiplied Alpha
+//!
+//! An export option within Spine allows textures to use premultiplied alpha. To support this
+//! feature, additional blend states are required. See [`BlendStates`]. To detect if a skeleton was
+//! exported with this option, iterate over [`rusty_spine::Atlas::pages`] and check if any page has
+//! [`rusty_spine::atlas::AtlasPage::pma`] set to true.
+//!
+//! # Backface Culling
+//!
+//! Spine animations may or may not rely on backface culling in their animations. This information
+//! is not exposed by skeleton files and must be coordinated manually. For an example of where
+//! backface culling is required, see the coin in this example. Disabling
+//! [`SpineDemo::backface_culling`] for that skeleton will cause it to not render correctly.
+//!
+//! # Dark Colors
+//!
+//! In addition to the usual vertex data (specifically: position, uv, and color), a dark color needs
+//! to be sent to the fragment shader (see [`shader::FRAGMENT`]). Dark colors can be animated and
+//! allow changing how darkened shades of a texture are lit. To see it in action, see the coin in
+//! this example.
+
 use std::sync::Arc;
 
-use enum_map::{enum_map, Enum, EnumMap};
 use glam::{Mat4, Vec2, Vec3};
 use miniquad::*;
 use rusty_spine::{
@@ -17,12 +53,22 @@ struct Vertex {
     dark_color: Color,
 }
 
+/// An instance of this enum is created for each loaded [`rusty_spine::atlas::AtlasPage`] upon
+/// loading a [`rusty_spine::Atlas`]. To see how this is done, see the [`main`] function of this
+/// example. It utilizes the following callbacks which must be set only once in an application:
+/// - [`rusty_spine::extension::set_create_texture_cb`]
+/// - [`rusty_spine::extension::set_dispose_texture_cb`]
+///
+/// The implementation in this example defers loading by setting the texture to
+/// [`SpineTexture::NeedsToBeLoaded`] and handling it later, but in other applications, it may be
+/// possible to load the textures immediately, or on another thread.
 #[derive(Debug)]
 enum SpineTexture {
     NeedsToBeLoaded(String),
     Loaded(Texture),
 }
 
+/// Holds all data related to load and demonstrate a particular Spine skeleton.
 #[derive(Clone, Copy)]
 struct SpineDemo {
     atlas_path: &'static str,
@@ -31,6 +77,7 @@ struct SpineDemo {
     position: Vec2,
     scale: f32,
     skin: Option<&'static str>,
+    backface_culling: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -39,15 +86,20 @@ enum SpineSkeletonPath {
     Json(&'static str),
 }
 
+/// Holds all data related to rendering Spine skeletons in this example.
 struct Spine {
     controller: SkeletonController,
     world: Mat4,
+    cull_face: CullFace,
 }
 
 impl Spine {
     pub fn load(info: SpineDemo) -> Self {
+        // Load atlas and auto-detect if the textures are premultiplied
         let atlas = Arc::new(Atlas::new_from_file(info.atlas_path).unwrap());
         let premultiplied_alpha = atlas.pages().any(|page| page.pma());
+
+        // Load either binary or json skeleton files
         let skeleton_data = Arc::new(match info.skeleton_path {
             SpineSkeletonPath::Binary(path) => {
                 let skeleton_binary = SkeletonBinary::new(atlas);
@@ -62,58 +114,173 @@ impl Spine {
                     .expect(&format!("failed to load file: {}", path))
             }
         });
+
+        // Create animation state data from a skeleton
+        // If desired, set crossfades at this point
+        // See [`rusty_spine::AnimationStateData::set_mix_by_name`]
         let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
+
+        // Instantiate the [`rusty_spine::controller::SkeletonController`] helper class which
+        // handles creating the live data ([`rusty_spine::Skeleton`] and
+        // [`rusty_spine::AnimationState`] and capable of generating mesh render data.
+        // Use of this helper is not required but it does handle a lot of little things for you.
         let mut controller = SkeletonController::new(skeleton_data.clone(), animation_state_data)
             .with_settings(SkeletonControllerSettings {
                 premultiplied_alpha,
-                cull_direction: CullDirection::Clockwise,
+                cull_direction: CullDirection::CounterClockwise,
                 color_space: ColorSpace::SRGB,
             });
+
+        // Start the animation on track 0 and loop
         controller
             .animation_state
             .set_animation_by_name(0, info.animation, true)
             .expect(&format!("failed to start animation: {}", info.animation));
+
+        // If a skin was provided, set it
         if let Some(skin) = info.skin {
             controller
                 .skeleton
                 .set_skin_by_name(skin)
                 .expect(&format!("failed to set skin: {}", skin));
         }
+
         controller.settings.premultiplied_alpha = premultiplied_alpha;
         Self {
             controller,
             world: Mat4::from_translation(info.position.extend(0.))
                 * Mat4::from_scale(Vec2::splat(info.scale).extend(1.)),
+            cull_face: match info.backface_culling {
+                false => CullFace::Nothing,
+                true => CullFace::Back,
+            },
         }
     }
 }
 
-#[derive(Enum)]
-enum Pipelines {
-    Additive,
-    Multiply,
-    Normal,
-    Screen,
-    AdditivePma,
-    MultiplyPma,
-    NormalPma,
-    ScreenPma,
+/// Convert a [`rusty_spine::BlendMode`] to a pair of [`miniquad::BlendState`]s. One for alpha, one
+/// for color.
+///
+/// Spine supports 4 different blend modes:
+/// - [`rusty_spine::BlendMode::Additive`]
+/// - [`rusty_spine::BlendMode::Multiply`]
+/// - [`rusty_spine::BlendMode::Normal`]
+/// - [`rusty_spine::BlendMode::Screen`]
+///
+/// And blend states are different depending on if the texture has premultiplied alpha values.
+///
+/// So, 8 blend states must be supported. See [`GetBlendStates::get_blend_states`] below.
+struct BlendStates {
+    alpha_blend: BlendState,
+    color_blend: BlendState,
 }
 
-impl Pipelines {
-    fn from_pma_blend_mode(premultiplied_alpha: bool, blend_mode: BlendMode) -> Self {
-        match premultiplied_alpha {
-            false => match blend_mode {
-                BlendMode::Additive => Self::Additive,
-                BlendMode::Multiply => Self::Multiply,
-                BlendMode::Normal => Self::Normal,
-                BlendMode::Screen => Self::Screen,
+trait GetBlendStates {
+    fn get_blend_states(&self, premultiplied_alpha: bool) -> BlendStates;
+}
+
+impl GetBlendStates for BlendMode {
+    fn get_blend_states(&self, premultiplied_alpha: bool) -> BlendStates {
+        match self {
+            Self::Additive => match premultiplied_alpha {
+                // Case 1: Additive Blend Mode, Normal Alpha
+                false => BlendStates {
+                    alpha_blend: BlendState::new(Equation::Add, BlendFactor::One, BlendFactor::One),
+                    color_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::Value(BlendValue::SourceAlpha),
+                        BlendFactor::One,
+                    ),
+                },
+                // Case 2: Additive Blend Mode, Premultiplied Alpha
+                true => BlendStates {
+                    alpha_blend: BlendState::new(Equation::Add, BlendFactor::One, BlendFactor::One),
+                    color_blend: BlendState::new(Equation::Add, BlendFactor::One, BlendFactor::One),
+                },
             },
-            true => match blend_mode {
-                BlendMode::Additive => Self::AdditivePma,
-                BlendMode::Multiply => Self::MultiplyPma,
-                BlendMode::Normal => Self::NormalPma,
-                BlendMode::Screen => Self::ScreenPma,
+            Self::Multiply => match premultiplied_alpha {
+                // Case 3: Multiply Blend Mode, Normal Alpha
+                false => BlendStates {
+                    alpha_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                    color_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::Value(BlendValue::DestinationColor),
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                },
+                // Case 4: Multiply Blend Mode, Premultiplied Alpha
+                true => BlendStates {
+                    alpha_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                    color_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::Value(BlendValue::DestinationColor),
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                },
+            },
+            Self::Normal => match premultiplied_alpha {
+                // Case 5: Normal Blend Mode, Normal Alpha
+                false => BlendStates {
+                    alpha_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::One,
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                    color_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::Value(BlendValue::SourceAlpha),
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                },
+                // Case 6: Normal Blend Mode, Premultiplied Alpha
+                true => BlendStates {
+                    alpha_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::One,
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                    color_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::One,
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                },
+            },
+            Self::Screen => match premultiplied_alpha {
+                // Case 7: Screen Blend Mode, Normal Alpha
+                false => BlendStates {
+                    alpha_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::OneMinusValue(BlendValue::SourceColor),
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                    color_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::One,
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                },
+                // Case 8: Screen Blend Mode, Premultiplied Alpha
+                true => BlendStates {
+                    alpha_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::OneMinusValue(BlendValue::SourceColor),
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                    color_blend: BlendState::new(
+                        Equation::Add,
+                        BlendFactor::One,
+                        BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
+                    ),
+                },
             },
         }
     }
@@ -123,7 +290,7 @@ struct Stage {
     spine: Spine,
     spine_demos: Vec<SpineDemo>,
     current_spine_demo: usize,
-    pipelines: EnumMap<Pipelines, Pipeline>,
+    pipeline: Pipeline,
     last_frame: f64,
     screen_size: Vec2,
     demo_text: text::TextMesh,
@@ -131,113 +298,18 @@ struct Stage {
 
 impl Stage {
     pub fn new(ctx: &mut Context) -> Stage {
-        let params_map = enum_map! {
-            Pipelines::Additive => (
-                BlendState::new(Equation::Add, BlendFactor::One, BlendFactor::One),
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::Value(BlendValue::SourceAlpha),
-                    BlendFactor::One,
-                ),
-            ),
-            Pipelines::Multiply => (
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::Value(BlendValue::DestinationColor),
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-            ),
-            Pipelines::Normal => (
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::One,
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::Value(BlendValue::SourceAlpha),
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-            ),
-            Pipelines::Screen => (
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::OneMinusValue(BlendValue::SourceColor),
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::One,
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-            ),
-            Pipelines::AdditivePma => (
-                BlendState::new(Equation::Add, BlendFactor::One, BlendFactor::One),
-                BlendState::new(Equation::Add, BlendFactor::One, BlendFactor::One),
-            ),
-            Pipelines::MultiplyPma => (
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::Value(BlendValue::DestinationColor),
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-            ),
-            Pipelines::NormalPma => (
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::One,
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::One,
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-            ),
-            Pipelines::ScreenPma => (
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::OneMinusValue(BlendValue::SourceColor),
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-                BlendState::new(
-                    Equation::Add,
-                    BlendFactor::One,
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                ),
-            )
-        };
-
-        let pipelines = params_map.map(|_, (alpha_blend, color_blend)| {
-            let shader =
-                Shader::new(ctx, shader::VERTEX, shader::FRAGMENT, shader::meta()).unwrap();
-            Pipeline::with_params(
-                ctx,
-                &[BufferLayout::default()],
-                &[
-                    VertexAttribute::new("pos", VertexFormat::Float2),
-                    VertexAttribute::new("uv", VertexFormat::Float2),
-                    VertexAttribute::new("color", VertexFormat::Float4),
-                    VertexAttribute::new("dark_color", VertexFormat::Float4),
-                ],
-                shader,
-                PipelineParams {
-                    alpha_blend: Some(alpha_blend),
-                    color_blend: Some(color_blend),
-                    ..Default::default()
-                },
-            )
-        });
+        let shader = Shader::new(ctx, shader::VERTEX, shader::FRAGMENT, shader::meta()).unwrap();
+        let pipeline = Pipeline::new(
+            ctx,
+            &[BufferLayout::default()],
+            &[
+                VertexAttribute::new("pos", VertexFormat::Float2),
+                VertexAttribute::new("uv", VertexFormat::Float2),
+                VertexAttribute::new("color", VertexFormat::Float4),
+                VertexAttribute::new("dark_color", VertexFormat::Float4),
+            ],
+            shader,
+        );
 
         let spine_demos = vec![
             SpineDemo {
@@ -249,6 +321,7 @@ impl Stage {
                 position: Vec2::new(0., -220.),
                 scale: 0.5,
                 skin: None,
+                backface_culling: false,
             },
             SpineDemo {
                 atlas_path: "assets/windmill/export/windmill.atlas",
@@ -257,6 +330,7 @@ impl Stage {
                 position: Vec2::new(0., -80.),
                 scale: 0.5,
                 skin: None,
+                backface_culling: true,
             },
             SpineDemo {
                 atlas_path: "assets/alien/export/alien.atlas",
@@ -265,6 +339,7 @@ impl Stage {
                 position: Vec2::new(0., -260.),
                 scale: 0.3,
                 skin: None,
+                backface_culling: true,
             },
             SpineDemo {
                 atlas_path: "assets/dragon/export/dragon.atlas",
@@ -273,6 +348,7 @@ impl Stage {
                 position: Vec2::new(0., -50.),
                 scale: 0.7,
                 skin: None,
+                backface_culling: true,
             },
             SpineDemo {
                 atlas_path: "assets/goblins/export/goblins.atlas",
@@ -281,6 +357,7 @@ impl Stage {
                 position: Vec2::new(0., -200.),
                 scale: 1.,
                 skin: Some("goblingirl"),
+                backface_culling: true,
             },
             SpineDemo {
                 atlas_path: "assets/coin/export/coin-pma.atlas",
@@ -289,6 +366,7 @@ impl Stage {
                 position: Vec2::ZERO,
                 scale: 1.,
                 skin: None,
+                backface_culling: false,
             },
         ];
         let current_spine_demo = 0;
@@ -298,7 +376,7 @@ impl Stage {
             spine,
             spine_demos,
             current_spine_demo,
-            pipelines,
+            pipeline,
             last_frame: date::now(),
             screen_size: Vec2::new(800., 600.),
             demo_text: text::TextMesh::new(
@@ -322,15 +400,19 @@ impl EventHandler for Stage {
         let renderables = self.spine.controller.combined_renderables();
 
         ctx.begin_default_pass(Default::default());
-        ctx.clear(Some((0., 0., 0., 1.)), None, None);
+        ctx.clear(Some((0.1, 0.1, 0.1, 1.)), None, None);
+
+        ctx.apply_pipeline(&self.pipeline);
+        ctx.set_cull_face(self.spine.cull_face);
 
         for renderable in renderables.into_iter() {
-            ctx.apply_pipeline(
-                &self.pipelines[Pipelines::from_pma_blend_mode(
-                    self.spine.controller.settings.premultiplied_alpha,
-                    renderable.blend_mode,
-                )],
-            );
+            let BlendStates {
+                alpha_blend,
+                color_blend,
+            } = renderable
+                .blend_mode
+                .get_blend_states(self.spine.controller.settings.premultiplied_alpha);
+            ctx.set_blend(Some(color_blend), Some(alpha_blend));
             let mut vertices = vec![];
             for vertex_index in 0..renderable.vertices.len() {
                 vertices.push(Vertex {
@@ -391,7 +473,7 @@ impl EventHandler for Stage {
             ctx.draw(0, renderable.indices.len() as i32, 1);
         }
 
-        ctx.apply_pipeline(&self.pipelines[Pipelines::NormalPma]);
+        ctx.apply_pipeline(&self.pipeline);
         for bindings in self.demo_text.bindings.iter() {
             ctx.apply_bindings(bindings);
             ctx.apply_uniforms(&shader::Uniforms {
