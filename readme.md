@@ -27,6 +27,8 @@ If you wish to use the C API directly (either because the Rust API lacks a featu
 
 - [Bevy](https://github.com/jabuwu/bevy_spine) - ([WASM Demo](https://jabuwu.github.io/bevy_spine_demos/))
 
+To integrate into your own engine, see the [miniquad example](https://github.com/jabuwu/rusty_spine/blob/main/examples/miniquad.rs)
+
 ## License
 
 Because this project uses the official Spine Runtime, you must follow the Spine Runtimes License Agreement. If using the `libc` crate (via the `use_libc` feature), then see the [libc crate](https://crates.io/crates/libc) for licensing. If using the built-in (wasm compatible) libc implementation, you must follow the BSD 3-clause license of The Regents of the University of California. See the `LICENSE` file for complete licenses. The Rust code is licensed under dual MIT / Apache-2.0 but with no attribution necessary. All contributions must agree to this licensing.
