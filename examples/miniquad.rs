@@ -35,7 +35,7 @@
 //! be animated and allow changing how darkened shades of a texture are lit. To see it in action,
 //! see the coin in this example.
 
-use std::sync::Arc;
+use std::{fs::read, sync::Arc};
 
 use glam::{Mat4, Vec2, Vec3};
 use miniquad::*;
@@ -116,7 +116,8 @@ struct Vertex {
 }
 
 fn create_pipeline(ctx: &mut Context) -> Pipeline {
-    let shader = Shader::new(ctx, shader::VERTEX, shader::FRAGMENT, shader::meta()).unwrap();
+    let shader = Shader::new(ctx, shader::VERTEX, shader::FRAGMENT, shader::meta())
+        .expect("failed to build shader");
     Pipeline::new(
         ctx,
         &[BufferLayout::default()],
@@ -173,7 +174,10 @@ struct Spine {
 impl Spine {
     pub fn load(info: SpineDemo) -> Self {
         // Load atlas and auto-detect if the textures are premultiplied
-        let atlas = Arc::new(Atlas::new_from_file(info.atlas_path).unwrap());
+        let atlas = Arc::new(
+            Atlas::new_from_file(info.atlas_path)
+                .expect(&format!("failed to load atlas file: {}", info.atlas_path)),
+        );
         let premultiplied_alpha = atlas.pages().any(|page| page.pma());
 
         // Load either binary or json skeleton files
@@ -182,13 +186,13 @@ impl Spine {
                 let skeleton_binary = SkeletonBinary::new(atlas);
                 skeleton_binary
                     .read_skeleton_data_file(path)
-                    .expect(&format!("failed to load file: {}", path))
+                    .expect(&format!("failed to load binary skeleton file: {}", path))
             }
             SpineSkeletonPath::Json(path) => {
                 let skeleton_json = SkeletonJson::new(atlas);
                 skeleton_json
                     .read_skeleton_data_file(path)
-                    .expect(&format!("failed to load file: {}", path))
+                    .expect(&format!("failed to load json skeleton file: {}", path))
             }
         });
 
@@ -385,7 +389,7 @@ impl Stage {
                 position: Vec2::new(0., -220.),
                 scale: 0.5,
                 skin: None,
-                backface_culling: false,
+                backface_culling: true,
             },
             SpineDemo {
                 atlas_path: "assets/windmill/export/windmill.atlas",
@@ -436,6 +440,7 @@ impl Stage {
 
         let current_spine_demo = 0;
         let spine = Spine::load(spine_demos[current_spine_demo]);
+        let font_file = "assets/FiraMono-Medium.ttf";
 
         Stage {
             spine,
@@ -447,7 +452,7 @@ impl Stage {
             demo_text: text::TextMesh::new(
                 ctx,
                 "Press space for next demo",
-                include_bytes!("../assets/FiraMono-Medium.ttf") as &[u8],
+                &read(font_file).expect(&format!("failed to load font: {}", font_file)),
             ),
         }
     }
@@ -520,10 +525,10 @@ impl EventHandler for Stage {
             let texture = match spine_texture {
                 SpineTexture::NeedsToBeLoaded(path) => {
                     use image::io::Reader as ImageReader;
-                    let image = ImageReader::open(path)
-                        .unwrap()
+                    let image = ImageReader::open(&path)
+                        .expect(&format!("failed to open image: {}", &path))
                         .decode()
-                        .unwrap()
+                        .expect(&format!("failed to decode image: {}", &path))
                         .to_rgba8();
                     let texture = Texture::from_rgba8(
                         ctx,
@@ -617,7 +622,8 @@ mod text {
 
     impl TextMesh {
         pub fn new(ctx: &mut Context, text: &'static str, ttf: &[u8]) -> Self {
-            let font = Font::from_bytes(ttf, fontdue::FontSettings::default()).unwrap();
+            let font = Font::from_bytes(ttf, fontdue::FontSettings::default())
+                .expect(&format!("failed to parse font"));
             let mut layout = Layout::new(CoordinateSystem::PositiveYUp);
             layout.append(&[&font], &TextStyle::new(text, 25.0, 0));
             let mut bindings = vec![];
