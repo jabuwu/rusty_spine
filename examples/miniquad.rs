@@ -3,7 +3,11 @@ use std::sync::Arc;
 use enum_map::{enum_map, Enum, EnumMap};
 use glam::{Mat4, Vec2, Vec3};
 use miniquad::*;
-use rusty_spine::{controller::*, *};
+use rusty_spine::{
+    controller::{SkeletonController, SkeletonControllerSettings},
+    draw::{ColorSpace, CullDirection},
+    AnimationStateData, Atlas, BlendMode, Color, SkeletonBinary, SkeletonJson,
+};
 
 #[repr(C)]
 struct Vertex {
@@ -22,31 +26,49 @@ enum SpineTexture {
 #[derive(Clone, Copy)]
 struct SpineDemo {
     atlas_path: &'static str,
-    json_path: &'static str,
+    skeleton_path: SpineSkeletonPath,
     animation: &'static str,
     position: Vec2,
     scale: f32,
     skin: Option<&'static str>,
 }
 
+#[derive(Clone, Copy)]
+enum SpineSkeletonPath {
+    Binary(&'static str),
+    Json(&'static str),
+}
+
 struct Spine {
     controller: SkeletonController,
     world: Mat4,
-    premultiplied_alpha: bool,
 }
 
 impl Spine {
     pub fn load(info: SpineDemo) -> Self {
         let atlas = Arc::new(Atlas::new_from_file(info.atlas_path).unwrap());
         let premultiplied_alpha = atlas.pages().any(|page| page.pma());
-        let skeleton_json = SkeletonJson::new(atlas);
-        let skeleton_data = Arc::new(
-            skeleton_json
-                .read_skeleton_data_file(info.json_path)
-                .unwrap(),
-        );
+        let skeleton_data = Arc::new(match info.skeleton_path {
+            SpineSkeletonPath::Binary(path) => {
+                let skeleton_binary = SkeletonBinary::new(atlas);
+                skeleton_binary
+                    .read_skeleton_data_file(path)
+                    .expect(&format!("failed to load file: {}", path))
+            }
+            SpineSkeletonPath::Json(path) => {
+                let skeleton_json = SkeletonJson::new(atlas);
+                skeleton_json
+                    .read_skeleton_data_file(path)
+                    .expect(&format!("failed to load file: {}", path))
+            }
+        });
         let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
-        let mut controller = SkeletonController::new(skeleton_data.clone(), animation_state_data);
+        let mut controller = SkeletonController::new(skeleton_data.clone(), animation_state_data)
+            .with_settings(SkeletonControllerSettings {
+                premultiplied_alpha,
+                cull_direction: CullDirection::Clockwise,
+                color_space: ColorSpace::SRGB,
+            });
         controller
             .animation_state
             .set_animation_by_name(0, info.animation, true)
@@ -57,11 +79,11 @@ impl Spine {
                 .set_skin_by_name(skin)
                 .expect(&format!("failed to set skin: {}", skin));
         }
+        controller.settings.premultiplied_alpha = premultiplied_alpha;
         Self {
             controller,
             world: Mat4::from_translation(info.position.extend(0.))
                 * Mat4::from_scale(Vec2::splat(info.scale).extend(1.)),
-            premultiplied_alpha,
         }
     }
 }
@@ -220,7 +242,9 @@ impl Stage {
         let spine_demos = vec![
             SpineDemo {
                 atlas_path: "assets/spineboy/export/spineboy-pma.atlas",
-                json_path: "assets/spineboy/export/spineboy-pro.json",
+                skeleton_path: SpineSkeletonPath::Binary(
+                    "assets/spineboy/export/spineboy-pro.skel",
+                ),
                 animation: "portal",
                 position: Vec2::new(0., -220.),
                 scale: 0.5,
@@ -228,7 +252,7 @@ impl Stage {
             },
             SpineDemo {
                 atlas_path: "assets/windmill/export/windmill.atlas",
-                json_path: "assets/windmill/export/windmill-ess.json",
+                skeleton_path: SpineSkeletonPath::Json("assets/windmill/export/windmill-ess.json"),
                 animation: "animation",
                 position: Vec2::new(0., -80.),
                 scale: 0.5,
@@ -236,7 +260,7 @@ impl Stage {
             },
             SpineDemo {
                 atlas_path: "assets/alien/export/alien.atlas",
-                json_path: "assets/alien/export/alien-pro.json",
+                skeleton_path: SpineSkeletonPath::Json("assets/alien/export/alien-pro.json"),
                 animation: "death",
                 position: Vec2::new(0., -260.),
                 scale: 0.3,
@@ -244,7 +268,7 @@ impl Stage {
             },
             SpineDemo {
                 atlas_path: "assets/dragon/export/dragon.atlas",
-                json_path: "assets/dragon/export/dragon-ess.json",
+                skeleton_path: SpineSkeletonPath::Json("assets/dragon/export/dragon-ess.json"),
                 animation: "flying",
                 position: Vec2::new(0., -50.),
                 scale: 0.7,
@@ -252,15 +276,15 @@ impl Stage {
             },
             SpineDemo {
                 atlas_path: "assets/goblins/export/goblins.atlas",
-                json_path: "assets/goblins/export/goblins-pro.json",
+                skeleton_path: SpineSkeletonPath::Json("assets/goblins/export/goblins-pro.json"),
                 animation: "walk",
                 position: Vec2::new(0., -200.),
                 scale: 1.,
                 skin: Some("goblingirl"),
             },
             SpineDemo {
-                atlas_path: "assets/coin/export/coin.atlas",
-                json_path: "assets/coin/export/coin-pro.json",
+                atlas_path: "assets/coin/export/coin-pma.atlas",
+                skeleton_path: SpineSkeletonPath::Json("assets/coin/export/coin-pro.json"),
                 animation: "animation",
                 position: Vec2::ZERO,
                 scale: 1.,
@@ -303,7 +327,7 @@ impl EventHandler for Stage {
         for renderable in renderables.into_iter() {
             ctx.apply_pipeline(
                 &self.pipelines[Pipelines::from_pma_blend_mode(
-                    self.spine.premultiplied_alpha,
+                    self.spine.controller.settings.premultiplied_alpha,
                     renderable.blend_mode,
                 )],
             );
