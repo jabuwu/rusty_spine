@@ -7,6 +7,13 @@
 //! Callbacks must be set to handle texture loading upon loading a [`rusty_spine::Atlas`].
 //! See [`SpineTexture`].
 //!
+//! # Texture Runtime Settings
+//!
+//! Defined in the [`rusty_spine::atlas::AtlasPage`], atlases contain runtime configuration settings
+//! for each texture. This includes the min filter, mag filter, uv wrapping, and texture format.
+//! This example does not handle all cases and will print a warning if encountering unsupported
+//! settings. Most notably, mipmap textures are not supported.
+//!
 //! # Blend Modes
 //!
 //! Slots within Spine can be assigned a blend mode, and this value is exposed on the renderable
@@ -40,6 +47,7 @@ use std::{fs::read, sync::Arc};
 use glam::{Mat4, Vec2, Vec3};
 use miniquad::*;
 use rusty_spine::{
+    atlas::{AtlasFilter, AtlasFormat, AtlasWrap},
     controller::{SkeletonController, SkeletonControllerSettings},
     draw::{ColorSpace, CullDirection},
     AnimationStateData, Atlas, BlendMode, Color, SkeletonBinary, SkeletonJson,
@@ -142,7 +150,14 @@ fn create_pipeline(ctx: &mut Context) -> Pipeline {
 /// possible to load the textures immediately, or on another thread.
 #[derive(Debug)]
 enum SpineTexture {
-    NeedsToBeLoaded(String),
+    NeedsToBeLoaded {
+        path: String,
+        min_filter: FilterMode,
+        mag_filter: FilterMode,
+        x_wrap: TextureWrap,
+        y_wrap: TextureWrap,
+        format: TextureFormat,
+    },
     Loaded(Texture),
 }
 
@@ -523,19 +538,45 @@ impl EventHandler for Stage {
             // Load textures if they haven't been loaded already
             let spine_texture = unsafe { &mut *(attachment_renderer_object as *mut SpineTexture) };
             let texture = match spine_texture {
-                SpineTexture::NeedsToBeLoaded(path) => {
+                SpineTexture::NeedsToBeLoaded {
+                    path,
+                    min_filter,
+                    mag_filter,
+                    x_wrap,
+                    y_wrap,
+                    format,
+                } => {
                     use image::io::Reader as ImageReader;
                     let image = ImageReader::open(&path)
                         .expect(&format!("failed to open image: {}", &path))
                         .decode()
-                        .expect(&format!("failed to decode image: {}", &path))
-                        .to_rgba8();
-                    let texture = Texture::from_rgba8(
-                        ctx,
-                        image.width() as u16,
-                        image.height() as u16,
-                        &image.to_vec(),
-                    );
+                        .expect(&format!("failed to decode image: {}", &path));
+                    let texture_params = TextureParams {
+                        width: image.width(),
+                        height: image.height(),
+                        format: *format,
+                        ..Default::default()
+                    };
+                    let texture = match format {
+                        TextureFormat::LuminanceAlpha => Texture::from_data_and_format(
+                            ctx,
+                            &image.to_luma_alpha8().to_vec(),
+                            texture_params,
+                        ),
+                        TextureFormat::RGB8 => Texture::from_data_and_format(
+                            ctx,
+                            &image.to_rgb8().to_vec(),
+                            texture_params,
+                        ),
+                        TextureFormat::RGBA8 => Texture::from_data_and_format(
+                            ctx,
+                            &image.to_rgba8().to_vec(),
+                            texture_params,
+                        ),
+                        _ => unreachable!(),
+                    };
+                    texture.set_filter_min_mag(ctx, *min_filter, *mag_filter);
+                    texture.set_wrap_xy(ctx, *x_wrap, *y_wrap);
                     *spine_texture = SpineTexture::Loaded(texture.clone());
                     texture
                 }
@@ -590,9 +631,48 @@ impl EventHandler for Stage {
 
 fn main() {
     rusty_spine::extension::set_create_texture_cb(|atlas_page, path| {
+        fn convert_filter(filter: AtlasFilter) -> FilterMode {
+            match filter {
+                AtlasFilter::Linear => FilterMode::Linear,
+                AtlasFilter::Nearest => FilterMode::Nearest,
+                filter => {
+                    println!("Unsupported texture filter mode: {:?}", filter);
+                    FilterMode::Linear
+                }
+            }
+        }
+        fn convert_wrap(wrap: AtlasWrap) -> TextureWrap {
+            match wrap {
+                AtlasWrap::ClampToEdge => TextureWrap::Clamp,
+                AtlasWrap::MirroredRepeat => TextureWrap::Mirror,
+                AtlasWrap::Repeat => TextureWrap::Repeat,
+                wrap => {
+                    println!("Unsupported texture wrap mode: {:?}", wrap);
+                    TextureWrap::Clamp
+                }
+            }
+        }
+        fn convert_format(format: AtlasFormat) -> TextureFormat {
+            match format {
+                AtlasFormat::LuminanceAlpha => TextureFormat::LuminanceAlpha,
+                AtlasFormat::RGB888 => TextureFormat::RGB8,
+                AtlasFormat::RGBA8888 => TextureFormat::RGBA8,
+                format => {
+                    println!("Unsupported texture format: {:?}", format);
+                    TextureFormat::RGBA8
+                }
+            }
+        }
         atlas_page
             .renderer_object()
-            .set(SpineTexture::NeedsToBeLoaded(path.to_owned()));
+            .set(SpineTexture::NeedsToBeLoaded {
+                path: path.to_owned(),
+                min_filter: convert_filter(atlas_page.min_filter()),
+                mag_filter: convert_filter(atlas_page.mag_filter()),
+                x_wrap: convert_wrap(atlas_page.u_wrap()),
+                y_wrap: convert_wrap(atlas_page.v_wrap()),
+                format: convert_format(atlas_page.format()),
+            });
     });
     rusty_spine::extension::set_dispose_texture_cb(|atlas_page| unsafe {
         atlas_page.renderer_object().dispose::<SpineTexture>();
