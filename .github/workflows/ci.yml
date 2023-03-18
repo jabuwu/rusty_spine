@@ -1,0 +1,15 @@
+name: Check and Lint
+on:
+  pull_request:
+  push:
+    branches:
+      - ci
+
+jobs:
+  test:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo run -p ci
