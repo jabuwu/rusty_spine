@@ -51,6 +51,10 @@ impl SimpleDrawer {
     /// the skeleton. If a [`SkeletonClipping`] is provided, meshes will be properly clipped. The
     /// renderables are expected to be rendered in the order provided with the first renderable
     /// being drawn behind all the others.
+    ///
+    /// # Panics
+    ///
+    /// Panics if not using the default attachment loader with valid atlas regions.
     pub fn draw(
         &self,
         skeleton: &mut Skeleton,
@@ -60,7 +64,9 @@ impl SimpleDrawer {
         let mut world_vertices = vec![];
         world_vertices.resize(1000, 0.);
         for slot_index in 0..skeleton.slots_count() {
-            let slot = skeleton.draw_order_at_index(slot_index).unwrap();
+            let Some(slot) = skeleton.draw_order_at_index(slot_index) else {
+                continue;
+            };
             if !slot.bone().active() {
                 if let Some(clipper) = clipper.as_deref_mut() {
                     clipper.clip_end(&slot);

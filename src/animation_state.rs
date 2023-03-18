@@ -1,4 +1,4 @@
-use std::{ffi::CString, sync::Arc};
+use std::sync::Arc;
 
 use crate::{
     animation::Animation,
@@ -14,7 +14,7 @@ use crate::{
         spAnimationState_setEmptyAnimations, spAnimationState_update, spEvent, spEventType,
         spTrackEntry, spTrackEntry_getAnimationTime, spTrackEntry_getTrackComplete,
     },
-    c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
+    c_interface::{to_c_str, CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::SpineError,
     event::Event,
     skeleton::Skeleton,
@@ -41,6 +41,7 @@ impl NewFromPtr<spAnimationState> for AnimationState {
 }
 
 impl AnimationState {
+    #[must_use]
     pub fn new(animation_state_data: Arc<AnimationStateData>) -> Self {
         let c_animation_state = unsafe { spAnimationState_create(animation_state_data.c_ptr()) };
         unsafe {
@@ -92,14 +93,14 @@ impl AnimationState {
         animation_name: &str,
         looping: bool,
     ) -> CTmpMut<Self, TrackEntry> {
-        let c_animation_name = CString::new(animation_name).unwrap();
+        let c_animation_name = to_c_str(animation_name);
         CTmpMut::new(
             self,
             TrackEntry::new_from_ptr(spAnimationState_setAnimationByName(
                 self.c_ptr(),
                 track_index,
                 c_animation_name.as_ptr(),
-                looping as i32,
+                i32::from(looping),
             )),
         )
     }
@@ -145,7 +146,7 @@ impl AnimationState {
                     self.c_ptr(),
                     track_index,
                     animation.c_ptr(),
-                    looping as i32,
+                    i32::from(looping),
                 )),
             )
         }
@@ -166,14 +167,14 @@ impl AnimationState {
         looping: bool,
         delay: f32,
     ) -> CTmpMut<Self, TrackEntry> {
-        let c_animation_name = CString::new(animation_name).unwrap();
+        let c_animation_name = to_c_str(animation_name);
         CTmpMut::new(
             self,
             TrackEntry::new_from_ptr(spAnimationState_addAnimationByName(
                 self.c_ptr(),
                 track_index,
                 c_animation_name.as_ptr(),
-                looping as i32,
+                i32::from(looping),
                 delay,
             )),
         )
@@ -222,7 +223,7 @@ impl AnimationState {
                     self.c_ptr(),
                     track_index,
                     animation.c_ptr(),
-                    looping as i32,
+                    i32::from(looping),
                     delay,
                 )),
             )
@@ -271,6 +272,7 @@ impl AnimationState {
         }
     }
 
+    #[must_use]
     pub fn get_current(&self, track_index: i32) -> Option<CTmpRef<Self, TrackEntry>> {
         unsafe {
             let ptr = spAnimationState_getCurrent(self.c_ptr(), track_index);
@@ -425,10 +427,12 @@ impl NewFromPtr<spTrackEntry> for TrackEntry {
 }
 
 impl TrackEntry {
+    #[must_use]
     pub fn animation_time(&self) -> f32 {
         unsafe { spTrackEntry_getAnimationTime(self.c_ptr()) }
     }
 
+    #[must_use]
     pub fn track_complete(&self) -> f32 {
         unsafe { spTrackEntry_getTrackComplete(self.c_ptr()) }
     }
@@ -514,12 +518,14 @@ c_handle_indexed_decl!(
 );
 
 impl<'a> CTmpRef<'a, AnimationState, TrackEntry> {
+    #[must_use]
     pub fn handle(&self) -> TrackEntryHandle {
         TrackEntryHandle::new(self.track_index(), self.c_ptr(), self.parent.c_ptr())
     }
 }
 
 impl<'a> CTmpMut<'a, AnimationState, TrackEntry> {
+    #[must_use]
     pub fn handle(&self) -> TrackEntryHandle {
         TrackEntryHandle::new(self.track_index(), self.c_ptr(), self.parent.c_ptr())
     }

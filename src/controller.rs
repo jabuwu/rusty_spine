@@ -98,10 +98,12 @@ impl Default for SkeletonControllerSettings {
 }
 
 impl SkeletonControllerSettings {
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
+    #[must_use]
     pub fn with_premultiplied_alpha(self, premultiplied_alpha: bool) -> Self {
         Self {
             premultiplied_alpha,
@@ -109,6 +111,7 @@ impl SkeletonControllerSettings {
         }
     }
 
+    #[must_use]
     pub fn with_cull_direction(self, cull_direction: CullDirection) -> Self {
         Self {
             cull_direction,
@@ -116,6 +119,7 @@ impl SkeletonControllerSettings {
         }
     }
 
+    #[must_use]
     pub fn with_color_space(self, color_space: ColorSpace) -> Self {
         Self {
             color_space,
@@ -126,6 +130,7 @@ impl SkeletonControllerSettings {
 
 impl SkeletonController {
     /// Creates a new skeleton and animation state instance with the given data.
+    #[must_use]
     pub fn new(
         skeleton_data: Arc<SkeletonData>,
         animation_state_data: Arc<AnimationStateData>,
@@ -141,6 +146,7 @@ impl SkeletonController {
         }
     }
 
+    #[must_use]
     pub fn with_settings(self, settings: SkeletonControllerSettings) -> Self {
         Self { settings, ..self }
     }

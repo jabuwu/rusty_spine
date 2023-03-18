@@ -29,6 +29,7 @@ impl Default for SkeletonClipping {
 }
 
 impl SkeletonClipping {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             c_skeleton_clipping: unsafe { SyncPtr(spSkeletonClipping_create()) },
@@ -58,6 +59,7 @@ impl SkeletonClipping {
         }
     }
 
+    #[must_use]
     pub fn is_clipping(&self) -> bool {
         unsafe { spSkeletonClipping_isClipping(self.c_ptr_mut()) != 0 }
     }

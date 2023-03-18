@@ -48,12 +48,16 @@ impl Atlas {
     ///
     /// # Errors
     ///
-    /// Returns the [`SpineError::NulError`] if `dir` or `data` contain an internal 0 byte. This
-    /// function does not error if the atlas file is invalid or malformed. The file is parsed
-    /// line-by-line and invalid lines are simply ignored.
+    /// Returns the [`SpineError::NulError`] if `dir` or `data` contain an internal 0 byte. Returns
+    /// [`SpineError::PathNotUtf8`] if the specified `dir` is not utf-8. This function does not
+    /// error if the atlas file is invalid or malformed. The file is parsed line-by-line and invalid
+    /// lines are simply ignored.
     pub fn new<P: AsRef<Path>>(data: &[u8], dir: P) -> Result<Atlas, SpineError> {
         let c_data = CString::new(data)?;
-        let c_dir = CString::new(dir.as_ref().to_str().unwrap())?;
+        let Some(dir_path) = dir.as_ref().to_str() else {
+            return Err(SpineError::PathNotUtf8);
+        };
+        let c_dir = CString::new(dir_path)?;
         let c_atlas = unsafe {
             spAtlas_create(
                 c_data.as_ptr(),
@@ -80,9 +84,13 @@ impl Atlas {
     ///
     /// Returns [`SpineError::FailedToReadFile`] if the file could not be read, returns
     /// [`SpineError::NulError`] if `path` contains an internal 0 byte or if the loaded atlas
-    /// contains a 0 byte.
+    /// contains a 0 byte. Returns  [`SpineError::PathNotUtf8`] if the specified `path` is not
+    /// utf-8.
     pub fn new_from_file<P: AsRef<Path>>(path: P) -> Result<Atlas, SpineError> {
-        let c_path = CString::new(path.as_ref().to_str().unwrap())?;
+        let Some(path_str) = path.as_ref().to_str() else {
+            return Err(SpineError::PathNotUtf8);
+        };
+        let c_path = CString::new(path_str)?;
         let c_atlas = unsafe { spAtlas_createFromFile(c_path.as_ptr(), null_mut()) };
         if !c_atlas.is_null() {
             Ok(Self {
@@ -91,11 +99,12 @@ impl Atlas {
             })
         } else {
             Err(SpineError::FailedToReadFile {
-                file: path.as_ref().to_str().unwrap().to_owned(),
+                file: path_str.to_owned(),
             })
         }
     }
 
+    #[must_use]
     pub fn pages(&self) -> AtlasPageIterator {
         AtlasPageIterator {
             _atlas: self,
@@ -103,6 +112,7 @@ impl Atlas {
         }
     }
 
+    #[must_use]
     pub fn pages_mut(&mut self) -> AtlasPageMutIterator {
         AtlasPageMutIterator {
             _atlas: self,
@@ -110,14 +120,17 @@ impl Atlas {
         }
     }
 
+    #[must_use]
     pub fn find_page(&self, name: &str) -> Option<CTmpRef<Self, AtlasPage>> {
         self.pages().find(|page| page.name() == name)
     }
 
+    #[must_use]
     pub fn find_page_mut(&mut self, name: &str) -> Option<CTmpMut<Self, AtlasPage>> {
         self.pages_mut().find(|page| page.name() == name)
     }
 
+    #[must_use]
     pub fn regions(&self) -> AtlasRegionIterator {
         AtlasRegionIterator {
             _atlas: self,
@@ -125,6 +138,7 @@ impl Atlas {
         }
     }
 
+    #[must_use]
     pub fn regions_mut(&mut self) -> AtlasRegionMutIterator {
         AtlasRegionMutIterator {
             _atlas: self,
@@ -132,10 +146,12 @@ impl Atlas {
         }
     }
 
+    #[must_use]
     pub fn find_region(&self, name: &str) -> Option<CTmpRef<Self, AtlasRegion>> {
         self.regions().find(|region| region.name() == name)
     }
 
+    #[must_use]
     pub fn find_region_mut(&mut self, name: &str) -> Option<CTmpMut<Self, AtlasRegion>> {
         self.regions_mut().find(|region| region.name() == name)
     }
@@ -158,6 +174,8 @@ pub mod atlas {
     //! Types related to atlases.
     //!
     //! To load an atlas file, see [`Atlas`].
+
+    use crate::c_interface::from_c_str;
 
     use super::*;
 
@@ -192,6 +210,7 @@ pub mod atlas {
     /// Functions available if using the `mint` feature.
     #[cfg(feature = "mint")]
     impl AtlasPage {
+        #[must_use]
         pub fn size(&self) -> Vector2<i32> {
             Vector2 {
                 x: self.width(),
@@ -343,13 +362,14 @@ pub mod atlas {
         c_accessor_fixed_slice_optional!(pads, pads, &[c_int; 4], 4);
         c_accessor_tmp_ptr!(page, page_mut, page, AtlasPage, spAtlasPage);
 
+        #[must_use]
         pub fn key_values(&self) -> Vec<KeyValue> {
             let mut vec = vec![];
             unsafe {
                 let array = &mut *self.c_ptr_ref().keyValues;
                 for i in 0..array.size {
                     let item = &*array.items.offset(i as isize);
-                    let name = String::from(CStr::from_ptr(item.name).to_str().unwrap());
+                    let name = String::from(from_c_str(CStr::from_ptr(item.name)));
                     let values = item.values;
                     vec.push(KeyValue { name, values });
                 }
@@ -388,6 +408,7 @@ pub mod atlas {
     /// Functions available if using the `mint` feature.
     #[cfg(feature = "mint")]
     impl AtlasRegion {
+        #[must_use]
         pub fn position(&self) -> Vector2<i32> {
             Vector2 {
                 x: self.x(),

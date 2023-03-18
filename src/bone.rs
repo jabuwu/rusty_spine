@@ -87,22 +87,27 @@ impl Bone {
         }
     }
 
+    #[must_use]
     pub fn world_rotation_x(&self) -> f32 {
         unsafe { spBone_getWorldRotationX(self.c_ptr()) }
     }
 
+    #[must_use]
     pub fn world_rotation_y(&self) -> f32 {
         unsafe { spBone_getWorldRotationY(self.c_ptr()) }
     }
 
+    #[must_use]
     pub fn world_scale_x(&self) -> f32 {
         unsafe { spBone_getWorldScaleX(self.c_ptr()) }
     }
 
+    #[must_use]
     pub fn world_scale_y(&self) -> f32 {
         unsafe { spBone_getWorldScaleY(self.c_ptr()) }
     }
 
+    #[must_use]
     pub fn world_to_local(&self, world_x: f32, world_y: f32) -> (f32, f32) {
         let mut local_x: f32 = 0.;
         let mut local_y: f32 = 0.;
@@ -112,6 +117,7 @@ impl Bone {
         (local_x, local_y)
     }
 
+    #[must_use]
     pub fn local_to_world(&self, local_x: f32, local_y: f32) -> (f32, f32) {
         let mut world_x: f32 = 0.;
         let mut world_y: f32 = 0.;
@@ -121,10 +127,12 @@ impl Bone {
         (world_x, world_y)
     }
 
+    #[must_use]
     pub fn world_to_local_rotation(&self, world_rotation: f32) -> f32 {
         unsafe { spBone_worldToLocalRotation(self.c_ptr(), world_rotation) }
     }
 
+    #[must_use]
     pub fn local_to_world_rotation(&self, local_rotation: f32) -> f32 {
         unsafe { spBone_worldToLocalRotation(self.c_ptr(), local_rotation) }
     }
@@ -135,6 +143,7 @@ impl Bone {
         }
     }
 
+    #[must_use]
     pub fn handle(&self) -> BoneHandle {
         BoneHandle::new(self.c_ptr(), unsafe { self.c_ptr_mut().skeleton })
     }
@@ -208,10 +217,11 @@ impl Bone {
 
     pub fn set_y_down(y_down: bool) {
         unsafe {
-            spBone_setYDown(y_down as i32);
+            spBone_setYDown(i32::from(y_down));
         }
     }
 
+    #[must_use]
     pub fn is_y_down() -> bool {
         unsafe { spBone_isYDown() != 0 }
     }
@@ -222,6 +232,7 @@ impl Bone {
 /// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl Bone {
+    #[must_use]
     pub fn position(&self) -> Vector2<f32> {
         Vector2 {
             x: self.x(),
@@ -235,6 +246,7 @@ impl Bone {
         self.set_y(position.y);
     }
 
+    #[must_use]
     pub fn world_position(&self) -> Vector2<f32> {
         Vector2 {
             x: self.world_x(),
@@ -248,6 +260,7 @@ impl Bone {
         self.set_world_y(position.y);
     }
 
+    #[must_use]
     pub fn applied_position(&self) -> Vector2<f32> {
         Vector2 {
             x: self.world_x(),
@@ -261,6 +274,7 @@ impl Bone {
         self.set_applied_y(position.y);
     }
 
+    #[must_use]
     pub fn scale(&self) -> Vector2<f32> {
         Vector2 {
             x: self.scale_x(),
@@ -274,6 +288,7 @@ impl Bone {
         self.set_scale_y(scale.y);
     }
 
+    #[must_use]
     pub fn world_scale(&self) -> Vector2<f32> {
         Vector2 {
             x: self.world_x(),
@@ -281,6 +296,7 @@ impl Bone {
         }
     }
 
+    #[must_use]
     pub fn applied_scale(&self) -> Vector2<f32> {
         Vector2 {
             x: self.applied_scale_x(),
@@ -294,6 +310,7 @@ impl Bone {
         self.set_applied_scale_y(scale.y);
     }
 
+    #[must_use]
     pub fn shear(&self) -> Vector2<f32> {
         Vector2 {
             x: self.shear_x(),
@@ -307,6 +324,7 @@ impl Bone {
         self.set_shear_y(shear.y);
     }
 
+    #[must_use]
     pub fn applied_shear(&self) -> Vector2<f32> {
         Vector2 {
             x: self.applied_shear_x(),
@@ -320,6 +338,7 @@ impl Bone {
         self.set_applied_shear_y(shear.y);
     }
 
+    #[must_use]
     pub fn world_rotation(&self) -> Vector2<f32> {
         Vector2 {
             x: self.world_rotation_x(),
@@ -412,6 +431,7 @@ impl BoneData {
 /// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl BoneData {
+    #[must_use]
     pub fn position(&self) -> Vector2<f32> {
         Vector2 {
             x: self.x(),
@@ -425,6 +445,7 @@ impl BoneData {
         self.set_y(position.y);
     }
 
+    #[must_use]
     pub fn scale(&self) -> Vector2<f32> {
         Vector2 {
             x: self.scale_x(),
@@ -438,6 +459,7 @@ impl BoneData {
         self.set_scale_y(scale.y);
     }
 
+    #[must_use]
     pub fn shear(&self) -> Vector2<f32> {
         Vector2 {
             x: self.shear_x(),

@@ -28,14 +28,17 @@ impl NewFromPtr<spMeshAttachment> for MeshAttachment {
 }
 
 impl MeshAttachment {
+    #[must_use]
     fn attachment(&self) -> &spAttachment {
         unsafe { &self.c_ptr_ref().super_0.super_0 }
     }
 
+    #[must_use]
     fn vertex_attachment(&self) -> &spVertexAttachment {
         unsafe { &self.c_ptr_ref().super_0 }
     }
 
+    #[must_use]
     pub unsafe fn new_linked_mesh(&self) -> Attachment {
         Attachment::new_from_ptr(spMeshAttachment_newLinkedMesh(self.c_ptr()) as *const spAttachment)
     }
@@ -73,6 +76,7 @@ impl MeshAttachment {
 /// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl MeshAttachment {
+    #[must_use]
     pub fn size(&self) -> Vector2<f32> {
         Vector2 {
             x: self.width(),

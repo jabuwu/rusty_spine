@@ -10,6 +10,8 @@ pub enum SpineError {
     NotFound { what: String, name: String },
     /// An error when failing to read files.
     FailedToReadFile { file: String },
+    /// An error when a specified path is not utf-8.
+    PathNotUtf8,
 }
 
 impl SpineError {
@@ -51,6 +53,10 @@ impl fmt::Display for SpineError {
             }
             Self::FailedToReadFile { file } => {
                 write!(f, "Failed to read file: {file}")?;
+                Ok(())
+            }
+            SpineError::PathNotUtf8 => {
+                write!(f, "Path not utf-8")?;
                 Ok(())
             }
         }

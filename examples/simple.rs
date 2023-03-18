@@ -22,7 +22,7 @@ fn main() {
     println!();
     println!("Renderables:");
     println!();
-    for renderable in renderables.iter() {
+    for renderable in &renderables {
         let slot = skeleton_controller
             .skeleton
             .slot_at_index(renderable.slot_index)

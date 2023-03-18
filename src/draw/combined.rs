@@ -46,6 +46,10 @@ impl CombinedDrawer {
     ///
     /// This drawer can provide a significant performance advantage over the [`SimpleDrawer`] in
     /// most cases.
+    ///
+    /// # Panics
+    ///
+    /// Panics if not using the default attachment loader with valid atlas regions.
     pub fn draw(
         &self,
         skeleton: &mut Skeleton,
@@ -64,7 +68,9 @@ impl CombinedDrawer {
         let mut vertex_base: u16 = 0;
         let mut index_base: u16 = 0;
         for slot_index in 0..skeleton.slots_count() {
-            let slot = skeleton.draw_order_at_index(slot_index).unwrap();
+            let Some(slot) = skeleton.draw_order_at_index(slot_index) else {
+                continue;
+            };
             if !slot.bone().active() {
                 if let Some(clipper) = clipper.as_deref_mut() {
                     clipper.clip_end(&slot);

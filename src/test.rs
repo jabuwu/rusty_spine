@@ -73,6 +73,7 @@ impl TestAsset {
         &Self::all()[0]
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn atlas(&self) -> Atlas {
         Atlas::new(self.atlas_data, "").unwrap()
     }
@@ -81,6 +82,7 @@ impl TestAsset {
         SkeletonJson::new(Arc::new(self.atlas()))
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn skeleton_data(&self) -> SkeletonData {
         self.skeleton_json()
             .read_skeleton_data(self.json_data)
@@ -117,7 +119,7 @@ fn load_example_assets() {
                 .unwrap(),
         );
         let animation_state_data = AnimationStateData::new(skeleton_data.clone());
-        Skeleton::new(skeleton_data);
-        AnimationState::new(Arc::new(animation_state_data));
+        let _ = Skeleton::new(skeleton_data);
+        let _ = AnimationState::new(Arc::new(animation_state_data));
     }
 }

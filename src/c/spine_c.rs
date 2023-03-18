@@ -6,7 +6,8 @@
     non_upper_case_globals,
     unused_assignments,
     unused_mut,
-    clippy::all
+    clippy::all,
+    clippy::cast_lossless
 )]
 extern "C" {
 

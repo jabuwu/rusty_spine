@@ -1,5 +1,3 @@
-use std::ffi::CString;
-
 use crate::{
     attachment::Attachment,
     bone::Bone,
@@ -9,7 +7,7 @@ use crate::{
         spSlot, spSlotData, spSlotData_setAttachmentName, spSlot_setAttachment,
         spSlot_setToSetupPose,
     },
-    c_interface::{CTmpRef, NewFromPtr, SyncPtr},
+    c_interface::{to_c_str, CTmpRef, NewFromPtr, SyncPtr},
     AttachmentType, BoneData, BoundingBoxAttachment, ClippingAttachment, MeshAttachment,
     PointAttachment, RegionAttachment, Skeleton,
 };
@@ -32,6 +30,7 @@ impl NewFromPtr<spSlot> for Slot {
 
 macro_rules! attachment_accessor {
     ($fn:ident, $fn_mut:ident, $type:ident, $c_type:ident, $attachment_type:expr) => {
+        #[must_use]
         pub fn $fn(&self) -> Option<CTmpRef<Self, $type>> {
             let attachment = unsafe { self.c_ptr_ref().attachment };
             if !attachment.is_null() {
@@ -67,6 +66,7 @@ impl Slot {
         }
     }
 
+    #[must_use]
     pub fn handle(&self) -> SlotHandle {
         SlotHandle::new(self.c_ptr(), unsafe { self.bone().c_ptr_mut().skeleton })
     }
@@ -167,7 +167,7 @@ impl NewFromPtr<spSlotData> for SlotData {
 
 impl SlotData {
     pub fn set_attachment_name(&mut self, attachment_name: &str) {
-        let c_attachment_name = CString::new(attachment_name).unwrap();
+        let c_attachment_name = to_c_str(attachment_name);
         unsafe { spSlotData_setAttachmentName(self.c_ptr(), c_attachment_name.as_ptr()) }
     }
 
@@ -192,7 +192,6 @@ pub enum BlendMode {
 impl From<spBlendMode> for BlendMode {
     fn from(attachment_type: spBlendMode) -> Self {
         match attachment_type {
-            0 => Self::Normal,
             1 => Self::Additive,
             2 => Self::Multiply,
             3 => Self::Screen,

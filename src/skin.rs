@@ -3,10 +3,9 @@ use crate::{
         spSkeletonData, spSkin, spSkin_addSkin, spSkin_copySkin, spSkin_create, spSkin_dispose,
         spSkin_getAttachments,
     },
-    c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
+    c_interface::{to_c_str, CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     Attachment, Skeleton, SkeletonData,
 };
-use std::ffi::CString;
 
 /// A container for attachments which can be applied to a skeleton.
 ///
@@ -27,8 +26,9 @@ impl NewFromPtr<spSkin> for Skin {
 }
 
 impl Skin {
+    #[must_use]
     pub fn new(name: &str) -> Skin {
-        let c_name = CString::new(name).unwrap();
+        let c_name = to_c_str(name);
         Self {
             c_skin: SyncPtr(unsafe { spSkin_create(c_name.as_ptr()) }),
             owns_memory: true,
@@ -47,6 +47,7 @@ impl Skin {
         }
     }
 
+    #[must_use]
     pub fn attachments(&self) -> Vec<AttachmentEntry> {
         let mut attachments = vec![];
         unsafe {
@@ -112,24 +113,28 @@ c_handle_decl!(
 );
 
 impl<'a> CTmpRef<'a, SkeletonData, Skin> {
+    #[must_use]
     pub fn handle(&self) -> SkinHandle {
         SkinHandle::new(self.c_ptr(), self.parent.c_ptr())
     }
 }
 
 impl<'a> CTmpMut<'a, SkeletonData, Skin> {
+    #[must_use]
     pub fn handle(&self) -> SkinHandle {
         SkinHandle::new(self.c_ptr(), self.parent.c_ptr())
     }
 }
 
 impl<'a> CTmpRef<'a, Skeleton, Skin> {
+    #[must_use]
     pub fn handle(&self) -> SkinHandle {
         SkinHandle::new(self.c_ptr(), unsafe { self.parent.c_ptr_mut().data })
     }
 }
 
 impl<'a> CTmpMut<'a, Skeleton, Skin> {
+    #[must_use]
     pub fn handle(&self) -> SkinHandle {
         SkinHandle::new(self.c_ptr(), unsafe { self.parent.c_ptr_mut().data })
     }

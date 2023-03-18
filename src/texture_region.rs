@@ -38,6 +38,7 @@ impl TextureRegion {
 /// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl TextureRegion {
+    #[must_use]
     pub fn uvs(&self) -> (Vector2<f32>, Vector2<f32>) {
         (
             Vector2 {
@@ -51,6 +52,7 @@ impl TextureRegion {
         )
     }
 
+    #[must_use]
     pub fn offset(&self) -> Vector2<f32> {
         Vector2 {
             x: self.offset_x(),
@@ -58,6 +60,7 @@ impl TextureRegion {
         }
     }
 
+    #[must_use]
     pub fn size(&self) -> Vector2<i32> {
         Vector2 {
             x: self.width(),
@@ -65,6 +68,7 @@ impl TextureRegion {
         }
     }
 
+    #[must_use]
     pub fn original_size(&self) -> Vector2<i32> {
         Vector2 {
             x: self.original_width(),

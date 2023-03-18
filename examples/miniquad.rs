@@ -503,7 +503,7 @@ impl EventHandler for Stage {
         // Apply backface culling only if this skeleton needs it
         ctx.set_cull_face(self.spine.cull_face);
 
-        for renderable in renderables.into_iter() {
+        for renderable in renderables {
             // Set blend state based on this renderable's blend mode
             let BlendStates {
                 alpha_blend,
@@ -712,7 +712,7 @@ mod text {
                 let (metrics, bitmap) = font.rasterize(glyph.parent, 25.0);
                 if metrics.width * metrics.height > 0 {
                     let mut rgba: Vec<u8> = vec![];
-                    for coverage in bitmap.into_iter() {
+                    for coverage in bitmap {
                         for _ in 0..4 {
                             rgba.push(coverage);
                         }
@@ -777,7 +777,7 @@ mod text {
                     BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
                 )),
             );
-            for bindings in self.bindings.iter() {
+            for bindings in &self.bindings {
                 ctx.apply_bindings(bindings);
                 ctx.apply_uniforms(&uniforms);
                 ctx.draw(0, 6, 1);
