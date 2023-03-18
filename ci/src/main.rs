@@ -15,7 +15,7 @@ bitflags! {
         const TEST = 0b00010000;
         const DOC_TEST = 0b00100000;
         const DOC_CHECK = 0b01000000;
-        const CLIPPY = 0b01000000;
+        const CLIPPY = 0b10000000;
     }
 }
 
