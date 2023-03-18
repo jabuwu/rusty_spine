@@ -782,6 +782,7 @@ macro_rules! c_vertex_attachment_accessors {
     };
 }
 
+#[cfg(feature = "mint")]
 macro_rules! c_vertex_attachment_accessors_mint {
     () => {
         /// Gets the vertices of the attachment as a Vector2 slice.
