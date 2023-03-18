@@ -13,6 +13,8 @@
 //!
 //! To receive animation events, see [`Event`].
 
+#![deny(warnings)]
+
 #[macro_use]
 pub mod c_interface;
 pub mod c;

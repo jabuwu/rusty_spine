@@ -16,7 +16,6 @@ libc = { version = "0.2", optional = true }
 mint = { version = "0.5", optional = true }
 
 [dev-dependencies]
-transpiler = { path = "./transpiler" }
 miniquad = { git = "https://github.com/not-fl3/miniquad", rev = "e035f6fa8827c846797556267a5ce745459af9d3" }
 image = { version = "0.24", default-features = false, features = [ "png", "webp", "jpeg" ] }
 glam = "0.23"
@@ -29,3 +28,10 @@ opt-level = 3
 default = [ "draw_functions", "mint" ]
 use_libc = [ "libc" ]
 draw_functions = []
+
+[workspace]
+resolver = "2"
+members = [
+    "transpiler",
+    "ci"
+]
