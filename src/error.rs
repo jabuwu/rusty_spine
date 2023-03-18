@@ -37,20 +37,20 @@ impl fmt::Display for SpineError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             SpineError::ParsingFailed { reason } => {
-                write!(f, "Spine parsing failed: {}", reason)?;
+                write!(f, "Spine parsing failed: {reason}")?;
                 Ok(())
             }
             SpineError::NulError(error) => {
-                write!(f, "Nul error: {}", error)?;
+                write!(f, "Nul error: {error}")?;
                 Ok(())
             }
             SpineError::NotFound { what, name } => {
                 // TODO: make this error better, this is not helpful
-                write!(f, "{} not found: {}", what, name)?;
+                write!(f, "{what} not found: {name}")?;
                 Ok(())
             }
             Self::FailedToReadFile { file } => {
-                write!(f, "Failed to read file: {}", file)?;
+                write!(f, "Failed to read file: {file}")?;
                 Ok(())
             }
         }

@@ -44,9 +44,8 @@ impl AnimationState {
     pub fn new(animation_state_data: Arc<AnimationStateData>) -> Self {
         let c_animation_state = unsafe { spAnimationState_create(animation_state_data.c_ptr()) };
         unsafe {
-            (*c_animation_state).userData = Box::leak(Box::new(AnimationStateUserData::default()))
-                as *mut AnimationStateUserData
-                as *mut c_void;
+            (*c_animation_state).userData =
+                Box::leak(Box::default()) as *mut AnimationStateUserData as *mut c_void;
         }
         Self {
             c_animation_state: SyncPtr(c_animation_state),
@@ -536,7 +535,7 @@ mod tests {
         let _ = animation_state.set_animation_by_name(0, "idle", true);
         let _ = animation_state.set_animation_by_name(2, "run", true);
 
-        let track_0 = animation_state.tracks().nth(0).unwrap();
+        let track_0 = animation_state.tracks().next().unwrap();
         let track_1 = animation_state.tracks().nth(1).unwrap();
         let track_2 = animation_state.tracks().nth(2).unwrap();
         assert!(track_0.is_some());

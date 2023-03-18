@@ -11,11 +11,9 @@ fn main() {
     };
     if in_container {
         transpiler::transpile::run();
+    } else if interactive {
+        transpiler::dockerize::run_interactive();
     } else {
-        if interactive {
-            transpiler::dockerize::run_interactive();
-        } else {
-            transpiler::dockerize::run();
-        }
+        transpiler::dockerize::run();
     }
 }

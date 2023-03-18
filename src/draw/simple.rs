@@ -318,7 +318,7 @@ mod test {
     /// Ensure all the example assets draw without error.
     #[test]
     fn simple_drawer() {
-        for example_asset in TestAsset::all().into_iter() {
+        for example_asset in TestAsset::all().iter() {
             let (mut skeleton, _) = example_asset.instance();
             let drawer = SimpleDrawer {
                 cull_direction: CullDirection::Clockwise,
@@ -327,7 +327,7 @@ mod test {
             };
             let mut clipper = SkeletonClipping::new();
             let renderables = drawer.draw(&mut skeleton, Some(&mut clipper));
-            assert!(renderables.len() > 0);
+            assert!(!renderables.is_empty());
         }
     }
 }

@@ -14,6 +14,8 @@
 //! To receive animation events, see [`Event`].
 
 #![deny(warnings)]
+// TODO: remove this allow. we definitely want to add safety docs.
+#![allow(clippy::missing_safety_doc)]
 
 #[macro_use]
 pub mod c_interface;

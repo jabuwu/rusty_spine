@@ -191,7 +191,7 @@ impl Spine {
         // Load atlas and auto-detect if the textures are premultiplied
         let atlas = Arc::new(
             Atlas::new_from_file(info.atlas_path)
-                .expect(&format!("failed to load atlas file: {}", info.atlas_path)),
+                .unwrap_or_else(|_| panic!("failed to load atlas file: {}", info.atlas_path)),
         );
         let premultiplied_alpha = atlas.pages().any(|page| page.pma());
 
@@ -201,13 +201,13 @@ impl Spine {
                 let skeleton_binary = SkeletonBinary::new(atlas);
                 skeleton_binary
                     .read_skeleton_data_file(path)
-                    .expect(&format!("failed to load binary skeleton file: {}", path))
+                    .unwrap_or_else(|_| panic!("failed to load binary skeleton file: {path}"))
             }
             SpineSkeletonPath::Json(path) => {
                 let skeleton_json = SkeletonJson::new(atlas);
                 skeleton_json
                     .read_skeleton_data_file(path)
-                    .expect(&format!("failed to load json skeleton file: {}", path))
+                    .unwrap_or_else(|_| panic!("failed to load json skeleton file: {path}"))
             }
         });
 
@@ -220,7 +220,7 @@ impl Spine {
         // handles creating the live data ([`rusty_spine::Skeleton`] and
         // [`rusty_spine::AnimationState`] and capable of generating mesh render data.
         // Use of this helper is not required but it does handle a lot of little things for you.
-        let mut controller = SkeletonController::new(skeleton_data.clone(), animation_state_data)
+        let mut controller = SkeletonController::new(skeleton_data, animation_state_data)
             .with_settings(SkeletonControllerSettings {
                 premultiplied_alpha,
                 cull_direction: CullDirection::CounterClockwise,
@@ -231,14 +231,14 @@ impl Spine {
         controller
             .animation_state
             .set_animation_by_name(0, info.animation, true)
-            .expect(&format!("failed to start animation: {}", info.animation));
+            .unwrap_or_else(|_| panic!("failed to start animation: {}", info.animation));
 
         // If a skin was provided, set it
         if let Some(skin) = info.skin {
             controller
                 .skeleton
                 .set_skin_by_name(skin)
-                .expect(&format!("failed to set skin: {}", skin));
+                .unwrap_or_else(|_| panic!("failed to set skin: {skin}"));
         }
 
         controller.settings.premultiplied_alpha = premultiplied_alpha;
@@ -467,7 +467,7 @@ impl Stage {
             demo_text: text::TextMesh::new(
                 ctx,
                 "Press space for next demo",
-                &read(font_file).expect(&format!("failed to load font: {}", font_file)),
+                &read(font_file).unwrap_or_else(|_| panic!("failed to load font: {font_file}")),
             ),
         }
     }
@@ -548,9 +548,9 @@ impl EventHandler for Stage {
                 } => {
                     use image::io::Reader as ImageReader;
                     let image = ImageReader::open(&path)
-                        .expect(&format!("failed to open image: {}", &path))
+                        .unwrap_or_else(|_| panic!("failed to open image: {}", &path))
                         .decode()
-                        .expect(&format!("failed to decode image: {}", &path));
+                        .unwrap_or_else(|_| panic!("failed to decode image: {}", &path));
                     let texture_params = TextureParams {
                         width: image.width(),
                         height: image.height(),
@@ -560,27 +560,23 @@ impl EventHandler for Stage {
                     let texture = match format {
                         TextureFormat::LuminanceAlpha => Texture::from_data_and_format(
                             ctx,
-                            &image.to_luma_alpha8().to_vec(),
+                            &image.to_luma_alpha8(),
                             texture_params,
                         ),
-                        TextureFormat::RGB8 => Texture::from_data_and_format(
-                            ctx,
-                            &image.to_rgb8().to_vec(),
-                            texture_params,
-                        ),
-                        TextureFormat::RGBA8 => Texture::from_data_and_format(
-                            ctx,
-                            &image.to_rgba8().to_vec(),
-                            texture_params,
-                        ),
+                        TextureFormat::RGB8 => {
+                            Texture::from_data_and_format(ctx, &image.to_rgb8(), texture_params)
+                        }
+                        TextureFormat::RGBA8 => {
+                            Texture::from_data_and_format(ctx, &image.to_rgba8(), texture_params)
+                        }
                         _ => unreachable!(),
                     };
                     texture.set_filter_min_mag(ctx, *min_filter, *mag_filter);
                     texture.set_wrap_xy(ctx, *x_wrap, *y_wrap);
-                    *spine_texture = SpineTexture::Loaded(texture.clone());
+                    *spine_texture = SpineTexture::Loaded(texture);
                     texture
                 }
-                SpineTexture::Loaded(texture) => texture.clone(),
+                SpineTexture::Loaded(texture) => *texture,
             };
 
             // Draw this renderable
@@ -636,7 +632,7 @@ fn main() {
                 AtlasFilter::Linear => FilterMode::Linear,
                 AtlasFilter::Nearest => FilterMode::Nearest,
                 filter => {
-                    println!("Unsupported texture filter mode: {:?}", filter);
+                    println!("Unsupported texture filter mode: {filter:?}");
                     FilterMode::Linear
                 }
             }
@@ -647,7 +643,7 @@ fn main() {
                 AtlasWrap::MirroredRepeat => TextureWrap::Mirror,
                 AtlasWrap::Repeat => TextureWrap::Repeat,
                 wrap => {
-                    println!("Unsupported texture wrap mode: {:?}", wrap);
+                    println!("Unsupported texture wrap mode: {wrap:?}");
                     TextureWrap::Clamp
                 }
             }
@@ -658,7 +654,7 @@ fn main() {
                 AtlasFormat::RGB888 => TextureFormat::RGB8,
                 AtlasFormat::RGBA8888 => TextureFormat::RGBA8,
                 format => {
-                    println!("Unsupported texture format: {:?}", format);
+                    println!("Unsupported texture format: {format:?}");
                     TextureFormat::RGBA8
                 }
             }
@@ -681,7 +677,7 @@ fn main() {
         window_title: "rusty_spine".to_owned(),
         ..Default::default()
     };
-    miniquad::start(conf, |mut ctx| Box::new(Stage::new(&mut ctx)));
+    miniquad::start(conf, |ctx| Box::new(Stage::new(ctx)));
 }
 
 /// Not part of the demo, just necessary to render some text. Can probably be simplified.
@@ -703,7 +699,7 @@ mod text {
     impl TextMesh {
         pub fn new(ctx: &mut Context, text: &'static str, ttf: &[u8]) -> Self {
             let font = Font::from_bytes(ttf, fontdue::FontSettings::default())
-                .expect(&format!("failed to parse font"));
+                .expect("failed to parse font");
             let mut layout = Layout::new(CoordinateSystem::PositiveYUp);
             layout.append(&[&font], &TextStyle::new(text, 25.0, 0));
             let mut bindings = vec![];
