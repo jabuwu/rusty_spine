@@ -15,6 +15,7 @@ bitflags! {
         const TEST = 0b00010000;
         const DOC_TEST = 0b00100000;
         const DOC_CHECK = 0b01000000;
+        const CLIPPY = 0b01000000;
     }
 }
 
@@ -27,6 +28,7 @@ fn main() -> anyhow::Result<()> {
         ("test", Check::TEST),
         ("doc-test", Check::DOC_TEST),
         ("doc-check", Check::DOC_CHECK),
+        ("clippy", Check::CLIPPY),
     ];
 
     let what_to_run = if let Some(arg) = std::env::args().nth(1).as_deref() {
@@ -66,6 +68,9 @@ fn main() -> anyhow::Result<()> {
     }
     if what_to_run.contains(Check::DOC_CHECK) {
         doc_check(&sh)?;
+    }
+    if what_to_run.contains(Check::CLIPPY) {
+        clippy(&sh)?;
     }
     Ok(())
 }
@@ -112,5 +117,10 @@ fn doc_check(sh: &Shell) -> anyhow::Result<()> {
         "cargo doc --workspace --all-features --no-deps --document-private-items"
     )
     .run()?;
+    Ok(())
+}
+
+fn clippy(sh: &Shell) -> anyhow::Result<()> {
+    cmd!(sh, "cargo clippy --workspace --all-targets").run()?;
     Ok(())
 }
