@@ -207,7 +207,7 @@ impl SkeletonController {
 
 #[derive(Debug, Clone)]
 pub struct SkeletonRenderable {
-    pub slot_index: i32,
+    pub slot_index: usize,
     pub vertices: Vec<[f32; 2]>,
     pub uvs: Vec<[f32; 2]>,
     pub indices: Vec<u16>,

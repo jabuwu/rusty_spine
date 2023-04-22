@@ -62,7 +62,7 @@ impl MeshAttachment {
     );
     c_accessor!(triangles_count, trianglesCount, i32);
     c_accessor_passthrough!(triangles, triangles, *mut c_ushort);
-    c_accessor!(edges_count, edgesCount, i32);
+    c_accessor!(edges_count, edgesCount, usize);
     c_accessor_passthrough!(edges, edges, *mut i32);
     c_accessor_passthrough!(uvs, uvs, *mut c_float);
     c_accessor_passthrough!(region_uvs, regionUVs, *mut c_float);

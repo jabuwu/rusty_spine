@@ -12,7 +12,7 @@ use crate::extension;
 #[derive(Clone)]
 pub struct SimpleRenderable {
     /// The index of the slot in [`Skeleton`] that this renderable represents.
-    pub slot_index: i32,
+    pub slot_index: usize,
     /// A list of vertex attributes for a mesh.
     pub vertices: Vec<[f32; 2]>,
     /// A list of UV attributes for a mesh.

@@ -371,7 +371,7 @@ macro_rules! c_accessor_for {
         pub fn $rust(&self) -> $type {
             #[allow(unused_unsafe)]
             unsafe {
-                self.$for().$c
+                self.$for().$c as $type
             }
         }
     };
@@ -595,7 +595,7 @@ macro_rules! c_accessor_array {
 
         pub fn $rust_index(
             &self,
-            index: i32,
+            index: usize,
         ) -> Option<crate::c_interface::CTmpRef<Self, $type>> {
             if index < self.$count_fn() {
                 Some(crate::c_interface::CTmpRef::new(self, unsafe {
@@ -610,7 +610,7 @@ macro_rules! c_accessor_array {
 
         pub fn $rust_index_mut(
             &mut self,
-            index: i32,
+            index: usize,
         ) -> Option<crate::c_interface::CTmpMut<Self, $type>> {
             if index < self.$count_fn() {
                 Some(crate::c_interface::CTmpMut::new(self, unsafe {

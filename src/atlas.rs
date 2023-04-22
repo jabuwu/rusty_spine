@@ -338,7 +338,7 @@ pub mod atlas {
         c_accessor_string!(name, name);
         c_accessor!(x, x, i32);
         c_accessor!(y, y, i32);
-        c_accessor!(index, index, i32);
+        c_accessor!(index, index, usize);
         c_accessor_fixed_slice_optional!(splits, splits, &[c_int; 4], 4);
         c_accessor_fixed_slice_optional!(pads, pads, &[c_int; 4], 4);
         c_accessor_tmp_ptr!(page, page_mut, page, AtlasPage, spAtlasPage);
