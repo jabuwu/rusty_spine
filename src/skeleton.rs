@@ -87,7 +87,11 @@ impl Skeleton {
     /// Set the skeleton's skin. If the skin is a user-created one (via [`Skin::new`]), then a
     /// clone is created and used instead, to help ensure memory safety. If this behavior is not
     /// desired then [`Skeleton::set_skin_unchecked`] can be used instead.
-    pub fn set_skin(&mut self, skin: &Skin) {
+    ///
+    /// # Safety
+    ///
+    /// The skin must originate from the same [`SkeletonData`] that this skeleton uses.
+    pub unsafe fn set_skin(&mut self, skin: &Skin) {
         if skin.owns_memory {
             let cloned_skin = skin.clone();
             unsafe { spSkeleton_setSkin(self.c_ptr(), cloned_skin.c_ptr()) };
@@ -102,6 +106,8 @@ impl Skeleton {
     /// Set the skeleton's skin.
     ///
     /// # Safety
+    ///
+    /// The skin must originate from the same [`SkeletonData`] that this skeleton uses.
     ///
     /// The [`Skin`] struct will destroy the underlying C representation of the skin in its [`Drop`]
     /// implementation. Skins assigned to a skeleton must live as long as the skeletons using them

@@ -35,7 +35,14 @@ impl Skin {
         }
     }
 
-    pub fn add_skin(&mut self, other: &Skin) {
+    /// Add a skin to this skin. Typically used on a newly created skin (via [`Skin::new`]) to
+    /// create conglomerate skins.
+    ///
+    /// # Safety
+    ///
+    /// Skins must all originate from the same [`SkeletonData`]. There is no safe version of this
+    /// function.
+    pub unsafe fn add_skin(&mut self, other: &Skin) {
         unsafe {
             spSkin_addSkin(self.c_ptr_mut(), other.c_ptr());
         }
