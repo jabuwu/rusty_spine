@@ -888,7 +888,7 @@ macro_rules! c_handle_decl {
             /// Acquire the item without any checks. This is a direct pointer access which is fast
             /// but will segfault if the data has been disposed of already.
             #[must_use]
-            pub unsafe fn get_unchecked<'a>(&self) -> $type {
+            pub unsafe fn get_unchecked(&self) -> $type {
                 <$type>::new_from_ptr(self.c_item.0)
             }
         }
