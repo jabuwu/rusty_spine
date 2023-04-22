@@ -10,6 +10,8 @@ pub enum SpineError {
     NotFound { what: String, name: String },
     /// An error when failing to read files.
     FailedToReadFile { file: String },
+    /// An error when a specified path is not utf-8.
+    PathNotUtf8,
 }
 
 impl SpineError {
@@ -37,20 +39,24 @@ impl fmt::Display for SpineError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             SpineError::ParsingFailed { reason } => {
-                write!(f, "Spine parsing failed: {}", reason)?;
+                write!(f, "Spine parsing failed: {reason}")?;
                 Ok(())
             }
             SpineError::NulError(error) => {
-                write!(f, "Nul error: {}", error)?;
+                write!(f, "Nul error: {error}")?;
                 Ok(())
             }
             SpineError::NotFound { what, name } => {
                 // TODO: make this error better, this is not helpful
-                write!(f, "{} not found: {}", what, name)?;
+                write!(f, "{what} not found: {name}")?;
                 Ok(())
             }
             Self::FailedToReadFile { file } => {
-                write!(f, "Failed to read file: {}", file)?;
+                write!(f, "Failed to read file: {file}")?;
+                Ok(())
+            }
+            SpineError::PathNotUtf8 => {
+                write!(f, "Path not utf-8")?;
                 Ok(())
             }
         }

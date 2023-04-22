@@ -897,7 +897,7 @@ fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
                         }
                     }
                     _ => {
-                        panic!("Unsupported printf tag: %{}", char);
+                        panic!("Unsupported printf tag: %{char}");
                     }
                 }
             } else {
@@ -1056,8 +1056,8 @@ mod tests {
             "integer: (123)"
         );
         assert_eq!(
-            super::fmt("float: (%f)".to_string(), vec![Box::new(3.14)]),
-            "float: (3.140000)"
+            super::fmt("float: (%f)".to_string(), vec![Box::new(4.14)]),
+            "float: (4.140000)"
         );
         let c_str = CString::new("hello").unwrap();
         assert_eq!(

@@ -20,12 +20,14 @@ pub struct RegionAttachment {
 }
 
 impl RegionAttachment {
+    #[must_use]
     pub fn new_from_ptr(c_region_attachment: *const spRegionAttachment) -> Self {
         Self {
             c_region_attachment: SyncPtr(c_region_attachment as *mut spRegionAttachment),
         }
     }
 
+    #[must_use]
     fn attachment(&self) -> &spAttachment {
         unsafe { &self.c_ptr_ref().super_0 }
     }
@@ -72,6 +74,7 @@ impl RegionAttachment {
 /// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl RegionAttachment {
+    #[must_use]
     pub fn position(&self) -> Vector2<f32> {
         Vector2 {
             x: self.x(),
@@ -79,6 +82,7 @@ impl RegionAttachment {
         }
     }
 
+    #[must_use]
     pub fn scale(&self) -> Vector2<f32> {
         Vector2 {
             x: self.scale_x(),
@@ -86,6 +90,7 @@ impl RegionAttachment {
         }
     }
 
+    #[must_use]
     pub fn size(&self) -> Vector2<f32> {
         Vector2 {
             x: self.width(),

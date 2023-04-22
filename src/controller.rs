@@ -5,55 +5,53 @@
 //!
 //! use rusty_spine::{controller::*, *};
 //!
-//! fn main() {
-//!     // Load and initialize the atlas and skeleton
-//!     let atlas_path = "assets/spineboy/export/spineboy.atlas";
-//!     let json_path = "assets/spineboy/export/spineboy-pro.json";
-//!     let atlas = Arc::new(Atlas::new_from_file(atlas_path).unwrap());
-//!     let skeleton_json = SkeletonJson::new(atlas);
-//!     let skeleton_data = Arc::new(skeleton_json.read_skeleton_data_file(json_path).unwrap());
-//!     let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
+//! // Load and initialize the atlas and skeleton
+//! let atlas_path = "assets/spineboy/export/spineboy.atlas";
+//! let json_path = "assets/spineboy/export/spineboy-pro.json";
+//! let atlas = Arc::new(Atlas::new_from_file(atlas_path).unwrap());
+//! let skeleton_json = SkeletonJson::new(atlas);
+//! let skeleton_data = Arc::new(skeleton_json.read_skeleton_data_file(json_path).unwrap());
+//! let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
 //!
-//!     // Create the controller
-//!     let mut skeleton_controller =
-//!         SkeletonController::new(skeleton_data.clone(), animation_state_data);
+//! // Create the controller
+//! let mut skeleton_controller =
+//!     SkeletonController::new(skeleton_data.clone(), animation_state_data);
 //!
-//!     // Update for one frame
-//!     skeleton_controller.update(0.016);
+//! // Update for one frame
+//! skeleton_controller.update(0.016);
 //!
-//!     // Get renderable mesh data
-//!     // Note: if slot_index is not important, use the much faster
-//!     // `combined_renderables()` method instead
-//!     let renderables = skeleton_controller.renderables();
-//!     println!("Skeleton:");
+//! // Get renderable mesh data
+//! // Note: if slot_index is not important, use the much faster
+//! // `combined_renderables()` method instead
+//! let renderables = skeleton_controller.renderables();
+//! println!("Skeleton:");
+//! println!("");
+//! println!("  Atlas: {}", atlas_path);
+//! println!("  JSON: {}", json_path);
+//! println!("  Version: {}", skeleton_data.version());
+//! println!("  Hash: {}", skeleton_data.hash());
+//! println!("");
+//! println!("Renderables:");
+//! println!("");
+//! for renderable in renderables.iter() {
+//!     let slot = skeleton_controller
+//!         .skeleton
+//!         .slot_at_index(renderable.slot_index)
+//!         .unwrap();
+//!     println!("  {}", slot.data().name());
+//!     println!("    {} Vertices / UVs", renderable.vertices.len());
+//!     println!("    {} Indices", renderable.indices.len());
+//!     println!("    {:?} Blend Mode", renderable.blend_mode);
+//!     println!("    {:?}", renderable.color);
+//!     println!(
+//!         "    {}",
+//!         if renderable.premultiplied_alpha {
+//!             "Premultiplied Alpha"
+//!         } else {
+//!             "No Premultiplied Alpha"
+//!         }
+//!     );
 //!     println!("");
-//!     println!("  Atlas: {}", atlas_path);
-//!     println!("  JSON: {}", json_path);
-//!     println!("  Version: {}", skeleton_data.version());
-//!     println!("  Hash: {}", skeleton_data.hash());
-//!     println!("");
-//!     println!("Renderables:");
-//!     println!("");
-//!     for renderable in renderables.iter() {
-//!         let slot = skeleton_controller
-//!             .skeleton
-//!             .slot_at_index(renderable.slot_index)
-//!             .unwrap();
-//!         println!("  {}", slot.data().name());
-//!         println!("    {} Vertices / UVs", renderable.vertices.len());
-//!         println!("    {} Indices", renderable.indices.len());
-//!         println!("    {:?} Blend Mode", renderable.blend_mode);
-//!         println!("    {:?}", renderable.color);
-//!         println!(
-//!             "    {}",
-//!             if renderable.premultiplied_alpha {
-//!                 "Premultiplied Alpha"
-//!             } else {
-//!                 "No Premultiplied Alpha"
-//!             }
-//!         );
-//!         println!("");
-//!     }
 //! }
 //! ```
 
@@ -100,10 +98,12 @@ impl Default for SkeletonControllerSettings {
 }
 
 impl SkeletonControllerSettings {
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
+    #[must_use]
     pub fn with_premultiplied_alpha(self, premultiplied_alpha: bool) -> Self {
         Self {
             premultiplied_alpha,
@@ -111,6 +111,7 @@ impl SkeletonControllerSettings {
         }
     }
 
+    #[must_use]
     pub fn with_cull_direction(self, cull_direction: CullDirection) -> Self {
         Self {
             cull_direction,
@@ -118,6 +119,7 @@ impl SkeletonControllerSettings {
         }
     }
 
+    #[must_use]
     pub fn with_color_space(self, color_space: ColorSpace) -> Self {
         Self {
             color_space,
@@ -128,6 +130,7 @@ impl SkeletonControllerSettings {
 
 impl SkeletonController {
     /// Creates a new skeleton and animation state instance with the given data.
+    #[must_use]
     pub fn new(
         skeleton_data: Arc<SkeletonData>,
         animation_state_data: Arc<AnimationStateData>,
@@ -143,6 +146,7 @@ impl SkeletonController {
         }
     }
 
+    #[must_use]
     pub fn with_settings(self, settings: SkeletonControllerSettings) -> Self {
         Self { settings, ..self }
     }

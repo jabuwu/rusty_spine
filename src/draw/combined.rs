@@ -46,6 +46,10 @@ impl CombinedDrawer {
     ///
     /// This drawer can provide a significant performance advantage over the [`SimpleDrawer`] in
     /// most cases.
+    ///
+    /// # Panics
+    ///
+    /// Panics if not using the default attachment loader with valid atlas regions.
     pub fn draw(
         &self,
         skeleton: &mut Skeleton,
@@ -64,7 +68,9 @@ impl CombinedDrawer {
         let mut vertex_base: u16 = 0;
         let mut index_base: u16 = 0;
         for slot_index in 0..skeleton.slots_count() {
-            let slot = skeleton.draw_order_at_index(slot_index).unwrap();
+            let Some(slot) = skeleton.draw_order_at_index(slot_index) else {
+                continue;
+            };
             if !slot.bone().active() {
                 if let Some(clipper) = clipper.as_deref_mut() {
                     clipper.clip_end(&slot);
@@ -394,7 +400,7 @@ mod test {
     /// Ensure all the example assets draw without error.
     #[test]
     fn combined_drawer() {
-        for example_asset in TestAsset::all().into_iter() {
+        for example_asset in TestAsset::all().iter() {
             let (mut skeleton, _) = example_asset.instance();
             let drawer = CombinedDrawer {
                 cull_direction: CullDirection::Clockwise,
@@ -403,7 +409,7 @@ mod test {
             };
             let mut clipper = SkeletonClipping::new();
             let renderables = drawer.draw(&mut skeleton, Some(&mut clipper));
-            assert!(renderables.len() > 0);
+            assert!(!renderables.is_empty());
         }
     }
 }

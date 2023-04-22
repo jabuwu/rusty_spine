@@ -31,6 +31,7 @@ impl PointAttachment {
         unsafe { &self.c_ptr_ref().super_0 }
     }
 
+    #[must_use]
     pub fn compute_world_position(&self, bone: &Bone) -> (f32, f32) {
         let mut x = 0.;
         let mut y = 0.;
@@ -40,6 +41,7 @@ impl PointAttachment {
         (x, y)
     }
 
+    #[must_use]
     pub fn compute_world_rotation(&self, bone: &Bone) -> f32 {
         unsafe { spPointAttachment_computeWorldRotation(self.c_ptr(), bone.c_ptr()) }
     }
@@ -55,6 +57,7 @@ impl PointAttachment {
 /// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl PointAttachment {
+    #[must_use]
     pub fn position(&self) -> Vector2<f32> {
         Vector2 {
             x: self.x(),

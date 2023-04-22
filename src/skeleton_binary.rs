@@ -9,7 +9,7 @@ use crate::{
         c_uchar, spSkeletonBinary, spSkeletonBinary_create, spSkeletonBinary_dispose,
         spSkeletonBinary_readSkeletonData, spSkeletonBinary_readSkeletonDataFile,
     },
-    c_interface::SyncPtr,
+    c_interface::{from_c_str, SyncPtr},
     error::SpineError,
     skeleton_data::SkeletonData,
     Atlas,
@@ -43,6 +43,7 @@ impl SkeletonBinary {
     ///     Ok((skeleton, animation_state))
     /// }
     /// ```
+    #[must_use]
     pub fn new(atlas: Arc<Atlas>) -> Self {
         let c_skeleton_binary = unsafe { spSkeletonBinary_create(atlas.c_ptr()) };
         Self {
@@ -70,7 +71,7 @@ impl SkeletonBinary {
             Ok(SkeletonData::new(c_skeleton_data, self.atlas.clone()))
         } else {
             let c_error = unsafe { CStr::from_ptr((*self.c_skeleton_binary.0).error) };
-            Err(SpineError::new_from_spine(c_error.to_str().unwrap()))
+            Err(SpineError::new_from_spine(from_c_str(c_error)))
         }
     }
 
@@ -80,12 +81,16 @@ impl SkeletonBinary {
     /// # Errors
     ///
     /// Returns [`SpineError::ParsingFailed`] if parsing of the binary data failed. Returns
-    /// [`SpineError::NulError`] if `path` contains an internal 0 byte.
+    /// [`SpineError::NulError`] if `path` contains an internal 0 byte. Returns
+    /// [`SpineError::PathNotUtf8`] if the specified path is not utf-8.
     pub fn read_skeleton_data_file<P: AsRef<Path>>(
         &self,
         path: P,
     ) -> Result<SkeletonData, SpineError> {
-        let c_path = CString::new(path.as_ref().to_str().unwrap())?;
+        let Some(path_str) = path.as_ref().to_str() else {
+            return Err(SpineError::PathNotUtf8);
+        };
+        let c_path = CString::new(path_str)?;
         let c_skeleton_data = unsafe {
             spSkeletonBinary_readSkeletonDataFile(self.c_skeleton_binary.0, c_path.as_ptr())
         };
@@ -93,7 +98,7 @@ impl SkeletonBinary {
             Ok(SkeletonData::new(c_skeleton_data, self.atlas.clone()))
         } else {
             let c_error = unsafe { CStr::from_ptr((*self.c_skeleton_binary.0).error) };
-            Err(SpineError::new_from_spine(c_error.to_str().unwrap()))
+            Err(SpineError::new_from_spine(from_c_str(c_error)))
         }
     }
 

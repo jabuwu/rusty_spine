@@ -98,6 +98,10 @@ impl Extension {
 ///     }
 /// }
 /// ```
+///
+/// # Panics
+///
+/// Panics if the internal mutex is poisoned.
 pub fn set_create_texture_cb<F>(create_texture_cb: F)
 where
     F: Fn(&mut AtlasPage, &str) + 'static,
@@ -110,6 +114,10 @@ where
 /// Set `_spAtlasPage_disposeTexture`
 ///
 /// For an example, see [`set_create_texture_cb`].
+///
+/// # Panics
+///
+/// Panics if the internal mutex is poisoned.
 pub fn set_dispose_texture_cb<F>(dispose_texture_cb: F)
 where
     F: Fn(&mut AtlasPage) + 'static,
@@ -131,6 +139,10 @@ where
 ///     std::fs::read(path).ok()
 /// });
 /// ```
+///
+/// # Panics
+///
+/// Panics if the internal mutex is poisoned.
 pub fn set_read_file_cb<F>(read_file_cb: F)
 where
     F: Fn(&str) -> Option<Vec<u8>> + 'static,

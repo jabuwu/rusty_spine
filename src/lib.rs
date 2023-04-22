@@ -13,7 +13,15 @@
 //!
 //! To receive animation events, see [`Event`].
 
-#![deny(warnings)]
+#![deny(
+    warnings,
+    clippy::missing_panics_doc,
+    clippy::missing_errors_doc,
+    clippy::doc_markdown,
+    clippy::manual_assert
+)]
+// TODO: remove this allow. we definitely want to add safety docs.
+#![allow(clippy::missing_safety_doc)]
 
 #[macro_use]
 pub mod c_interface;

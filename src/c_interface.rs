@@ -3,6 +3,7 @@
 #![allow(clippy::all)]
 
 use std::{
+    ffi::{CStr, CString},
     hash::Hash,
     marker::PhantomData,
     ops::{Deref, DerefMut},
@@ -60,18 +61,22 @@ pub struct CTmpMut<'a, P, T> {
 }
 
 impl<'a, P, T> CTmpMut<'a, P, T> {
+    #[must_use]
     pub fn new(parent: &'a mut P, data: T) -> Self {
         Self { data, parent }
     }
 
+    #[must_use]
     pub fn unwrap_parent_child(&mut self) -> (&mut P, &mut T) {
         (self.parent, &mut self.data)
     }
 
+    #[must_use]
     pub fn as_ref(&self) -> &T {
         &self.data
     }
 
+    #[must_use]
     pub fn as_mut(&mut self) -> &mut T {
         &mut self.data
     }
@@ -116,6 +121,7 @@ impl<'a, P, T, C> CTmpPtrIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
 {
+    #[must_use]
     pub(crate) fn new(parent: &'a P, items: *mut *mut C, count: usize) -> Self {
         Self {
             _parent: parent,
@@ -160,6 +166,7 @@ impl<'a, P, T, C> CTmpMutIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
 {
+    #[must_use]
     pub(crate) fn new(parent: &'a P, items: *mut *mut C, count: usize) -> Self {
         Self {
             _parent: parent,
@@ -207,6 +214,7 @@ impl<'a, P, T, C> CTmpPtrNullableIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
 {
+    #[must_use]
     pub(crate) fn new(parent: &'a P, items: *mut *mut C, count: usize) -> Self {
         Self {
             _parent: parent,
@@ -283,6 +291,7 @@ impl<'a, P, T, C> CTmpMutNullableIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
 {
+    #[must_use]
     pub(crate) fn new(parent: &'a P, items: *mut *mut C, count: usize) -> Self {
         Self {
             _parent: parent,
@@ -335,17 +344,20 @@ impl<T> Ord for SyncPtr<T> {
 macro_rules! c_ptr {
     ($member:ident, $c_type:ty) => {
         #[inline]
+        #[must_use]
         pub fn c_ptr(&self) -> *mut $c_type {
             self.$member.0
         }
 
         #[inline]
+        #[must_use]
         #[allow(dead_code)]
         pub(crate) unsafe fn c_ptr_ref(&self) -> &$c_type {
             &*self.$member.0
         }
 
         #[inline]
+        #[must_use]
         #[allow(dead_code, clippy::mut_from_ref)]
         pub(crate) unsafe fn c_ptr_mut(&self) -> &mut $c_type {
             &mut *self.$member.0
@@ -368,6 +380,7 @@ macro_rules! c_accessor_mut {
 macro_rules! c_accessor_for {
     ($for:ident, $rust:ident, $c:ident, $type:ty) => {
         #[inline]
+        #[must_use]
         pub fn $rust(&self) -> $type {
             #[allow(unused_unsafe)]
             unsafe {
@@ -392,12 +405,11 @@ macro_rules! c_accessor_mut_for {
 macro_rules! c_accessor_string {
     ($rust:ident, $c:ident) => {
         #[inline]
+        #[must_use]
         pub fn $rust(&self) -> &str {
             unsafe {
                 if !self.c_ptr_ref().$c.is_null() {
-                    std::ffi::CStr::from_ptr(self.c_ptr_ref().$c)
-                        .to_str()
-                        .unwrap()
+                    crate::c_interface::from_c_str(std::ffi::CStr::from_ptr(self.c_ptr_ref().$c))
                 } else {
                     ""
                 }
@@ -408,6 +420,7 @@ macro_rules! c_accessor_string {
 
 macro_rules! c_accessor_bool {
     ($rust:ident, $c:ident) => {
+        #[must_use]
         pub fn $rust(&self) -> bool {
             unsafe { self.c_ptr_ref().$c != 0 }
         }
@@ -427,6 +440,7 @@ macro_rules! c_accessor_bool_mut {
 
 macro_rules! c_accessor_color {
     ($rust:ident, $c:ident) => {
+        #[must_use]
         pub fn $rust(&self) -> crate::color::Color {
             unsafe {
                 *(&self.c_ptr_ref().$c as *const crate::c::spColor as *const crate::color::Color)
@@ -438,6 +452,7 @@ macro_rules! c_accessor_color {
 macro_rules! c_accessor_color_mut {
     ($rust:ident, $rust_mut:ident, $c:ident) => {
         c_accessor_color!($rust, $c);
+        #[must_use]
         pub fn $rust_mut(&mut self) -> &mut crate::color::Color {
             unsafe {
                 &mut *(&self.c_ptr_mut().$c as *const crate::c::spColor as *mut crate::color::Color)
@@ -448,6 +463,7 @@ macro_rules! c_accessor_color_mut {
 
 macro_rules! c_accessor_color_optional {
     ($rust:ident, $c:ident) => {
+        #[must_use]
         pub fn $rust(&self) -> Option<crate::color::Color> {
             unsafe {
                 let ptr = *(&self.c_ptr_ref().$c);
@@ -463,6 +479,7 @@ macro_rules! c_accessor_color_optional {
 
 macro_rules! c_accessor_enum {
     ($rust:ident, $c:ident, $type:ty) => {
+        #[must_use]
         pub fn $rust(&self) -> $type {
             unsafe { self.c_ptr_ref().$c.into() }
         }
@@ -491,6 +508,7 @@ macro_rules! c_accessor_enum_mut {
 
 macro_rules! c_accessor_renderer_object {
     () => {
+        #[must_use]
         pub fn renderer_object(&self) -> crate::renderer_object::RendererObject {
             crate::renderer_object::RendererObject::new(unsafe {
                 &mut self.c_ptr_mut().rendererObject
@@ -501,6 +519,7 @@ macro_rules! c_accessor_renderer_object {
 
 macro_rules! c_accessor_tmp_ptr {
     ($rust:ident, $rust_mut:ident, $c:ident, $type:ty, $c_type:ident) => {
+        #[must_use]
         pub fn $rust(&self) -> crate::c_interface::CTmpRef<Self, $type> {
             crate::c_interface::CTmpRef::new(self, unsafe {
                 <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
@@ -508,6 +527,7 @@ macro_rules! c_accessor_tmp_ptr {
                 )
             })
         }
+        #[must_use]
         pub fn $rust_mut(&mut self) -> crate::c_interface::CTmpMut<Self, $type> {
             crate::c_interface::CTmpMut::new(self, unsafe {
                 <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
@@ -520,6 +540,7 @@ macro_rules! c_accessor_tmp_ptr {
 
 macro_rules! c_accessor_tmp_ptr_optional {
     ($rust:ident, $rust_mut:ident, $c:ident, $type:ty, $c_type:ident) => {
+        #[must_use]
         pub fn $rust(&self) -> Option<crate::c_interface::CTmpRef<Self, $type>> {
             let ptr = unsafe { self.c_ptr_ref().$c };
             if !ptr.is_null() {
@@ -530,6 +551,7 @@ macro_rules! c_accessor_tmp_ptr_optional {
                 None
             }
         }
+        #[must_use]
         pub fn $rust_mut(&mut self) -> Option<crate::c_interface::CTmpMut<Self, $type>> {
             let ptr = unsafe { self.c_ptr_ref().$c };
             if !ptr.is_null() {
@@ -545,6 +567,7 @@ macro_rules! c_accessor_tmp_ptr_optional {
 
 macro_rules! c_accessor_super {
     ($rust:ident, $rust_mut:ident, $type:ty, $c_type:ident) => {
+        #[must_use]
         pub fn $rust(&self) -> crate::c_interface::CTmpRef<Self, $type> {
             crate::c_interface::CTmpRef::new(self, unsafe {
                 #[allow(clippy::unnecessary_mut_passed)]
@@ -553,6 +576,7 @@ macro_rules! c_accessor_super {
                 )
             })
         }
+        #[must_use]
         pub fn $rust_mut(&mut self) -> crate::c_interface::CTmpMut<Self, $type> {
             crate::c_interface::CTmpMut::new(self, unsafe {
                 #[allow(clippy::unnecessary_mut_passed)]
@@ -566,6 +590,7 @@ macro_rules! c_accessor_super {
 
 macro_rules! c_accessor_passthrough {
     ($rust:ident, $c:ident, $type:ty) => {
+        #[must_use]
         pub fn $rust(&self) -> $type {
             unsafe { self.c_ptr_ref().$c }
         }
@@ -575,6 +600,7 @@ macro_rules! c_accessor_passthrough {
 macro_rules! c_accessor_array {
     ($(#[$($attrss:tt)*])* $rust:ident, $rust_mut:ident, $rust_index:ident, $rust_index_mut:ident, $parent_type:ty, $type:ty, $c_type:ty, $c:ident, $count_fn:ident) => {
         $(#[$($attrss)*])*
+        #[must_use]
         pub fn $rust(&self) -> crate::c_interface::CTmpPtrIterator<$parent_type, $type, $c_type> {
             crate::c_interface::CTmpPtrIterator::new(
                 self,
@@ -583,6 +609,7 @@ macro_rules! c_accessor_array {
             )
         }
 
+        #[must_use]
         pub fn $rust_mut(
             &mut self,
         ) -> crate::c_interface::CTmpMutIterator<$parent_type, $type, $c_type> {
@@ -593,6 +620,7 @@ macro_rules! c_accessor_array {
             )
         }
 
+        #[must_use]
         pub fn $rust_index(
             &self,
             index: usize,
@@ -600,7 +628,7 @@ macro_rules! c_accessor_array {
             if index < self.$count_fn() {
                 Some(crate::c_interface::CTmpRef::new(self, unsafe {
                     <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                        *self.c_ptr_ref().$c.offset(index as isize),
+                        *self.c_ptr_ref().$c.add(index),
                     )
                 }))
             } else {
@@ -608,6 +636,7 @@ macro_rules! c_accessor_array {
             }
         }
 
+        #[must_use]
         pub fn $rust_index_mut(
             &mut self,
             index: usize,
@@ -615,7 +644,7 @@ macro_rules! c_accessor_array {
             if index < self.$count_fn() {
                 Some(crate::c_interface::CTmpMut::new(self, unsafe {
                     <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                        *self.c_ptr_mut().$c.offset(index as isize),
+                        *self.c_ptr_mut().$c.add(index),
                     )
                 }))
             } else {
@@ -627,6 +656,7 @@ macro_rules! c_accessor_array {
 
 macro_rules! c_accessor_array_nullable {
     ($rust:ident, $rust_mut:ident, $rust_index:ident, $rust_index_mut:ident, $parent_type:ty, $type:ty, $c_type:ty, $c:ident, $count_fn:ident) => {
+        #[must_use]
         pub fn $rust(
             &self,
         ) -> crate::c_interface::CTmpPtrNullableIterator<$parent_type, $type, $c_type> {
@@ -637,6 +667,7 @@ macro_rules! c_accessor_array_nullable {
             )
         }
 
+        #[must_use]
         pub fn $rust_mut(
             &mut self,
         ) -> crate::c_interface::CTmpMutNullableIterator<$parent_type, $type, $c_type> {
@@ -647,6 +678,7 @@ macro_rules! c_accessor_array_nullable {
             )
         }
 
+        #[must_use]
         pub fn $rust_index(
             &self,
             index: usize,
@@ -665,6 +697,7 @@ macro_rules! c_accessor_array_nullable {
             }
         }
 
+        #[must_use]
         pub fn $rust_index_mut(
             &mut self,
             index: usize,
@@ -689,6 +722,7 @@ macro_rules! c_accessor_slice_for {
     ($(#[$($attrss:tt)*])* $for:ident, $rust:ident, $c:ident, $type:ty, $len:ident) => {
         $(#[$($attrss)*])*
         #[inline]
+        #[must_use]
         pub fn $rust(&self) -> $type {
             #[allow(unused_unsafe)]
             unsafe {
@@ -703,6 +737,7 @@ macro_rules! c_accessor_slice_for {
 macro_rules! c_accessor_fixed_slice_optional {
     ($rust:ident, $c:ident, $type:ty, $len:literal) => {
         #[inline]
+        #[must_use]
         pub fn $rust(&self) -> Option<$type> {
             #[allow(unused_unsafe)]
             unsafe {
@@ -720,15 +755,15 @@ macro_rules! c_accessor_fixed_slice_optional {
 macro_rules! c_attachment_accessors {
     () => {
         #[inline]
+        #[must_use]
         pub fn name(&self) -> &str {
             unsafe {
-                std::ffi::CStr::from_ptr(self.attachment().name)
-                    .to_str()
-                    .unwrap()
+                crate::c_interface::from_c_str(std::ffi::CStr::from_ptr(self.attachment().name))
             }
         }
 
         #[inline]
+        #[must_use]
         pub fn attachment_type(&self) -> crate::attachment::AttachmentType {
             self.attachment().type_0.into()
         }
@@ -786,6 +821,7 @@ macro_rules! c_vertex_attachment_accessors {
 macro_rules! c_vertex_attachment_accessors_mint {
     () => {
         /// Gets the vertices of the attachment as a Vector2 slice.
+        #[must_use]
         pub fn vertices2(&self) -> &[mint::Vector2<f32>] {
             unsafe {
                 std::slice::from_raw_parts(
@@ -809,6 +845,7 @@ macro_rules! c_handle_decl {
         }
 
         impl $name {
+            #[must_use]
             pub(crate) fn new(c_item: *const $c_type, c_parent: *const $c_parent) -> Self {
                 Self {
                     c_item: SyncPtr(c_item as *mut $c_type),
@@ -817,6 +854,7 @@ macro_rules! c_handle_decl {
             }
 
             /// Safely acquired the item, verifying its existence using its parent.
+            #[must_use]
             pub fn get<'a>(
                 &self,
                 parent: &'a $parent,
@@ -831,6 +869,7 @@ macro_rules! c_handle_decl {
             }
 
             /// Safely acquired the item, verifying its existence using its parent.
+            #[must_use]
             pub fn get_mut<'a>(
                 &self,
                 parent: &'a mut $parent,
@@ -848,7 +887,8 @@ macro_rules! c_handle_decl {
             ///
             /// Acquire the item without any checks. This is a direct pointer access which is fast
             /// but will segfault if the data has been disposed of already.
-            pub unsafe fn get_unchecked<'a>(&self) -> $type {
+            #[must_use]
+            pub unsafe fn get_unchecked(&self) -> $type {
                 <$type>::new_from_ptr(self.c_item.0)
             }
         }
@@ -866,6 +906,7 @@ macro_rules! c_handle_indexed_decl {
         }
 
         impl $name {
+            #[must_use]
             pub(crate) fn new(
                 index: i32,
                 c_item: *const $c_type,
@@ -879,6 +920,7 @@ macro_rules! c_handle_indexed_decl {
             }
 
             /// Safely acquired the item, verifying its existence using its parent.
+            #[must_use]
             pub fn get<'a>(
                 &self,
                 parent: &'a $parent,
@@ -897,6 +939,7 @@ macro_rules! c_handle_indexed_decl {
             }
 
             /// Safely acquired the item, verifying its existence using its parent.
+            #[must_use]
             pub fn get_mut<'a>(
                 &self,
                 parent: &'a mut $parent,
@@ -918,9 +961,22 @@ macro_rules! c_handle_indexed_decl {
             ///
             /// Acquire the item without any checks. This is a direct pointer access which is fast
             /// but will segfault if the data has been disposed of already.
-            pub unsafe fn get_unchecked<'a>(&self) -> $type {
+            #[must_use]
+            pub unsafe fn get_unchecked(&self) -> $type {
                 <$type>::new_from_ptr(self.c_item.0)
             }
         }
     };
+}
+
+/// Used to isolate this unwrap() in one place in the codebase. It is necessary to avoid proceeding
+/// with corrupt data, but the panic (ideally) never happens.
+pub(crate) fn to_c_str(rust_string: &str) -> CString {
+    CString::new(rust_string).unwrap()
+}
+
+/// Used to isolate this unwrap() in one place in the codebase. It is necessary to avoid proceeding
+/// with corrupt data, but the panic (ideally) never happens.
+pub(crate) fn from_c_str(c_string: &CStr) -> &str {
+    c_string.to_str().unwrap()
 }

@@ -73,17 +73,19 @@ impl TestAsset {
         &Self::all()[0]
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn atlas(&self) -> Atlas {
-        Atlas::new(&self.atlas_data, "").unwrap()
+        Atlas::new(self.atlas_data, "").unwrap()
     }
 
     pub fn skeleton_json(&self) -> SkeletonJson {
         SkeletonJson::new(Arc::new(self.atlas()))
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn skeleton_data(&self) -> SkeletonData {
         self.skeleton_json()
-            .read_skeleton_data(&self.json_data)
+            .read_skeleton_data(self.json_data)
             .unwrap()
     }
 
@@ -109,15 +111,15 @@ impl TestAsset {
 #[test]
 fn load_example_assets() {
     for example_asset in TestAsset::all().iter() {
-        let atlas = Arc::new(Atlas::new(&example_asset.atlas_data, "").unwrap());
+        let atlas = Arc::new(Atlas::new(example_asset.atlas_data, "").unwrap());
         let skeleton_json = SkeletonJson::new(atlas);
         let skeleton_data = Arc::new(
             skeleton_json
-                .read_skeleton_data(&example_asset.json_data)
+                .read_skeleton_data(example_asset.json_data)
                 .unwrap(),
         );
         let animation_state_data = AnimationStateData::new(skeleton_data.clone());
-        Skeleton::new(skeleton_data);
-        AnimationState::new(Arc::new(animation_state_data));
+        let _ = Skeleton::new(skeleton_data);
+        let _ = AnimationState::new(Arc::new(animation_state_data));
     }
 }

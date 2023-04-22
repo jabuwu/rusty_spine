@@ -1,4 +1,4 @@
-use std::{ffi::CString, sync::Arc};
+use std::sync::Arc;
 
 use crate::{
     animation::Animation,
@@ -7,7 +7,7 @@ use crate::{
         spAnimationStateData_getMix, spAnimationStateData_setMix,
         spAnimationStateData_setMixByName, spSkeletonData,
     },
-    c_interface::{NewFromPtr, SyncPtr},
+    c_interface::{to_c_str, NewFromPtr, SyncPtr},
     skeleton_data::SkeletonData,
 };
 
@@ -56,6 +56,7 @@ impl NewFromPtr<spAnimationStateData> for AnimationStateData {
 }
 
 impl AnimationStateData {
+    #[must_use]
     pub fn new(skeleton_data: Arc<SkeletonData>) -> Self {
         let c_animation_state_data = unsafe { spAnimationStateData_create(skeleton_data.c_ptr()) };
         Self {
@@ -66,8 +67,8 @@ impl AnimationStateData {
     }
 
     pub fn set_mix_by_name(&mut self, from_name: &str, to_name: &str, duration: f32) {
-        let c_from_name = CString::new(from_name).unwrap();
-        let c_to_name = CString::new(to_name).unwrap();
+        let c_from_name = to_c_str(from_name);
+        let c_to_name = to_c_str(to_name);
         unsafe {
             spAnimationStateData_setMixByName(
                 self.c_ptr(),

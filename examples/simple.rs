@@ -14,15 +14,15 @@ fn main() {
     skeleton_controller.update(0.016);
     let renderables = skeleton_controller.renderables();
     println!("Skeleton:");
-    println!("");
-    println!("  Atlas: {}", atlas_path);
-    println!("  JSON: {}", json_path);
+    println!();
+    println!("  Atlas: {atlas_path}");
+    println!("  JSON: {json_path}");
     println!("  Version: {}", skeleton_data.version());
     println!("  Hash: {}", skeleton_data.hash());
-    println!("");
+    println!();
     println!("Renderables:");
-    println!("");
-    for renderable in renderables.iter() {
+    println!();
+    for renderable in &renderables {
         let slot = skeleton_controller
             .skeleton
             .slot_at_index(renderable.slot_index)
@@ -40,6 +40,6 @@ fn main() {
                 "No Premultiplied Alpha"
             }
         );
-        println!("");
+        println!();
     }
 }

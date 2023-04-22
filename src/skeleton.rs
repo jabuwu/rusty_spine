@@ -1,4 +1,4 @@
-use std::{ffi::CString, sync::Arc};
+use std::sync::Arc;
 
 use crate::{
     bone::Bone,
@@ -10,7 +10,7 @@ use crate::{
         spSkeleton_updateCache, spSkeleton_updateWorldTransform,
         spSkeleton_updateWorldTransformWith, spSkin, spSlot,
     },
-    c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
+    c_interface::{to_c_str, CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::SpineError,
     skeleton_data::SkeletonData,
     skin::Skin,
@@ -39,6 +39,7 @@ impl Skeleton {
     /// Create a new instance of the skeleton loaded in [`SkeletonData`].
     ///
     /// See [`SkeletonJson`] or [`SkeletonBinary`] for a complete example of loading a skeleton.
+    #[must_use]
     pub fn new(skeleton_data: Arc<SkeletonData>) -> Self {
         let c_skeleton = unsafe { spSkeleton_create(skeleton_data.c_ptr()) };
         Self {
@@ -117,12 +118,16 @@ impl Skeleton {
     /// alternative, [`Skeleton::set_skin_by_name`], but will likely segfault if the skin does not
     /// exist.
     pub unsafe fn set_skin_by_name_unchecked(&mut self, skin_name: &str) {
-        let c_skin_name = CString::new(skin_name).unwrap();
+        let c_skin_name = to_c_str(skin_name);
         spSkeleton_setSkinByName(self.c_ptr(), c_skin_name.as_ptr());
         self._skin = None;
     }
 
     /// Set the skeleton's skin by name.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SpineError::NotFound`] if the specified skin name doesn't exist.
     pub fn set_skin_by_name(&mut self, skin_name: &str) -> Result<(), SpineError> {
         if self.data().skins().any(|skin| skin.name() == skin_name) {
             unsafe { self.set_skin_by_name_unchecked(skin_name) };
@@ -132,34 +137,40 @@ impl Skeleton {
         }
     }
 
+    #[must_use]
     pub fn bone_root(&self) -> CTmpRef<Skeleton, Bone> {
         CTmpRef::new(self, unsafe { Bone::new_from_ptr(self.c_ptr_mut().root) })
     }
 
+    #[must_use]
     pub fn bone_root_mut(&mut self) -> CTmpMut<Skeleton, Bone> {
         CTmpMut::new(self, unsafe { Bone::new_from_ptr(self.c_ptr_mut().root) })
     }
 
+    #[must_use]
     pub fn find_bone(&self, name: &str) -> Option<CTmpRef<Skeleton, Bone>> {
         self.bones().find(|bone| bone.data().name() == name)
     }
 
+    #[must_use]
     pub fn find_bone_mut(&mut self, name: &str) -> Option<CTmpMut<Skeleton, Bone>> {
         self.bones_mut().find(|bone| bone.data().name() == name)
     }
 
+    #[must_use]
     pub fn find_slot(&self, name: &str) -> Option<CTmpRef<Skeleton, Slot>> {
         self.slots().find(|slot| slot.data().name() == name)
     }
 
+    #[must_use]
     pub fn find_slot_mut(&mut self, name: &str) -> Option<CTmpMut<Skeleton, Slot>> {
         self.slots_mut().find(|slot| slot.data().name() == name)
     }
 
     pub fn set_attachment(&mut self, slot_name: &str, attachment_name: Option<&str>) -> bool {
-        let c_slot_name = CString::new(slot_name).unwrap();
+        let c_slot_name = to_c_str(slot_name);
         if let Some(attachment_name) = attachment_name {
-            let c_attachment_name = CString::new(attachment_name).unwrap();
+            let c_attachment_name = to_c_str(attachment_name);
             unsafe {
                 spSkeleton_setAttachment(
                     self.c_ptr(),
@@ -179,8 +190,8 @@ impl Skeleton {
         slot_name: &str,
         attachment_name: &str,
     ) -> Option<Attachment> {
-        let c_slot_name = CString::new(slot_name).unwrap();
-        let c_attachment_name = CString::new(attachment_name).unwrap();
+        let c_slot_name = to_c_str(slot_name);
+        let c_attachment_name = to_c_str(attachment_name);
         unsafe {
             let c_attachment = spSkeleton_getAttachmentForSlotName(
                 self.c_ptr(),
@@ -200,7 +211,7 @@ impl Skeleton {
         slot_index: usize,
         attachment_name: &str,
     ) -> Option<Attachment> {
-        let c_attachment_name = CString::new(attachment_name).unwrap();
+        let c_attachment_name = to_c_str(attachment_name);
         unsafe {
             let c_attachment = spSkeleton_getAttachmentForSlotIndex(
                 self.c_ptr(),
@@ -268,6 +279,7 @@ impl Skeleton {
 /// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl Skeleton {
+    #[must_use]
     pub fn position(&self) -> Vector2<f32> {
         Vector2 {
             x: self.x(),
@@ -281,6 +293,7 @@ impl Skeleton {
         self.set_y(position.y);
     }
 
+    #[must_use]
     pub fn scale(&self) -> Vector2<f32> {
         Vector2 {
             x: self.scale_x(),

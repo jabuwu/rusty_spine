@@ -13,6 +13,7 @@ pub struct Color {
 }
 
 impl Color {
+    #[must_use]
     pub fn new_rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
         Self { r, g, b, a }
     }
@@ -109,6 +110,7 @@ impl Color {
         self.b *= self.a;
     }
 
+    #[must_use]
     pub fn linear_to_nonlinear(&self) -> Color {
         Color {
             r: linear_to_nonlinear(self.r),
@@ -118,6 +120,7 @@ impl Color {
         }
     }
 
+    #[must_use]
     pub fn nonlinear_to_linear(&self) -> Color {
         Color {
             r: nonlinear_to_linear(self.r),
