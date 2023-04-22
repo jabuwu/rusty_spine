@@ -172,7 +172,7 @@ impl Bone {
     c_accessor_bool!(active, active);
     c_accessor_tmp_ptr!(data, data_mut, data, BoneData, spBoneData);
     c_accessor_tmp_ptr_optional!(parent, parent_mut, parent, Bone, spBone);
-    c_accessor!(children_count, childrenCount, i32);
+    c_accessor!(children_count, childrenCount, usize);
     c_accessor_array!(
         /// An iterator over the children of this bone.
         ///
@@ -408,7 +408,7 @@ impl NewFromPtr<spBoneData> for BoneData {
 impl BoneData {
     c_ptr!(c_bone_data, spBoneData);
     c_accessor_string!(name, name);
-    c_accessor!(index, index, i32);
+    c_accessor!(index, index, usize);
     c_accessor_mut!(length, set_length, length, f32);
     c_accessor_mut!(x, set_x, x, f32);
     c_accessor_mut!(y, set_y, y, f32);

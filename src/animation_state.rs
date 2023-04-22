@@ -73,9 +73,9 @@ impl AnimationState {
     }
 
     /// Clears animations for the given track entry index in this animation state.
-    pub fn clear_track(&mut self, track_index: i32) {
+    pub fn clear_track(&mut self, track_index: usize) {
         unsafe {
-            spAnimationState_clearTrack(self.c_ptr(), track_index);
+            spAnimationState_clearTrack(self.c_ptr(), track_index as i32);
         }
     }
 
@@ -89,7 +89,7 @@ impl AnimationState {
     /// animation does not exist.
     pub unsafe fn set_animation_by_name_unchecked(
         &mut self,
-        track_index: i32,
+        track_index: usize,
         animation_name: &str,
         looping: bool,
     ) -> CTmpMut<Self, TrackEntry> {
@@ -98,7 +98,7 @@ impl AnimationState {
             self,
             TrackEntry::new_from_ptr(spAnimationState_setAnimationByName(
                 self.c_ptr(),
-                track_index,
+                track_index as i32,
                 c_animation_name.as_ptr(),
                 i32::from(looping),
             )),
@@ -113,7 +113,7 @@ impl AnimationState {
     /// Returns [`SpineError::NotFound`] if an animation doesn't exist with the given name.
     pub fn set_animation_by_name(
         &mut self,
-        track_index: i32,
+        track_index: usize,
         animation_name: &str,
         looping: bool,
     ) -> Result<CTmpMut<Self, TrackEntry>, SpineError> {
@@ -135,7 +135,7 @@ impl AnimationState {
     /// track index. If the track index doesn't exist then it will be created.
     pub fn set_animation(
         &mut self,
-        track_index: i32,
+        track_index: usize,
         animation: &Animation,
         looping: bool,
     ) -> CTmpMut<Self, TrackEntry> {
@@ -144,7 +144,7 @@ impl AnimationState {
                 self,
                 TrackEntry::new_from_ptr(spAnimationState_setAnimation(
                     self.c_ptr(),
-                    track_index,
+                    track_index as i32,
                     animation.c_ptr(),
                     i32::from(looping),
                 )),
@@ -162,7 +162,7 @@ impl AnimationState {
     /// animation does not exist.
     pub unsafe fn add_animation_by_name_unchecked(
         &mut self,
-        track_index: i32,
+        track_index: usize,
         animation_name: &str,
         looping: bool,
         delay: f32,
@@ -172,7 +172,7 @@ impl AnimationState {
             self,
             TrackEntry::new_from_ptr(spAnimationState_addAnimationByName(
                 self.c_ptr(),
-                track_index,
+                track_index as i32,
                 c_animation_name.as_ptr(),
                 i32::from(looping),
                 delay,
@@ -188,7 +188,7 @@ impl AnimationState {
     /// Returns [`SpineError::NotFound`] if an animation doesn't exist with the given name.
     pub fn add_animation_by_name(
         &mut self,
-        track_index: i32,
+        track_index: usize,
         animation_name: &str,
         looping: bool,
         delay: f32,
@@ -211,7 +211,7 @@ impl AnimationState {
     /// doesn't exist then it will be created.
     pub fn add_animation(
         &mut self,
-        track_index: i32,
+        track_index: usize,
         animation: &Animation,
         looping: bool,
         delay: f32,
@@ -221,7 +221,7 @@ impl AnimationState {
                 self,
                 TrackEntry::new_from_ptr(spAnimationState_addAnimation(
                     self.c_ptr(),
-                    track_index,
+                    track_index as i32,
                     animation.c_ptr(),
                     i32::from(looping),
                     delay,
@@ -232,7 +232,7 @@ impl AnimationState {
 
     pub fn set_empty_animation(
         &mut self,
-        track_index: i32,
+        track_index: usize,
         mix_duration: f32,
     ) -> CTmpMut<Self, TrackEntry> {
         unsafe {
@@ -240,7 +240,7 @@ impl AnimationState {
                 self,
                 TrackEntry::new_from_ptr(spAnimationState_setEmptyAnimation(
                     self.c_ptr(),
-                    track_index,
+                    track_index as i32,
                     mix_duration,
                 )),
             )
@@ -249,7 +249,7 @@ impl AnimationState {
 
     pub fn add_empty_animation(
         &mut self,
-        track_index: i32,
+        track_index: usize,
         mix_duration: f32,
         delay: f32,
     ) -> CTmpMut<Self, TrackEntry> {
@@ -258,7 +258,7 @@ impl AnimationState {
                 self,
                 TrackEntry::new_from_ptr(spAnimationState_addEmptyAnimation(
                     self.c_ptr(),
-                    track_index,
+                    track_index as i32,
                     mix_duration,
                     delay,
                 )),
@@ -273,9 +273,9 @@ impl AnimationState {
     }
 
     #[must_use]
-    pub fn get_current(&self, track_index: i32) -> Option<CTmpRef<Self, TrackEntry>> {
+    pub fn get_current(&self, track_index: usize) -> Option<CTmpRef<Self, TrackEntry>> {
         unsafe {
-            let ptr = spAnimationState_getCurrent(self.c_ptr(), track_index);
+            let ptr = spAnimationState_getCurrent(self.c_ptr(), track_index as i32);
             if !ptr.is_null() {
                 Some(CTmpRef::new(self, TrackEntry::new_from_ptr(ptr)))
             } else {
@@ -341,7 +341,7 @@ impl AnimationState {
         AnimationStateData,
         spAnimationStateData
     );
-    c_accessor!(tracks_count, tracksCount, i32);
+    c_accessor!(tracks_count, tracksCount, usize);
     c_accessor_array_nullable!(
         tracks,
         tracks_mut,
@@ -459,7 +459,7 @@ impl TrackEntry {
         spTrackEntry
     );
     c_accessor_tmp_ptr!(mixing_to, mixing_to_mut, mixingTo, TrackEntry, spTrackEntry);
-    c_accessor!(track_index, trackIndex, i32);
+    c_accessor!(track_index, trackIndex, usize);
     c_accessor_bool_mut!(looping, set_looping, loop_0);
     c_accessor_bool_mut!(hold_previous, set_hold_previous, holdPrevious);
     c_accessor_bool_mut!(reverse, set_reverse, reverse);
@@ -520,14 +520,14 @@ c_handle_indexed_decl!(
 impl<'a> CTmpRef<'a, AnimationState, TrackEntry> {
     #[must_use]
     pub fn handle(&self) -> TrackEntryHandle {
-        TrackEntryHandle::new(self.track_index(), self.c_ptr(), self.parent.c_ptr())
+        TrackEntryHandle::new(self.track_index() as i32, self.c_ptr(), self.parent.c_ptr())
     }
 }
 
 impl<'a> CTmpMut<'a, AnimationState, TrackEntry> {
     #[must_use]
     pub fn handle(&self) -> TrackEntryHandle {
-        TrackEntryHandle::new(self.track_index(), self.c_ptr(), self.parent.c_ptr())
+        TrackEntryHandle::new(self.track_index() as i32, self.c_ptr(), self.parent.c_ptr())
     }
 }
 

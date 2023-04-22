@@ -94,14 +94,18 @@ impl SkeletonData {
     c_accessor!(y, y, f32);
     c_accessor!(width, width, f32);
     c_accessor!(height, height, f32);
-    c_accessor!(bones_count, bonesCount, i32);
-    c_accessor!(slots_count, slotsCount, i32);
-    c_accessor!(skins_count, skinsCount, i32);
-    c_accessor!(events_count, eventsCount, i32);
-    c_accessor!(animations_count, animationsCount, i32);
-    c_accessor!(ik_constraints_count, ikConstraintsCount, i32);
-    c_accessor!(transform_constraints_count, transformConstraintsCount, i32);
-    c_accessor!(path_constraints_count, pathConstraintsCount, i32);
+    c_accessor!(bones_count, bonesCount, usize);
+    c_accessor!(slots_count, slotsCount, usize);
+    c_accessor!(skins_count, skinsCount, usize);
+    c_accessor!(events_count, eventsCount, usize);
+    c_accessor!(animations_count, animationsCount, usize);
+    c_accessor!(ik_constraints_count, ikConstraintsCount, usize);
+    c_accessor!(
+        transform_constraints_count,
+        transformConstraintsCount,
+        usize
+    );
+    c_accessor!(path_constraints_count, pathConstraintsCount, usize);
     c_accessor_array!(
         bones,
         bones_mut,

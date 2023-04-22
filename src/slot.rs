@@ -123,7 +123,7 @@ impl Slot {
         spAttachment
     );
     c_ptr!(c_slot, spSlot);
-    c_accessor!(sequence_index, sequenceIndex, i32);
+    c_accessor!(sequence_index, sequenceIndex, usize);
 
     // TODO: accessors for deform
 }
@@ -171,7 +171,7 @@ impl SlotData {
         unsafe { spSlotData_setAttachmentName(self.c_ptr(), c_attachment_name.as_ptr()) }
     }
 
-    c_accessor!(index, index, i32);
+    c_accessor!(index, index, usize);
     c_accessor_string!(name, name);
     c_accessor_tmp_ptr!(bone_data, bone_data_mut, boneData, BoneData, spBoneData);
     c_accessor_string!(attachment_name, attachmentName);

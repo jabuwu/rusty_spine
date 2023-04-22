@@ -208,14 +208,14 @@ impl Skeleton {
 
     pub fn get_attachment_for_slot_index(
         &mut self,
-        slot_index: i32,
+        slot_index: usize,
         attachment_name: &str,
     ) -> Option<Attachment> {
         let c_attachment_name = to_c_str(attachment_name);
         unsafe {
             let c_attachment = spSkeleton_getAttachmentForSlotIndex(
                 self.c_ptr(),
-                slot_index,
+                slot_index as i32,
                 c_attachment_name.as_ptr(),
             );
             if !c_attachment.is_null() {
@@ -230,11 +230,11 @@ impl Skeleton {
 
     c_accessor_tmp_ptr!(data, data_mut, data, SkeletonData, spSkeletonData);
     c_accessor_color_mut!(color, color_mut, color);
-    c_accessor!(bones_count, bonesCount, i32);
-    c_accessor!(slots_count, slotsCount, i32);
-    c_accessor!(ik_contraints_count, ikConstraintsCount, i32);
-    c_accessor!(transform_contraints_count, transformConstraintsCount, i32);
-    c_accessor!(path_contraints_count, pathConstraintsCount, i32);
+    c_accessor!(bones_count, bonesCount, usize);
+    c_accessor!(slots_count, slotsCount, usize);
+    c_accessor!(ik_contraints_count, ikConstraintsCount, usize);
+    c_accessor!(transform_contraints_count, transformConstraintsCount, usize);
+    c_accessor!(path_contraints_count, pathConstraintsCount, usize);
     c_accessor_mut!(scale_x, set_scale_x, scaleX, f32);
     c_accessor_mut!(scale_y, set_scale_y, scaleY, f32);
     c_accessor_mut!(x, set_x, x, f32);
