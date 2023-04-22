@@ -628,7 +628,7 @@ macro_rules! c_accessor_array {
             if index < self.$count_fn() {
                 Some(crate::c_interface::CTmpRef::new(self, unsafe {
                     <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                        *self.c_ptr_ref().$c.offset(index as isize),
+                        *self.c_ptr_ref().$c.add(index),
                     )
                 }))
             } else {
@@ -644,7 +644,7 @@ macro_rules! c_accessor_array {
             if index < self.$count_fn() {
                 Some(crate::c_interface::CTmpMut::new(self, unsafe {
                     <$type as crate::c_interface::NewFromPtr<$c_type>>::new_from_ptr(
-                        *self.c_ptr_mut().$c.offset(index as isize),
+                        *self.c_ptr_mut().$c.add(index),
                     )
                 }))
             } else {
