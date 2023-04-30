@@ -558,11 +558,6 @@ impl EventHandler for Stage {
                         ..Default::default()
                     };
                     let texture = match format {
-                        TextureFormat::LuminanceAlpha => Texture::from_data_and_format(
-                            ctx,
-                            &image.to_luma_alpha8(),
-                            texture_params,
-                        ),
                         TextureFormat::RGB8 => {
                             Texture::from_data_and_format(ctx, &image.to_rgb8(), texture_params)
                         }
@@ -650,7 +645,6 @@ fn main() {
         }
         fn convert_format(format: AtlasFormat) -> TextureFormat {
             match format {
-                AtlasFormat::LuminanceAlpha => TextureFormat::LuminanceAlpha,
                 AtlasFormat::RGB888 => TextureFormat::RGB8,
                 AtlasFormat::RGBA8888 => TextureFormat::RGBA8,
                 format => {
