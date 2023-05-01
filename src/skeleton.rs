@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{borrow::Cow, sync::Arc};
 
 use crate::{
     bone::Bone,
@@ -141,6 +141,41 @@ impl Skeleton {
         } else {
             Err(SpineError::new_not_found("Skin", skin_name))
         }
+    }
+
+    /// Create a conglomerate skin containing `skin_names` and attach to this skeleton.
+    ///
+    /// A faster (but unsafe) way to create conglomerate skins is to use [`Skin::new`] and
+    /// [`Skin::add_skin`] to create a pre-configured skin that can be attached at any time with
+    /// [`Skeleton::set_skin`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SpineError::NotFound`] if any of the specified skin names do not exist.
+    pub fn set_skins_by_name<'a, T>(
+        &mut self,
+        combined_skin_name: &str,
+        skin_names: impl IntoIterator<Item = T>,
+    ) -> Result<(), SpineError>
+    where
+        Cow<'a, str>: From<T>,
+    {
+        let mut combined_skin = Skin::new(combined_skin_name);
+        for skin_name in skin_names {
+            let skin_name_str = &*Cow::<'a, str>::from(skin_name);
+            unsafe {
+                combined_skin.add_skin(
+                    self.data()
+                        .find_skin(skin_name_str)
+                        .ok_or_else(|| SpineError::new_not_found("Skin", skin_name_str))?
+                        .as_ref(),
+                );
+            }
+        }
+        unsafe {
+            self.set_skin(&combined_skin);
+        }
+        Ok(())
     }
 
     #[must_use]
