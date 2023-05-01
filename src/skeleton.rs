@@ -145,6 +145,9 @@ impl Skeleton {
 
     /// Create a conglomerate skin containing `skin_names` and attach to this skeleton.
     ///
+    /// The name assigned to this skin (via `combined_skin_name`) is unimportant and does not need
+    /// to be unique.
+    ///
     /// A faster (but unsafe) way to create conglomerate skins is to use [`Skin::new`] and
     /// [`Skin::add_skin`] to create a pre-configured skin that can be attached at any time with
     /// [`Skeleton::set_skin`].
