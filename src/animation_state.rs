@@ -18,6 +18,7 @@ use crate::{
     error::SpineError,
     event::Event,
     skeleton::Skeleton,
+    AnimationEvent,
 };
 
 /// The live animation state for a skeleton, allowing animation layering and crossfading.
@@ -285,10 +286,58 @@ impl AnimationState {
     }
 
     /// Set the event listener on this animation state. An animation state can only have one event
-    /// listener at a time. See the documentation for [`Event`] for more information.
+    /// listener at a time.
+    ///
+    /// ```
+    /// # #[path="./test.rs"]
+    /// # mod test;
+    /// # use rusty_spine::{AnimationState, AnimationEvent};
+    /// # let (_, mut animation_state) = test::TestAsset::spineboy().instance();
+    /// animation_state.set_listener(|_, animation_event| match animation_event {
+    ///     AnimationEvent::Start { track_entry } => {
+    ///         println!("Animation {} started!", track_entry.track_index());
+    ///     }
+    ///     AnimationEvent::Interrupt { track_entry } => {
+    ///         println!("Animation {} interrupted!", track_entry.track_index());
+    ///     }
+    ///     AnimationEvent::End { track_entry } => {
+    ///         println!("Animation {} ended!", track_entry.track_index());
+    ///     }
+    ///     AnimationEvent::Complete { track_entry } => {
+    ///         println!("Animation {} completed!", track_entry.track_index());
+    ///     }
+    ///     AnimationEvent::Dispose { track_entry } => {
+    ///         println!("Animation {} disposed!", track_entry.track_index());
+    ///     }
+    ///     AnimationEvent::Event {
+    ///         track_entry,
+    ///         name,
+    ///         int,
+    ///         float,
+    ///         string,
+    ///         audio_path,
+    ///         volume,
+    ///         balance,
+    ///         ..
+    ///     } => {
+    ///         println!("Animation {} event!", track_entry.track_index());
+    ///         println!("  Name: {name}");
+    ///         println!("  Integer: {int}");
+    ///         println!("  Float: {float}");
+    ///         if !string.is_empty() {
+    ///             println!("  String: \"{string}\"");
+    ///         }
+    ///         if !audio_path.is_empty() {
+    ///             println!("  Audio: \"{audio_path}\"");
+    ///             println!("    Volume: {volume}");
+    ///             println!("    Balance: {balance}");
+    ///         }
+    ///     }
+    /// });
+    /// ```
     pub fn set_listener<F>(&mut self, listener: F)
     where
-        F: Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>) + 'static,
+        F: Fn(&AnimationState, AnimationEvent) + 'static,
     {
         extern "C" fn c_listener(
             c_animation_state: *mut spAnimationState,
@@ -301,17 +350,45 @@ impl AnimationState {
             if let Some(listener) = &user_data.listener {
                 let animation_state = unsafe { AnimationState::new_from_ptr(c_animation_state) };
                 let track_entry = unsafe { TrackEntry::new_from_ptr(c_track_entry) };
-                let event = if !c_event.is_null() {
-                    Some(unsafe { Event::new_from_ptr(c_event) })
-                } else {
-                    None
+                let event_type = EventType::from(c_event_type);
+                match event_type {
+                    EventType::Start => {
+                        listener(&animation_state, AnimationEvent::Start { track_entry })
+                    }
+                    EventType::Interrupt => {
+                        listener(&animation_state, AnimationEvent::Interrupt { track_entry })
+                    }
+                    EventType::End => {
+                        listener(&animation_state, AnimationEvent::End { track_entry })
+                    }
+                    EventType::Complete => {
+                        listener(&animation_state, AnimationEvent::Complete { track_entry })
+                    }
+                    EventType::Dispose => {
+                        listener(&animation_state, AnimationEvent::Dispose { track_entry })
+                    }
+                    EventType::Event => {
+                        assert!(!c_event.is_null());
+                        let event = unsafe { Event::new_from_ptr(c_event) };
+                        let raw_event = unsafe { Event::new_from_ptr(c_event) };
+                        listener(
+                            &animation_state,
+                            AnimationEvent::Event {
+                                track_entry,
+                                name: event.data().name(),
+                                time: event.time(),
+                                int: event.int_value(),
+                                float: event.float_value(),
+                                string: event.string_value(),
+                                audio_path: event.data().audio_path(),
+                                volume: event.volume(),
+                                balance: event.balance(),
+                                event: raw_event,
+                            },
+                        )
+                    }
+                    EventType::Unknown => {}
                 };
-                listener(
-                    &animation_state,
-                    EventType::from(c_event_type),
-                    &track_entry,
-                    event.as_ref(),
-                );
             }
         }
         let user_data =
@@ -380,8 +457,7 @@ impl Drop for AnimationState {
     }
 }
 
-type AnimationStateListenerCb =
-    Box<dyn Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>)>;
+type AnimationStateListenerCb = Box<dyn Fn(&AnimationState, AnimationEvent)>;
 
 #[derive(Default)]
 struct AnimationStateUserData {

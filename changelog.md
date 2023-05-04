@@ -1,5 +1,6 @@
 # 0.6.0 (unreleased)
 - All indices are now `usize` (previously some were `i32` which lead to inconsistent APIs)
+- Events are nicer to work with using the new `AnimationEvent` enum.
 - New error type: `SpineError::PathNotUtf8` (removes some internal `unwrap` calls)
 - Lots of clippy fixes
   - Many functions now marked `#[must_use]`
@@ -12,7 +13,7 @@
 # 0.5.2
 - Upstream fixes
   - Dark color alpha inconsistent between binary and JSON formats ([EsotericSoftware/spine-runtimes#2263](https://github.com/EsotericSoftware/spine-runtimes/issues/2263))
-  - Atlas defaults are not handled ([EsotericSoftware/spine-runtimes#2264](https://github.com/EsotericSoftware/spine-runtimes/issues/2263))
+  - Atlas defaults are not handled ([EsotericSoftware/spine-runtimes#2264](https://github.com/EsotericSoftware/spine-runtimes/issues/2264))
 - Set dark color's alpha to 0 for non-PMA and 1 for PMA textures in drawers (the dark color's alpha is not typically used, so this is merely a convenience)
 
 # 0.5.1
