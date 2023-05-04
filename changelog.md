@@ -1,6 +1,8 @@
 # 0.6.0 (unreleased)
 - All indices are now `usize` (previously some were `i32` which lead to inconsistent APIs)
 - Events are nicer to work with using the new `AnimationEvent` enum.
+- `Skeleton::set_skin` and `Skin::add_skin` marked unsafe (with safety comments)
+  - Add `Skeleton::set_skins_by_name` as a safe alternative for the primary use case (conglomerate skins)
 - New error type: `SpineError::PathNotUtf8` (removes some internal `unwrap` calls)
 - Lots of clippy fixes
   - Many functions now marked `#[must_use]`
