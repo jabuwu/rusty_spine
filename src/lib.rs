@@ -11,7 +11,7 @@
 //!
 //! To find and manage bones, see [`Bone`].
 //!
-//! To receive animation events, see [`Event`].
+//! To receive animation events, see [`AnimationState::set_listener`].
 
 #![deny(
     warnings,

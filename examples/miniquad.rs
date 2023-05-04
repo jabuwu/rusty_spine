@@ -1,6 +1,6 @@
 //! Demonstrates a complete Spine integration using `miniquad`.
 //!
-//! To integrate Spine into a project, the following features must be supported:
+//! Below is a list of all features that should be considered when integrating Spine into a project.
 //!
 //! # Texture Creation & Disposal
 //!
@@ -41,6 +41,12 @@
 //! dark color needs to be sent to the fragment shader (see [`shader::FRAGMENT`]). Dark colors can
 //! be animated and allow changing how darkened shades of a texture are lit. To see it in action,
 //! see the coin in this example.
+//!
+//! # Audio Events
+//!
+//! Events can have audio files associated with them (along with a volume and balance) that can be
+//! hooked up to the audio system to play sounds. This example does not support this (although
+//! events will be printed to console).
 
 use std::{fs::read, sync::Arc};
 
@@ -50,7 +56,7 @@ use rusty_spine::{
     atlas::{AtlasFilter, AtlasFormat, AtlasWrap},
     controller::{SkeletonController, SkeletonControllerSettings},
     draw::{ColorSpace, CullDirection},
-    AnimationStateData, Atlas, BlendMode, Color, SkeletonBinary, SkeletonJson,
+    AnimationEvent, AnimationStateData, Atlas, BlendMode, Color, SkeletonBinary, SkeletonJson,
 };
 
 mod shader {
@@ -225,6 +231,51 @@ impl Spine {
                 premultiplied_alpha,
                 cull_direction: CullDirection::CounterClockwise,
                 color_space: ColorSpace::SRGB,
+            });
+
+        // Listen for animation events
+        controller
+            .animation_state
+            .set_listener(|_, animation_event| match animation_event {
+                AnimationEvent::Start { track_entry } => {
+                    println!("Animation {} started!", track_entry.track_index());
+                }
+                AnimationEvent::Interrupt { track_entry } => {
+                    println!("Animation {} interrupted!", track_entry.track_index());
+                }
+                AnimationEvent::End { track_entry } => {
+                    println!("Animation {} ended!", track_entry.track_index());
+                }
+                AnimationEvent::Complete { track_entry } => {
+                    println!("Animation {} completed!", track_entry.track_index());
+                }
+                AnimationEvent::Dispose { track_entry } => {
+                    println!("Animation {} disposed!", track_entry.track_index());
+                }
+                AnimationEvent::Event {
+                    track_entry,
+                    name,
+                    int,
+                    float,
+                    string,
+                    audio_path,
+                    volume,
+                    balance,
+                    ..
+                } => {
+                    println!("Animation {} event!", track_entry.track_index());
+                    println!("  Name: {name}");
+                    println!("  Integer: {int}");
+                    println!("  Float: {float}");
+                    if !string.is_empty() {
+                        println!("  String: \"{string}\"");
+                    }
+                    if !audio_path.is_empty() {
+                        println!("  Audio: \"{audio_path}\"");
+                        println!("    Volume: {volume}");
+                        println!("    Balance: {balance}");
+                    }
+                }
             });
 
         // Start the animation on track 0 and loop
@@ -558,11 +609,6 @@ impl EventHandler for Stage {
                         ..Default::default()
                     };
                     let texture = match format {
-                        TextureFormat::LuminanceAlpha => Texture::from_data_and_format(
-                            ctx,
-                            &image.to_luma_alpha8(),
-                            texture_params,
-                        ),
                         TextureFormat::RGB8 => {
                             Texture::from_data_and_format(ctx, &image.to_rgb8(), texture_params)
                         }
@@ -650,7 +696,6 @@ fn main() {
         }
         fn convert_format(format: AtlasFormat) -> TextureFormat {
             match format {
-                AtlasFormat::LuminanceAlpha => TextureFormat::LuminanceAlpha,
                 AtlasFormat::RGB888 => TextureFormat::RGB8,
                 AtlasFormat::RGBA8888 => TextureFormat::RGBA8,
                 format => {

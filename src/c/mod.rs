@@ -1,7 +1,7 @@
 //! Direct access to the [Spine C Runtime](http://en.esotericsoftware.com/spine-c).
 //!
 //! Transpiled from spine-c commit
-//! [7a5c6995effdeaf6c4846884aae0d7fe37982f9f](https://github.com/EsotericSoftware/spine-runtimes/tree/7a5c6995effdeaf6c4846884aae0d7fe37982f9f)
+//! [f85fb25a35d69a659e3d8d01a99b1fc93f759778](https://github.com/EsotericSoftware/spine-runtimes/tree/f85fb25a35d69a659e3d8d01a99b1fc93f759778)
 //!
 //! Transpiled using c2rust commit [0a2b64b4f83b42f08fe13c3d4fbd8b5b167f07a8](https://github.com/immunant/c2rust/tree/0a2b64b4f83b42f08fe13c3d4fbd8b5b167f07a8)
 #[cfg(not(feature = "libc"))]
