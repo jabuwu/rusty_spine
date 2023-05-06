@@ -4,6 +4,10 @@
 - New error type: `SpineError::PathNotUtf8` (removes some internal `unwrap` calls)
 - Lots of clippy fixes
   - Many functions now marked `#[must_use]`
+- The following functions are no longer `unsafe`:
+  - `MeshAttachment::new_linked_mesh`
+  - `MeshAttachment::update_region`
+  - `RegionAttachment::update_region`
 - Upstream fixes
   - Fix IK constraint NaN when a parent bone has zero scale
   - Handle skeleton loading problems without crashes ([EsotericSoftware/spine-runtimes#2276](https://github.com/EsotericSoftware/spine-runtimes/pull/2276))

@@ -43,8 +43,12 @@ impl<'a> RendererObject<'a> {
         *self.renderer_object = ptr;
     }
 
-    /// Gets the type pointed to by this renderer object. It is not guaranteed that the returned
-    /// option has a valid object and could segfault if the renderer object is a different type.
+    /// Gets the type pointed to by this renderer object.
+    ///
+    /// # Safety
+    ///
+    /// It is not guaranteed that the returned option has a valid object and could segfault if the
+    /// renderer object is a different type than requested.
     pub unsafe fn get<T>(&mut self) -> Option<&mut T> {
         let ptr = *self.renderer_object;
         if !ptr.is_null() {
@@ -54,13 +58,22 @@ impl<'a> RendererObject<'a> {
         }
     }
 
+    /// Gets the type pointed to by this renderer object without a null check.
+    ///
+    /// # Safety
+    ///
+    /// It is not guaranteed that the returned option has a valid object and could segfault if the
+    /// renderer object is a different type than requested.
     pub unsafe fn get_unchecked<T>(&mut self) -> &mut T {
         &mut *(*self.renderer_object as *mut T)
     }
 
     /// Gets the atlas region on mesh and region attachments if the default attachment loader was
-    /// used to create the skeleton. This function does not guarantee that the returned option
-    /// has a valid [`AtlasRegion`] and could segfault if the renderer object is a different type.
+    /// used to create the skeleton.
+    ///
+    /// # Safety
+    /// This function does not guarantee that the returned option has a valid [`AtlasRegion`] and
+    /// could segfault if the renderer object is a different type.
     pub unsafe fn get_atlas_region(&mut self) -> Option<CTmpRef<Self, AtlasRegion>> {
         let ptr = *self.renderer_object;
         if !ptr.is_null() {
@@ -73,8 +86,12 @@ impl<'a> RendererObject<'a> {
         }
     }
 
-    /// Drop the underlying data. This only works for Rust types and might segfault if the type
-    /// was allocated in C.
+    /// Drop the underlying data.
+    ///
+    /// # Safety
+    ///
+    /// Must only be called after setting the render object to a Rust type. Might segfault if
+    /// pointing to a type that was allocated in C.
     pub unsafe fn dispose<T>(&mut self) {
         if !self.renderer_object.is_null() {
             drop(Box::from_raw(*self.renderer_object as *mut T));

@@ -62,6 +62,9 @@ impl Skeleton {
         }
     }
 
+    /// # Safety
+    ///
+    /// The bone must original from this skeleton.
     pub unsafe fn update_world_transform_with(&mut self, parent: &Bone) {
         spSkeleton_updateWorldTransformWith(self.c_ptr(), parent.c_ptr());
     }

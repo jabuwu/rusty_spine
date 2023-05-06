@@ -64,6 +64,9 @@ impl SkeletonClipping {
         unsafe { spSkeletonClipping_isClipping(self.c_ptr_mut()) != 0 }
     }
 
+    /// # Safety
+    ///
+    /// The triangles data passed in must represent valid mesh data.
     pub unsafe fn clip_triangles(
         &self,
         vertices: &mut [[f32; 2]],

@@ -32,6 +32,9 @@ impl RegionAttachment {
         unsafe { &self.c_ptr_ref().super_0 }
     }
 
+    /// # Safety
+    ///
+    /// The slot passed in must be the same slot this attachment originated from.
     pub unsafe fn compute_world_vertices(
         &self,
         slot: &Slot,
@@ -48,8 +51,10 @@ impl RegionAttachment {
         );
     }
 
-    pub unsafe fn update_region(&mut self) {
-        spRegionAttachment_updateRegion(self.c_ptr());
+    pub fn update_region(&mut self) {
+        unsafe {
+            spRegionAttachment_updateRegion(self.c_ptr());
+        }
     }
 
     c_attachment_accessors!();

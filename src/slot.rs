@@ -50,8 +50,11 @@ macro_rules! attachment_accessor {
 }
 
 impl Slot {
-    /// Sets the attachment for this slot. This function is unsafe because there is no way to know
-    /// if the attachment is compatible with this slot and may segfault if used incorrectly.
+    /// Sets the attachment for this slot.
+    ///
+    /// # Safety
+    ///
+    /// The attachment must be compatible with this slot, usually by originating from it.
     pub unsafe fn set_attachment(&mut self, attachment: Option<Attachment>) {
         if let Some(attachment) = attachment {
             spSlot_setAttachment(self.c_ptr(), attachment.c_ptr());

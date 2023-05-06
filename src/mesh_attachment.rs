@@ -39,12 +39,18 @@ impl MeshAttachment {
     }
 
     #[must_use]
-    pub unsafe fn new_linked_mesh(&self) -> Attachment {
-        Attachment::new_from_ptr(spMeshAttachment_newLinkedMesh(self.c_ptr()) as *const spAttachment)
+    pub fn new_linked_mesh(&self) -> Attachment {
+        unsafe {
+            Attachment::new_from_ptr(
+                spMeshAttachment_newLinkedMesh(self.c_ptr()) as *const spAttachment
+            )
+        }
     }
 
-    pub unsafe fn update_region(&mut self) {
-        spMeshAttachment_updateRegion(self.c_ptr());
+    pub fn update_region(&mut self) {
+        unsafe {
+            spMeshAttachment_updateRegion(self.c_ptr());
+        }
     }
 
     c_attachment_accessors!();

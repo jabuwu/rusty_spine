@@ -772,6 +772,9 @@ macro_rules! c_attachment_accessors {
 
 macro_rules! c_vertex_attachment_accessors {
     () => {
+        /// # Safety
+        ///
+        /// The slot passed in must be the same slot this attachment originated from.
         #[inline]
         pub unsafe fn compute_world_vertices(
             &self,
