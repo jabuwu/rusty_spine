@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{borrow::Cow, sync::Arc};
 
 use crate::{
     bone::Bone,
@@ -90,7 +90,11 @@ impl Skeleton {
     /// Set the skeleton's skin. If the skin is a user-created one (via [`Skin::new`]), then a
     /// clone is created and used instead, to help ensure memory safety. If this behavior is not
     /// desired then [`Skeleton::set_skin_unchecked`] can be used instead.
-    pub fn set_skin(&mut self, skin: &Skin) {
+    ///
+    /// # Safety
+    ///
+    /// The skin must originate from the same [`SkeletonData`] that this skeleton uses.
+    pub unsafe fn set_skin(&mut self, skin: &Skin) {
         if skin.owns_memory {
             let cloned_skin = skin.clone();
             unsafe { spSkeleton_setSkin(self.c_ptr(), cloned_skin.c_ptr()) };
@@ -105,6 +109,8 @@ impl Skeleton {
     /// Set the skeleton's skin.
     ///
     /// # Safety
+    ///
+    /// The skin must originate from the same [`SkeletonData`] that this skeleton uses.
     ///
     /// The [`Skin`] struct will destroy the underlying C representation of the skin in its [`Drop`]
     /// implementation. Skins assigned to a skeleton must live as long as the skeletons using them
@@ -138,6 +144,53 @@ impl Skeleton {
         } else {
             Err(SpineError::new_not_found("Skin", skin_name))
         }
+    }
+
+    /// Create a conglomerate skin containing `skin_names` and attach to this skeleton.
+    ///
+    /// ```
+    /// # #[path="./test.rs"]
+    /// # mod test;
+    /// # use rusty_spine::{AnimationState, AnimationEvent};
+    /// # let (mut skeleton, _) = test::TestAsset::spineboy().instance();
+    /// skeleton.set_skins_by_name("combined-skin", ["hat", "suit", "tie"]);
+    /// ```
+    ///
+    /// The name assigned to this skin (via `combined_skin_name`) is unimportant and does not need
+    /// to be unique.
+    ///
+    /// A faster (but `unsafe`) way to create conglomerate skins is to use [`Skin::new`] and
+    /// [`Skin::add_skin`] to create a pre-configured skin that can be attached at any time with
+    /// [`Skeleton::set_skin`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SpineError::NotFound`] if any of the specified skin names do not exist (in this
+    /// case, the current skin remains unchanged).
+    pub fn set_skins_by_name<'a, T>(
+        &mut self,
+        combined_skin_name: &str,
+        skin_names: impl IntoIterator<Item = T>,
+    ) -> Result<(), SpineError>
+    where
+        Cow<'a, str>: From<T>,
+    {
+        let mut combined_skin = Skin::new(combined_skin_name);
+        for skin_name in skin_names {
+            let skin_name_str = &*Cow::<'a, str>::from(skin_name);
+            unsafe {
+                combined_skin.add_skin(
+                    self.data()
+                        .find_skin(skin_name_str)
+                        .ok_or_else(|| SpineError::new_not_found("Skin", skin_name_str))?
+                        .as_ref(),
+                );
+            }
+        }
+        unsafe {
+            self.set_skin(&combined_skin);
+        }
+        Ok(())
     }
 
     #[must_use]
