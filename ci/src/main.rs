@@ -20,6 +20,8 @@ bitflags! {
 }
 
 fn main() -> anyhow::Result<()> {
+    std::env::set_var("RUSTFLAGS", "-D warnings");
+
     let arguments = [
         ("check", Check::CHECK),
         ("wasm-check", Check::WASM_CHECK),

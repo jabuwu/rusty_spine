@@ -14,7 +14,6 @@
 //! To receive animation events, see [`AnimationState::set_listener`].
 
 #![deny(
-    warnings,
     clippy::missing_panics_doc,
     clippy::missing_errors_doc,
     clippy::doc_markdown,
