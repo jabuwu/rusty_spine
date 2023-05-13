@@ -13,7 +13,7 @@ rusty_spine = "0.5"
 
 A Rust API is provided on top of the C API, because working with C APIs directly in Rust is tedious and error prone. It's made to be as thin a wrapper as possible.
 
-The Rust API is unstable and changes often. Most features are accessible through rust with the most noteable exclusion being the [Timeline API](http://en.esotericsoftware.com/spine-api-reference#Timeline) and custom attachment loaders. Most projects do not need these APIs, but if your's does, please open an issue.
+The Rust API is mostly stable, but does not support the [Timeline API](http://en.esotericsoftware.com/spine-api-reference#Timeline) or custom attachment loaders. A few accessors might be missing as well. Most projects do not need these, but if your's does, please open an issue.
 
 [Rust API Documentation](https://docs.rs/rusty_spine/latest/rusty_spine/index.html)
 
