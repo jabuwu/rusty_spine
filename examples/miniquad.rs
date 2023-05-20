@@ -659,7 +659,7 @@ impl EventHandler for Stage {
             bindings.images = vec![texture];
 
             // Draw this renderable
-            ctx.apply_bindings(&bindings);
+            ctx.apply_bindings(bindings);
             ctx.apply_uniforms(&shader::Uniforms {
                 world: self.spine.world,
                 view,
@@ -754,10 +754,7 @@ fn main() {
         if let Some(SpineTexture::Loaded(texture)) =
             atlas_page.renderer_object().get::<SpineTexture>()
         {
-            texture_delete_queue_cb
-                .lock()
-                .unwrap()
-                .push(texture.clone());
+            texture_delete_queue_cb.lock().unwrap().push(*texture);
         }
         atlas_page.renderer_object().dispose::<SpineTexture>();
     });
@@ -807,8 +804,8 @@ mod text {
                 buffer.set_text(text, Attrs::new());
                 buffer.shape_until_scroll();
             }
-            let mut width = 1 as usize;
-            let mut height = 1 as usize;
+            let mut width = 1_usize;
+            let mut height = 1_usize;
             for run in buffer.layout_runs() {
                 for glyph in run.glyphs {
                     width = width.max((run.line_w + glyph.w) as usize);
