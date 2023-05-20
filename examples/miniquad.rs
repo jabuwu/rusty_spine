@@ -48,7 +48,10 @@
 //! hooked up to the audio system to play sounds. This example does not support this (although
 //! events will be printed to console).
 
-use std::{fs::read, sync::Arc};
+use std::{
+    fs::read,
+    sync::{Arc, Mutex},
+};
 
 use glam::{Mat4, Vec2, Vec3};
 use miniquad::*;
@@ -58,6 +61,9 @@ use rusty_spine::{
     draw::{ColorSpace, CullDirection},
     AnimationEvent, AnimationStateData, Atlas, BlendMode, Color, SkeletonBinary, SkeletonJson,
 };
+
+const MAX_MESH_VERTICES: usize = 10000;
+const MAX_MESH_INDICES: usize = 5000;
 
 mod shader {
     use glam::Mat4;
@@ -438,13 +444,15 @@ struct Stage {
     spine_demos: Vec<SpineDemo>,
     current_spine_demo: usize,
     pipeline: Pipeline,
+    bindings: Vec<Bindings>,
+    texture_delete_queue: Arc<Mutex<Vec<Texture>>>,
     last_frame_time: f64,
     screen_size: Vec2,
     demo_text: text::TextMesh,
 }
 
 impl Stage {
-    fn new(ctx: &mut Context) -> Stage {
+    fn new(ctx: &mut Context, texture_delete_queue: Arc<Mutex<Vec<Texture>>>) -> Stage {
         let spine_demos = vec![
             SpineDemo {
                 atlas_path: "assets/spineboy/export/spineboy-pma.atlas",
@@ -513,6 +521,8 @@ impl Stage {
             spine_demos,
             current_spine_demo,
             pipeline: create_pipeline(ctx),
+            bindings: vec![],
+            texture_delete_queue,
             last_frame_time: date::now(),
             screen_size: Vec2::new(800., 600.),
             demo_text: text::TextMesh::new(
@@ -546,6 +556,31 @@ impl EventHandler for Stage {
     fn draw(&mut self, ctx: &mut Context) {
         let renderables = self.spine.controller.combined_renderables();
 
+        // Create bindings that can be re-used for rendering Spine meshes
+        while renderables.len() > self.bindings.len() {
+            let vertex_buffer = Buffer::stream(
+                ctx,
+                BufferType::VertexBuffer,
+                MAX_MESH_VERTICES * std::mem::size_of::<Vertex>(),
+            );
+            let index_buffer = Buffer::stream(
+                ctx,
+                BufferType::IndexBuffer,
+                MAX_MESH_INDICES * std::mem::size_of::<u16>(),
+            );
+            self.bindings.push(Bindings {
+                vertex_buffers: vec![vertex_buffer],
+                index_buffer,
+                images: vec![Texture::empty()],
+            });
+        }
+
+        // Delete textures that are no longer used. The delete call needs to happen here, before
+        // rendering, or it may not actually delete the texture.
+        for texture_delete in self.texture_delete_queue.lock().unwrap().drain(..) {
+            texture_delete.delete();
+        }
+
         // Begin frame
         ctx.begin_default_pass(Default::default());
         ctx.clear(Some((0.1, 0.1, 0.1, 1.)), None, None);
@@ -554,7 +589,8 @@ impl EventHandler for Stage {
         // Apply backface culling only if this skeleton needs it
         ctx.set_cull_face(self.spine.cull_face);
 
-        for renderable in renderables {
+        let view = self.view();
+        for (renderable, bindings) in renderables.into_iter().zip(self.bindings.iter_mut()) {
             // Set blend state based on this renderable's blend mode
             let BlendStates {
                 alpha_blend,
@@ -580,8 +616,8 @@ impl EventHandler for Stage {
                     dark_color: Color::from(renderable.dark_colors[vertex_index]),
                 });
             }
-            let vertex_buffer = Buffer::immutable(ctx, BufferType::VertexBuffer, &vertices);
-            let index_buffer = Buffer::immutable(ctx, BufferType::IndexBuffer, &renderable.indices);
+            bindings.vertex_buffers[0].update(ctx, &vertices);
+            bindings.index_buffer.update(ctx, &renderable.indices);
 
             // If there is no attachment (and therefore no texture), skip rendering this renderable
             let Some(attachment_renderer_object) = renderable.attachment_renderer_object else { continue };
@@ -624,16 +660,13 @@ impl EventHandler for Stage {
                 }
                 SpineTexture::Loaded(texture) => *texture,
             };
+            bindings.images = vec![texture];
 
             // Draw this renderable
-            ctx.apply_bindings(&Bindings {
-                vertex_buffers: vec![vertex_buffer],
-                index_buffer,
-                images: vec![texture],
-            });
+            ctx.apply_bindings(&bindings);
             ctx.apply_uniforms(&shader::Uniforms {
                 world: self.spine.world,
-                view: self.view(),
+                view,
             });
             ctx.draw(0, renderable.indices.len() as i32, 1);
         }
@@ -653,8 +686,8 @@ impl EventHandler for Stage {
         ctx.commit_frame();
     }
 
-    fn resize_event(&mut self, _ctx: &mut Context, width: f32, height: f32) {
-        self.screen_size = Vec2::new(width, height);
+    fn resize_event(&mut self, ctx: &mut Context, width: f32, height: f32) {
+        self.screen_size = Vec2::new(width, height) / ctx.dpi_scale();
     }
 
     fn key_down_event(
@@ -715,14 +748,25 @@ fn main() {
                 format: convert_format(atlas_page.format()),
             });
     });
-    rusty_spine::extension::set_dispose_texture_cb(|atlas_page| unsafe {
+    let texture_delete_queue: Arc<Mutex<Vec<Texture>>> = Arc::new(Mutex::new(vec![]));
+    let texture_delete_queue_cb = texture_delete_queue.clone();
+    rusty_spine::extension::set_dispose_texture_cb(move |atlas_page| unsafe {
+        if let Some(SpineTexture::Loaded(texture)) =
+            atlas_page.renderer_object().get::<SpineTexture>()
+        {
+            texture_delete_queue_cb
+                .lock()
+                .unwrap()
+                .push(texture.clone());
+        }
         atlas_page.renderer_object().dispose::<SpineTexture>();
     });
     let conf = conf::Conf {
         window_title: "rusty_spine".to_owned(),
+        high_dpi: true,
         ..Default::default()
     };
-    miniquad::start(conf, |ctx| Box::new(Stage::new(ctx)));
+    miniquad::start(conf, |ctx| Box::new(Stage::new(ctx, texture_delete_queue)));
 }
 
 /// Not part of the demo, just necessary to render some text. Can probably be simplified.
