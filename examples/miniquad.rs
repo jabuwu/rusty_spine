@@ -48,10 +48,7 @@
 //! hooked up to the audio system to play sounds. This example does not support this (although
 //! events will be printed to console).
 
-use std::{
-    fs::read,
-    sync::{Arc, Mutex},
-};
+use std::sync::{Arc, Mutex};
 
 use glam::{Mat4, Vec2, Vec3};
 use miniquad::*;
@@ -448,7 +445,7 @@ struct Stage {
     texture_delete_queue: Arc<Mutex<Vec<Texture>>>,
     last_frame_time: f64,
     screen_size: Vec2,
-    demo_text: text::TextMesh,
+    demo_text: text::Text,
 }
 
 impl Stage {
@@ -514,7 +511,10 @@ impl Stage {
 
         let current_spine_demo = 0;
         let spine = Spine::load(spine_demos[current_spine_demo]);
-        let font_file = "assets/FiraMono-Medium.ttf";
+
+        let mut text_system = text::TextSystem::new();
+        let demo_text =
+            text_system.create_text(ctx, "press space for next demo", 32. * ctx.dpi_scale());
 
         Stage {
             spine,
@@ -525,11 +525,7 @@ impl Stage {
             texture_delete_queue,
             last_frame_time: date::now(),
             screen_size: Vec2::new(800., 600.),
-            demo_text: text::TextMesh::new(
-                ctx,
-                "Press space for next demo",
-                &read(font_file).unwrap_or_else(|_| panic!("failed to load font: {font_file}")),
-            ),
+            demo_text,
         }
     }
 
@@ -672,14 +668,18 @@ impl EventHandler for Stage {
         }
 
         // Draw demo text
-        ctx.apply_pipeline(&self.pipeline);
-        self.demo_text.draw(
-            ctx,
-            shader::Uniforms {
-                world: Mat4::from_translation(Vec3::new(0., self.screen_size.y * 0.5 - 30., 0.)),
-                view: self.view(),
-            },
-        );
+        let BlendStates {
+            alpha_blend,
+            color_blend,
+        } = BlendMode::Normal.get_blend_states(true);
+        ctx.set_blend(Some(color_blend), Some(alpha_blend));
+        ctx.apply_bindings(&self.demo_text.bindings);
+        ctx.apply_uniforms(&shader::Uniforms {
+            world: Mat4::from_translation(Vec3::new(0., self.screen_size.y * 0.48, 0.))
+                * Mat4::from_scale(self.demo_text.size.extend(0.) / ctx.dpi_scale()),
+            view,
+        });
+        ctx.draw(0, self.demo_text.num_elements, 1);
 
         // End frame
         ctx.end_render_pass();
@@ -769,107 +769,125 @@ fn main() {
     miniquad::start(conf, |ctx| Box::new(Stage::new(ctx, texture_delete_queue)));
 }
 
-/// Not part of the demo, just necessary to render some text. Can probably be simplified.
+/// Not part of the demo, just necessary to render some text.
 mod text {
-    use fontdue::{
-        layout::{CoordinateSystem, Layout, TextStyle},
-        Font,
-    };
+    use cosmic_text::{Attrs, FontSystem, Metrics, SwashCache, Wrap};
     use glam::Vec2;
     use miniquad::*;
     use rusty_spine::Color;
 
-    use super::{shader, Vertex};
+    use super::Vertex;
 
-    pub struct TextMesh {
-        pub bindings: Vec<Bindings>,
+    pub struct Text {
+        pub bindings: Bindings,
+        pub num_elements: i32,
+        pub size: Vec2,
     }
 
-    impl TextMesh {
-        pub fn new(ctx: &mut Context, text: &'static str, ttf: &[u8]) -> Self {
-            let font = Font::from_bytes(ttf, fontdue::FontSettings::default())
-                .expect("failed to parse font");
-            let mut layout = Layout::new(CoordinateSystem::PositiveYUp);
-            layout.append(&[&font], &TextStyle::new(text, 25.0, 0));
-            let mut bindings = vec![];
-            let total_width = if let Some(last_glyph) = layout.glyphs().iter().last() {
-                last_glyph.x + last_glyph.width as f32
-            } else {
-                0.
-            };
-            for glyph in layout.glyphs() {
-                let (metrics, bitmap) = font.rasterize(glyph.parent, 25.0);
-                if metrics.width * metrics.height > 0 {
-                    let mut rgba: Vec<u8> = vec![];
-                    for coverage in bitmap {
-                        for _ in 0..4 {
-                            rgba.push(coverage);
-                        }
-                    }
-                    let texture = Texture::from_rgba8(
-                        ctx,
-                        metrics.width as u16,
-                        metrics.height as u16,
-                        &rgba,
-                    );
-                    let position = Vec2::new(glyph.x, glyph.y) - Vec2::new(total_width * 0.5, 0.);
-                    let size = Vec2::new(glyph.width as f32, glyph.height as f32);
-                    let vertices = [
-                        Vertex {
-                            position: position + Vec2::new(0., 0.) * size,
-                            uv: Vec2::new(0., 1.),
-                            color: Color::new_rgba(1., 1., 1., 1.),
-                            dark_color: Color::new_rgba(0., 0., 0., 1.),
-                        },
-                        Vertex {
-                            position: position + Vec2::new(0., 1.) * size,
-                            uv: Vec2::new(0., 0.),
-                            color: Color::new_rgba(1., 1., 1., 1.),
-                            dark_color: Color::new_rgba(0., 0., 0., 1.),
-                        },
-                        Vertex {
-                            position: position + Vec2::new(1., 1.) * size,
-                            uv: Vec2::new(1., 0.),
-                            color: Color::new_rgba(1., 1., 1., 1.),
-                            dark_color: Color::new_rgba(0., 0., 0., 1.),
-                        },
-                        Vertex {
-                            position: position + Vec2::new(1., 0.) * size,
-                            uv: Vec2::new(1., 1.),
-                            color: Color::new_rgba(1., 1., 1., 1.),
-                            dark_color: Color::new_rgba(0., 0., 0., 1.),
-                        },
-                    ];
-                    let indices = vec![0, 2, 1, 0, 3, 2];
-                    let vertex_buffer = Buffer::immutable(ctx, BufferType::VertexBuffer, &vertices);
-                    let index_buffer = Buffer::immutable(ctx, BufferType::IndexBuffer, &indices);
-                    bindings.push(Bindings {
-                        vertex_buffers: vec![vertex_buffer],
-                        index_buffer,
-                        images: vec![texture],
-                    });
-                }
+    pub struct TextSystem {
+        pub font_system: FontSystem,
+        pub swash_cache: SwashCache,
+    }
+
+    impl TextSystem {
+        pub fn new() -> Self {
+            Self {
+                font_system: FontSystem::new(),
+                swash_cache: SwashCache::new(),
             }
-            Self { bindings }
         }
 
-        pub fn draw(&self, ctx: &mut Context, uniforms: shader::Uniforms) {
-            ctx.set_blend(
-                Some(BlendState::new(
-                    Equation::Add,
-                    BlendFactor::One,
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                )),
-                Some(BlendState::new(
-                    Equation::Add,
-                    BlendFactor::One,
-                    BlendFactor::OneMinusValue(BlendValue::SourceAlpha),
-                )),
+        pub fn create_text(&mut self, ctx: &mut Context, text: &str, size: f32) -> Text {
+            let metrics = Metrics::new(size, size);
+            let mut buffer = cosmic_text::Buffer::new(&mut self.font_system, metrics);
+            {
+                let mut buffer = buffer.borrow_with(&mut self.font_system);
+                buffer.set_wrap(Wrap::None);
+                buffer.set_size(f32::MAX, f32::MAX);
+                buffer.set_text(text, Attrs::new());
+                buffer.shape_until_scroll();
+            }
+            let mut width = 1 as usize;
+            let mut height = 1 as usize;
+            for run in buffer.layout_runs() {
+                for glyph in run.glyphs {
+                    width = width.max((run.line_w + glyph.w) as usize);
+                }
+                height = height.max((run.line_y + size) as usize);
+            }
+            let mut texture_data = vec![0; width * height * 4];
+            buffer.draw(
+                &mut self.font_system,
+                &mut self.swash_cache,
+                cosmic_text::Color::rgb(255, 255, 255),
+                |x, y, h, w, color| {
+                    if x < 0 || y < 0 {
+                        return;
+                    }
+                    let a = color.a() as f32 / 255.;
+                    let (r, g, b) = if a == 0. {
+                        (
+                            (color.r() as f32 / 255.) * a,
+                            (color.g() as f32 / 255.) * a,
+                            (color.b() as f32 / 255.) * a,
+                        )
+                    } else {
+                        (0., 0., 0.)
+                    };
+                    let (x, y, w, h) = (x as usize, y as usize, w as usize, h as usize);
+                    for xx in x..(x + w) {
+                        for yy in y..(y + h) {
+                            if xx < width && y < height {
+                                let index = xx + yy * width;
+                                texture_data[index * 4] = (r * 255.) as u8;
+                                texture_data[index * 4 + 1] = (g * 255.) as u8;
+                                texture_data[index * 4 + 2] = (b * 255.) as u8;
+                                texture_data[index * 4 + 3] = color.a();
+                            }
+                        }
+                    }
+                },
             );
-            for bindings in &self.bindings {
-                ctx.apply_bindings(bindings);
-                ctx.apply_uniforms(&uniforms);
-                ctx.draw(0, 6, 1);
+            let vertex_buffers = Buffer::immutable(
+                ctx,
+                BufferType::VertexBuffer,
+                &[
+                    Vertex {
+                        position: Vec2::new(-0.5, -1.),
+                        uv: Vec2::new(0., 1.),
+                        color: Color::new_rgba(1., 1., 1., 1.),
+                        dark_color: Color::new_rgba(1., 1., 1., 1.),
+                    },
+                    Vertex {
+                        position: Vec2::new(0.5, -1.),
+                        uv: Vec2::new(1., 1.),
+                        color: Color::new_rgba(1., 1., 1., 1.),
+                        dark_color: Color::new_rgba(1., 1., 1., 1.),
+                    },
+                    Vertex {
+                        position: Vec2::new(-0.5, 0.),
+                        uv: Vec2::new(0., 0.),
+                        color: Color::new_rgba(1., 1., 1., 1.),
+                        dark_color: Color::new_rgba(1., 1., 1., 1.),
+                    },
+                    Vertex {
+                        position: Vec2::new(0.5, 0.),
+                        uv: Vec2::new(1., 0.),
+                        color: Color::new_rgba(1., 1., 1., 1.),
+                        dark_color: Color::new_rgba(1., 1., 1., 1.),
+                    },
+                ],
+            );
+            let index_buffer = Buffer::immutable(ctx, BufferType::IndexBuffer, &[0, 1, 2, 1, 3, 2]);
+            let texture = Texture::from_rgba8(ctx, width as u16, height as u16, &texture_data);
+            Text {
+                bindings: Bindings {
+                    vertex_buffers: vec![vertex_buffers],
+                    index_buffer,
+                    images: vec![texture],
+                },
+                num_elements: 6,
+                size: Vec2::new(width as f32, height as f32),
             }
         }
     }

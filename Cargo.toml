@@ -19,7 +19,7 @@ mint = { version = "0.5", optional = true }
 miniquad = "0.3.16"
 image = { version = "0.24", default-features = false, features = [ "png", "webp", "jpeg" ] }
 glam = "0.23"
-fontdue = "0.7"
+cosmic-text = "0.8"
 
 [profile.dev.package."*"]
 opt-level = 3
