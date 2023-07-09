@@ -822,7 +822,7 @@ mod text {
                         return;
                     }
                     let a = color.a() as f32 / 255.;
-                    let (r, g, b) = if a == 0. {
+                    let (r, g, b) = if a != 0. {
                         (
                             (color.r() as f32 / 255.) * a,
                             (color.g() as f32 / 255.) * a,
@@ -853,25 +853,25 @@ mod text {
                         position: Vec2::new(-0.5, -1.),
                         uv: Vec2::new(0., 1.),
                         color: Color::new_rgba(1., 1., 1., 1.),
-                        dark_color: Color::new_rgba(1., 1., 1., 1.),
+                        dark_color: Color::new_rgba(0., 0., 0., 1.),
                     },
                     Vertex {
                         position: Vec2::new(0.5, -1.),
                         uv: Vec2::new(1., 1.),
                         color: Color::new_rgba(1., 1., 1., 1.),
-                        dark_color: Color::new_rgba(1., 1., 1., 1.),
+                        dark_color: Color::new_rgba(0., 0., 0., 1.),
                     },
                     Vertex {
                         position: Vec2::new(-0.5, 0.),
                         uv: Vec2::new(0., 0.),
                         color: Color::new_rgba(1., 1., 1., 1.),
-                        dark_color: Color::new_rgba(1., 1., 1., 1.),
+                        dark_color: Color::new_rgba(0., 0., 0., 1.),
                     },
                     Vertex {
                         position: Vec2::new(0.5, 0.),
                         uv: Vec2::new(1., 0.),
                         color: Color::new_rgba(1., 1., 1., 1.),
-                        dark_color: Color::new_rgba(1., 1., 1., 1.),
+                        dark_color: Color::new_rgba(0., 0., 0., 1.),
                     },
                 ],
             );
