@@ -1,4 +1,4 @@
-# 0.6.0 (unreleased)
+# 0.6.0
 - All indices are now `usize` (previously some were `i32` which lead to inconsistent APIs)
 - Events are nicer to work with using the new `AnimationEvent` enum.
 - `Skeleton::set_skin` and `Skin::add_skin` marked unsafe (with safety comments)
