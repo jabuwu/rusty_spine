@@ -1,4 +1,4 @@
-# 0.6.1 (UNRELEASED)
+# 0.6.1
 - Compilation fixes for new Rust lints
 
 # 0.6.0
