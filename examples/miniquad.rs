@@ -768,7 +768,7 @@ fn main() {
 
 /// Not part of the demo, just necessary to render some text.
 mod text {
-    use cosmic_text::{Attrs, FontSystem, Metrics, SwashCache, Wrap};
+    use cosmic_text::{Attrs, FontSystem, Metrics, Shaping, SwashCache, Wrap};
     use glam::Vec2;
     use miniquad::*;
     use rusty_spine::Color;
@@ -801,7 +801,7 @@ mod text {
                 let mut buffer = buffer.borrow_with(&mut self.font_system);
                 buffer.set_wrap(Wrap::None);
                 buffer.set_size(f32::MAX, f32::MAX);
-                buffer.set_text(text, Attrs::new());
+                buffer.set_text(text, Attrs::new(), Shaping::Basic);
                 buffer.shape_until_scroll();
             }
             let mut width = 1_usize;

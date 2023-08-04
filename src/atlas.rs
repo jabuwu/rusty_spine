@@ -114,10 +114,8 @@ impl Atlas {
 
     #[must_use]
     pub fn pages_mut(&mut self) -> AtlasPageMutIterator {
-        AtlasPageMutIterator {
-            _atlas: self,
-            page: unsafe { self.c_ptr_mut().pages },
-        }
+        let page = unsafe { self.c_ptr_mut().pages };
+        AtlasPageMutIterator { _atlas: self, page }
     }
 
     #[must_use]
@@ -140,9 +138,10 @@ impl Atlas {
 
     #[must_use]
     pub fn regions_mut(&mut self) -> AtlasRegionMutIterator {
+        let region = unsafe { self.c_ptr_mut().regions };
         AtlasRegionMutIterator {
             _atlas: self,
-            region: unsafe { self.c_ptr_mut().regions },
+            region,
         }
     }
 
@@ -239,7 +238,7 @@ pub mod atlas {
     }
 
     pub struct AtlasPageMutIterator<'a> {
-        pub(crate) _atlas: &'a Atlas,
+        pub(crate) _atlas: &'a mut Atlas,
         pub(crate) page: *mut spAtlasPage,
     }
 
@@ -252,7 +251,7 @@ pub mod atlas {
                 self.page = unsafe { (*self.page).next };
                 #[allow(clippy::cast_ref_to_mut)]
                 Some(CTmpMut::new(
-                    unsafe { &mut *(self._atlas as *const Atlas as *mut Atlas) },
+                    unsafe { &mut *(self._atlas as *mut Atlas) },
                     page,
                 ))
             } else {
@@ -418,7 +417,7 @@ pub mod atlas {
     }
 
     pub struct AtlasRegionMutIterator<'a> {
-        pub(crate) _atlas: &'a Atlas,
+        pub(crate) _atlas: &'a mut Atlas,
         pub(crate) region: *mut spAtlasRegion,
     }
 
@@ -431,7 +430,7 @@ pub mod atlas {
                 self.region = unsafe { (*self.region).next };
                 #[allow(clippy::cast_ref_to_mut)]
                 Some(CTmpMut::new(
-                    unsafe { &mut *(self._atlas as *const Atlas as *mut Atlas) },
+                    unsafe { &mut *(self._atlas as *mut Atlas) },
                     page,
                 ))
             } else {

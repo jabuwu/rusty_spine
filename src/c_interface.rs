@@ -155,7 +155,7 @@ pub struct CTmpMutIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
 {
-    _parent: &'a P,
+    _parent: &'a mut P,
     items: *mut *mut C,
     index: usize,
     count: usize,
@@ -167,7 +167,7 @@ where
     T: NewFromPtr<C>,
 {
     #[must_use]
-    pub(crate) fn new(parent: &'a P, items: *mut *mut C, count: usize) -> Self {
+    pub(crate) fn new(parent: &'a mut P, items: *mut *mut C, count: usize) -> Self {
         Self {
             _parent: parent,
             items,
@@ -280,7 +280,7 @@ pub struct CTmpMutNullableIterator<'a, P, T, C>
 where
     T: NewFromPtr<C>,
 {
-    _parent: &'a P,
+    _parent: &'a mut P,
     items: *mut *mut C,
     index: usize,
     count: usize,
@@ -292,7 +292,7 @@ where
     T: NewFromPtr<C>,
 {
     #[must_use]
-    pub(crate) fn new(parent: &'a P, items: *mut *mut C, count: usize) -> Self {
+    pub(crate) fn new(parent: &'a mut P, items: *mut *mut C, count: usize) -> Self {
         Self {
             _parent: parent,
             items,
@@ -455,7 +455,8 @@ macro_rules! c_accessor_color_mut {
         #[must_use]
         pub fn $rust_mut(&mut self) -> &mut crate::color::Color {
             unsafe {
-                &mut *(&self.c_ptr_mut().$c as *const crate::c::spColor as *mut crate::color::Color)
+                &mut *(&mut self.c_ptr_mut().color as *mut crate::c::spColor
+                    as *mut crate::color::Color)
             }
         }
     };

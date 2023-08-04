@@ -1,3 +1,6 @@
+# 0.6.1 (UNRELEASED)
+- Compilation fixes for new Rust lints
+
 # 0.6.0
 - All indices are now `usize` (previously some were `i32` which lead to inconsistent APIs)
 - Events are nicer to work with using the new `AnimationEvent` enum.
