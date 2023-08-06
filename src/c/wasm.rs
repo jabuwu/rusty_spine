@@ -33,6 +33,7 @@
  */
 
 use crate::c::FILE;
+use std::alloc::Layout;
 use std::any::Any;
 use std::collections::HashMap;
 use std::ffi::{CStr, CString};
@@ -76,7 +77,7 @@ type size_t = c_ulong;
 
 #[derive(Default)]
 struct Allocator {
-    allocations: HashMap<*const c_void, Vec<u8>>,
+    allocations: HashMap<*const c_void, Layout>,
 }
 
 impl Allocator {
@@ -93,36 +94,46 @@ impl Allocator {
     }
 
     pub fn malloc(&mut self, size: usize) -> *mut c_void {
-        let mut data: Vec<u8> = vec![];
-        data.resize(size, 0);
-        let ptr = data.as_ptr();
-        self.allocations.insert(ptr as *const c_void, data);
-        ptr as *mut c_void
+        if size > 0 {
+            let layout = std::alloc::Layout::array::<u8>(size)
+                .unwrap()
+                .align_to(8)
+                .unwrap();
+            let ptr = unsafe { std::alloc::alloc(layout) };
+            self.allocations.insert(ptr as *const c_void, layout);
+            ptr as *mut c_void
+        } else {
+            std::ptr::null_mut()
+        }
     }
 
     pub unsafe fn realloc(&mut self, ptr: *const c_void, size: usize) -> *mut c_void {
-        let mut previous_allocation = self.allocations.remove(&ptr).unwrap();
-        previous_allocation.resize(size, 0);
-        let new_ptr = previous_allocation.as_ptr();
-        self.allocations
-            .insert(new_ptr as *const c_void, previous_allocation);
-        new_ptr as *mut c_void
+        let new_memory = self.malloc(size);
+        if !new_memory.is_null() {
+            let layout = self.allocations.get(&ptr).unwrap();
+            spine_memcpy(new_memory, ptr, layout.size() as size_t);
+        }
+        self.free(ptr);
+        new_memory
     }
 
     #[allow(dead_code)]
     pub unsafe fn size(&mut self, ptr: *const c_void) -> usize {
-        self.allocations.get(&ptr).unwrap().len()
+        self.allocations.get(&ptr).unwrap().size()
     }
 
     pub unsafe fn free(&mut self, ptr: *const c_void) {
-        self.allocations.remove(&ptr).unwrap();
+        if !ptr.is_null() {
+            let layout = self.allocations.remove(&ptr).unwrap();
+            unsafe { std::alloc::dealloc(ptr as *mut u8, layout) };
+        }
     }
 
     #[allow(dead_code)]
     pub fn size_allocated(&self) -> usize {
         let mut size = 0;
         for (_, allocation) in self.allocations.iter() {
-            size += allocation.len();
+            size += allocation.size();
         }
         size
     }
@@ -771,24 +782,54 @@ pub unsafe extern "C" fn spine_strrchr(mut p: *const c_char, ch: c_int) -> *mut 
 }
 
 #[no_mangle]
-unsafe fn spine_rand() -> c_int {
+unsafe extern "C" fn spine_rand() -> c_int {
     unimplemented!();
 }
 
 #[no_mangle]
-fn spine_sqrtf(x: c_float) -> c_float {
+extern "C" fn spine_sqrtf(x: c_float) -> c_float {
     x.sqrt()
 }
 
 #[no_mangle]
-unsafe fn spine_malloc(size: size_t) -> *mut c_void {
+extern "C" fn spine_acosf(x: c_float) -> c_float {
+    x.acos()
+}
+
+#[no_mangle]
+extern "C" fn spine_atan2f(x: c_float, y: c_float) -> c_float {
+    x.atan2(y)
+}
+
+#[no_mangle]
+extern "C" fn spine_cosf(x: c_float) -> c_float {
+    x.cos()
+}
+
+#[no_mangle]
+extern "C" fn spine_sinf(x: c_float) -> c_float {
+    x.sin()
+}
+
+#[no_mangle]
+extern "C" fn spine_pow(x: c_double, y: c_double) -> c_double {
+    x.powf(y)
+}
+
+#[no_mangle]
+extern "C" fn spine_fmodf(x: c_float, y: c_float) -> c_float {
+    x % y
+}
+
+#[no_mangle]
+unsafe extern "C" fn spine_malloc(size: size_t) -> *mut c_void {
     let singleton = Allocator::singleton();
     let mut allocator = singleton.lock().unwrap();
     allocator.malloc(size as usize)
 }
 
 #[no_mangle]
-unsafe fn spine_realloc(ptr: *mut c_void, size: size_t) -> *mut c_void {
+unsafe extern "C" fn spine_realloc(ptr: *mut c_void, size: size_t) -> *mut c_void {
     if !ptr.is_null() {
         let singleton = Allocator::singleton();
         let mut allocator = singleton.lock().unwrap();
@@ -799,8 +840,8 @@ unsafe fn spine_realloc(ptr: *mut c_void, size: size_t) -> *mut c_void {
 }
 
 #[no_mangle]
-unsafe fn spine_free(ptr: *mut c_void) {
-    if !ptr.is_null() && ptr != 1 as *mut c_void {
+unsafe extern "C" fn spine_free(ptr: *mut c_void) {
+    if !ptr.is_null() && ptr as usize != 1 {
         let singleton = Allocator::singleton();
         let mut allocator = singleton.lock().unwrap();
         allocator.free(ptr)
@@ -808,19 +849,23 @@ unsafe fn spine_free(ptr: *mut c_void) {
 }
 
 #[no_mangle]
-unsafe fn spine_memcpy(dest: *mut c_void, src: *const c_void, n: size_t) -> *mut c_void {
+unsafe extern "C" fn spine_memcpy(dest: *mut c_void, src: *const c_void, n: size_t) -> *mut c_void {
     std::ptr::copy_nonoverlapping(src, dest, n as usize);
     dest
 }
 
 #[no_mangle]
-unsafe fn spine_memmove(dest: *mut c_void, src: *const c_void, n: size_t) -> *mut c_void {
+unsafe extern "C" fn spine_memmove(
+    dest: *mut c_void,
+    src: *const c_void,
+    n: size_t,
+) -> *mut c_void {
     std::ptr::copy(src, dest, n as usize);
     dest
 }
 
 #[no_mangle]
-unsafe fn spine_memset(s: *mut c_void, c: c_int, n: size_t) -> *mut c_void {
+unsafe extern "C" fn spine_memset(s: *mut c_void, c: c_int, n: size_t) -> *mut c_void {
     for offset in 0..n {
         (*(s as *mut u8).offset(offset as isize)) = c as u8;
     }
@@ -828,27 +873,32 @@ unsafe fn spine_memset(s: *mut c_void, c: c_int, n: size_t) -> *mut c_void {
 }
 
 #[no_mangle]
-unsafe fn spine_fopen(_filename: *const c_char, _modes: *const c_char) -> *mut FILE {
+unsafe extern "C" fn spine_fopen(_filename: *const c_char, _modes: *const c_char) -> *mut FILE {
     unimplemented!();
 }
 
 #[no_mangle]
-unsafe fn spine_fclose(_stream: *mut FILE) -> c_int {
+unsafe extern "C" fn spine_fclose(_stream: *mut FILE) -> c_int {
     unimplemented!();
 }
 
 #[no_mangle]
-unsafe fn spine_fread(_ptr: *mut c_void, _size: size_t, _n: size_t, _stream: *mut FILE) -> size_t {
+unsafe extern "C" fn spine_fread(
+    _ptr: *mut c_void,
+    _size: size_t,
+    _n: size_t,
+    _stream: *mut FILE,
+) -> size_t {
     unimplemented!();
 }
 
 #[no_mangle]
-unsafe fn spine_fseek(_stream: *mut FILE, _off: c_long, _whence: c_int) -> c_int {
+unsafe extern "C" fn spine_fseek(_stream: *mut FILE, _off: c_long, _whence: c_int) -> c_int {
     unimplemented!();
 }
 
 #[no_mangle]
-unsafe fn spine_ftell(_stream: *mut FILE) -> c_long {
+unsafe extern "C" fn spine_ftell(_stream: *mut FILE) -> c_long {
     unimplemented!();
 }
 
