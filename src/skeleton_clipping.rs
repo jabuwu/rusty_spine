@@ -1,9 +1,8 @@
 use crate::{
     c::{
-        spClippingAttachment, spSkeletonClipping, spSkeletonClipping_clipEnd,
-        spSkeletonClipping_clipEnd2, spSkeletonClipping_clipStart,
-        spSkeletonClipping_clipTriangles, spSkeletonClipping_create, spSkeletonClipping_dispose,
-        spSkeletonClipping_isClipping,
+        spSkeletonClipping, spSkeletonClipping_clipEnd, spSkeletonClipping_clipEnd2,
+        spSkeletonClipping_clipStart, spSkeletonClipping_clipTriangles, spSkeletonClipping_create,
+        spSkeletonClipping_dispose, spSkeletonClipping_isClipping,
     },
     c_interface::SyncPtr,
     clipping_attachment::ClippingAttachment,
@@ -39,11 +38,7 @@ impl SkeletonClipping {
 
     pub fn clip_start(&mut self, slot: &Slot, clip: &ClippingAttachment) {
         unsafe {
-            spSkeletonClipping_clipStart(
-                self.c_ptr_mut(),
-                slot.c_ptr(),
-                clip.c_ptr() as *mut spClippingAttachment,
-            );
+            spSkeletonClipping_clipStart(self.c_ptr_mut(), slot.c_ptr(), clip.c_ptr());
         }
     }
 

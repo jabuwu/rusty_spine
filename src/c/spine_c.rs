@@ -7,7 +7,8 @@
     unused_assignments,
     unused_mut,
     clippy::all,
-    clippy::cast_lossless
+    clippy::cast_lossless,
+    clippy::missing_panics_doc
 )]
 extern "C" {
     fn spine_memcpy(__dest: *mut c_void, __src: *const c_void, __n: size_t) -> *mut c_void;

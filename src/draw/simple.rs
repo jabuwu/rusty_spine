@@ -231,7 +231,7 @@ impl SimpleDrawer {
                         indices.resize(clipped_triangles_size, 0);
                         std::ptr::copy_nonoverlapping(
                             (*clipper.c_ptr_ref().clippedTriangles).items,
-                            indices.as_mut_ptr() as *mut u16,
+                            indices.as_mut_ptr(),
                             clipped_triangles_size,
                         );
                         let clipped_uvs_size = (*clipper.c_ptr_ref().clippedUVs).size as usize;
