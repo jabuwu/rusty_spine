@@ -54,21 +54,51 @@ impl<'a, P, T: std::fmt::Debug> std::fmt::Debug for CTmpRef<'a, P, T> {
     }
 }
 
+pub(crate) enum CTmpMutParent<'a, P> {
+    Weak(*mut P),
+    Strong(&'a mut P),
+}
+
+impl<'a, P> Deref for CTmpMutParent<'a, P> {
+    type Target = P;
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Self::Weak(pointer) => unsafe { &**pointer },
+            Self::Strong(reference) => *reference,
+        }
+    }
+}
+
 /// A mutable version of [`CTmpRef`].
 pub struct CTmpMut<'a, P, T> {
     pub(crate) data: T,
-    pub(crate) parent: &'a mut P,
+    pub(crate) parent: CTmpMutParent<'a, P>,
 }
 
 impl<'a, P, T> CTmpMut<'a, P, T> {
     #[must_use]
     pub fn new(parent: &'a mut P, data: T) -> Self {
-        Self { data, parent }
+        Self {
+            data,
+            parent: CTmpMutParent::Strong(parent),
+        }
+    }
+
+    #[must_use]
+    pub fn new_weak(parent: *mut P, data: T) -> Self {
+        Self {
+            data,
+            parent: CTmpMutParent::Weak(parent),
+        }
     }
 
     #[must_use]
     pub fn unwrap_parent_child(&mut self) -> (&mut P, &mut T) {
-        (self.parent, &mut self.data)
+        let parent = match &mut self.parent {
+            CTmpMutParent::Strong(reference) => reference,
+            CTmpMutParent::Weak(pointer) => unsafe { &mut **pointer },
+        };
+        (parent, &mut self.data)
     }
 
     #[must_use]
@@ -188,10 +218,7 @@ where
         if self.index < self.count {
             let item = unsafe { T::new_from_ptr(*self.items.offset(self.index as isize)) };
             self.index += 1;
-            Some(CTmpMut::new(
-                unsafe { &mut *(self._parent as *const P).cast_mut() },
-                item,
-            ))
+            Some(CTmpMut::new_weak(self._parent, item))
         } else {
             None
         }
@@ -261,10 +288,7 @@ where
             if !ptr.is_null() {
                 let item = unsafe { T::new_from_ptr(ptr) };
                 self.index += 1;
-                Some(Some(CTmpMut::new(
-                    unsafe { &mut *(self._parent as *const P).cast_mut() },
-                    item,
-                )))
+                Some(Some(CTmpMut::new_weak(self._parent, item)))
             } else {
                 self.index += 1;
                 Some(None)
