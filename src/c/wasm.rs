@@ -132,7 +132,7 @@ impl Allocator {
     #[allow(dead_code)]
     pub fn size_allocated(&self) -> usize {
         let mut size = 0;
-        for (_, allocation) in self.allocations.iter() {
+        for allocation in self.allocations.values() {
             size += allocation.size();
         }
         size
