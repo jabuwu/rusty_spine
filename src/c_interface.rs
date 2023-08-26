@@ -158,7 +158,7 @@ where
             items,
             index: 0,
             count,
-            _marker: Default::default(),
+            _marker: PhantomData::default(),
         }
     }
 }
@@ -203,7 +203,7 @@ where
             items,
             index: 0,
             count,
-            _marker: Default::default(),
+            _marker: PhantomData::default(),
         }
     }
 }
@@ -248,7 +248,7 @@ where
             items,
             index: 0,
             count,
-            _marker: Default::default(),
+            _marker: PhantomData::default(),
         }
     }
 }
@@ -322,7 +322,7 @@ where
             items,
             index: 0,
             count,
-            _marker: Default::default(),
+            _marker: PhantomData::default(),
         }
     }
 }

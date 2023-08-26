@@ -19,7 +19,8 @@
     clippy::doc_markdown,
     clippy::manual_assert,
     clippy::ptr_cast_constness,
-    clippy::ptr_as_ptr
+    clippy::ptr_as_ptr,
+    clippy::default_trait_access
 )]
 // https://github.com/rust-lang/rust-clippy/issues/11382
 #![allow(clippy::arc_with_non_send_sync)]
