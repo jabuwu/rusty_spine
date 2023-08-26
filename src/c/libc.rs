@@ -1,3 +1,5 @@
+#![allow(clippy::missing_const_for_fn)]
+
 pub mod types {
     #[allow(non_camel_case_types)]
     pub type c_short = libc::c_short;

@@ -32,6 +32,8 @@
  * SUCH DAMAGE.
  */
 
+#![allow(clippy::missing_const_for_fn)]
+
 use crate::c::FILE;
 use std::alloc::Layout;
 use std::any::Any;

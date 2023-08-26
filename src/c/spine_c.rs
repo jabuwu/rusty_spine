@@ -10,7 +10,8 @@
     clippy::cast_lossless,
     clippy::missing_panics_doc,
     clippy::ptr_cast_constness,
-    clippy::ptr_as_ptr
+    clippy::ptr_as_ptr,
+    clippy::missing_const_for_fn
 )]
 extern "C" {
     fn spine_memcpy(__dest: *mut c_void, __src: *const c_void, __n: size_t) -> *mut c_void;

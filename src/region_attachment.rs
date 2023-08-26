@@ -21,7 +21,7 @@ pub struct RegionAttachment {
 
 impl RegionAttachment {
     #[must_use]
-    pub fn new_from_ptr(c_region_attachment: *mut spRegionAttachment) -> Self {
+    pub const fn new_from_ptr(c_region_attachment: *mut spRegionAttachment) -> Self {
         Self {
             c_region_attachment: SyncPtr(c_region_attachment),
         }

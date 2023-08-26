@@ -25,7 +25,7 @@ pub struct CTmpRef<'a, P, T> {
 }
 
 impl<'a, P, T> CTmpRef<'a, P, T> {
-    pub fn new(parent: &'a P, data: T) -> Self {
+    pub const fn new(parent: &'a P, data: T) -> Self {
         Self { data, parent }
     }
 
@@ -33,7 +33,7 @@ impl<'a, P, T> CTmpRef<'a, P, T> {
         (self.parent, &self.data)
     }
 
-    pub fn as_ref(&self) -> &T {
+    pub const fn as_ref(&self) -> &T {
         &self.data
     }
 }
@@ -85,7 +85,7 @@ impl<'a, P, T> CTmpMut<'a, P, T> {
     }
 
     #[must_use]
-    pub fn new_weak(parent: *mut P, data: T) -> Self {
+    pub const fn new_weak(parent: *mut P, data: T) -> Self {
         Self {
             data,
             parent: CTmpMutParent::Weak(parent),
@@ -102,7 +102,7 @@ impl<'a, P, T> CTmpMut<'a, P, T> {
     }
 
     #[must_use]
-    pub fn as_ref(&self) -> &T {
+    pub const fn as_ref(&self) -> &T {
         &self.data
     }
 
@@ -369,7 +369,7 @@ macro_rules! c_ptr {
     ($member:ident, $c_type:ty) => {
         #[inline]
         #[must_use]
-        pub fn c_ptr(&self) -> *mut $c_type {
+        pub const fn c_ptr(&self) -> *mut $c_type {
             self.$member.0
         }
 
@@ -876,7 +876,7 @@ macro_rules! c_handle_decl {
 
         impl $name {
             #[must_use]
-            pub(crate) fn new(c_item: *const $c_type, c_parent: *const $c_parent) -> Self {
+            pub(crate) const fn new(c_item: *const $c_type, c_parent: *const $c_parent) -> Self {
                 Self {
                     c_item: SyncPtr(c_item as *mut $c_type),
                     c_parent: SyncPtr(c_parent as *mut $c_parent),
@@ -937,7 +937,7 @@ macro_rules! c_handle_indexed_decl {
 
         impl $name {
             #[must_use]
-            pub(crate) fn new(
+            pub(crate) const fn new(
                 index: i32,
                 c_item: *const $c_type,
                 c_parent: *const $c_parent,

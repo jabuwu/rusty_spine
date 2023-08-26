@@ -14,7 +14,7 @@ pub struct Color {
 
 impl Color {
     #[must_use]
-    pub fn new_rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
+    pub const fn new_rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
         Self { r, g, b, a }
     }
 

@@ -37,7 +37,10 @@ impl NewFromPtr<spSkeletonData> for SkeletonData {
 }
 
 impl SkeletonData {
-    pub(crate) fn new(c_skeleton_data: *mut spSkeletonData, atlas: Option<Arc<Atlas>>) -> Self {
+    pub(crate) const fn new(
+        c_skeleton_data: *mut spSkeletonData,
+        atlas: Option<Arc<Atlas>>,
+    ) -> Self {
         Self {
             c_skeleton_data: SyncPtr(c_skeleton_data),
             owns_memory: true,

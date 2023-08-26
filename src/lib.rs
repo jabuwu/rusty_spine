@@ -22,7 +22,8 @@
     clippy::ptr_as_ptr,
     clippy::default_trait_access,
     clippy::explicit_iter_loop,
-    clippy::explicit_into_iter_loop
+    clippy::explicit_into_iter_loop,
+    clippy::missing_const_for_fn
 )]
 // https://github.com/rust-lang/rust-clippy/issues/11382
 #![allow(clippy::arc_with_non_send_sync)]
