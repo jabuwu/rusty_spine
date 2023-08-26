@@ -1036,7 +1036,7 @@ mod tests {
         let mut allocator = Allocator::default();
         let mut allocations = vec![];
         for _ in 0..30 {
-            let data = allocator.malloc(255) as *mut u8;
+            let data = allocator.malloc(255).cast::<u8>();
             unsafe {
                 for i in 0..255 {
                     *data.offset(i) = i as u8;
@@ -1049,7 +1049,7 @@ mod tests {
             allocations.push(data);
         }
         assert_eq!(allocator.size_allocated(), 30 * 255);
-        for allocation in allocations.iter() {
+        for allocation in &allocations {
             unsafe { allocator.free(*allocation as *const super::c_void) }
         }
         assert_eq!(allocator.size_allocated(), 0);

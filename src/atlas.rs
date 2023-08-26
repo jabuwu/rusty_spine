@@ -446,7 +446,7 @@ mod tests {
 
     #[test]
     fn new_from_file() {
-        for test_example_asset in TestAsset::all().iter() {
+        for test_example_asset in TestAsset::all() {
             let atlas = Atlas::new_from_file(test_example_asset.atlas_file);
             assert!(atlas.is_ok());
         }

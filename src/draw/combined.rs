@@ -405,7 +405,7 @@ mod test {
     /// Ensure all the example assets draw without error.
     #[test]
     fn combined_drawer() {
-        for example_asset in TestAsset::all().iter() {
+        for example_asset in TestAsset::all() {
             let (mut skeleton, _) = example_asset.instance();
             let drawer = CombinedDrawer {
                 cull_direction: CullDirection::Clockwise,
