@@ -1070,13 +1070,13 @@ mod tests {
             let mut endptr: *mut super::c_char = std::ptr::null_mut();
             let value = spine_strtol(str.as_ptr(), &mut endptr, 10);
             assert_eq!(value, 1234);
-            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(4));
+            assert_eq!(endptr.cast_const(), str.as_ptr().offset(4));
 
             let str = CString::new("hello world").unwrap();
             let mut endptr: *mut super::c_char = std::ptr::null_mut();
             let value = spine_strtol(str.as_ptr(), &mut endptr, 10);
             assert_eq!(value, 0);
-            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(0));
+            assert_eq!(endptr.cast_const(), str.as_ptr().offset(0));
         }
     }
 
@@ -1087,13 +1087,13 @@ mod tests {
             let mut endptr: *mut super::c_char = std::ptr::null_mut();
             let value = spine_strtoul(str.as_ptr(), &mut endptr, 10);
             assert_eq!(value, 1234);
-            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(4));
+            assert_eq!(endptr.cast_const(), str.as_ptr().offset(4));
 
             let str = CString::new("hello world").unwrap();
             let mut endptr: *mut super::c_char = std::ptr::null_mut();
             let value = spine_strtoul(str.as_ptr(), &mut endptr, 10);
             assert_eq!(value, 0);
-            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(0));
+            assert_eq!(endptr.cast_const(), str.as_ptr().offset(0));
         }
     }
 
