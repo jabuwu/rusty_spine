@@ -356,19 +356,19 @@ impl AnimationState {
                 let event_type = EventType::from(c_event_type);
                 match event_type {
                     EventType::Start => {
-                        listener(&animation_state, AnimationEvent::Start { track_entry })
+                        listener(&animation_state, AnimationEvent::Start { track_entry });
                     }
                     EventType::Interrupt => {
-                        listener(&animation_state, AnimationEvent::Interrupt { track_entry })
+                        listener(&animation_state, AnimationEvent::Interrupt { track_entry });
                     }
                     EventType::End => {
-                        listener(&animation_state, AnimationEvent::End { track_entry })
+                        listener(&animation_state, AnimationEvent::End { track_entry });
                     }
                     EventType::Complete => {
-                        listener(&animation_state, AnimationEvent::Complete { track_entry })
+                        listener(&animation_state, AnimationEvent::Complete { track_entry });
                     }
                     EventType::Dispose => {
-                        listener(&animation_state, AnimationEvent::Dispose { track_entry })
+                        listener(&animation_state, AnimationEvent::Dispose { track_entry });
                     }
                     EventType::Event => {
                         assert!(!c_event.is_null());
@@ -388,7 +388,7 @@ impl AnimationState {
                                 balance: event.balance(),
                                 event: raw_event,
                             },
-                        )
+                        );
                     }
                     EventType::Unknown => {}
                 };

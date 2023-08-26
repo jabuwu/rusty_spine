@@ -26,7 +26,8 @@
     clippy::missing_const_for_fn,
     clippy::needless_pass_by_value,
     clippy::option_if_let_else,
-    clippy::redundant_feature_names
+    clippy::redundant_feature_names,
+    clippy::semicolon_if_nothing_returned
 )]
 // https://github.com/rust-lang/rust-clippy/issues/11382
 #![allow(clippy::arc_with_non_send_sync)]

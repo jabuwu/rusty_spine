@@ -63,7 +63,7 @@ impl Slot {
             |attachment| {
                 spSlot_setAttachment(self.c_ptr(), attachment.c_ptr());
             },
-        )
+        );
     }
 
     pub fn set_to_setup_pose(&mut self) {
