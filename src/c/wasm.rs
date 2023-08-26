@@ -914,8 +914,11 @@ fn fmt(format: &str, args: &[Box<dyn Any>]) -> String {
         if char == '%' {
             percent = true;
         } else if percent {
-            if let Some(arg) = args.get(index) {
-                match char {
+            args.get(index).map_or_else(
+                || {
+                    panic!("Incorrect argument count");
+                },
+                |arg| match char {
                     'i' | 'd' => {
                         if let Some(i) = arg.downcast_ref::<i32>() {
                             new_str += &format!("{}", *i);
@@ -925,13 +928,14 @@ fn fmt(format: &str, args: &[Box<dyn Any>]) -> String {
                             panic!("Unsupported printf argument type");
                         }
                     }
-                    's' => {
-                        if let Some(s) = arg.downcast_ref::<*const c_char>() {
-                            new_str += unsafe { CStr::from_ptr(*s).to_str().unwrap() };
-                        } else {
+                    's' => arg.downcast_ref::<*const c_char>().map_or_else(
+                        || {
                             panic!("Unsupported printf argument type");
-                        }
-                    }
+                        },
+                        |s| {
+                            new_str += unsafe { CStr::from_ptr(*s).to_str().unwrap() };
+                        },
+                    ),
                     'f' => {
                         if let Some(f) = arg.downcast_ref::<f32>() {
                             new_str += &format!("{:.6}", *f);
@@ -953,10 +957,8 @@ fn fmt(format: &str, args: &[Box<dyn Any>]) -> String {
                     _ => {
                         panic!("Unsupported printf tag: %{char}");
                     }
-                }
-            } else {
-                panic!("Incorrect argument count");
-            }
+                },
+            );
             percent = false;
             index += 1;
         } else {

@@ -110,35 +110,42 @@ impl CombinedDrawer {
             }
 
             let next_blend_mode = slot.data().blend_mode();
-            let next_attachment_renderer_object = if let Some(mesh_attachment) =
-                slot.attachment().and_then(|a| a.as_mesh())
-            {
-                let next_attachment_renderer_object = Some(unsafe {
-                    mesh_attachment
-                        .renderer_object()
-                        .get_atlas_region()
-                        .unwrap()
-                        .page()
-                        .c_ptr_ref()
-                        .rendererObject
-                        .cast_const()
-                });
-                next_attachment_renderer_object
-            } else if let Some(region_attachment) = slot.attachment().and_then(|a| a.as_region()) {
-                let next_attachment_renderer_object = Some(unsafe {
-                    region_attachment
-                        .renderer_object()
-                        .get_atlas_region()
-                        .unwrap()
-                        .page()
-                        .c_ptr_ref()
-                        .rendererObject
-                        .cast_const()
-                });
-                next_attachment_renderer_object
-            } else {
-                unreachable!();
-            };
+            let next_attachment_renderer_object =
+                slot.attachment().and_then(|a| a.as_mesh()).map_or_else(
+                    || {
+                        slot.attachment().and_then(|a| a.as_region()).map_or_else(
+                            || {
+                                unreachable!();
+                            },
+                            |region_attachment| {
+                                let next_attachment_renderer_object = Some(unsafe {
+                                    region_attachment
+                                        .renderer_object()
+                                        .get_atlas_region()
+                                        .unwrap()
+                                        .page()
+                                        .c_ptr_ref()
+                                        .rendererObject
+                                        .cast_const()
+                                });
+                                next_attachment_renderer_object
+                            },
+                        )
+                    },
+                    |mesh_attachment| {
+                        let next_attachment_renderer_object = Some(unsafe {
+                            mesh_attachment
+                                .renderer_object()
+                                .get_atlas_region()
+                                .unwrap()
+                                .page()
+                                .c_ptr_ref()
+                                .rendererObject
+                                .cast_const()
+                        });
+                        next_attachment_renderer_object
+                    },
+                );
 
             if slot_index == 0 {
                 blend_mode = next_blend_mode;

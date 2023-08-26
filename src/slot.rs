@@ -56,11 +56,14 @@ impl Slot {
     ///
     /// The attachment must be compatible with this slot, usually by originating from it.
     pub unsafe fn set_attachment(&mut self, attachment: Option<Attachment>) {
-        if let Some(attachment) = attachment {
-            spSlot_setAttachment(self.c_ptr(), attachment.c_ptr());
-        } else {
-            spSlot_setAttachment(self.c_ptr(), std::ptr::null_mut());
-        }
+        attachment.map_or_else(
+            || {
+                spSlot_setAttachment(self.c_ptr(), std::ptr::null_mut());
+            },
+            |attachment| {
+                spSlot_setAttachment(self.c_ptr(), attachment.c_ptr());
+            },
+        )
     }
 
     pub fn set_to_setup_pose(&mut self) {
