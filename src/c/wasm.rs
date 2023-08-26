@@ -906,7 +906,7 @@ unsafe extern "C" fn spine_ftell(_stream: *mut FILE) -> c_long {
     unimplemented!();
 }
 
-fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
+fn fmt(format: &str, args: &[Box<dyn Any>]) -> String {
     let mut new_str = String::new();
     let mut percent = false;
     let mut index = 0;
@@ -966,14 +966,14 @@ fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
     new_str
 }
 
-pub(crate) fn printf(c_format: *const c_char, args: Vec<Box<dyn Any>>) {
+pub(crate) fn printf(c_format: *const c_char, args: &[Box<dyn Any>]) {
     let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
-    print!("{}", fmt(format, args));
+    print!("{}", fmt(&format, args));
 }
 
-pub(crate) fn sprintf(c_str: *mut c_char, c_format: *const c_char, args: Vec<Box<dyn Any>>) {
+pub(crate) fn sprintf(c_str: *mut c_char, c_format: *const c_char, args: &[Box<dyn Any>]) {
     let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
-    let result = fmt(format, args);
+    let result = fmt(&format, args);
     unsafe {
         let str = CString::new(result).unwrap();
         spine_strcpy(c_str, str.as_ptr());
@@ -991,10 +991,10 @@ pub(crate) fn sscanf(c_str: *const c_char, c_format: *const c_char, args: *mut c
 
 macro_rules! spine_printf {
     ($format:expr) => {
-        crate::c::wasm::printf($format, vec![]);
+        crate::c::wasm::printf($format, &[]);
     };
     ($format:expr, $($arg:expr),+ $(,)? ) => {
-        crate::c::wasm::printf($format, vec![
+        crate::c::wasm::printf($format, &[
             $(Box::new($arg)),+
         ]);
     };
@@ -1005,7 +1005,7 @@ macro_rules! spine_sprintf {
         crate::c::wasm::sprintf($str, $format, vec![]);
     };
     ($str:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
-        crate::c::wasm::sprintf($str, $format, vec![
+        crate::c::wasm::sprintf($str, $format, &[
             $(Box::new($arg)),+
         ]);
     };
@@ -1102,26 +1102,23 @@ mod tests {
     #[test]
     fn fmt() {
         assert_eq!(
-            super::fmt("integer: (%i)".to_string(), vec![Box::new(52)]),
+            super::fmt("integer: (%i)", &[Box::new(52)]),
             "integer: (52)"
         );
         assert_eq!(
-            super::fmt("integer: (%d)".to_string(), vec![Box::new(123)]),
+            super::fmt("integer: (%d)", &[Box::new(123)]),
             "integer: (123)"
         );
         assert_eq!(
-            super::fmt("float: (%f)".to_string(), vec![Box::new(4.14)]),
+            super::fmt("float: (%f)", &[Box::new(4.14)]),
             "float: (4.140000)"
         );
         let c_str = CString::new("hello").unwrap();
         assert_eq!(
-            super::fmt("string: (%s)".to_string(), vec![Box::new(c_str.as_ptr())]),
+            super::fmt("string: (%s)", &[Box::new(c_str.as_ptr())]),
             "string: (hello)"
         );
-        assert_eq!(
-            super::fmt("hex: (%x)".to_string(), vec![Box::new(200)]),
-            "hex: (c8)"
-        );
+        assert_eq!(super::fmt("hex: (%x)", &[Box::new(200)]), "hex: (c8)");
     }
 
     #[test]
