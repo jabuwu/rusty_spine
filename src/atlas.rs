@@ -27,9 +27,9 @@ pub struct Atlas {
 }
 
 impl NewFromPtr<spAtlas> for Atlas {
-    unsafe fn new_from_ptr(c_atlas: *const spAtlas) -> Atlas {
+    unsafe fn new_from_ptr(c_atlas: *mut spAtlas) -> Atlas {
         Atlas {
-            c_atlas: SyncPtr(c_atlas as *mut spAtlas),
+            c_atlas: SyncPtr(c_atlas),
             owns_memory: false,
         }
     }
@@ -184,9 +184,9 @@ pub mod atlas {
     }
 
     impl NewFromPtr<spAtlasPage> for AtlasPage {
-        unsafe fn new_from_ptr(c_atlas_page: *const spAtlasPage) -> Self {
+        unsafe fn new_from_ptr(c_atlas_page: *mut spAtlasPage) -> Self {
             Self {
-                c_atlas_page: SyncPtr(c_atlas_page as *mut spAtlasPage),
+                c_atlas_page: SyncPtr(c_atlas_page),
             }
         }
     }
@@ -338,9 +338,9 @@ pub mod atlas {
     }
 
     impl NewFromPtr<spAtlasRegion> for AtlasRegion {
-        unsafe fn new_from_ptr(c_atlas_region: *const spAtlasRegion) -> Self {
+        unsafe fn new_from_ptr(c_atlas_region: *mut spAtlasRegion) -> Self {
             Self {
-                c_atlas_region: SyncPtr(c_atlas_region as *mut spAtlasRegion),
+                c_atlas_region: SyncPtr(c_atlas_region),
             }
         }
     }

@@ -17,7 +17,8 @@
     clippy::missing_panics_doc,
     clippy::missing_errors_doc,
     clippy::doc_markdown,
-    clippy::manual_assert
+    clippy::manual_assert,
+    clippy::ptr_cast_constness
 )]
 // https://github.com/rust-lang/rust-clippy/issues/11382
 #![allow(clippy::arc_with_non_send_sync)]

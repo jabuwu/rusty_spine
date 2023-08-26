@@ -10,7 +10,7 @@ use std::{
 };
 
 pub trait NewFromPtr<C> {
-    unsafe fn new_from_ptr(c_ptr: *const C) -> Self;
+    unsafe fn new_from_ptr(c_ptr: *mut C) -> Self;
 }
 
 /// A reference type to temporarily borrow two types at once, ensuring a parent's lifetime remains
@@ -189,7 +189,7 @@ where
             let item = unsafe { T::new_from_ptr(*self.items.offset(self.index as isize)) };
             self.index += 1;
             Some(CTmpMut::new(
-                unsafe { &mut *(self._parent as *const P as *mut P) },
+                unsafe { &mut *(self._parent as *const P).cast_mut() },
                 item,
             ))
         } else {
@@ -262,7 +262,7 @@ where
                 let item = unsafe { T::new_from_ptr(ptr) };
                 self.index += 1;
                 Some(Some(CTmpMut::new(
-                    unsafe { &mut *(self._parent as *const P as *mut P) },
+                    unsafe { &mut *(self._parent as *const P).cast_mut() },
                     item,
                 )))
             } else {

@@ -20,9 +20,9 @@ pub struct MeshAttachment {
 }
 
 impl NewFromPtr<spMeshAttachment> for MeshAttachment {
-    unsafe fn new_from_ptr(c_mesh_attachment: *const spMeshAttachment) -> Self {
+    unsafe fn new_from_ptr(c_mesh_attachment: *mut spMeshAttachment) -> Self {
         Self {
-            c_mesh_attachment: SyncPtr(c_mesh_attachment as *mut spMeshAttachment),
+            c_mesh_attachment: SyncPtr(c_mesh_attachment),
         }
     }
 }
@@ -42,7 +42,7 @@ impl MeshAttachment {
     pub fn new_linked_mesh(&self) -> Attachment {
         unsafe {
             Attachment::new_from_ptr(
-                spMeshAttachment_newLinkedMesh(self.c_ptr()) as *const spAttachment
+                spMeshAttachment_newLinkedMesh(self.c_ptr()) as *mut spAttachment
             )
         }
     }

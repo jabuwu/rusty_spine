@@ -19,9 +19,9 @@ pub struct PointAttachment {
 }
 
 impl NewFromPtr<spPointAttachment> for PointAttachment {
-    unsafe fn new_from_ptr(c_point_attachment: *const spPointAttachment) -> Self {
+    unsafe fn new_from_ptr(c_point_attachment: *mut spPointAttachment) -> Self {
         Self {
-            c_point_attachment: SyncPtr(c_point_attachment as *mut spPointAttachment),
+            c_point_attachment: SyncPtr(c_point_attachment),
         }
     }
 }

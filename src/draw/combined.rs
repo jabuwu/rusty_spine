@@ -120,7 +120,8 @@ impl CombinedDrawer {
                         .unwrap()
                         .page()
                         .c_ptr_ref()
-                        .rendererObject as *const c_void
+                        .rendererObject
+                        .cast_const()
                 });
                 next_attachment_renderer_object
             } else if let Some(region_attachment) = slot.attachment().and_then(|a| a.as_region()) {
@@ -131,7 +132,8 @@ impl CombinedDrawer {
                         .unwrap()
                         .page()
                         .c_ptr_ref()
-                        .rendererObject as *const c_void
+                        .rendererObject
+                        .cast_const()
                 });
                 next_attachment_renderer_object
             } else {

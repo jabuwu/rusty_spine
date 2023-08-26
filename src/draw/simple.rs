@@ -254,7 +254,8 @@ impl SimpleDrawer {
                             .unwrap()
                             .page()
                             .c_ptr_ref()
-                            .rendererObject as *const c_void
+                            .rendererObject
+                            .cast_const()
                     })
                 } else {
                     slot.attachment()
@@ -266,7 +267,8 @@ impl SimpleDrawer {
                                 .unwrap()
                                 .page()
                                 .c_ptr_ref()
-                                .rendererObject as *const c_void
+                                .rendererObject
+                                .cast_const()
                         })
                 };
 

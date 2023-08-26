@@ -12,9 +12,9 @@ pub struct Animation {
 }
 
 impl NewFromPtr<spAnimation> for Animation {
-    unsafe fn new_from_ptr(c_animation: *const spAnimation) -> Self {
+    unsafe fn new_from_ptr(c_animation: *mut spAnimation) -> Self {
         Self {
-            c_animation: SyncPtr(c_animation as *mut spAnimation),
+            c_animation: SyncPtr(c_animation),
         }
     }
 }

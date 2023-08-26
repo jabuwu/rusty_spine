@@ -27,9 +27,9 @@ pub struct SkeletonData {
 }
 
 impl NewFromPtr<spSkeletonData> for SkeletonData {
-    unsafe fn new_from_ptr(c_skeleton_data: *const spSkeletonData) -> Self {
+    unsafe fn new_from_ptr(c_skeleton_data: *mut spSkeletonData) -> Self {
         Self {
-            c_skeleton_data: SyncPtr(c_skeleton_data as *mut spSkeletonData),
+            c_skeleton_data: SyncPtr(c_skeleton_data),
             owns_memory: false,
             _atlas: None,
         }

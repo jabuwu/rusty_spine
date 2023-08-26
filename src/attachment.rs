@@ -26,10 +26,10 @@ pub struct Attachment {
 }
 
 impl NewFromPtr<spAttachment> for Attachment {
-    unsafe fn new_from_ptr(c_attachment: *const spAttachment) -> Self {
-        (*(c_attachment as *mut spAttachment)).refCount += 1;
+    unsafe fn new_from_ptr(c_attachment: *mut spAttachment) -> Self {
+        (*c_attachment).refCount += 1;
         Self {
-            c_attachment: SyncPtr(c_attachment as *mut spAttachment),
+            c_attachment: SyncPtr(c_attachment),
         }
     }
 }

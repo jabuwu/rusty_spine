@@ -46,9 +46,9 @@ pub struct AnimationStateData {
 }
 
 impl NewFromPtr<spAnimationStateData> for AnimationStateData {
-    unsafe fn new_from_ptr(c_animation_state_data: *const spAnimationStateData) -> Self {
+    unsafe fn new_from_ptr(c_animation_state_data: *mut spAnimationStateData) -> Self {
         Self {
-            c_animation_state_data: SyncPtr(c_animation_state_data as *mut spAnimationStateData),
+            c_animation_state_data: SyncPtr(c_animation_state_data),
             owns_memory: false,
             _skeleton_data: None,
         }

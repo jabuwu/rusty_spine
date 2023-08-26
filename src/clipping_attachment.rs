@@ -13,9 +13,9 @@ pub struct ClippingAttachment {
 }
 
 impl NewFromPtr<spClippingAttachment> for ClippingAttachment {
-    unsafe fn new_from_ptr(c_clipping_attachment: *const spClippingAttachment) -> Self {
+    unsafe fn new_from_ptr(c_clipping_attachment: *mut spClippingAttachment) -> Self {
         Self {
-            c_clipping_attachment: SyncPtr(c_clipping_attachment as *mut spClippingAttachment),
+            c_clipping_attachment: SyncPtr(c_clipping_attachment),
         }
     }
 }

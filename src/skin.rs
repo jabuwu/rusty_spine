@@ -17,9 +17,9 @@ pub struct Skin {
 }
 
 impl NewFromPtr<spSkin> for Skin {
-    unsafe fn new_from_ptr(c_skin: *const spSkin) -> Self {
+    unsafe fn new_from_ptr(c_skin: *mut spSkin) -> Self {
         Self {
-            c_skin: SyncPtr(c_skin as *mut spSkin),
+            c_skin: SyncPtr(c_skin),
             owns_memory: false,
         }
     }

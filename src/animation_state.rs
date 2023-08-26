@@ -32,9 +32,9 @@ pub struct AnimationState {
 }
 
 impl NewFromPtr<spAnimationState> for AnimationState {
-    unsafe fn new_from_ptr(c_animation_state: *const spAnimationState) -> Self {
+    unsafe fn new_from_ptr(c_animation_state: *mut spAnimationState) -> Self {
         Self {
-            c_animation_state: SyncPtr(c_animation_state as *mut spAnimationState),
+            c_animation_state: SyncPtr(c_animation_state),
             owns_memory: false,
             _animation_state_data: None,
         }
@@ -495,9 +495,9 @@ pub struct TrackEntry {
 }
 
 impl NewFromPtr<spTrackEntry> for TrackEntry {
-    unsafe fn new_from_ptr(c_track_entry: *const spTrackEntry) -> Self {
+    unsafe fn new_from_ptr(c_track_entry: *mut spTrackEntry) -> Self {
         TrackEntry {
-            c_track_entry: SyncPtr(c_track_entry as *mut spTrackEntry),
+            c_track_entry: SyncPtr(c_track_entry),
         }
     }
 }

@@ -667,7 +667,8 @@ pub unsafe extern "C" fn spine_strtol(
             s.offset(-(1 as c_int as isize))
         } else {
             nptr
-        }) as *mut c_char;
+        })
+        .cast_mut();
     }
     acc
 }
@@ -762,7 +763,8 @@ pub unsafe extern "C" fn spine_strtoul(
             s.offset(-(1 as c_int as isize))
         } else {
             nptr
-        }) as *mut c_char;
+        })
+        .cast_mut();
     }
     acc
 }
@@ -772,7 +774,7 @@ pub unsafe extern "C" fn spine_strrchr(mut p: *const c_char, ch: c_int) -> *mut 
     let mut save: *mut c_char = std::ptr::null_mut::<c_char>();
     loop {
         if *p as c_int == ch {
-            save = p as *mut c_char;
+            save = p.cast_mut();
         }
         if *p == 0 {
             return save;
@@ -844,7 +846,7 @@ unsafe extern "C" fn spine_free(ptr: *mut c_void) {
     if !ptr.is_null() && ptr as usize != 1 {
         let singleton = Allocator::singleton();
         let mut allocator = singleton.lock().unwrap();
-        allocator.free(ptr)
+        allocator.free(ptr);
     }
 }
 
@@ -903,7 +905,7 @@ unsafe extern "C" fn spine_ftell(_stream: *mut FILE) -> c_long {
 }
 
 fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
-    let mut new_str = "".to_owned();
+    let mut new_str = String::new();
     let mut percent = false;
     let mut index = 0;
     for char in format.chars() {

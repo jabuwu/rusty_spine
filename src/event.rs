@@ -66,9 +66,9 @@ pub struct Event {
 }
 
 impl NewFromPtr<spEvent> for Event {
-    unsafe fn new_from_ptr(c_event: *const spEvent) -> Self {
+    unsafe fn new_from_ptr(c_event: *mut spEvent) -> Self {
         Self {
-            c_event: SyncPtr(c_event as *mut spEvent),
+            c_event: SyncPtr(c_event),
         }
     }
 }
@@ -93,9 +93,9 @@ pub struct EventData {
 }
 
 impl NewFromPtr<spEventData> for EventData {
-    unsafe fn new_from_ptr(c_event_data: *const spEventData) -> Self {
+    unsafe fn new_from_ptr(c_event_data: *mut spEventData) -> Self {
         Self {
-            c_event_data: SyncPtr(c_event_data as *mut spEventData),
+            c_event_data: SyncPtr(c_event_data),
         }
     }
 }
