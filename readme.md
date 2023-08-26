@@ -31,15 +31,15 @@ To integrate into your own engine, see the [miniquad example](https://github.com
 
 ## License
 
-Because this project uses the official Spine Runtime, you must follow the Spine Runtimes License Agreement. If using the `libc` crate (via the `use_libc` feature), then see the [libc crate](https://crates.io/crates/libc) for licensing. If using the built-in (wasm compatible) libc implementation, you must follow the BSD 3-clause license of The Regents of the University of California. See the `LICENSE` file for complete licenses. The Rust code is licensed under dual MIT / Apache-2.0 but with no attribution necessary. All contributions must agree to this licensing.
+Because this project uses the official Spine Runtime, you must follow the Spine Runtimes License Agreement. If using the `libc` crate (via the `libc` feature), then see the [libc crate](https://crates.io/crates/libc) for licensing. If using the built-in (wasm compatible) libc implementation, you must follow the BSD 3-clause license of The Regents of the University of California. See the `LICENSE` file for complete licenses. The Rust code is licensed under dual MIT / Apache-2.0 but with no attribution necessary. All contributions must agree to this licensing.
 
 ## Features
 
-### use_libc
+### libc
 
 Default: no
 
-A small subset of libc is provided in this repo to avoid a dependency on [libc](https://crates.io/crates/libc) and to allow the code to run in the `wasm32-unknown-unknown` target. However, it's possible to rely on the OS implementation of libc instead by using the `use_libc` feature.
+A small subset of libc is provided in this repo to avoid a dependency on [libc](https://crates.io/crates/libc) and to allow the code to run in the `wasm32-unknown-unknown` target. However, it's possible to rely on the OS implementation of libc instead by using the `libc` feature.
 
 ### draw_functions
 
