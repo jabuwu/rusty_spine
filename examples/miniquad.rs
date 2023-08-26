@@ -616,7 +616,9 @@ impl EventHandler for Stage {
             bindings.index_buffer.update(ctx, &renderable.indices);
 
             // If there is no attachment (and therefore no texture), skip rendering this renderable
-            let Some(attachment_renderer_object) = renderable.attachment_renderer_object else { continue };
+            let Some(attachment_renderer_object) = renderable.attachment_renderer_object else {
+                continue;
+            };
 
             // Load textures if they haven't been loaded already
             let spine_texture = unsafe { &mut *(attachment_renderer_object as *mut SpineTexture) };

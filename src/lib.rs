@@ -19,6 +19,8 @@
     clippy::doc_markdown,
     clippy::manual_assert
 )]
+// https://github.com/rust-lang/rust-clippy/issues/11382
+#![allow(clippy::arc_with_non_send_sync)]
 
 #[macro_use]
 pub mod c_interface;

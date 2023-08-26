@@ -249,7 +249,6 @@ pub mod atlas {
             if !self.page.is_null() {
                 let page = unsafe { AtlasPage::new_from_ptr(self.page) };
                 self.page = unsafe { (*self.page).next };
-                #[allow(clippy::cast_ref_to_mut)]
                 Some(CTmpMut::new(
                     unsafe { &mut *(self._atlas as *mut Atlas) },
                     page,
@@ -428,7 +427,6 @@ pub mod atlas {
             if !self.region.is_null() {
                 let page = unsafe { AtlasRegion::new_from_ptr(self.region) };
                 self.region = unsafe { (*self.region).next };
-                #[allow(clippy::cast_ref_to_mut)]
                 Some(CTmpMut::new(
                     unsafe { &mut *(self._atlas as *mut Atlas) },
                     page,

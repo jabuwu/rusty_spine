@@ -342,7 +342,7 @@ impl CombinedDrawer {
                         indices.resize(index_base as usize + clipped_triangles_size, 0);
                         std::ptr::copy_nonoverlapping(
                             (*clipper.c_ptr_ref().clippedTriangles).items,
-                            indices.as_mut_ptr().offset(index_base as isize) as *mut u16,
+                            indices.as_mut_ptr().offset(index_base as isize),
                             clipped_triangles_size,
                         );
                         vertices.resize(vertex_base as usize + clipped_vertices_size / 2, [0., 0.]);
