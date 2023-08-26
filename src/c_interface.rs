@@ -467,7 +467,7 @@ macro_rules! c_accessor_color {
         #[must_use]
         pub fn $rust(&self) -> crate::color::Color {
             unsafe {
-                *(&self.c_ptr_ref().$c as *const crate::c::spColor as *const crate::color::Color)
+                *((&self.c_ptr_ref().$c as *const crate::c::spColor).cast::<crate::color::Color>())
             }
         }
     };
@@ -479,8 +479,8 @@ macro_rules! c_accessor_color_mut {
         #[must_use]
         pub fn $rust_mut(&mut self) -> &mut crate::color::Color {
             unsafe {
-                &mut *(&mut self.c_ptr_mut().color as *mut crate::c::spColor
-                    as *mut crate::color::Color)
+                &mut *(&mut self.c_ptr_mut().color as *mut crate::c::spColor)
+                    .cast::<crate::color::Color>()
             }
         }
     };
@@ -493,7 +493,7 @@ macro_rules! c_accessor_color_optional {
             unsafe {
                 let ptr = *(&self.c_ptr_ref().$c);
                 if !ptr.is_null() {
-                    Some(*(ptr as *const crate::c::spColor as *const crate::color::Color))
+                    Some(*(ptr).cast::<crate::color::Color>())
                 } else {
                     None
                 }
@@ -853,7 +853,9 @@ macro_rules! c_vertex_attachment_accessors_mint {
         pub fn vertices2(&self) -> &[mint::Vector2<f32>] {
             unsafe {
                 std::slice::from_raw_parts(
-                    self.vertex_attachment().vertices as *mut mint::Vector2<f32>,
+                    self.vertex_attachment()
+                        .vertices
+                        .cast::<mint::Vector2<f32>>(),
                     self.vertex_attachment().verticesCount as usize / 2,
                 )
                 .try_into()

@@ -191,8 +191,8 @@ extern "C" fn _spUtil_readFile(c_path: *const c_char, c_length: *mut c_int) -> *
             unsafe {
                 *c_length = data.len() as c_int;
                 let c_data = spine_malloc(data.len() as size_t);
-                spine_memcpy(c_data, data.as_ptr() as *const c_void, data.len() as size_t);
-                c_data as *mut c_char
+                spine_memcpy(c_data, data.as_ptr().cast::<c_void>(), data.len() as size_t);
+                c_data.cast::<c_char>()
             }
         } else {
             std::ptr::null_mut()
@@ -202,10 +202,10 @@ extern "C" fn _spUtil_readFile(c_path: *const c_char, c_length: *mut c_int) -> *
         if let Ok(data) = read(str) {
             let c_data = unsafe { spine_malloc(data.len() as size_t) };
             unsafe {
-                spine_memcpy(c_data, data.as_ptr() as *const c_void, data.len() as size_t);
+                spine_memcpy(c_data, data.as_ptr().cast::<c_void>(), data.len() as size_t);
                 *c_length = data.len() as c_int;
             }
-            c_data as *mut c_char
+            c_data.cast::<c_char>()
         } else {
             std::ptr::null_mut()
         }

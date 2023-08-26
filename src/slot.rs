@@ -37,7 +37,7 @@ macro_rules! attachment_accessor {
                 if AttachmentType::from(unsafe { (*attachment).type_0 }) == $attachment_type {
                     #[allow(unused_unsafe)]
                     Some(CTmpRef::new(self, unsafe {
-                        ($type::new_from_ptr(attachment as *mut $c_type))
+                        ($type::new_from_ptr(attachment.cast::<$c_type>()))
                     }))
                 } else {
                     None

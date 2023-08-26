@@ -350,13 +350,16 @@ impl CombinedDrawer {
                         vertices.resize(vertex_base as usize + clipped_vertices_size / 2, [0., 0.]);
                         std::ptr::copy_nonoverlapping(
                             (*clipper.c_ptr_ref().clippedVertices).items,
-                            vertices.as_mut_ptr().offset(vertex_base as isize) as *mut f32,
+                            vertices
+                                .as_mut_ptr()
+                                .offset(vertex_base as isize)
+                                .cast::<f32>(),
                             clipped_vertices_size,
                         );
                         uvs.resize(vertex_base as usize + clipped_uvs_size / 2, [0., 0.]);
                         std::ptr::copy_nonoverlapping(
                             (*clipper.c_ptr_ref().clippedUVs).items,
-                            uvs.as_mut_ptr().offset(vertex_base as isize) as *mut f32,
+                            uvs.as_mut_ptr().offset(vertex_base as isize).cast::<f32>(),
                             clipped_uvs_size,
                         );
                     }

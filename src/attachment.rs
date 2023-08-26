@@ -39,7 +39,7 @@ impl Attachment {
     pub fn as_region(&self) -> Option<RegionAttachment> {
         if self.attachment_type() == AttachmentType::Region {
             Some(RegionAttachment::new_from_ptr(
-                self.c_attachment.0 as *mut spRegionAttachment,
+                self.c_attachment.0.cast::<spRegionAttachment>(),
             ))
         } else {
             None
@@ -51,7 +51,7 @@ impl Attachment {
         if self.attachment_type() == AttachmentType::BoundingBox {
             Some(unsafe {
                 BoundingBoxAttachment::new_from_ptr(
-                    self.c_attachment.0 as *mut spBoundingBoxAttachment,
+                    self.c_attachment.0.cast::<spBoundingBoxAttachment>(),
                 )
             })
         } else {
@@ -63,7 +63,7 @@ impl Attachment {
     pub fn as_mesh(&self) -> Option<MeshAttachment> {
         if self.attachment_type() == AttachmentType::Mesh {
             Some(unsafe {
-                MeshAttachment::new_from_ptr(self.c_attachment.0 as *mut spMeshAttachment)
+                MeshAttachment::new_from_ptr(self.c_attachment.0.cast::<spMeshAttachment>())
             })
         } else {
             None
@@ -74,7 +74,7 @@ impl Attachment {
     pub fn as_point(&self) -> Option<PointAttachment> {
         if self.attachment_type() == AttachmentType::Point {
             Some(unsafe {
-                PointAttachment::new_from_ptr(self.c_attachment.0 as *mut spPointAttachment)
+                PointAttachment::new_from_ptr(self.c_attachment.0.cast::<spPointAttachment>())
             })
         } else {
             None
@@ -85,7 +85,7 @@ impl Attachment {
     pub fn as_clipping(&self) -> Option<ClippingAttachment> {
         if self.attachment_type() == AttachmentType::Clipping {
             Some(unsafe {
-                ClippingAttachment::new_from_ptr(self.c_attachment.0 as *mut spClippingAttachment)
+                ClippingAttachment::new_from_ptr(self.c_attachment.0.cast::<spClippingAttachment>())
             })
         } else {
             None

@@ -42,7 +42,7 @@ impl MeshAttachment {
     pub fn new_linked_mesh(&self) -> Attachment {
         unsafe {
             Attachment::new_from_ptr(
-                spMeshAttachment_newLinkedMesh(self.c_ptr()) as *mut spAttachment
+                spMeshAttachment_newLinkedMesh(self.c_ptr()).cast::<spAttachment>(),
             )
         }
     }

@@ -101,7 +101,7 @@ impl Allocator {
                 .unwrap();
             let ptr = unsafe { std::alloc::alloc(layout) };
             self.allocations.insert(ptr as *const c_void, layout);
-            ptr as *mut c_void
+            ptr.cast::<c_void>()
         } else {
             std::ptr::null_mut()
         }
@@ -495,8 +495,8 @@ static mut CHARMAP: [c_uchar; 256] = [
 #[no_mangle]
 pub unsafe extern "C" fn spine_strcasecmp(s1: *const c_char, s2: *const c_char) -> c_int {
     let cm: *const c_uchar = CHARMAP.as_ptr();
-    let mut us1: *const c_uchar = s1 as *const c_uchar;
-    let mut us2: *const c_uchar = s2 as *const c_uchar;
+    let mut us1: *const c_uchar = s1.cast::<c_uchar>();
+    let mut us2: *const c_uchar = s2.cast::<c_uchar>();
     loop {
         let fresh0 = us2;
         us2 = us2.offset(1);
@@ -869,7 +869,7 @@ unsafe extern "C" fn spine_memmove(
 #[no_mangle]
 unsafe extern "C" fn spine_memset(s: *mut c_void, c: c_int, n: size_t) -> *mut c_void {
     for offset in 0..n {
-        (*(s as *mut u8).offset(offset as isize)) = c as u8;
+        (*(s.cast::<u8>()).offset(offset as isize)) = c as u8;
     }
     s
 }

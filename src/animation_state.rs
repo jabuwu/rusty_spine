@@ -47,7 +47,7 @@ impl AnimationState {
         let c_animation_state = unsafe { spAnimationState_create(animation_state_data.c_ptr()) };
         unsafe {
             (*c_animation_state).userData =
-                Box::leak(Box::default()) as *mut AnimationStateUserData as *mut c_void;
+                (Box::leak(Box::default()) as *mut AnimationStateUserData).cast::<c_void>();
         }
         Self {
             c_animation_state: SyncPtr(c_animation_state),
@@ -345,8 +345,11 @@ impl AnimationState {
             c_track_entry: *mut spTrackEntry,
             c_event: *mut spEvent,
         ) {
-            let user_data =
-                unsafe { &mut *((*c_animation_state).userData as *mut AnimationStateUserData) };
+            let user_data = unsafe {
+                &mut *((*c_animation_state)
+                    .userData
+                    .cast::<AnimationStateUserData>())
+            };
             if let Some(listener) = &user_data.listener {
                 let animation_state = unsafe { AnimationState::new_from_ptr(c_animation_state) };
                 let track_entry = unsafe { TrackEntry::new_from_ptr(c_track_entry) };
@@ -391,8 +394,11 @@ impl AnimationState {
                 };
             }
         }
-        let user_data =
-            unsafe { &mut *((*self.c_animation_state.0).userData as *mut AnimationStateUserData) };
+        let user_data = unsafe {
+            &mut *((*self.c_animation_state.0)
+                .userData
+                .cast::<AnimationStateUserData>())
+        };
         user_data.listener = Some(Box::new(listener));
         unsafe {
             self.c_ptr_mut().listener = Some(c_listener);
@@ -447,7 +453,9 @@ impl Drop for AnimationState {
             unsafe {
                 (*self.c_animation_state.0).listener = None;
                 drop(Box::from_raw(
-                    (*self.c_animation_state.0).userData as *mut AnimationStateUserData,
+                    (*self.c_animation_state.0)
+                        .userData
+                        .cast::<AnimationStateUserData>(),
                 ));
             }
             unsafe {

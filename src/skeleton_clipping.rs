@@ -71,11 +71,11 @@ impl SkeletonClipping {
     ) {
         spSkeletonClipping_clipTriangles(
             self.c_ptr(),
-            vertices.as_mut_ptr() as *mut f32,
+            vertices.as_mut_ptr().cast::<f32>(),
             vertices.len() as i32,
             triangles.as_mut_ptr(),
             triangles.len() as i32,
-            uvs.as_mut_ptr() as *mut f32,
+            uvs.as_mut_ptr().cast::<f32>(),
             stride,
         );
     }

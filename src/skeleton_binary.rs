@@ -63,7 +63,7 @@ impl SkeletonBinary {
         let c_skeleton_data = unsafe {
             spSkeletonBinary_readSkeletonData(
                 self.c_skeleton_binary.0,
-                data.as_ptr() as *const c_uchar,
+                data.as_ptr().cast::<c_uchar>(),
                 data.len() as i32,
             )
         };
