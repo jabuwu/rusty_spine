@@ -21,9 +21,9 @@ pub struct Slot {
 }
 
 impl NewFromPtr<spSlot> for Slot {
-    unsafe fn new_from_ptr(c_slot: *const spSlot) -> Self {
+    unsafe fn new_from_ptr(c_slot: *mut spSlot) -> Self {
         Self {
-            c_slot: SyncPtr(c_slot as *mut spSlot),
+            c_slot: SyncPtr(c_slot),
         }
     }
 }
@@ -37,7 +37,7 @@ macro_rules! attachment_accessor {
                 if AttachmentType::from(unsafe { (*attachment).type_0 }) == $attachment_type {
                     #[allow(unused_unsafe)]
                     Some(CTmpRef::new(self, unsafe {
-                        ($type::new_from_ptr(attachment as *mut $c_type))
+                        ($type::new_from_ptr(attachment.cast::<$c_type>()))
                     }))
                 } else {
                     None
@@ -56,11 +56,14 @@ impl Slot {
     ///
     /// The attachment must be compatible with this slot, usually by originating from it.
     pub unsafe fn set_attachment(&mut self, attachment: Option<Attachment>) {
-        if let Some(attachment) = attachment {
-            spSlot_setAttachment(self.c_ptr(), attachment.c_ptr());
-        } else {
-            spSlot_setAttachment(self.c_ptr(), std::ptr::null_mut());
-        }
+        attachment.map_or_else(
+            || {
+                spSlot_setAttachment(self.c_ptr(), std::ptr::null_mut());
+            },
+            |attachment| {
+                spSlot_setAttachment(self.c_ptr(), attachment.c_ptr());
+            },
+        );
     }
 
     pub fn set_to_setup_pose(&mut self) {
@@ -161,9 +164,9 @@ pub struct SlotData {
 }
 
 impl NewFromPtr<spSlotData> for SlotData {
-    unsafe fn new_from_ptr(c_slot_data: *const spSlotData) -> Self {
+    unsafe fn new_from_ptr(c_slot_data: *mut spSlotData) -> Self {
         Self {
-            c_slot_data: SyncPtr(c_slot_data as *mut spSlotData),
+            c_slot_data: SyncPtr(c_slot_data),
         }
     }
 }

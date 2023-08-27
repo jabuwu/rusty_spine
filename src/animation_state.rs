@@ -32,9 +32,9 @@ pub struct AnimationState {
 }
 
 impl NewFromPtr<spAnimationState> for AnimationState {
-    unsafe fn new_from_ptr(c_animation_state: *const spAnimationState) -> Self {
+    unsafe fn new_from_ptr(c_animation_state: *mut spAnimationState) -> Self {
         Self {
-            c_animation_state: SyncPtr(c_animation_state as *mut spAnimationState),
+            c_animation_state: SyncPtr(c_animation_state),
             owns_memory: false,
             _animation_state_data: None,
         }
@@ -47,7 +47,7 @@ impl AnimationState {
         let c_animation_state = unsafe { spAnimationState_create(animation_state_data.c_ptr()) };
         unsafe {
             (*c_animation_state).userData =
-                Box::leak(Box::default()) as *mut AnimationStateUserData as *mut c_void;
+                (Box::leak(Box::default()) as *mut AnimationStateUserData).cast::<c_void>();
         }
         Self {
             c_animation_state: SyncPtr(c_animation_state),
@@ -345,27 +345,30 @@ impl AnimationState {
             c_track_entry: *mut spTrackEntry,
             c_event: *mut spEvent,
         ) {
-            let user_data =
-                unsafe { &mut *((*c_animation_state).userData as *mut AnimationStateUserData) };
+            let user_data = unsafe {
+                &mut *((*c_animation_state)
+                    .userData
+                    .cast::<AnimationStateUserData>())
+            };
             if let Some(listener) = &user_data.listener {
                 let animation_state = unsafe { AnimationState::new_from_ptr(c_animation_state) };
                 let track_entry = unsafe { TrackEntry::new_from_ptr(c_track_entry) };
                 let event_type = EventType::from(c_event_type);
                 match event_type {
                     EventType::Start => {
-                        listener(&animation_state, AnimationEvent::Start { track_entry })
+                        listener(&animation_state, AnimationEvent::Start { track_entry });
                     }
                     EventType::Interrupt => {
-                        listener(&animation_state, AnimationEvent::Interrupt { track_entry })
+                        listener(&animation_state, AnimationEvent::Interrupt { track_entry });
                     }
                     EventType::End => {
-                        listener(&animation_state, AnimationEvent::End { track_entry })
+                        listener(&animation_state, AnimationEvent::End { track_entry });
                     }
                     EventType::Complete => {
-                        listener(&animation_state, AnimationEvent::Complete { track_entry })
+                        listener(&animation_state, AnimationEvent::Complete { track_entry });
                     }
                     EventType::Dispose => {
-                        listener(&animation_state, AnimationEvent::Dispose { track_entry })
+                        listener(&animation_state, AnimationEvent::Dispose { track_entry });
                     }
                     EventType::Event => {
                         assert!(!c_event.is_null());
@@ -385,14 +388,17 @@ impl AnimationState {
                                 balance: event.balance(),
                                 event: raw_event,
                             },
-                        )
+                        );
                     }
                     EventType::Unknown => {}
                 };
             }
         }
-        let user_data =
-            unsafe { &mut *((*self.c_animation_state.0).userData as *mut AnimationStateUserData) };
+        let user_data = unsafe {
+            &mut *((*self.c_animation_state.0)
+                .userData
+                .cast::<AnimationStateUserData>())
+        };
         user_data.listener = Some(Box::new(listener));
         unsafe {
             self.c_ptr_mut().listener = Some(c_listener);
@@ -447,7 +453,9 @@ impl Drop for AnimationState {
             unsafe {
                 (*self.c_animation_state.0).listener = None;
                 drop(Box::from_raw(
-                    (*self.c_animation_state.0).userData as *mut AnimationStateUserData,
+                    (*self.c_animation_state.0)
+                        .userData
+                        .cast::<AnimationStateUserData>(),
                 ));
             }
             unsafe {
@@ -495,9 +503,9 @@ pub struct TrackEntry {
 }
 
 impl NewFromPtr<spTrackEntry> for TrackEntry {
-    unsafe fn new_from_ptr(c_track_entry: *const spTrackEntry) -> Self {
+    unsafe fn new_from_ptr(c_track_entry: *mut spTrackEntry) -> Self {
         TrackEntry {
-            c_track_entry: SyncPtr(c_track_entry as *mut spTrackEntry),
+            c_track_entry: SyncPtr(c_track_entry),
         }
     }
 }

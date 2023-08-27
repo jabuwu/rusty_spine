@@ -32,6 +32,8 @@
  * SUCH DAMAGE.
  */
 
+#![allow(clippy::missing_const_for_fn)]
+
 use crate::c::FILE;
 use std::alloc::Layout;
 use std::any::Any;
@@ -101,7 +103,7 @@ impl Allocator {
                 .unwrap();
             let ptr = unsafe { std::alloc::alloc(layout) };
             self.allocations.insert(ptr as *const c_void, layout);
-            ptr as *mut c_void
+            ptr.cast::<c_void>()
         } else {
             std::ptr::null_mut()
         }
@@ -132,7 +134,7 @@ impl Allocator {
     #[allow(dead_code)]
     pub fn size_allocated(&self) -> usize {
         let mut size = 0;
-        for (_, allocation) in self.allocations.iter() {
+        for allocation in self.allocations.values() {
             size += allocation.size();
         }
         size
@@ -495,8 +497,8 @@ static mut CHARMAP: [c_uchar; 256] = [
 #[no_mangle]
 pub unsafe extern "C" fn spine_strcasecmp(s1: *const c_char, s2: *const c_char) -> c_int {
     let cm: *const c_uchar = CHARMAP.as_ptr();
-    let mut us1: *const c_uchar = s1 as *const c_uchar;
-    let mut us2: *const c_uchar = s2 as *const c_uchar;
+    let mut us1: *const c_uchar = s1.cast::<c_uchar>();
+    let mut us2: *const c_uchar = s2.cast::<c_uchar>();
     loop {
         let fresh0 = us2;
         us2 = us2.offset(1);
@@ -667,7 +669,8 @@ pub unsafe extern "C" fn spine_strtol(
             s.offset(-(1 as c_int as isize))
         } else {
             nptr
-        }) as *mut c_char;
+        })
+        .cast_mut();
     }
     acc
 }
@@ -762,7 +765,8 @@ pub unsafe extern "C" fn spine_strtoul(
             s.offset(-(1 as c_int as isize))
         } else {
             nptr
-        }) as *mut c_char;
+        })
+        .cast_mut();
     }
     acc
 }
@@ -772,7 +776,7 @@ pub unsafe extern "C" fn spine_strrchr(mut p: *const c_char, ch: c_int) -> *mut 
     let mut save: *mut c_char = std::ptr::null_mut::<c_char>();
     loop {
         if *p as c_int == ch {
-            save = p as *mut c_char;
+            save = p.cast_mut();
         }
         if *p == 0 {
             return save;
@@ -844,7 +848,7 @@ unsafe extern "C" fn spine_free(ptr: *mut c_void) {
     if !ptr.is_null() && ptr as usize != 1 {
         let singleton = Allocator::singleton();
         let mut allocator = singleton.lock().unwrap();
-        allocator.free(ptr)
+        allocator.free(ptr);
     }
 }
 
@@ -867,7 +871,7 @@ unsafe extern "C" fn spine_memmove(
 #[no_mangle]
 unsafe extern "C" fn spine_memset(s: *mut c_void, c: c_int, n: size_t) -> *mut c_void {
     for offset in 0..n {
-        (*(s as *mut u8).offset(offset as isize)) = c as u8;
+        (*(s.cast::<u8>()).offset(offset as isize)) = c as u8;
     }
     s
 }
@@ -902,16 +906,19 @@ unsafe extern "C" fn spine_ftell(_stream: *mut FILE) -> c_long {
     unimplemented!();
 }
 
-fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
-    let mut new_str = "".to_owned();
+fn fmt(format: &str, args: &[Box<dyn Any>]) -> String {
+    let mut new_str = String::new();
     let mut percent = false;
     let mut index = 0;
     for char in format.chars() {
         if char == '%' {
             percent = true;
         } else if percent {
-            if let Some(arg) = args.get(index) {
-                match char {
+            args.get(index).map_or_else(
+                || {
+                    panic!("Incorrect argument count");
+                },
+                |arg| match char {
                     'i' | 'd' => {
                         if let Some(i) = arg.downcast_ref::<i32>() {
                             new_str += &format!("{}", *i);
@@ -921,13 +928,14 @@ fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
                             panic!("Unsupported printf argument type");
                         }
                     }
-                    's' => {
-                        if let Some(s) = arg.downcast_ref::<*const c_char>() {
-                            new_str += unsafe { CStr::from_ptr(*s).to_str().unwrap() };
-                        } else {
+                    's' => arg.downcast_ref::<*const c_char>().map_or_else(
+                        || {
                             panic!("Unsupported printf argument type");
-                        }
-                    }
+                        },
+                        |s| {
+                            new_str += unsafe { CStr::from_ptr(*s).to_str().unwrap() };
+                        },
+                    ),
                     'f' => {
                         if let Some(f) = arg.downcast_ref::<f32>() {
                             new_str += &format!("{:.6}", *f);
@@ -949,10 +957,8 @@ fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
                     _ => {
                         panic!("Unsupported printf tag: %{char}");
                     }
-                }
-            } else {
-                panic!("Incorrect argument count");
-            }
+                },
+            );
             percent = false;
             index += 1;
         } else {
@@ -962,14 +968,14 @@ fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
     new_str
 }
 
-pub(crate) fn printf(c_format: *const c_char, args: Vec<Box<dyn Any>>) {
+pub(crate) fn printf(c_format: *const c_char, args: &[Box<dyn Any>]) {
     let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
-    print!("{}", fmt(format, args));
+    print!("{}", fmt(&format, args));
 }
 
-pub(crate) fn sprintf(c_str: *mut c_char, c_format: *const c_char, args: Vec<Box<dyn Any>>) {
+pub(crate) fn sprintf(c_str: *mut c_char, c_format: *const c_char, args: &[Box<dyn Any>]) {
     let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
-    let result = fmt(format, args);
+    let result = fmt(&format, args);
     unsafe {
         let str = CString::new(result).unwrap();
         spine_strcpy(c_str, str.as_ptr());
@@ -987,10 +993,10 @@ pub(crate) fn sscanf(c_str: *const c_char, c_format: *const c_char, args: *mut c
 
 macro_rules! spine_printf {
     ($format:expr) => {
-        crate::c::wasm::printf($format, vec![]);
+        crate::c::wasm::printf($format, &[]);
     };
     ($format:expr, $($arg:expr),+ $(,)? ) => {
-        crate::c::wasm::printf($format, vec![
+        crate::c::wasm::printf($format, &[
             $(Box::new($arg)),+
         ]);
     };
@@ -1001,7 +1007,7 @@ macro_rules! spine_sprintf {
         crate::c::wasm::sprintf($str, $format, vec![]);
     };
     ($str:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
-        crate::c::wasm::sprintf($str, $format, vec![
+        crate::c::wasm::sprintf($str, $format, &[
             $(Box::new($arg)),+
         ]);
     };
@@ -1032,7 +1038,7 @@ mod tests {
         let mut allocator = Allocator::default();
         let mut allocations = vec![];
         for _ in 0..30 {
-            let data = allocator.malloc(255) as *mut u8;
+            let data = allocator.malloc(255).cast::<u8>();
             unsafe {
                 for i in 0..255 {
                     *data.offset(i) = i as u8;
@@ -1045,7 +1051,7 @@ mod tests {
             allocations.push(data);
         }
         assert_eq!(allocator.size_allocated(), 30 * 255);
-        for allocation in allocations.iter() {
+        for allocation in &allocations {
             unsafe { allocator.free(*allocation as *const super::c_void) }
         }
         assert_eq!(allocator.size_allocated(), 0);
@@ -1068,13 +1074,13 @@ mod tests {
             let mut endptr: *mut super::c_char = std::ptr::null_mut();
             let value = spine_strtol(str.as_ptr(), &mut endptr, 10);
             assert_eq!(value, 1234);
-            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(4));
+            assert_eq!(endptr.cast_const(), str.as_ptr().offset(4));
 
             let str = CString::new("hello world").unwrap();
             let mut endptr: *mut super::c_char = std::ptr::null_mut();
             let value = spine_strtol(str.as_ptr(), &mut endptr, 10);
             assert_eq!(value, 0);
-            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(0));
+            assert_eq!(endptr.cast_const(), str.as_ptr().offset(0));
         }
     }
 
@@ -1085,39 +1091,36 @@ mod tests {
             let mut endptr: *mut super::c_char = std::ptr::null_mut();
             let value = spine_strtoul(str.as_ptr(), &mut endptr, 10);
             assert_eq!(value, 1234);
-            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(4));
+            assert_eq!(endptr.cast_const(), str.as_ptr().offset(4));
 
             let str = CString::new("hello world").unwrap();
             let mut endptr: *mut super::c_char = std::ptr::null_mut();
             let value = spine_strtoul(str.as_ptr(), &mut endptr, 10);
             assert_eq!(value, 0);
-            assert_eq!(endptr as *const super::c_char, str.as_ptr().offset(0));
+            assert_eq!(endptr.cast_const(), str.as_ptr().offset(0));
         }
     }
 
     #[test]
     fn fmt() {
         assert_eq!(
-            super::fmt("integer: (%i)".to_string(), vec![Box::new(52)]),
+            super::fmt("integer: (%i)", &[Box::new(52)]),
             "integer: (52)"
         );
         assert_eq!(
-            super::fmt("integer: (%d)".to_string(), vec![Box::new(123)]),
+            super::fmt("integer: (%d)", &[Box::new(123)]),
             "integer: (123)"
         );
         assert_eq!(
-            super::fmt("float: (%f)".to_string(), vec![Box::new(4.14)]),
+            super::fmt("float: (%f)", &[Box::new(4.14)]),
             "float: (4.140000)"
         );
         let c_str = CString::new("hello").unwrap();
         assert_eq!(
-            super::fmt("string: (%s)".to_string(), vec![Box::new(c_str.as_ptr())]),
+            super::fmt("string: (%s)", &[Box::new(c_str.as_ptr())]),
             "string: (hello)"
         );
-        assert_eq!(
-            super::fmt("hex: (%x)".to_string(), vec![Box::new(200)]),
-            "hex: (c8)"
-        );
+        assert_eq!(super::fmt("hex: (%x)", &[Box::new(200)]), "hex: (c8)");
     }
 
     #[test]

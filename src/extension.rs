@@ -186,28 +186,28 @@ extern "C" {
 extern "C" fn _spUtil_readFile(c_path: *const c_char, c_length: *mut c_int) -> *mut c_char {
     let singleton = Extension::singleton();
     let extension = singleton.lock().unwrap();
-    if let Some(cb) = &extension.read_file_cb {
-        if let Some(data) = cb(unsafe { CStr::from_ptr(c_path).to_str().unwrap() }) {
-            unsafe {
-                *c_length = data.len() as c_int;
-                let c_data = spine_malloc(data.len() as size_t);
-                spine_memcpy(c_data, data.as_ptr() as *const c_void, data.len() as size_t);
-                c_data as *mut c_char
-            }
-        } else {
-            std::ptr::null_mut()
-        }
-    } else {
-        let str = unsafe { CStr::from_ptr(c_path).to_str().unwrap().to_owned() };
-        if let Ok(data) = read(str) {
-            let c_data = unsafe { spine_malloc(data.len() as size_t) };
-            unsafe {
-                spine_memcpy(c_data, data.as_ptr() as *const c_void, data.len() as size_t);
-                *c_length = data.len() as c_int;
-            }
-            c_data as *mut c_char
-        } else {
-            std::ptr::null_mut()
-        }
-    }
+    extension.read_file_cb.as_ref().map_or_else(
+        || {
+            let str = unsafe { CStr::from_ptr(c_path).to_str().unwrap().to_owned() };
+            read(str).map_or(std::ptr::null_mut(), |data| {
+                let c_data = unsafe { spine_malloc(data.len() as size_t) };
+                unsafe {
+                    spine_memcpy(c_data, data.as_ptr().cast::<c_void>(), data.len() as size_t);
+                    *c_length = data.len() as c_int;
+                }
+                c_data.cast::<c_char>()
+            })
+        },
+        |cb| {
+            cb(unsafe { CStr::from_ptr(c_path).to_str().unwrap() }).map_or(
+                std::ptr::null_mut(),
+                |data| unsafe {
+                    *c_length = data.len() as c_int;
+                    let c_data = spine_malloc(data.len() as size_t);
+                    spine_memcpy(c_data, data.as_ptr().cast::<c_void>(), data.len() as size_t);
+                    c_data.cast::<c_char>()
+                },
+            )
+        },
+    )
 }

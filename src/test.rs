@@ -24,7 +24,7 @@ pub struct TestAsset {
 }
 
 impl TestAsset {
-    pub fn all() -> &'static [Self; 8] {
+    pub const fn all() -> &'static [Self; 8] {
         &[
             Self {
                 atlas_file: "assets/spineboy/export/spineboy.atlas",
@@ -69,7 +69,7 @@ impl TestAsset {
         ]
     }
 
-    pub fn spineboy() -> &'static Self {
+    pub const fn spineboy() -> &'static Self {
         &Self::all()[0]
     }
 
@@ -110,7 +110,7 @@ impl TestAsset {
 /// Ensure all the example assets load without error.
 #[test]
 fn load_example_assets() {
-    for example_asset in TestAsset::all().iter() {
+    for example_asset in TestAsset::all() {
         let atlas = Arc::new(Atlas::new(example_asset.atlas_data, "").unwrap());
         let skeleton_json = SkeletonJson::new(atlas);
         let skeleton_data = Arc::new(

@@ -30,9 +30,9 @@ pub struct Bone {
 }
 
 impl NewFromPtr<spBone> for Bone {
-    unsafe fn new_from_ptr(c_bone: *const spBone) -> Self {
+    unsafe fn new_from_ptr(c_bone: *mut spBone) -> Self {
         Self {
-            c_bone: SyncPtr(c_bone as *mut spBone),
+            c_bone: SyncPtr(c_bone),
         }
     }
 }
@@ -398,9 +398,9 @@ pub struct BoneData {
 }
 
 impl NewFromPtr<spBoneData> for BoneData {
-    unsafe fn new_from_ptr(c_bone_data: *const spBoneData) -> Self {
+    unsafe fn new_from_ptr(c_bone_data: *mut spBoneData) -> Self {
         Self {
-            c_bone_data: SyncPtr(c_bone_data as *mut spBoneData),
+            c_bone_data: SyncPtr(c_bone_data),
         }
     }
 }

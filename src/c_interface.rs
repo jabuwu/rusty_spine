@@ -10,7 +10,7 @@ use std::{
 };
 
 pub trait NewFromPtr<C> {
-    unsafe fn new_from_ptr(c_ptr: *const C) -> Self;
+    unsafe fn new_from_ptr(c_ptr: *mut C) -> Self;
 }
 
 /// A reference type to temporarily borrow two types at once, ensuring a parent's lifetime remains
@@ -25,7 +25,7 @@ pub struct CTmpRef<'a, P, T> {
 }
 
 impl<'a, P, T> CTmpRef<'a, P, T> {
-    pub fn new(parent: &'a P, data: T) -> Self {
+    pub const fn new(parent: &'a P, data: T) -> Self {
         Self { data, parent }
     }
 
@@ -33,7 +33,7 @@ impl<'a, P, T> CTmpRef<'a, P, T> {
         (self.parent, &self.data)
     }
 
-    pub fn as_ref(&self) -> &T {
+    pub const fn as_ref(&self) -> &T {
         &self.data
     }
 }
@@ -54,25 +54,55 @@ impl<'a, P, T: std::fmt::Debug> std::fmt::Debug for CTmpRef<'a, P, T> {
     }
 }
 
+pub(crate) enum CTmpMutParent<'a, P> {
+    Weak(*mut P),
+    Strong(&'a mut P),
+}
+
+impl<'a, P> Deref for CTmpMutParent<'a, P> {
+    type Target = P;
+    fn deref(&self) -> &Self::Target {
+        match self {
+            Self::Weak(pointer) => unsafe { &**pointer },
+            Self::Strong(reference) => *reference,
+        }
+    }
+}
+
 /// A mutable version of [`CTmpRef`].
 pub struct CTmpMut<'a, P, T> {
     pub(crate) data: T,
-    pub(crate) parent: &'a mut P,
+    pub(crate) parent: CTmpMutParent<'a, P>,
 }
 
 impl<'a, P, T> CTmpMut<'a, P, T> {
     #[must_use]
     pub fn new(parent: &'a mut P, data: T) -> Self {
-        Self { data, parent }
+        Self {
+            data,
+            parent: CTmpMutParent::Strong(parent),
+        }
+    }
+
+    #[must_use]
+    pub const fn new_weak(parent: *mut P, data: T) -> Self {
+        Self {
+            data,
+            parent: CTmpMutParent::Weak(parent),
+        }
     }
 
     #[must_use]
     pub fn unwrap_parent_child(&mut self) -> (&mut P, &mut T) {
-        (self.parent, &mut self.data)
+        let parent = match &mut self.parent {
+            CTmpMutParent::Strong(reference) => reference,
+            CTmpMutParent::Weak(pointer) => unsafe { &mut **pointer },
+        };
+        (parent, &mut self.data)
     }
 
     #[must_use]
-    pub fn as_ref(&self) -> &T {
+    pub const fn as_ref(&self) -> &T {
         &self.data
     }
 
@@ -128,7 +158,7 @@ where
             items,
             index: 0,
             count,
-            _marker: Default::default(),
+            _marker: PhantomData::default(),
         }
     }
 }
@@ -173,7 +203,7 @@ where
             items,
             index: 0,
             count,
-            _marker: Default::default(),
+            _marker: PhantomData::default(),
         }
     }
 }
@@ -188,10 +218,7 @@ where
         if self.index < self.count {
             let item = unsafe { T::new_from_ptr(*self.items.offset(self.index as isize)) };
             self.index += 1;
-            Some(CTmpMut::new(
-                unsafe { &mut *(self._parent as *const P as *mut P) },
-                item,
-            ))
+            Some(CTmpMut::new_weak(self._parent, item))
         } else {
             None
         }
@@ -221,7 +248,7 @@ where
             items,
             index: 0,
             count,
-            _marker: Default::default(),
+            _marker: PhantomData::default(),
         }
     }
 }
@@ -261,10 +288,7 @@ where
             if !ptr.is_null() {
                 let item = unsafe { T::new_from_ptr(ptr) };
                 self.index += 1;
-                Some(Some(CTmpMut::new(
-                    unsafe { &mut *(self._parent as *const P as *mut P) },
-                    item,
-                )))
+                Some(Some(CTmpMut::new_weak(self._parent, item)))
             } else {
                 self.index += 1;
                 Some(None)
@@ -298,7 +322,7 @@ where
             items,
             index: 0,
             count,
-            _marker: Default::default(),
+            _marker: PhantomData::default(),
         }
     }
 }
@@ -345,7 +369,7 @@ macro_rules! c_ptr {
     ($member:ident, $c_type:ty) => {
         #[inline]
         #[must_use]
-        pub fn c_ptr(&self) -> *mut $c_type {
+        pub const fn c_ptr(&self) -> *mut $c_type {
             self.$member.0
         }
 
@@ -443,7 +467,7 @@ macro_rules! c_accessor_color {
         #[must_use]
         pub fn $rust(&self) -> crate::color::Color {
             unsafe {
-                *(&self.c_ptr_ref().$c as *const crate::c::spColor as *const crate::color::Color)
+                *((&self.c_ptr_ref().$c as *const crate::c::spColor).cast::<crate::color::Color>())
             }
         }
     };
@@ -455,8 +479,8 @@ macro_rules! c_accessor_color_mut {
         #[must_use]
         pub fn $rust_mut(&mut self) -> &mut crate::color::Color {
             unsafe {
-                &mut *(&mut self.c_ptr_mut().color as *mut crate::c::spColor
-                    as *mut crate::color::Color)
+                &mut *(&mut self.c_ptr_mut().color as *mut crate::c::spColor)
+                    .cast::<crate::color::Color>()
             }
         }
     };
@@ -469,7 +493,7 @@ macro_rules! c_accessor_color_optional {
             unsafe {
                 let ptr = *(&self.c_ptr_ref().$c);
                 if !ptr.is_null() {
-                    Some(*(ptr as *const crate::c::spColor as *const crate::color::Color))
+                    Some(*(ptr).cast::<crate::color::Color>())
                 } else {
                     None
                 }
@@ -829,7 +853,9 @@ macro_rules! c_vertex_attachment_accessors_mint {
         pub fn vertices2(&self) -> &[mint::Vector2<f32>] {
             unsafe {
                 std::slice::from_raw_parts(
-                    self.vertex_attachment().vertices as *mut mint::Vector2<f32>,
+                    self.vertex_attachment()
+                        .vertices
+                        .cast::<mint::Vector2<f32>>(),
                     self.vertex_attachment().verticesCount as usize / 2,
                 )
                 .try_into()
@@ -850,7 +876,7 @@ macro_rules! c_handle_decl {
 
         impl $name {
             #[must_use]
-            pub(crate) fn new(c_item: *const $c_type, c_parent: *const $c_parent) -> Self {
+            pub(crate) const fn new(c_item: *const $c_type, c_parent: *const $c_parent) -> Self {
                 Self {
                     c_item: SyncPtr(c_item as *mut $c_type),
                     c_parent: SyncPtr(c_parent as *mut $c_parent),
@@ -911,7 +937,7 @@ macro_rules! c_handle_indexed_decl {
 
         impl $name {
             #[must_use]
-            pub(crate) fn new(
+            pub(crate) const fn new(
                 index: i32,
                 c_item: *const $c_type,
                 c_parent: *const $c_parent,

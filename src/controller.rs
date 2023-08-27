@@ -104,7 +104,7 @@ impl SkeletonControllerSettings {
     }
 
     #[must_use]
-    pub fn with_premultiplied_alpha(self, premultiplied_alpha: bool) -> Self {
+    pub const fn with_premultiplied_alpha(self, premultiplied_alpha: bool) -> Self {
         Self {
             premultiplied_alpha,
             ..self
@@ -112,7 +112,7 @@ impl SkeletonControllerSettings {
     }
 
     #[must_use]
-    pub fn with_cull_direction(self, cull_direction: CullDirection) -> Self {
+    pub const fn with_cull_direction(self, cull_direction: CullDirection) -> Self {
         Self {
             cull_direction,
             ..self
@@ -120,7 +120,7 @@ impl SkeletonControllerSettings {
     }
 
     #[must_use]
-    pub fn with_color_space(self, color_space: ColorSpace) -> Self {
+    pub const fn with_color_space(self, color_space: ColorSpace) -> Self {
         Self {
             color_space,
             ..self

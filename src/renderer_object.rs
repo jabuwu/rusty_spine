@@ -34,7 +34,7 @@ impl<'a> RendererObject<'a> {
             self.renderer_object.is_null(),
             "Setting renderer object when it's already set."
         );
-        let ptr = Box::leak(Box::new(data)) as *mut T as *mut c_void;
+        let ptr = (Box::leak(Box::new(data)) as *mut T).cast::<c_void>();
         assert!(
             ptr != 1 as *mut c_void,
             "Renderer object cannot be set to an empty type, please add member variables: {}",
@@ -52,7 +52,7 @@ impl<'a> RendererObject<'a> {
     pub unsafe fn get<T>(&mut self) -> Option<&mut T> {
         let ptr = *self.renderer_object;
         if !ptr.is_null() {
-            Some(&mut *(*self.renderer_object as *mut T))
+            Some(&mut *((*self.renderer_object).cast::<T>()))
         } else {
             None
         }
@@ -65,7 +65,7 @@ impl<'a> RendererObject<'a> {
     /// It is not guaranteed that the returned option has a valid object and could segfault if the
     /// renderer object is a different type than requested.
     pub unsafe fn get_unchecked<T>(&mut self) -> &mut T {
-        &mut *(*self.renderer_object as *mut T)
+        &mut *((*self.renderer_object).cast::<T>())
     }
 
     /// Gets the atlas region on mesh and region attachments if the default attachment loader was
@@ -79,7 +79,7 @@ impl<'a> RendererObject<'a> {
         if !ptr.is_null() {
             Some(CTmpRef::new(
                 self,
-                AtlasRegion::new_from_ptr(ptr as *mut spAtlasRegion),
+                AtlasRegion::new_from_ptr(ptr.cast::<spAtlasRegion>()),
             ))
         } else {
             None
@@ -94,7 +94,7 @@ impl<'a> RendererObject<'a> {
     /// pointing to a type that was allocated in C.
     pub unsafe fn dispose<T>(&mut self) {
         if !self.renderer_object.is_null() {
-            drop(Box::from_raw(*self.renderer_object as *mut T));
+            drop(Box::from_raw((*self.renderer_object).cast::<T>()));
             *self.renderer_object = std::ptr::null_mut();
         }
     }

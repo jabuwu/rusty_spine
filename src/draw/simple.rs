@@ -223,7 +223,7 @@ impl SimpleDrawer {
                         vertices.resize(clipped_vertices_size / 2, [0., 0.]);
                         std::ptr::copy_nonoverlapping(
                             (*clipper.c_ptr_ref().clippedVertices).items,
-                            vertices.as_mut_ptr() as *mut f32,
+                            vertices.as_mut_ptr().cast::<f32>(),
                             clipped_vertices_size,
                         );
                         let clipped_triangles_size =
@@ -238,7 +238,7 @@ impl SimpleDrawer {
                         uvs.resize(clipped_uvs_size / 2, [0., 0.]);
                         std::ptr::copy_nonoverlapping(
                             (*clipper.c_ptr_ref().clippedUVs).items,
-                            uvs.as_mut_ptr() as *mut f32,
+                            uvs.as_mut_ptr().cast::<f32>(),
                             clipped_uvs_size,
                         );
                     }
@@ -246,29 +246,34 @@ impl SimpleDrawer {
             }
 
             let attachment_renderer_object =
-                if let Some(mesh_attachment) = slot.attachment().and_then(|a| a.as_mesh()) {
-                    Some(unsafe {
-                        mesh_attachment
-                            .renderer_object()
-                            .get_atlas_region()
-                            .unwrap()
-                            .page()
-                            .c_ptr_ref()
-                            .rendererObject as *const c_void
-                    })
-                } else {
-                    slot.attachment()
-                        .and_then(|a| a.as_region())
-                        .map(|region_attachment| unsafe {
-                            region_attachment
+                slot.attachment().and_then(|a| a.as_mesh()).map_or_else(
+                    || {
+                        slot.attachment().and_then(|a| a.as_region()).map(
+                            |region_attachment| unsafe {
+                                region_attachment
+                                    .renderer_object()
+                                    .get_atlas_region()
+                                    .unwrap()
+                                    .page()
+                                    .c_ptr_ref()
+                                    .rendererObject
+                                    .cast_const()
+                            },
+                        )
+                    },
+                    |mesh_attachment| {
+                        Some(unsafe {
+                            mesh_attachment
                                 .renderer_object()
                                 .get_atlas_region()
                                 .unwrap()
                                 .page()
                                 .c_ptr_ref()
-                                .rendererObject as *const c_void
+                                .rendererObject
+                                .cast_const()
                         })
-                };
+                    },
+                );
 
             color *= slot.color() * skeleton.color();
             if self.premultiplied_alpha {
@@ -324,7 +329,7 @@ mod test {
     /// Ensure all the example assets draw without error.
     #[test]
     fn simple_drawer() {
-        for example_asset in TestAsset::all().iter() {
+        for example_asset in TestAsset::all() {
             let (mut skeleton, _) = example_asset.instance();
             let drawer = SimpleDrawer {
                 cull_direction: CullDirection::Clockwise,

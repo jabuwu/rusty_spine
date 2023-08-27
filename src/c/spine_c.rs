@@ -8,7 +8,10 @@
     unused_mut,
     clippy::all,
     clippy::cast_lossless,
-    clippy::missing_panics_doc
+    clippy::missing_panics_doc,
+    clippy::ptr_cast_constness,
+    clippy::ptr_as_ptr,
+    clippy::missing_const_for_fn
 )]
 extern "C" {
     fn spine_memcpy(__dest: *mut c_void, __src: *const c_void, __n: size_t) -> *mut c_void;
@@ -690,8 +693,8 @@ pub struct spAtlasRegion {
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct spAtlasPage {
-    pub atlas: *const spAtlas,
-    pub name: *const c_char,
+    pub atlas: *mut spAtlas,
+    pub name: *mut c_char,
     pub format: spAtlasFormat,
     pub minFilter: spAtlasFilter,
     pub magFilter: spAtlasFilter,
@@ -9706,9 +9709,9 @@ pub unsafe extern "C" fn spAtlasPage_create(
         b"spine.c\0" as *const u8 as *const c_char,
         4130 as c_int,
     ) as *mut spAtlasPage;
-    let ref mut fresh41 = *(&mut (*self_0).atlas as *mut *const spAtlas as *mut *mut spAtlas);
+    let ref mut fresh41 = *(&mut (*self_0).atlas as *mut *mut spAtlas);
     *fresh41 = atlas;
-    let ref mut fresh42 = *(&mut (*self_0).name as *mut *const c_char as *mut *mut c_char);
+    let ref mut fresh42 = *(&mut (*self_0).name as *mut *mut c_char);
     *fresh42 = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
             .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),

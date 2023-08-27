@@ -110,33 +110,42 @@ impl CombinedDrawer {
             }
 
             let next_blend_mode = slot.data().blend_mode();
-            let next_attachment_renderer_object = if let Some(mesh_attachment) =
-                slot.attachment().and_then(|a| a.as_mesh())
-            {
-                let next_attachment_renderer_object = Some(unsafe {
-                    mesh_attachment
-                        .renderer_object()
-                        .get_atlas_region()
-                        .unwrap()
-                        .page()
-                        .c_ptr_ref()
-                        .rendererObject as *const c_void
-                });
-                next_attachment_renderer_object
-            } else if let Some(region_attachment) = slot.attachment().and_then(|a| a.as_region()) {
-                let next_attachment_renderer_object = Some(unsafe {
-                    region_attachment
-                        .renderer_object()
-                        .get_atlas_region()
-                        .unwrap()
-                        .page()
-                        .c_ptr_ref()
-                        .rendererObject as *const c_void
-                });
-                next_attachment_renderer_object
-            } else {
-                unreachable!();
-            };
+            let next_attachment_renderer_object =
+                slot.attachment().and_then(|a| a.as_mesh()).map_or_else(
+                    || {
+                        slot.attachment().and_then(|a| a.as_region()).map_or_else(
+                            || {
+                                unreachable!();
+                            },
+                            |region_attachment| {
+                                let next_attachment_renderer_object = Some(unsafe {
+                                    region_attachment
+                                        .renderer_object()
+                                        .get_atlas_region()
+                                        .unwrap()
+                                        .page()
+                                        .c_ptr_ref()
+                                        .rendererObject
+                                        .cast_const()
+                                });
+                                next_attachment_renderer_object
+                            },
+                        )
+                    },
+                    |mesh_attachment| {
+                        let next_attachment_renderer_object = Some(unsafe {
+                            mesh_attachment
+                                .renderer_object()
+                                .get_atlas_region()
+                                .unwrap()
+                                .page()
+                                .c_ptr_ref()
+                                .rendererObject
+                                .cast_const()
+                        });
+                        next_attachment_renderer_object
+                    },
+                );
 
             if slot_index == 0 {
                 blend_mode = next_blend_mode;
@@ -348,13 +357,16 @@ impl CombinedDrawer {
                         vertices.resize(vertex_base as usize + clipped_vertices_size / 2, [0., 0.]);
                         std::ptr::copy_nonoverlapping(
                             (*clipper.c_ptr_ref().clippedVertices).items,
-                            vertices.as_mut_ptr().offset(vertex_base as isize) as *mut f32,
+                            vertices
+                                .as_mut_ptr()
+                                .offset(vertex_base as isize)
+                                .cast::<f32>(),
                             clipped_vertices_size,
                         );
                         uvs.resize(vertex_base as usize + clipped_uvs_size / 2, [0., 0.]);
                         std::ptr::copy_nonoverlapping(
                             (*clipper.c_ptr_ref().clippedUVs).items,
-                            uvs.as_mut_ptr().offset(vertex_base as isize) as *mut f32,
+                            uvs.as_mut_ptr().offset(vertex_base as isize).cast::<f32>(),
                             clipped_uvs_size,
                         );
                     }
@@ -400,7 +412,7 @@ mod test {
     /// Ensure all the example assets draw without error.
     #[test]
     fn combined_drawer() {
-        for example_asset in TestAsset::all().iter() {
+        for example_asset in TestAsset::all() {
             let (mut skeleton, _) = example_asset.instance();
             let drawer = CombinedDrawer {
                 cull_direction: CullDirection::Clockwise,

@@ -17,7 +17,17 @@
     clippy::missing_panics_doc,
     clippy::missing_errors_doc,
     clippy::doc_markdown,
-    clippy::manual_assert
+    clippy::manual_assert,
+    clippy::ptr_cast_constness,
+    clippy::ptr_as_ptr,
+    clippy::default_trait_access,
+    clippy::explicit_iter_loop,
+    clippy::explicit_into_iter_loop,
+    clippy::missing_const_for_fn,
+    clippy::needless_pass_by_value,
+    clippy::option_if_let_else,
+    clippy::redundant_feature_names,
+    clippy::semicolon_if_nothing_returned
 )]
 // https://github.com/rust-lang/rust-clippy/issues/11382
 #![allow(clippy::arc_with_non_send_sync)]

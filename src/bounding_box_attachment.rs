@@ -12,11 +12,9 @@ pub struct BoundingBoxAttachment {
 }
 
 impl NewFromPtr<spBoundingBoxAttachment> for BoundingBoxAttachment {
-    unsafe fn new_from_ptr(c_bounding_box_attachment: *const spBoundingBoxAttachment) -> Self {
+    unsafe fn new_from_ptr(c_bounding_box_attachment: *mut spBoundingBoxAttachment) -> Self {
         Self {
-            c_bounding_box_attachment: SyncPtr(
-                c_bounding_box_attachment as *mut spBoundingBoxAttachment,
-            ),
+            c_bounding_box_attachment: SyncPtr(c_bounding_box_attachment),
         }
     }
 }

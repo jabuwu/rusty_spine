@@ -12,9 +12,9 @@ pub struct TextureRegion {
 }
 
 impl NewFromPtr<spTextureRegion> for TextureRegion {
-    unsafe fn new_from_ptr(c_texture_region: *const spTextureRegion) -> Self {
+    unsafe fn new_from_ptr(c_texture_region: *mut spTextureRegion) -> Self {
         Self {
-            c_texture_region: SyncPtr(c_texture_region as *mut spTextureRegion),
+            c_texture_region: SyncPtr(c_texture_region),
         }
     }
 }

@@ -225,20 +225,21 @@ impl Skeleton {
 
     pub fn set_attachment(&mut self, slot_name: &str, attachment_name: Option<&str>) -> bool {
         let c_slot_name = to_c_str(slot_name);
-        if let Some(attachment_name) = attachment_name {
-            let c_attachment_name = to_c_str(attachment_name);
-            unsafe {
-                spSkeleton_setAttachment(
-                    self.c_ptr(),
-                    c_slot_name.as_ptr(),
-                    c_attachment_name.as_ptr(),
-                ) != 0
-            }
-        } else {
-            unsafe {
+        attachment_name.map_or_else(
+            || unsafe {
                 spSkeleton_setAttachment(self.c_ptr(), c_slot_name.as_ptr(), std::ptr::null()) != 0
-            }
-        }
+            },
+            |attachment_name| {
+                let c_attachment_name = to_c_str(attachment_name);
+                unsafe {
+                    spSkeleton_setAttachment(
+                        self.c_ptr(),
+                        c_slot_name.as_ptr(),
+                        c_attachment_name.as_ptr(),
+                    ) != 0
+                }
+            },
+        )
     }
 
     pub fn get_attachment_for_slot_name(

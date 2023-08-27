@@ -12,9 +12,9 @@ pub struct PathAttachment {
 }
 
 impl NewFromPtr<spPathAttachment> for PathAttachment {
-    unsafe fn new_from_ptr(c_path_attachment: *const spPathAttachment) -> Self {
+    unsafe fn new_from_ptr(c_path_attachment: *mut spPathAttachment) -> Self {
         Self {
-            c_path_attachment: SyncPtr(c_path_attachment as *mut spPathAttachment),
+            c_path_attachment: SyncPtr(c_path_attachment),
         }
     }
 }
