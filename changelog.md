@@ -1,4 +1,5 @@
 # 0.7.0 (UNRELEASED)
+- Removed unnecessary feature `use_libc`, use `libc` instead
 - More clippy fixes
 - Fixes for pointer, abi, and memory undefined behavior
 - Lots of docs
