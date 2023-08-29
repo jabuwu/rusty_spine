@@ -102,7 +102,18 @@ impl SkeletonBinary {
         }
     }
 
-    c_accessor_mut!(scale, set_scale, scale, f32);
+    c_accessor_mut!(
+        /// Scales bone positions, image sizes, and translations as they are loaded. This allows
+        /// different size images to be used at runtime than were used in Spine.
+        ///
+        /// See [`Scaling`](http://esotericsoftware.com/spine-loading-skeleton-data#Scaling) in the
+        /// Spine Runtimes Guide.
+        scale,
+        /// Sets the scaling of this skeleton, see [`scale`](`Self::scale`).
+        set_scale,
+        scale,
+        f32
+    );
     c_ptr!(c_skeleton_binary, spSkeletonBinary);
 }
 

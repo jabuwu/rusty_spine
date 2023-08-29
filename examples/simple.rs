@@ -17,7 +17,7 @@ fn main() {
     println!();
     println!("  Atlas: {atlas_path}");
     println!("  JSON: {json_path}");
-    println!("  Version: {}", skeleton_data.version());
+    println!("  Version: {}", skeleton_data.version().unwrap_or("??"));
     println!("  Hash: {}", skeleton_data.hash());
     println!();
     println!("Renderables:");

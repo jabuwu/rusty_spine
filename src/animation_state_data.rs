@@ -89,7 +89,7 @@ impl AnimationStateData {
         unsafe { spAnimationStateData_getMix(self.c_ptr(), from.c_ptr(), to.c_ptr()) }
     }
 
-    c_accessor_tmp_ptr!(
+    c_accessor_tmp_ptr_mut!(
         skeleton_data,
         skeleton_data_mut,
         skeletonData,

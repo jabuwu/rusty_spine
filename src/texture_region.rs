@@ -6,6 +6,7 @@ use crate::{
 #[cfg(feature = "mint")]
 use mint::Vector2;
 
+/// A region of a texture, usually imported from an [`AtlasRegion`](`crate::atlas::AtlasRegion`).
 #[derive(Debug)]
 pub struct TextureRegion {
     c_texture_region: SyncPtr<spTextureRegion>,

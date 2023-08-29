@@ -50,37 +50,54 @@ impl Skeleton {
         }
     }
 
+    /// Caches information about bones and constraints. Must be called if the skin is modified or if
+    /// bones, constraints, or weighted path attachments are added or removed.
     pub fn update_cache(&mut self) {
         unsafe {
             spSkeleton_updateCache(self.c_ptr());
         }
     }
 
+    /// Updates the world transform for each bone and applies all constraints.
+    ///
+    /// See
+    /// [`World transforms`](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms)
+    /// in the Spine Runtimes Guide.
     pub fn update_world_transform(&mut self) {
         unsafe {
             spSkeleton_updateWorldTransform(self.c_ptr());
         }
     }
 
+    /// Temporarily sets the root bone as a child of the specified bone, then updates the world
+    /// transform for each bone and applies all constraints.
+    ///
+    /// See
+    /// [`World transforms`](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms)
+    /// in the Spine Runtimes Guide.
+    ///
     /// # Safety
     ///
-    /// The bone must original from this skeleton.
+    /// The bone must originate from this skeleton.
     pub unsafe fn update_world_transform_with(&mut self, parent: &Bone) {
         spSkeleton_updateWorldTransformWith(self.c_ptr(), parent.c_ptr());
     }
 
+    /// Sets the bones, constraints, slots, and draw order to their setup pose values.
     pub fn set_to_setup_pose(&mut self) {
         unsafe {
             spSkeleton_setToSetupPose(self.c_ptr());
         }
     }
 
+    /// Sets the bones and constraints to their setup pose values.
     pub fn set_bones_to_setup_pose(&mut self) {
         unsafe {
             spSkeleton_setBonesToSetupPose(self.c_ptr());
         }
     }
 
+    /// Sets the slots and draw order to their setup pose values.
     pub fn set_slots_to_setup_pose(&mut self) {
         unsafe {
             spSkeleton_setSlotsToSetupPose(self.c_ptr());
@@ -193,11 +210,13 @@ impl Skeleton {
         Ok(())
     }
 
+    /// The root bone, or [`None`] if the skeleton has no bones.
     #[must_use]
     pub fn bone_root(&self) -> CTmpRef<Skeleton, Bone> {
         CTmpRef::new(self, unsafe { Bone::new_from_ptr(self.c_ptr_mut().root) })
     }
 
+    /// The mutable root bone, or [`None`] if the skeleton has no bones.
     #[must_use]
     pub fn bone_root_mut(&mut self) -> CTmpMut<Skeleton, Bone> {
         CTmpMut::new(self, unsafe { Bone::new_from_ptr(self.c_ptr_mut().root) })
@@ -285,21 +304,96 @@ impl Skeleton {
 
     // TODO: iterators for ik, transform, path constraints
 
-    c_accessor_tmp_ptr!(data, data_mut, data, SkeletonData, spSkeletonData);
-    c_accessor_color_mut!(color, color_mut, color);
-    c_accessor!(bones_count, bonesCount, usize);
-    c_accessor!(slots_count, slotsCount, usize);
-    c_accessor!(ik_contraints_count, ikConstraintsCount, usize);
-    c_accessor!(transform_contraints_count, transformConstraintsCount, usize);
-    c_accessor!(path_contraints_count, pathConstraintsCount, usize);
-    c_accessor_mut!(scale_x, set_scale_x, scaleX, f32);
-    c_accessor_mut!(scale_y, set_scale_y, scaleY, f32);
-    c_accessor_mut!(x, set_x, x, f32);
-    c_accessor_mut!(y, set_y, y, f32);
-    c_accessor_array!(
+    c_accessor_tmp_ptr_mut!(
+        /// The skeleton's setup pose data.
+        data,
+        /// The skeleton's mutable setup pose data.
+        data_mut,
+        data,
+        SkeletonData,
+        spSkeletonData
+    );
+    c_accessor_color_mut!(
+        /// The color to tint all the skeleton's attachments.
+        color,
+        /// Set the color to tint all the skeleton's attachments.
+        color_mut,
+        color
+    );
+    c_accessor!(
+        /// The number of bones in this skeleton.
+        bones_count,
+        bonesCount,
+        usize
+    );
+    c_accessor!(
+        /// The number of slots in this skeleton.
+        slots_count,
+        slotsCount,
+        usize
+    );
+    c_accessor!(
+        /// The number of IK constraints in this skeleton.
+        ik_contraints_count,
+        ikConstraintsCount,
+        usize
+    );
+    c_accessor!(
+        /// The number of transform constraints in this skeleton.
+        transform_contraints_count,
+        transformConstraintsCount,
+        usize
+    );
+    c_accessor!(
+        /// The number of path constraints in this skeleton.
+        path_contraints_count,
+        pathConstraintsCount,
+        usize
+    );
+    c_accessor_mut!(
+        /// Scales the entire skeleton on the X axis.
+        scale_x,
+        /// Sets the scale the entire skeleton on the X axis.
+        /// Bones that do not inherit scale are still affected by this property.
+        set_scale_x,
+        scaleX,
+        f32
+    );
+    c_accessor_mut!(
+        /// Scales the entire skeleton on the Y axis.
+        scale_y,
+        /// Sets the scale the entire skeleton on the Y axis.
+        /// Bones that do not inherit scale are still affected by this property.
+        set_scale_y,
+        scaleY,
+        f32
+    );
+    c_accessor_mut!(
+        /// The skeleton X position, which is added to the root bone worldX position.
+        x,
+        /// Sets the skeleton X position, which is added to the root bone worldX position.
+        /// Bones that do not inherit translation are still affected by this property.
+        set_x,
+        x,
+        f32
+    );
+    c_accessor_mut!(
+        /// The skeleton Y position, which is added to the root bone worldY position.
+        y,
+        /// Sets the skeleton Y position, which is added to the root bone worldY position.
+        /// Bones that do not inherit translation are still affected by this property.
+        set_y,
+        y,
+        f32
+    );
+    c_accessor_array_mut!(
+        /// An iterator to the skeleton's bones.
         bones,
+        /// A mutable iterator to the skeleton's bones.
         bones_mut,
+        /// The nth bone in the skeleton.
         bone_at_index,
+        /// The nth mutable bone in the skeleton.
         bone_at_index_mut,
         Skeleton,
         Bone,
@@ -307,10 +401,14 @@ impl Skeleton {
         bones,
         bones_count
     );
-    c_accessor_array!(
+    c_accessor_array_mut!(
+        /// An iterator to the skeleton's slots.
         slots,
+        /// A mutable iterator to the skeleton's slots.
         slots_mut,
+        /// The nth slot in the skeleton.
         slot_at_index,
+        /// The nth mutable slot in the skeleton.
         slot_at_index_mut,
         Skeleton,
         Slot,
@@ -318,10 +416,14 @@ impl Skeleton {
         slots,
         slots_count
     );
-    c_accessor_array!(
+    c_accessor_array_mut!(
+        /// An iterator to the skeleton's slots in the order they should be drawn.
         draw_order,
+        /// A mutable iterator to the skeleton's slots in the order they should be drawn.
         draw_order_mut,
+        /// The nth skeleton slot, indexed in the order they should be drawn.
         draw_order_at_index,
+        /// The nth mutable skeleton slot, indexed in the order they should be drawn.
         draw_order_at_index_mut,
         Skeleton,
         Slot,
@@ -329,7 +431,7 @@ impl Skeleton {
         drawOrder,
         slots_count
     );
-    c_accessor_tmp_ptr_optional!(skin, skin_mut, skin, Skin, spSkin);
+    c_accessor_tmp_ptr_optional_mut!(skin, skin_mut, skin, Skin, spSkin);
     c_ptr!(c_skeleton, spSkeleton);
 }
 

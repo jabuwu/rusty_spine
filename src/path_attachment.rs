@@ -30,10 +30,35 @@ impl PathAttachment {
 
     c_attachment_accessors!();
     c_vertex_attachment_accessors!();
-    c_accessor_bool_mut!(closed, set_closed, closed);
-    c_accessor_color_mut!(color, color_mut, color);
-    c_accessor_bool_mut!(constant_speed, set_constant_speed, constantSpeed);
-    c_accessor_passthrough!(lengths, lengths, *mut c_float);
+    c_accessor_bool_mut!(
+        /// If `true, the start and end knots are connected.
+        closed,
+        /// Set closed, see [`closed`](`Self::closed`).
+        set_closed,
+        closed
+    );
+    c_accessor_color_mut!(
+        /// The color of the path as it was in Spine, or a default color if nonessential data was
+        /// not exported. Paths are not usually rendered at runtime.
+        color,
+        color_mut,
+        color
+    );
+    c_accessor_bool_mut!(
+        /// If `true`, additional calculations are performed to make computing positions along the
+        /// path more accurate and movement along the path have a constant speed.
+        constant_speed,
+        set_constant_speed,
+        constantSpeed
+    );
+    // TODO: do not use passthrough
+    c_accessor_passthrough!(
+        /// The lengths along the path in the setup pose from the start of the path to the end of
+        /// each Bezier curve.
+        lengths,
+        lengths,
+        *mut c_float
+    );
     c_ptr!(c_path_attachment, spPathAttachment);
 }
 

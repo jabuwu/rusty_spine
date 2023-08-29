@@ -21,7 +21,11 @@ use crate::{
     AnimationEvent,
 };
 
-/// The live animation state for a skeleton, allowing animation layering and crossfading.
+/// Applies animations over time, queues animations for later playback, mixes (crossfading) between
+/// animations, and applies multiple animations on top of each other (layering).
+///
+/// See [Applying Animations](http://esotericsoftware.com/spine-applying-animations/) in the Spine
+/// Runtimes Guide.
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#AnimationState)
 #[derive(Debug)]
@@ -417,7 +421,8 @@ impl AnimationState {
         }
     }
 
-    c_accessor_tmp_ptr!(
+    c_accessor_tmp_ptr_mut!(
+        /// The [`AnimationStateData`] to look up mix durations.
         data,
         data_mut,
         data,
@@ -436,7 +441,17 @@ impl AnimationState {
         tracks,
         tracks_count
     );
-    c_accessor_mut!(timescale, set_timescale, timeScale, f32);
+    c_accessor_mut!(
+        /// Multiplier for the delta time when the animation state is updated, causing time for all
+        /// animations and mixes to play slower or faster. Defaults to 1.
+        ///
+        /// See [`TrackEntry::timescale`] for affecting a single animation.
+        timescale,
+        /// Set the timescale, see [`timescale`](`Self::timescale`).
+        set_timescale,
+        timeScale,
+        f32
+    );
     c_accessor_renderer_object!();
 
     pub fn dispose_statics() {
@@ -472,6 +487,9 @@ struct AnimationStateUserData {
     listener: Option<AnimationStateListenerCb>,
 }
 
+/// The variants of event types.
+///
+/// Usually not necessary to check, instead use the variants of [`AnimationEvent`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
     Start = 0,
@@ -497,6 +515,9 @@ impl From<spEventType> for EventType {
     }
 }
 
+/// Stores settings and other state for the playback of an animation on an [`AnimationState`] track.
+///
+/// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#TrackEntry)
 #[derive(Debug)]
 pub struct TrackEntry {
     c_track_entry: SyncPtr<spTrackEntry>,
@@ -511,11 +532,27 @@ impl NewFromPtr<spTrackEntry> for TrackEntry {
 }
 
 impl TrackEntry {
+    /// Uses [`track_time`](`Self::track_time`) to compute the
+    /// [`animation_time`](`Self::animation_time`). When the [`track_time`](`Self::track_time`) is
+    /// 0, the [`animation_time`](`Self::animation_time`) is equal to the
+    /// [`animation_start`](`Self::animation_start`) time.
+    ///
+    /// The [`animation_time`](`Self::animation_time`) is between
+    /// [`animation_start`](`Self::animation_start`) and
+    /// [`animation_end`](`Self::animation_end`), except if this track entry is non-looping and
+    /// [`animation_end`](`Self::animation_end`) is >= to the animation duration, then
+    /// [`animation_time`](`Self::animation_time`) continues to increase past
+    /// [`animation_end`](`Self::animation_end`).
     #[must_use]
     pub fn animation_time(&self) -> f32 {
         unsafe { spTrackEntry_getAnimationTime(self.c_ptr()) }
     }
 
+    /// If this track entry is non-looping, the track time in seconds when
+    /// [`animation_end`](`Self::animation_end`) is reached, or the current
+    /// [`track_time`](`Self::track_time`) if it has already been reached. If this track entry is
+    /// looping, the track time when this animation will reach its next
+    /// [`animation_end`](`Self::animation_end`) (the next loop completion).
     #[must_use]
     pub fn track_complete(&self) -> f32 {
         unsafe { spTrackEntry_getTrackComplete(self.c_ptr()) }
@@ -532,45 +569,287 @@ impl TrackEntry {
         }
     }
 
-    c_accessor_tmp_ptr!(animation, animation_mut, animation, Animation, spAnimation);
-    c_accessor_tmp_ptr!(previous, previous_mut, previous, TrackEntry, spTrackEntry);
-    c_accessor_tmp_ptr!(next, next_mut, next, TrackEntry, spTrackEntry);
-    c_accessor_tmp_ptr!(
+    c_accessor_tmp_ptr_mut!(
+        /// The animation to apply for this track entry.
+        animation,
+        /// The mutable animation to apply for this track entry.
+        animation_mut,
+        animation,
+        Animation,
+        spAnimation
+    );
+    c_accessor_tmp_ptr_optional!(
+        /// The animation queued to play before this animation, or [`None`]. `previous` makes up a
+        /// doubly linked list.
+        previous,
+        previous,
+        TrackEntry,
+        spTrackEntry
+    );
+    c_accessor_tmp_ptr_optional!(
+        /// The animation queued to start after this animation, or [`None`] if there is none. `next`
+        /// makes up a doubly linked list.
+        ///
+        /// See [`AnimationState::clear_next`] to truncate the list.
+        next,
+        next,
+        TrackEntry,
+        spTrackEntry
+    );
+    c_accessor_tmp_ptr_optional!(
+        /// The track entry for the previous animation when mixing from the previous animation to this
+        /// animation, or [`None`] if no mixing is currently occuring. When mixing from multiple
+        /// animations, `mixing_from` makes up a linked list.
         mixing_from,
-        mixing_from_mut,
         mixingFrom,
         TrackEntry,
         spTrackEntry
     );
-    c_accessor_tmp_ptr!(mixing_to, mixing_to_mut, mixingTo, TrackEntry, spTrackEntry);
+    c_accessor_tmp_ptr_optional!(
+        /// The track entry for the next animation when mixing from this animation to the next
+        /// animation, or [`None`] if no mixing is currently occuring. When mixing to multiple
+        /// animations, `mixing_to` makes up a linked list.
+        mixing_to,
+        mixingTo,
+        TrackEntry,
+        spTrackEntry
+    );
     c_accessor!(track_index, trackIndex, usize);
-    c_accessor_bool_mut!(looping, set_looping, loop_0);
-    c_accessor_bool_mut!(hold_previous, set_hold_previous, holdPrevious);
-    c_accessor_bool_mut!(reverse, set_reverse, reverse);
-    c_accessor_bool_mut!(shortest_rotation, set_shortest_rotation, shortestRotation);
-    c_accessor_mut!(event_threshold, set_event_threshold, eventThreshold, f32);
+    c_accessor_bool_mut!(
+        /// If `true`, the animation will repeat. If `false` it will not, instead its last frame is
+        /// applied if played beyond its duration.
+        looping,
+        /// Set looping, see [`looping`](`Self::looping`).
+        set_looping,
+        loop_0
+    );
+    c_accessor_bool_mut!(
+        /// If `true`, when mixing from the previous animation to this animation, the previous
+        /// animation is applied as normal instead of being mixed out.
+        ///
+        /// When mixing between animations that key the same property, if a lower track also keys
+        /// that property then the value will briefly dip toward the lower track value during the
+        /// mix. This happens because the first animation mixes from 100% to 0% while the second
+        /// animation mixes from 0% to 100%. Setting `hold_previous` to true applies the first
+        /// animation at 100% during the mix so the lower track value is overwritten. Such dipping
+        /// does not occur on the lowest track which keys the property, only when a higher track
+        /// also keys the property.
+        ///
+        /// Snapping will occur if `hold_previous` is true and this animation does not key all the
+        /// same properties as the previous animation.
+        hold_previous,
+        /// Set hold previous, see [`hold_previous`](`Self::hold_previous`).
+        set_hold_previous,
+        holdPrevious
+    );
+    c_accessor_bool_mut!(
+        /// If `true`, the animation will be applied in reverse. Events are not fired when an
+        /// animation is applied in reverse.
+        reverse,
+        /// Set reverse, see [`reverse`](`Self::reverse`).
+        set_reverse,
+        reverse
+    );
+    c_accessor_bool_mut!(
+        /// If `true`, mixing rotation between tracks always uses the shortest rotation direction.
+        /// If the rotation is animated, the shortest rotation direction may change during the mix.
+        ///
+        /// If `false`, the shortest rotation direction is remembered when the mix starts and the
+        /// same direction is used for the rest of the mix.
+        ///
+        /// Defaults to `false`.
+        shortest_rotation,
+        /// Set shortest rotation, see [`shortest_rotation`](`Self::shortest_rotation`).
+        set_shortest_rotation,
+        shortestRotation
+    );
     c_accessor_mut!(
+        /// When the mix percentage ([`mix_time`](`Self::mix_time`) /
+        /// [`mix_duration`](`Self::mix_duration`)) is less than the `event_threshold`, event
+        /// timelines are applied while this animation is being mixed out. Defaults to 0, so event
+        /// timelines are not applied while this animation is being mixed out.
+        event_threshold,
+        /// Set the event threshold, see [`event_threshold`](`Self::event_threshold`).
+        set_event_threshold,
+        eventThreshold,
+        f32
+    );
+    c_accessor_mut!(
+        /// When the mix percentage ([`mix_time`](`Self::mix_time`) /
+        /// [`mix_duration`](`Self::mix_duration`)) is less than the `attachment_threshold`,
+        /// attachment timelines are applied while this animation is being mixed out. Defaults to 0,
+        /// so attachment timelines are not applied while this animation is being mixed out.
         attachment_threshold,
+        /// Set the attachment threshold, see
+        /// [`attachment_threshold`](`Self::attachment_threshold`).
         set_attachment_threshold,
         attachmentThreshold,
         f32
     );
     c_accessor_mut!(
+        /// When the mix percentage ([`mix_time`](`Self::mix_time`) /
+        /// [`mix_duration`](`Self::mix_duration`)) is less than the `draw_order_threshold`, draw
+        /// order timelines are applied while this animation is being mixed out. Defaults to 0, so
+        /// draw order timelines are not applied while this animation is being mixed out.
         draw_order_threshold,
+        /// Set the draw order threshold, see
+        /// [`draw_order_threshold`](`Self::draw_order_threshold`).
         set_draw_order_threshold,
         drawOrderThreshold,
         f32
     );
-    c_accessor_mut!(animation_start, set_animation_start, animationStart, f32);
-    c_accessor_mut!(animation_end, set_animation_end, animationEnd, f32);
-    c_accessor_mut!(animation_last, set_animation_last, animationLast, f32);
-    c_accessor_mut!(delay, set_delay, delay, f32);
-    c_accessor_mut!(track_time, set_track_time, trackTime, f32);
-    c_accessor_mut!(track_end, set_track_end, trackEnd, f32);
-    c_accessor_mut!(timescale, set_timescale, timeScale, f32);
-    c_accessor_mut!(alpha, set_alpha, alpha, f32);
-    c_accessor_mut!(mix_time, set_mix_time, mixTime, f32);
-    c_accessor_mut!(mix_duration, set_mix_duration, mixDuration, f32);
+    c_accessor_mut!(
+        /// Seconds when this animation starts, both initially and after looping. Defaults to 0.
+        ///
+        /// When changing the animationStart time, it often makes sense to set
+        /// [`animation_last`](`Self::animation_last`) to the same value to prevent timeline keys
+        /// before the start time from triggering.
+        animation_start,
+        /// Set the animation start, see [`animation_start`](`Self::animation_start`).
+        set_animation_start,
+        animationStart,
+        f32
+    );
+    c_accessor_mut!(
+        /// Seconds for the last frame of this animation. Non-looping animations won't play past
+        /// this time. Looping animations will loop back to
+        /// [`animation_start`](`Self::animation_start`) at this time. Defaults to the animation
+        /// duration.
+        animation_end,
+        /// Set the animation end, see [`animation_end`](`Self::animation_end`).
+        set_animation_end,
+        animationEnd,
+        f32
+    );
+    c_accessor_mut!(
+        /// The time in seconds this animation was last applied. Some timelines use this for
+        /// one-time triggers. Eg, when this animation is applied, event timelines will fire all
+        /// events between the animationLast time (exclusive) and animationTime (inclusive).
+        /// Defaults to -1 to ensure triggers on frame 0 happen the first time this animation is
+        /// applied.
+        animation_last,
+        /// Set the animation last, see [`animation_last`](`Self::animation_last`).
+        set_animation_last,
+        animationLast,
+        f32
+    );
+    c_accessor_mut!(
+        /// Seconds to postpone playing the animation. When this track entry is the current track
+        /// entry, delay postpones incrementing the [`track_time`](`Self::track_time`). When this
+        /// track entry is queued, delay is the time from the start of the previous animation to
+        /// when this track entry will become the current track entry (ie when the previous track
+        /// entry [`track_time`](`Self::track_time`) >= this track entry's delay).
+        ///
+        /// [`timescale`](`Self::timescale`) affects the delay.
+        ///
+        /// When using addAnimation with a delay <= 0, the delay is set using the mix duration from
+        /// the AnimationStateData. If mixDuration is set afterward, the delay may need to be
+        /// adjusted.
+        delay,
+        /// Set the delay, see [`delay`](`Self::delay`).
+        set_delay,
+        delay,
+        f32
+    );
+    c_accessor!(
+        /// Current time in seconds this track entry has been the current track entry. The track
+        /// time determines [`animation_time`](`Self::animation_time`). The track time can be set
+        /// to start the animation at a time other than 0, without affecting looping.
+        track_time,
+        trackTime,
+        f32
+    );
+    c_accessor_mut!(
+        /// The track time in seconds when this animation will be removed from the track. Defaults
+        /// to the highest possible float value, meaning the animation will be applied until a new
+        /// animation is set or the track is cleared. If the track end time is reached, no other
+        /// animations are queued for playback, and mixing from any previous animations is complete,
+        /// then the properties keyed by the animation are set to the setup pose and the track is
+        /// cleared.
+        ///
+        /// It may be desired to use [`AnimationState::add_empty_animation`] rather than have the
+        /// animation abruptly cease being applied.
+        track_end,
+        /// Set the track end, see [`track_end`](`Self::track_end`).
+        set_track_end,
+        trackEnd,
+        f32
+    );
+    c_accessor_mut!(
+        /// Multiplier for the delta time when this track entry is updated, causing time for this
+        /// animation to pass slower or faster. Defaults to 1.
+        ///
+        /// Values < 0 are not supported. To play an animation in reverse, use
+        /// [`set_reverse`](`Self::set_reverse`).
+        ///
+        /// [`mix_time`](`Self::mix_time`) is not affected by track entry time scale, so
+        /// [`mix_duration`](`Self::mix_duration`) may need to be adjusted to match the animation
+        /// speed.
+        ///
+        /// When using [`AnimationState::add_animation`] with a delay <= 0, the delay is set using
+        /// the mix duration from the [`AnimationStateData`], assuming time scale to be 1. If the
+        /// time scale is not 1, the delay may need to be adjusted.
+        ///
+        /// See [`AnimationState::timescale`] for affecting all animations.
+        timescale,
+        /// Set the timescale, see [`timescale`](`Self::timescale`).
+        set_timescale,
+        timeScale,
+        f32
+    );
+    c_accessor_mut!(
+        /// Values < 1 mix this animation with the skeleton's current pose (usually the pose
+        /// resulting from lower tracks). Defaults to 1, which overwrites the skeleton's current
+        /// pose with this animation.
+        ///
+        /// Typically track 0 is used to completely pose the skeleton, then alpha is used on higher
+        /// tracks. It doesn't make sense to use alpha on track 0 if the skeleton pose is from the
+        /// last frame render.
+        alpha,
+        /// Set the alpha value, see [`alpha`](`Self::alpha`).
+        set_alpha,
+        alpha,
+        f32
+    );
+    c_accessor_mut!(
+        /// Seconds from 0 to the [`mix_duration`](`Self::mix_duration`) when mixing from the
+        /// previous animation to this animation. May be slightly more than
+        /// [`mix_duration`](`Self::mix_duration`) when the mix is complete.
+        mix_time,
+        /// Set the mix time, see [`mix_time`](`Self::mix_time`).
+        set_mix_time,
+        mixTime,
+        f32
+    );
+    c_accessor_mut!(
+        /// Seconds for mixing from the previous animation to this animation. Defaults to the value
+        /// provided by [`AnimationStateData::get_mix`] based on the animation before this animation
+        /// (if any).
+        ///
+        /// A mix duration of 0 still mixes out over one frame to provide the track entry being
+        /// mixed out a chance to revert the properties it was animating.
+        ///
+        /// The mixDuration can be set manually rather than use the value from
+        /// [`AnimationStateData::get_mix`]. In that case, the
+        /// [`mix_duration`](`Self::mix_duration`) can be set for a new track entry only before
+        /// update is first called.
+        ///
+        /// When using [`AnimationState::add_animation`] with a `delay <= 0`, the
+        /// [`delay`](`Self::delay`) is set using the mix duration from the [`AnimationStateData`].
+        /// If `mix_duration` is set afterward, the delay may need to be adjusted.
+        ///
+        /// For example:
+        /// ```
+        /// # fn foo(entry: &mut rusty_spine::TrackEntry) {
+        /// entry.set_delay(entry.previous().unwrap().track_complete() - entry.mix_duration());
+        /// # }
+        /// ```
+        mix_duration,
+        /// Set the mix duration, see [`mix_duration`](`Self::mix_duration`).
+        set_mix_duration,
+        mixDuration,
+        f32
+    );
     c_accessor!(total_alpha, totalAlpha, f32);
     c_accessor_renderer_object!();
     c_ptr!(c_track_entry, spTrackEntry);

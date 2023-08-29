@@ -1,3 +1,63 @@
+# 0.7.0 (UNRELEASED)
+- More clippy fixes
+- Fixes for pointer, abi, and memory undefined behavior
+- Lots of docs
+- Return values now optional:
+  - `SkeletonData::audio_path`
+  - `SkeletonData::images_path`
+  - `SkeletonData::version`
+  - `SlotData::attachment_name`
+  - `SlotData::blend_mode`
+  - `SlotData::color`
+  - `TrackEntry::mixing_from`
+  - `TrackEntry::mixing_to`
+  - `TrackEntry::next`
+  - `TrackEntry::previous`
+- Remove unnecessary functions:
+  - `Atlas::find_page_mut`
+  - `Atlas::find_region_mut`
+  - `Atlas::pages_mut`
+  - `Atlas::regions_mut`
+  - `AtlasPage::atlas_mut`
+  - `AtlasRegion::page_mut`
+  - `BoneData::color_mut`
+  - `BoneData::parent_mut`
+  - `BoneData::set_length`
+  - `BoneData::set_position`
+  - `BoneData::set_rotation`
+  - `BoneData::set_scale_x`
+  - `BoneData::set_scale_y`
+  - `BoneData::set_scale`
+  - `BoneData::set_shear_x`
+  - `BoneData::set_shear_y`
+  - `BoneData::set_shear`
+  - `BoneData::set_skin_required`
+  - `BoneData::set_transform_mode`
+  - `BoneData::set_x`
+  - `BoneData::set_y`
+  - `SkeletonData::animation_at_index_mut`
+  - `SkeletonData::animations_mut`
+  - `SkeletonData::bone_at_index_mut`
+  - `SkeletonData::bones_mut`
+  - `SkeletonData::default_skin_mut`
+  - `SkeletonData::find_animation_mut`
+  - `SkeletonData::find_bone_mut`
+  - `SkeletonData::find_skin_mut`
+  - `SkeletonData::find_slot_mut`
+  - `SkeletonData::skin_at_index_mut`
+  - `SkeletonData::skins_mut`
+  - `SkeletonData::slot_at_index_mut`
+  - `SkeletonData::slots_mut`
+  - `SlotData::bone_data_mut`
+  - `TrackEntry::set_animation_time`
+  - `TrackEntry::set_mixing_from`
+  - `TrackEntry::set_mixing_to`
+  - `TrackEntry::set_next`
+  - `TrackEntry::set_previous`
+- Remove unnecessary types:
+  - `AtlasPageMutIterator`
+  - `AtlasRegionMutIterator`
+
 # 0.6.1
 - Compilation fixes for new Rust lints
 

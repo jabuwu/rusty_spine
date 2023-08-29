@@ -61,8 +61,8 @@ impl MeshAttachment {
     c_accessor!(width, width, f32);
     c_accessor!(height, height, f32);
     c_accessor_renderer_object!();
-    c_accessor_tmp_ptr_optional!(region, region_mut, region, TextureRegion, spTextureRegion);
-    c_accessor_tmp_ptr!(
+    c_accessor_tmp_ptr_optional_mut!(region, region_mut, region, TextureRegion, spTextureRegion);
+    c_accessor_tmp_ptr_mut!(
         parent_mesh,
         parent_mesh_mut,
         parentMesh,

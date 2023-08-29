@@ -5,7 +5,7 @@ use crate::c::{
     spAtlasFilter, spAtlasFormat, spAtlasRegion, spAtlasWrap, spAtlas_createFromFile,
     spTextureRegion,
 };
-use crate::c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr};
+use crate::c_interface::{CTmpRef, NewFromPtr, SyncPtr};
 use crate::texture_region::TextureRegion;
 use crate::{
     c::{c_int, spAtlas, spAtlasPage, spAtlas_create, spAtlas_dispose},
@@ -104,6 +104,7 @@ impl Atlas {
         }
     }
 
+    /// Iterator over the [`AtlasPage`] list in this atlas.
     #[must_use]
     pub fn pages(&self) -> AtlasPageIterator {
         AtlasPageIterator {
@@ -112,22 +113,13 @@ impl Atlas {
         }
     }
 
-    #[must_use]
-    pub fn pages_mut(&mut self) -> AtlasPageMutIterator {
-        let page = unsafe { self.c_ptr_mut().pages };
-        AtlasPageMutIterator { _atlas: self, page }
-    }
-
+    /// Find an [`AtlasPage`] in this atlas by name.
     #[must_use]
     pub fn find_page(&self, name: &str) -> Option<CTmpRef<Self, AtlasPage>> {
         self.pages().find(|page| page.name() == name)
     }
 
-    #[must_use]
-    pub fn find_page_mut(&mut self, name: &str) -> Option<CTmpMut<Self, AtlasPage>> {
-        self.pages_mut().find(|page| page.name() == name)
-    }
-
+    /// Iterator over the [`AtlasRegion`] list in this atlas, across all pages.
     #[must_use]
     pub fn regions(&self) -> AtlasRegionIterator {
         AtlasRegionIterator {
@@ -136,23 +128,10 @@ impl Atlas {
         }
     }
 
-    #[must_use]
-    pub fn regions_mut(&mut self) -> AtlasRegionMutIterator {
-        let region = unsafe { self.c_ptr_mut().regions };
-        AtlasRegionMutIterator {
-            _atlas: self,
-            region,
-        }
-    }
-
+    /// Find an [`AtlasRegion`] in this atlas by name, across all pages.
     #[must_use]
     pub fn find_region(&self, name: &str) -> Option<CTmpRef<Self, AtlasRegion>> {
         self.regions().find(|region| region.name() == name)
-    }
-
-    #[must_use]
-    pub fn find_region_mut(&mut self, name: &str) -> Option<CTmpMut<Self, AtlasRegion>> {
-        self.regions_mut().find(|region| region.name() == name)
     }
 
     c_accessor_renderer_object!();
@@ -178,6 +157,9 @@ pub mod atlas {
 
     use super::*;
 
+    /// Settings for an atlas backing texture contained in [`Atlas`].
+    ///
+    /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#AtlasPage)
     #[derive(Debug)]
     pub struct AtlasPage {
         c_atlas_page: SyncPtr<spAtlasPage>,
@@ -192,16 +174,65 @@ pub mod atlas {
     }
 
     impl AtlasPage {
-        c_accessor_tmp_ptr!(atlas, atlas_mut, atlas, Atlas, spAtlas);
-        c_accessor_string!(name, name);
-        c_accessor_enum!(format, format, AtlasFormat);
-        c_accessor_enum!(min_filter, minFilter, AtlasFilter);
-        c_accessor_enum!(mag_filter, magFilter, AtlasFilter);
-        c_accessor_enum!(u_wrap, uWrap, AtlasWrap);
-        c_accessor_enum!(v_wrap, vWrap, AtlasWrap);
-        c_accessor!(width, width, i32);
-        c_accessor!(height, height, i32);
-        c_accessor_bool!(pma, pma);
+        c_accessor_tmp_ptr!(
+            /// The [`Atlas`] this page belongs to.
+            atlas,
+            atlas,
+            Atlas,
+            spAtlas
+        );
+        c_accessor_string!(
+            /// The name of the image file for the texture.
+            name,
+            name
+        );
+        c_accessor_enum!(
+            /// The memory format to use for the texture.
+            format,
+            format,
+            AtlasFormat
+        );
+        c_accessor_enum!(
+            /// The texture's magnification filter.
+            mag_filter,
+            magFilter,
+            AtlasFilter
+        );
+        c_accessor_enum!(
+            /// The texture's minification filter.
+            min_filter,
+            minFilter,
+            AtlasFilter
+        );
+        c_accessor_enum!(
+            /// The X axis texture wrap setting.
+            u_wrap,
+            uWrap,
+            AtlasWrap
+        );
+        c_accessor_enum!(
+            /// The Y axis texture wrap setting.
+            v_wrap,
+            vWrap,
+            AtlasWrap
+        );
+        c_accessor!(
+            /// The width in pixels of the image file.
+            width,
+            width,
+            i32
+        );
+        c_accessor!(
+            /// The height in pixels of the image file.
+            height,
+            height,
+            i32
+        );
+        c_accessor_bool!(
+            /// The premultiplied alpha setting.
+            pma,
+            pma
+        );
         c_accessor_renderer_object!();
         c_ptr!(c_atlas_page, spAtlasPage);
     }
@@ -209,6 +240,7 @@ pub mod atlas {
     /// Functions available if using the `mint` feature.
     #[cfg(feature = "mint")]
     impl AtlasPage {
+        /// The width and height in pixels of the image file.
         #[must_use]
         pub fn size(&self) -> Vector2<i32> {
             Vector2 {
@@ -218,6 +250,7 @@ pub mod atlas {
         }
     }
 
+    /// An iterator over each [`AtlasPage`] in an [`Atlas`].
     pub struct AtlasPageIterator<'a> {
         pub(crate) _atlas: &'a Atlas,
         pub(crate) page: *mut spAtlasPage,
@@ -237,28 +270,7 @@ pub mod atlas {
         }
     }
 
-    pub struct AtlasPageMutIterator<'a> {
-        pub(crate) _atlas: &'a mut Atlas,
-        pub(crate) page: *mut spAtlasPage,
-    }
-
-    impl<'a> Iterator for AtlasPageMutIterator<'a> {
-        type Item = CTmpMut<'a, Atlas, AtlasPage>;
-
-        fn next(&mut self) -> Option<Self::Item> {
-            if !self.page.is_null() {
-                let page = unsafe { AtlasPage::new_from_ptr(self.page) };
-                self.page = unsafe { (*self.page).next };
-                Some(CTmpMut::new(
-                    unsafe { &mut *(self._atlas as *mut Atlas) },
-                    page,
-                ))
-            } else {
-                None
-            }
-        }
-    }
-
+    /// The texture format setting to use for an [`AtlasPage`].
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum AtlasFormat {
         UnknownFormat = 0,
@@ -286,6 +298,7 @@ pub mod atlas {
         }
     }
 
+    /// The texture filter setting to use for an [`AtlasPage`].
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum AtlasFilter {
         UnknownFilter = 0,
@@ -313,6 +326,7 @@ pub mod atlas {
         }
     }
 
+    /// The texture wrapping setting to use for an [`AtlasPage`].
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum AtlasWrap {
         MirroredRepeat = 0,
@@ -332,6 +346,9 @@ pub mod atlas {
         }
     }
 
+    /// A texture region on an [`AtlasPage`].
+    ///
+    /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#AtlasRegion)
     #[derive(Debug)]
     pub struct AtlasRegion {
         c_atlas_region: SyncPtr<spAtlasRegion>,
@@ -358,7 +375,7 @@ pub mod atlas {
         c_accessor!(index, index, usize);
         c_accessor_fixed_slice_optional!(splits, splits, &[c_int; 4], 4);
         c_accessor_fixed_slice_optional!(pads, pads, &[c_int; 4], 4);
-        c_accessor_tmp_ptr!(page, page_mut, page, AtlasPage, spAtlasPage);
+        c_accessor_tmp_ptr!(page, page, AtlasPage, spAtlasPage);
 
         #[must_use]
         pub fn key_values(&self) -> Vec<KeyValue> {
@@ -378,12 +395,14 @@ pub mod atlas {
         c_ptr!(c_atlas_region, spAtlasRegion);
     }
 
+    /// Additional key-value pairs in an [`AtlasRegion`].
     #[derive(Debug)]
     pub struct KeyValue {
         pub name: String,
         pub values: [f32; 5],
     }
 
+    /// An iterator over each [`AtlasRegion`] in an [`Atlas`].
     pub struct AtlasRegionIterator<'a> {
         pub(crate) _atlas: &'a Atlas,
         pub(crate) region: *mut spAtlasRegion,
@@ -411,28 +430,6 @@ pub mod atlas {
             Vector2 {
                 x: self.x(),
                 y: self.y(),
-            }
-        }
-    }
-
-    pub struct AtlasRegionMutIterator<'a> {
-        pub(crate) _atlas: &'a mut Atlas,
-        pub(crate) region: *mut spAtlasRegion,
-    }
-
-    impl<'a> Iterator for AtlasRegionMutIterator<'a> {
-        type Item = CTmpMut<'a, Atlas, AtlasRegion>;
-
-        fn next(&mut self) -> Option<Self::Item> {
-            if !self.region.is_null() {
-                let page = unsafe { AtlasRegion::new_from_ptr(self.region) };
-                self.region = unsafe { (*self.region).next };
-                Some(CTmpMut::new(
-                    unsafe { &mut *(self._atlas as *mut Atlas) },
-                    page,
-                ))
-            } else {
-                None
             }
         }
     }

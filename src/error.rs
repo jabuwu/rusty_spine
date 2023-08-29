@@ -1,5 +1,6 @@
 use std::{error, ffi::NulError, fmt};
 
+/// Error types when interacting with the Spine runtime.
 #[derive(Debug)]
 pub enum SpineError {
     /// A parsing error straight from the Spine C runtime.

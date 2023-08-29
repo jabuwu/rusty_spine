@@ -9,6 +9,7 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
+/// Create a type from its underlying [`spine-c`](`crate::c`) pointer type.
 pub trait NewFromPtr<C> {
     unsafe fn new_from_ptr(c_ptr: *mut C) -> Self;
 }
@@ -367,6 +368,7 @@ impl<T> Ord for SyncPtr<T> {
 
 macro_rules! c_ptr {
     ($member:ident, $c_type:ty) => {
+        /// Get a pointer to the underlying [`spine-c`](`crate::c`) type.
         #[inline]
         #[must_use]
         pub const fn c_ptr(&self) -> *mut $c_type {
@@ -390,19 +392,29 @@ macro_rules! c_ptr {
 }
 
 macro_rules! c_accessor {
-    ($rust:ident, $c:ident, $type:ty) => {
-        c_accessor_for!(c_ptr_ref, $rust, $c, $type);
+    ($(#[$($attrss:tt)*])* $rust:ident, $c:ident, $type:ty) => {
+        c_accessor_for!(c_ptr_ref, $(#[$($attrss)*])* $rust, $c, $type);
     };
 }
 
 macro_rules! c_accessor_mut {
-    ($rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
-        c_accessor_mut_for!(c_ptr_ref, c_ptr_mut, $rust, $rust_set, $c, $type);
+    ($(#[$($attrss1:tt)*])* $rust:ident, $(#[$($attrss2:tt)*])* $rust_set:ident, $c:ident, $type:ty) => {
+        c_accessor_mut_for!(
+            c_ptr_ref,
+            c_ptr_mut,
+            $(#[$($attrss1)*])*
+            $rust,
+            $(#[$($attrss2)*])*
+            $rust_set,
+            $c,
+            $type
+        );
     };
 }
 
 macro_rules! c_accessor_for {
-    ($for:ident, $rust:ident, $c:ident, $type:ty) => {
+    ($for:ident, $(#[$($attrss:tt)*])* $rust:ident, $c:ident, $type:ty) => {
+        $(#[$($attrss)*])*
         #[inline]
         #[must_use]
         pub fn $rust(&self) -> $type {
@@ -415,8 +427,15 @@ macro_rules! c_accessor_for {
 }
 
 macro_rules! c_accessor_mut_for {
-    ($for:ident, $for_mut:ident, $rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
-        c_accessor_for!($for, $rust, $c, $type);
+    ($for:ident, $for_mut:ident, $(#[$($attrss1:tt)*])* $rust:ident, $(#[$($attrss2:tt)*])* $rust_set:ident, $c:ident, $type:ty) => {
+        c_accessor_for!(
+            $for,
+            $(#[$($attrss1)*])*
+            $rust,
+            $c,
+            $type
+        );
+        $(#[$($attrss2)*])*
         #[inline]
         pub fn $rust_set(&mut self, value: $type) {
             unsafe {
@@ -427,7 +446,8 @@ macro_rules! c_accessor_mut_for {
 }
 
 macro_rules! c_accessor_string {
-    ($rust:ident, $c:ident) => {
+    ($(#[$($attrss:tt)*])* $rust:ident, $c:ident) => {
+        $(#[$($attrss)*])*
         #[inline]
         #[must_use]
         pub fn $rust(&self) -> &str {
@@ -442,8 +462,26 @@ macro_rules! c_accessor_string {
     };
 }
 
+macro_rules! c_accessor_string_optional {
+    ($(#[$($attrss:tt)*])* $rust:ident, $c:ident) => {
+        $(#[$($attrss)*])*
+        #[inline]
+        #[must_use]
+        pub fn $rust(&self) -> Option<&str> {
+            unsafe {
+                if !self.c_ptr_ref().$c.is_null() {
+                    Some(crate::c_interface::from_c_str(std::ffi::CStr::from_ptr(self.c_ptr_ref().$c)))
+                } else {
+                    None
+                }
+            }
+        }
+    };
+}
+
 macro_rules! c_accessor_bool {
-    ($rust:ident, $c:ident) => {
+    ($(#[$($attrss:tt)*])* $rust:ident, $c:ident) => {
+        $(#[$($attrss)*])*
         #[must_use]
         pub fn $rust(&self) -> bool {
             unsafe { self.c_ptr_ref().$c != 0 }
@@ -452,8 +490,9 @@ macro_rules! c_accessor_bool {
 }
 
 macro_rules! c_accessor_bool_mut {
-    ($rust:ident, $rust_set:ident, $c:ident) => {
-        c_accessor_bool!($rust, $c);
+    ($(#[$($attrss1:tt)*])* $rust:ident, $(#[$($attrss2:tt)*])* $rust_set:ident, $c:ident) => {
+        c_accessor_bool!($(#[$($attrss1)*])* $rust, $c);
+        $(#[$($attrss2)*])*
         pub fn $rust_set(&mut self, value: bool) {
             unsafe {
                 self.c_ptr_mut().$c = if value { 1 } else { 0 };
@@ -463,7 +502,8 @@ macro_rules! c_accessor_bool_mut {
 }
 
 macro_rules! c_accessor_color {
-    ($rust:ident, $c:ident) => {
+    ($(#[$($attrss1:tt)*])* $rust:ident, $c:ident) => {
+        $(#[$($attrss1)*])*
         #[must_use]
         pub fn $rust(&self) -> crate::color::Color {
             unsafe {
@@ -474,8 +514,13 @@ macro_rules! c_accessor_color {
 }
 
 macro_rules! c_accessor_color_mut {
-    ($rust:ident, $rust_mut:ident, $c:ident) => {
-        c_accessor_color!($rust, $c);
+    ($(#[$($attrss1:tt)*])* $rust:ident, $(#[$($attrss2:tt)*])* $rust_mut:ident, $c:ident) => {
+        c_accessor_color!(
+            $(#[$($attrss1)*])*
+            $rust,
+            $c
+        );
+        $(#[$($attrss2)*])*
         #[must_use]
         pub fn $rust_mut(&mut self) -> &mut crate::color::Color {
             unsafe {
@@ -487,7 +532,8 @@ macro_rules! c_accessor_color_mut {
 }
 
 macro_rules! c_accessor_color_optional {
-    ($rust:ident, $c:ident) => {
+    ($(#[$($attrss:tt)*])* $rust:ident, $c:ident) => {
+        $(#[$($attrss)*])*
         #[must_use]
         pub fn $rust(&self) -> Option<crate::color::Color> {
             unsafe {
@@ -503,7 +549,8 @@ macro_rules! c_accessor_color_optional {
 }
 
 macro_rules! c_accessor_enum {
-    ($rust:ident, $c:ident, $type:ty) => {
+    ($(#[$($attrss:tt)*])* $rust:ident, $c:ident, $type:ty) => {
+        $(#[$($attrss)*])*
         #[must_use]
         pub fn $rust(&self) -> $type {
             unsafe { self.c_ptr_ref().$c.into() }
@@ -511,22 +558,19 @@ macro_rules! c_accessor_enum {
     };
 }
 
-macro_rules! c_accessor_enum_mut {
-    ($rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
-        c_accessor_enum!($rust, $c, $type);
+/*macro_rules! c_accessor_enum_mut {
+    ($(#[$($attrss1:tt)*])* $rust:ident, $(#[$($attrss2:tt)*])* $rust_set:ident, $c:ident, $type:ty) => {
+        c_accessor_enum!(
+            $(#[$($attrss1)*])*
+            $rust,
+            $c,
+            $type
+        );
+        $(#[$($attrss2)*])*
         pub fn $rust_set(&self, value: $type) {
             unsafe {
                 (*self.c_ptr()).$c = value as u32;
             }
-        }
-    };
-}
-
-/*macro_rules! c_accessor_enum_mut {
-    ($rust:ident, $rust_set:ident, $c:ident, $type:ty) => {
-        c_accessor_enum!($rust, $c, $type);
-        pub fn $rust_set(&mut self, value: $type) {
-            self.c_ptr_mut().$c = value as u32;
         }
     };
 }*/
@@ -543,7 +587,8 @@ macro_rules! c_accessor_renderer_object {
 }
 
 macro_rules! c_accessor_tmp_ptr {
-    ($rust:ident, $rust_mut:ident, $c:ident, $type:ty, $c_type:ident) => {
+    ($(#[$($attrss:tt)*])* $rust:ident, $c:ident, $type:ty, $c_type:ident) => {
+        $(#[$($attrss)*])*
         #[must_use]
         pub fn $rust(&self) -> crate::c_interface::CTmpRef<Self, $type> {
             crate::c_interface::CTmpRef::new(self, unsafe {
@@ -552,6 +597,19 @@ macro_rules! c_accessor_tmp_ptr {
                 )
             })
         }
+    };
+}
+
+macro_rules! c_accessor_tmp_ptr_mut {
+    ($(#[$($attrss1:tt)*])* $rust:ident, $(#[$($attrss2:tt)*])* $rust_mut:ident, $c:ident, $type:ty, $c_type:ident) => {
+        c_accessor_tmp_ptr!(
+            $(#[$($attrss1)*])*
+            $rust,
+            $c,
+            $type,
+            $c_type
+        );
+        $(#[$($attrss2)*])*
         #[must_use]
         pub fn $rust_mut(&mut self) -> crate::c_interface::CTmpMut<Self, $type> {
             crate::c_interface::CTmpMut::new(self, unsafe {
@@ -563,8 +621,9 @@ macro_rules! c_accessor_tmp_ptr {
     };
 }
 
-macro_rules! c_accessor_tmp_ptr_optional {
-    ($rust:ident, $rust_mut:ident, $c:ident, $type:ty, $c_type:ident) => {
+macro_rules! c_accessor_tmp_ptr_optional{
+    ($(#[$($attrss:tt)*])* $rust:ident, $c:ident, $type:ty, $c_type:ident) => {
+        $(#[$($attrss)*])*
         #[must_use]
         pub fn $rust(&self) -> Option<crate::c_interface::CTmpRef<Self, $type>> {
             let ptr = unsafe { self.c_ptr_ref().$c };
@@ -576,6 +635,19 @@ macro_rules! c_accessor_tmp_ptr_optional {
                 None
             }
         }
+    };
+}
+
+macro_rules! c_accessor_tmp_ptr_optional_mut {
+    ($(#[$($attrss1:tt)*])* $rust:ident, $(#[$($attrss2:tt)*])* $rust_mut:ident, $c:ident, $type:ty, $c_type:ident) => {
+        c_accessor_tmp_ptr_optional!(
+            $(#[$($attrss1)*])*
+            $rust,
+            $c,
+            $type,
+            $c_type
+        );
+        $(#[$($attrss2)*])*
         #[must_use]
         pub fn $rust_mut(&mut self) -> Option<crate::c_interface::CTmpMut<Self, $type>> {
             let ptr = unsafe { self.c_ptr_ref().$c };
@@ -614,7 +686,8 @@ macro_rules! c_accessor_super {
 }
 
 macro_rules! c_accessor_passthrough {
-    ($rust:ident, $c:ident, $type:ty) => {
+    ($(#[$($attrss:tt)*])* $rust:ident, $c:ident, $type:ty) => {
+        $(#[$($attrss)*])*
         #[must_use]
         pub fn $rust(&self) -> $type {
             unsafe { self.c_ptr_ref().$c }
@@ -623,8 +696,8 @@ macro_rules! c_accessor_passthrough {
 }
 
 macro_rules! c_accessor_array {
-    ($(#[$($attrss:tt)*])* $rust:ident, $rust_mut:ident, $rust_index:ident, $rust_index_mut:ident, $parent_type:ty, $type:ty, $c_type:ty, $c:ident, $count_fn:ident) => {
-        $(#[$($attrss)*])*
+    ($(#[$($attrss1:tt)*])* $rust:ident, $(#[$($attrss2:tt)*])* $rust_index:ident, $parent_type:ty, $type:ty, $c_type:ty, $c:ident, $count_fn:ident) => {
+        $(#[$($attrss1)*])*
         #[must_use]
         pub fn $rust(&self) -> crate::c_interface::CTmpPtrIterator<$parent_type, $type, $c_type> {
             crate::c_interface::CTmpPtrIterator::new(
@@ -634,17 +707,7 @@ macro_rules! c_accessor_array {
             )
         }
 
-        #[must_use]
-        pub fn $rust_mut(
-            &mut self,
-        ) -> crate::c_interface::CTmpMutIterator<$parent_type, $type, $c_type> {
-            crate::c_interface::CTmpMutIterator::new(
-                self,
-                unsafe { self.c_ptr_ref().$c },
-                self.$count_fn() as usize,
-            )
-        }
-
+        $(#[$($attrss2)*])*
         #[must_use]
         pub fn $rust_index(
             &self,
@@ -660,7 +723,36 @@ macro_rules! c_accessor_array {
                 None
             }
         }
+    };
+}
 
+macro_rules! c_accessor_array_mut {
+    ($(#[$($attrss1:tt)*])* $rust:ident, $(#[$($attrss2:tt)*])* $rust_mut:ident, $(#[$($attrss3:tt)*])* $rust_index:ident, $(#[$($attrss4:tt)*])* $rust_index_mut:ident, $parent_type:ty, $type:ty, $c_type:ty, $c:ident, $count_fn:ident) => {
+        c_accessor_array!(
+            $(#[$($attrss1)*])*
+            $rust,
+            $(#[$($attrss3)*])*
+            $rust_index,
+            $parent_type,
+            $type,
+            $c_type,
+            $c,
+            $count_fn
+        );
+
+        $(#[$($attrss2)*])*
+        #[must_use]
+        pub fn $rust_mut(
+            &mut self,
+        ) -> crate::c_interface::CTmpMutIterator<$parent_type, $type, $c_type> {
+            crate::c_interface::CTmpMutIterator::new(
+                self,
+                unsafe { self.c_ptr_ref().$c },
+                self.$count_fn() as usize,
+            )
+        }
+
+        $(#[$($attrss4)*])*
         #[must_use]
         pub fn $rust_index_mut(
             &mut self,
@@ -680,7 +772,8 @@ macro_rules! c_accessor_array {
 }
 
 macro_rules! c_accessor_array_nullable {
-    ($rust:ident, $rust_mut:ident, $rust_index:ident, $rust_index_mut:ident, $parent_type:ty, $type:ty, $c_type:ty, $c:ident, $count_fn:ident) => {
+    ($(#[$($attrss1:tt)*])* $rust:ident, $(#[$($attrss2:tt)*])* $rust_mut:ident, $(#[$($attrss3:tt)*])* $rust_index:ident, $(#[$($attrss4:tt)*])* $rust_index_mut:ident, $parent_type:ty, $type:ty, $c_type:ty, $c:ident, $count_fn:ident) => {
+        $(#[$($attrss1)*])*
         #[must_use]
         pub fn $rust(
             &self,
@@ -692,6 +785,7 @@ macro_rules! c_accessor_array_nullable {
             )
         }
 
+        $(#[$($attrss2)*])*
         #[must_use]
         pub fn $rust_mut(
             &mut self,
@@ -703,6 +797,7 @@ macro_rules! c_accessor_array_nullable {
             )
         }
 
+        $(#[$($attrss3)*])*
         #[must_use]
         pub fn $rust_index(
             &self,
@@ -722,6 +817,7 @@ macro_rules! c_accessor_array_nullable {
             }
         }
 
+        $(#[$($attrss4)*])*
         #[must_use]
         pub fn $rust_index_mut(
             &mut self,
@@ -744,7 +840,7 @@ macro_rules! c_accessor_array_nullable {
 }
 
 macro_rules! c_accessor_slice_for {
-    ($(#[$($attrss:tt)*])* $for:ident, $rust:ident, $c:ident, $type:ty, $len:ident) => {
+    ($for:ident, $(#[$($attrss:tt)*])* $rust:ident, $c:ident, $type:ty, $len:ident) => {
         $(#[$($attrss)*])*
         #[inline]
         #[must_use]
@@ -760,7 +856,8 @@ macro_rules! c_accessor_slice_for {
 }
 
 macro_rules! c_accessor_fixed_slice_optional {
-    ($rust:ident, $c:ident, $type:ty, $len:literal) => {
+    ($(#[$($attrss:tt)*])* $rust:ident, $c:ident, $type:ty, $len:literal) => {
+        $(#[$($attrss)*])*
         #[inline]
         #[must_use]
         pub fn $rust(&self) -> Option<$type> {
@@ -832,9 +929,9 @@ macro_rules! c_vertex_attachment_accessors {
 
         c_accessor_slice_for!(vertex_attachment, bones, bones, &[i32], bonesCount);
         c_accessor_slice_for!(
+            vertex_attachment,
             /// Gets the raw float array slice representing the vertices of the attachment. If using
             /// the `mint` feature, the [`Self::vertices2`] function may be more convenient to use.
-            vertex_attachment,
             vertices,
             vertices,
             &[f32],

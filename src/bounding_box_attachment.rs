@@ -30,7 +30,12 @@ impl BoundingBoxAttachment {
 
     c_attachment_accessors!();
     c_vertex_attachment_accessors!();
-    c_accessor_color!(color, color);
+    c_accessor_color!(
+        /// The color of the bounding box as it was in Spine, or a default color if nonessential
+        /// data was not exported. Bounding boxes are not usually rendered at runtime.
+        color,
+        color
+    );
     c_ptr!(c_bounding_box_attachment, spBoundingBoxAttachment);
 }
 

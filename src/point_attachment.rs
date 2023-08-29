@@ -47,7 +47,12 @@ impl PointAttachment {
     }
 
     c_attachment_accessors!();
-    c_accessor_color!(color, color);
+    c_accessor_color!(
+        /// The color of the point attachment as it was in Spine, or a default color if nonessential
+        /// data was not exported. Point attachments are not usually rendered at runtime.
+        color,
+        color
+    );
     c_accessor_mut!(rotation, set_rotation, rotation, f32);
     c_accessor_mut!(x, set_x, x, f32);
     c_accessor_mut!(y, set_y, x, f32);

@@ -81,6 +81,7 @@ impl SkeletonClipping {
     }
 
     c_ptr!(c_skeleton_clipping, spSkeletonClipping);
+    // TODO
     /*spTriangulator *triangulator;
     spFloatArray *clippingPolygon;
     spFloatArray *clipOutput;

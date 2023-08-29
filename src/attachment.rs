@@ -35,6 +35,7 @@ impl NewFromPtr<spAttachment> for Attachment {
 }
 
 impl Attachment {
+    /// Get this attachment as a [`RegionAttachment`], or [`None`] if it's a different type.
     #[must_use]
     pub fn as_region(&self) -> Option<RegionAttachment> {
         if self.attachment_type() == AttachmentType::Region {
@@ -46,6 +47,7 @@ impl Attachment {
         }
     }
 
+    /// Get this attachment as a [`BoundingBoxAttachment`], or [`None`] if it's a different type.
     #[must_use]
     pub fn as_bounding_box(&self) -> Option<BoundingBoxAttachment> {
         if self.attachment_type() == AttachmentType::BoundingBox {
@@ -59,6 +61,7 @@ impl Attachment {
         }
     }
 
+    /// Get this attachment as a [`MeshAttachment`], or [`None`] if it's a different type.
     #[must_use]
     pub fn as_mesh(&self) -> Option<MeshAttachment> {
         if self.attachment_type() == AttachmentType::Mesh {
@@ -70,6 +73,7 @@ impl Attachment {
         }
     }
 
+    /// Get this attachment as a [`PointAttachment`], or [`None`] if it's a different type.
     #[must_use]
     pub fn as_point(&self) -> Option<PointAttachment> {
         if self.attachment_type() == AttachmentType::Point {
@@ -81,6 +85,7 @@ impl Attachment {
         }
     }
 
+    /// Get this attachment as a [`ClippingAttachment`], or [`None`] if it's a different type.
     #[must_use]
     pub fn as_clipping(&self) -> Option<ClippingAttachment> {
         if self.attachment_type() == AttachmentType::Clipping {
@@ -92,8 +97,17 @@ impl Attachment {
         }
     }
 
-    c_accessor_string!(name, name);
-    c_accessor_enum!(attachment_type, type_0, AttachmentType);
+    c_accessor_string!(
+        /// The attachment's name.
+        name,
+        name
+    );
+    c_accessor_enum!(
+        /// The attachment's type.
+        attachment_type,
+        type_0,
+        AttachmentType
+    );
     c_ptr!(c_attachment, spAttachment);
 }
 
@@ -111,6 +125,7 @@ impl Drop for Attachment {
     }
 }
 
+/// The type variants of an [`Attachment`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AttachmentType {
     Region = 0,

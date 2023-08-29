@@ -28,5 +28,5 @@ impl ClippingAttachment {
     c_attachment_accessors!();
     c_ptr!(c_clipping_attachment, spClippingAttachment);
     c_accessor_color_mut!(color, color_mut, color);
-    c_accessor_tmp_ptr!(end_slot, end_slot_mut, endSlot, SlotData, spSlotData);
+    c_accessor_tmp_ptr_mut!(end_slot, end_slot_mut, endSlot, SlotData, spSlotData);
 }

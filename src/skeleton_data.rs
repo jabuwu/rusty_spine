@@ -4,7 +4,7 @@ use crate::{
     animation::Animation,
     bone::BoneData,
     c::{spAnimation, spBoneData, spSkeletonData, spSkeletonData_dispose, spSkin, spSlotData},
-    c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
+    c_interface::{CTmpRef, NewFromPtr, SyncPtr},
     skin::Skin,
     slot::SlotData,
     Atlas,
@@ -54,18 +54,8 @@ impl SkeletonData {
     }
 
     #[must_use]
-    pub fn find_bone_mut(&mut self, name: &str) -> Option<CTmpMut<SkeletonData, BoneData>> {
-        self.bones_mut().find(|bone| bone.name() == name)
-    }
-
-    #[must_use]
     pub fn find_slot(&self, name: &str) -> Option<CTmpRef<SkeletonData, SlotData>> {
         self.slots().find(|slot| slot.name() == name)
-    }
-
-    #[must_use]
-    pub fn find_slot_mut(&mut self, name: &str) -> Option<CTmpMut<SkeletonData, SlotData>> {
-        self.slots_mut().find(|slot| slot.name() == name)
     }
 
     #[must_use]
@@ -74,29 +64,56 @@ impl SkeletonData {
     }
 
     #[must_use]
-    pub fn find_skin_mut(&mut self, name: &str) -> Option<CTmpMut<SkeletonData, Skin>> {
-        self.skins_mut().find(|skin| skin.name() == name)
-    }
-
-    #[must_use]
     pub fn find_animation(&self, name: &str) -> Option<CTmpRef<SkeletonData, Animation>> {
         self.animations().find(|animation| animation.name() == name)
     }
 
-    #[must_use]
-    pub fn find_animation_mut(&mut self, name: &str) -> Option<CTmpMut<SkeletonData, Animation>> {
-        self.animations_mut()
-            .find(|animation| animation.name() == name)
-    }
-
-    c_accessor_string!(version, version);
-    c_accessor_string!(hash, hash);
-    c_accessor_string!(images_path, imagesPath);
-    c_accessor_string!(audio_path, audioPath);
-    c_accessor!(x, x, f32);
-    c_accessor!(y, y, f32);
-    c_accessor!(width, width, f32);
-    c_accessor!(height, height, f32);
+    c_accessor_string_optional!(
+        /// The Spine version used to export the skeleton data, or [`None`].
+        version,
+        version
+    );
+    c_accessor_string!(
+        /// The skeleton data hash. This value will change if any of the skeleton data has changed.
+        hash,
+        hash
+    );
+    c_accessor_string_optional!(
+        /// The path to the images directory as defined in Spine, or [`None`] if nonessential data
+        /// was not exported.
+        images_path,
+        imagesPath
+    );
+    c_accessor_string_optional!(
+        /// The path to the audio directory as defined in Spine, or [`None`] if nonessential data
+        /// was not exported.
+        audio_path,
+        audioPath
+    );
+    c_accessor!(
+        /// The X coordinate of the skeleton's axis aligned bounding box in the setup pose.
+        x,
+        x,
+        f32
+    );
+    c_accessor!(
+        /// The Y coordinate of the skeleton's axis aligned bounding box in the setup pose.
+        y,
+        y,
+        f32
+    );
+    c_accessor!(
+        /// The width of the skeleton's axis aligned bounding box in the setup pose.
+        width,
+        width,
+        f32
+    );
+    c_accessor!(
+        /// The height of the skeleton's axis aligned bounding box in the setup pose.
+        height,
+        height,
+        f32
+    );
     c_accessor!(bones_count, bonesCount, usize);
     c_accessor!(slots_count, slotsCount, usize);
     c_accessor!(skins_count, skinsCount, usize);
@@ -111,9 +128,7 @@ impl SkeletonData {
     c_accessor!(path_constraints_count, pathConstraintsCount, usize);
     c_accessor_array!(
         bones,
-        bones_mut,
         bone_at_index,
-        bone_at_index_mut,
         SkeletonData,
         BoneData,
         spBoneData,
@@ -122,9 +137,7 @@ impl SkeletonData {
     );
     c_accessor_array!(
         slots,
-        slots_mut,
         slot_at_index,
-        slot_at_index_mut,
         SkeletonData,
         SlotData,
         spSlotData,
@@ -133,21 +146,17 @@ impl SkeletonData {
     );
     c_accessor_array!(
         skins,
-        skins_mut,
         skin_at_index,
-        skin_at_index_mut,
         SkeletonData,
         Skin,
         spSkin,
         skins,
         skins_count
     );
-    c_accessor_tmp_ptr!(default_skin, default_skin_mut, defaultSkin, Skin, spSkin);
+    c_accessor_tmp_ptr!(default_skin, defaultSkin, Skin, spSkin);
     c_accessor_array!(
         animations,
-        animations_mut,
         animation_at_index,
-        animation_at_index_mut,
         SkeletonData,
         Animation,
         spAnimation,
@@ -162,6 +171,7 @@ impl SkeletonData {
 /// Functions available if using the `mint` feature.
 #[cfg(feature = "mint")]
 impl SkeletonData {
+    /// The translation of the skeleton's axis aligned bounding box in the setup pose.
     #[must_use]
     pub fn position(&self) -> Vector2<f32> {
         Vector2 {
@@ -170,6 +180,7 @@ impl SkeletonData {
         }
     }
 
+    /// The size of the skeleton's axis aligned bounding box in the setup pose.
     #[must_use]
     pub fn size(&self) -> Vector2<f32> {
         Vector2 {

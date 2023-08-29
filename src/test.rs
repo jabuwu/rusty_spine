@@ -10,13 +10,6 @@ use rusty_spine::{
     AnimationState, AnimationStateData, Atlas, Skeleton, SkeletonData, SkeletonJson,
 };
 
-/*pub const TEST_SPINEBOY_ATLAS_FILE: &'static str = "assets/spineboy/export/spineboy.atlas";
-
-pub const TEST_SPINEBOY_ATLAS_BYTES: &'static [u8] =
-    include_bytes!("../assets/spineboy/export/spineboy.atlas");
-pub const TEST_SPINEBOY_JSON_BYTES: &'static [u8] =
-    include_bytes!("../assets/spineboy/export/spineboy-pro.json");*/
-
 pub struct TestAsset {
     pub atlas_file: &'static str,
     pub atlas_data: &'static [u8],

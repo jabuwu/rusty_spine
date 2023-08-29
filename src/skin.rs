@@ -148,6 +148,7 @@ impl<'a> CTmpMut<'a, Skeleton, Skin> {
     }
 }
 
+/// An [`Skin`]'s [`Attachment`] and slot index.
 pub struct AttachmentEntry {
     pub slot_index: i32,
     pub attachment: Attachment,
