@@ -4,7 +4,7 @@
 //!
 //! # Texture Creation & Disposal
 //!
-//! Callbacks must be set to handle texture loading upon loading a [`rusty_spine::Atlas`].
+//! Callbacks must first be set to handle texture loading upon loading a [`rusty_spine::Atlas`].
 //! See [`SpineTexture`].
 //!
 //! # Texture Runtime Settings
@@ -616,6 +616,7 @@ impl EventHandler for Stage {
             bindings.index_buffer.update(ctx, &renderable.indices);
 
             // If there is no attachment (and therefore no texture), skip rendering this renderable
+            // May also be None if a create texture callback was never set.
             let Some(attachment_renderer_object) = renderable.attachment_renderer_object else {
                 continue;
             };
@@ -707,6 +708,7 @@ impl EventHandler for Stage {
 }
 
 fn main() {
+    // These texture callbacks should be set before loading an atlas.
     rusty_spine::extension::set_create_texture_cb(|atlas_page, path| {
         fn convert_filter(filter: AtlasFilter) -> FilterMode {
             match filter {
