@@ -248,30 +248,38 @@ impl SimpleDrawer {
             let attachment_renderer_object =
                 slot.attachment().and_then(|a| a.as_mesh()).map_or_else(
                     || {
-                        slot.attachment().and_then(|a| a.as_region()).map(
+                        slot.attachment().and_then(|a| a.as_region()).and_then(
                             |region_attachment| unsafe {
-                                region_attachment
+                                let attachment_renderer_object = region_attachment
                                     .renderer_object()
                                     .get_atlas_region()
                                     .unwrap()
                                     .page()
                                     .c_ptr_ref()
                                     .rendererObject
-                                    .cast_const()
+                                    .cast_const();
+                                if attachment_renderer_object.is_null() {
+                                    None
+                                } else {
+                                    Some(attachment_renderer_object)
+                                }
                             },
                         )
                     },
-                    |mesh_attachment| {
-                        Some(unsafe {
-                            mesh_attachment
-                                .renderer_object()
-                                .get_atlas_region()
-                                .unwrap()
-                                .page()
-                                .c_ptr_ref()
-                                .rendererObject
-                                .cast_const()
-                        })
+                    |mesh_attachment| unsafe {
+                        let attachment_renderer_object = mesh_attachment
+                            .renderer_object()
+                            .get_atlas_region()
+                            .unwrap()
+                            .page()
+                            .c_ptr_ref()
+                            .rendererObject
+                            .cast_const();
+                        if attachment_renderer_object.is_null() {
+                            None
+                        } else {
+                            Some(attachment_renderer_object)
+                        }
                     },
                 );
 

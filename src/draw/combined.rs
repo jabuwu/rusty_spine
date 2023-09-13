@@ -118,7 +118,7 @@ impl CombinedDrawer {
                                 unreachable!();
                             },
                             |region_attachment| {
-                                let next_attachment_renderer_object = Some(unsafe {
+                                let next_attachment_renderer_object = unsafe {
                                     region_attachment
                                         .renderer_object()
                                         .get_atlas_region()
@@ -127,13 +127,17 @@ impl CombinedDrawer {
                                         .c_ptr_ref()
                                         .rendererObject
                                         .cast_const()
-                                });
-                                next_attachment_renderer_object
+                                };
+                                if next_attachment_renderer_object.is_null() {
+                                    None
+                                } else {
+                                    Some(next_attachment_renderer_object)
+                                }
                             },
                         )
                     },
                     |mesh_attachment| {
-                        let next_attachment_renderer_object = Some(unsafe {
+                        let next_attachment_renderer_object = unsafe {
                             mesh_attachment
                                 .renderer_object()
                                 .get_atlas_region()
@@ -142,8 +146,12 @@ impl CombinedDrawer {
                                 .c_ptr_ref()
                                 .rendererObject
                                 .cast_const()
-                        });
-                        next_attachment_renderer_object
+                        };
+                        if next_attachment_renderer_object.is_null() {
+                            None
+                        } else {
+                            Some(next_attachment_renderer_object)
+                        }
                     },
                 );
 
