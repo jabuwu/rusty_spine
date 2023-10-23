@@ -10,7 +10,8 @@ use crate::{
 /// Error types related to [`AttachmentLoader`](`crate::AttachmentLoader`).
 #[derive(Debug)]
 pub enum AttachmentLoaderError {
-    /// Creating an attachment failed. Check error1() and error2().
+    /// Creating an attachment failed.
+    /// Check [`error1`](`Self::error1`) and [`error2`](`Self::error2`) for more information.
     CreateAttachmentFailed,
     InvalidArgument {
         field: &'static str,
@@ -46,7 +47,7 @@ impl AttachmentLoader {
     /// # Errors
     ///
     /// Returns [`AttachmentLoaderError::CreateAttachmentFailed`] if creating the attachment failed.
-    /// Check error1() and error2() for more information.
+    /// Check [`error1`](`Self::error1`) and [`error2`](`Self::error2`) for more information.
     /// Returns [`AttachmentLoaderError::InvalidArgument`] if `name` or `path` contain a null byte.
     pub fn create_attachment(
         &self,
