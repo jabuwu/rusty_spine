@@ -48,6 +48,7 @@ mod animation_state_data;
 #[path = "atlas.rs"]
 mod atlas_mod;
 mod attachment;
+mod attachment_loader;
 mod bone;
 mod bounding_box_attachment;
 mod clipping_attachment;
@@ -73,6 +74,7 @@ pub use animation_state::*;
 pub use animation_state_data::*;
 pub use atlas_mod::{atlas, Atlas};
 pub use attachment::*;
+pub use attachment_loader::*;
 pub use bone::*;
 pub use bounding_box_attachment::*;
 pub use clipping_attachment::*;
