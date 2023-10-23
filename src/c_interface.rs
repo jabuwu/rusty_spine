@@ -462,6 +462,30 @@ macro_rules! c_accessor_string {
     };
 }
 
+macro_rules! c_accessor_string_mut {
+    ($(#[$($attrss:tt)*])* $rust:ident, $rust_set:ident, $c:ident) => {
+        $(#[$($attrss)*])*
+        #[must_use]
+        pub fn $rust(&self) -> &str {
+            unsafe {
+                if !self.c_ptr_ref().$c.is_null() {
+                    crate::c_interface::from_c_str(std::ffi::CStr::from_ptr(self.c_ptr_ref().$c))
+                } else {
+                    ""
+                }
+            }
+        }
+
+        $(#[$($attrss)*])*
+        pub fn $rust_set(&mut self, value: String) {
+            let c_str = std::ffi::CString::new(value).expect("Null byte found in provided string");
+            unsafe {
+                self.c_ptr_mut().$c = c_str.into_raw();
+            }
+        }
+    };
+}
+
 macro_rules! c_accessor_string_optional {
     ($(#[$($attrss:tt)*])* $rust:ident, $c:ident) => {
         $(#[$($attrss)*])*
