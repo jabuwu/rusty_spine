@@ -4,7 +4,7 @@ use crate::{
         spAttachmentLoader_dispose,
     },
     c_interface::{NewFromPtr, SyncPtr},
-    Atlas, Attachment, AttachmentType, RegionAttachment, RegionProps, Skin,
+    Atlas, Attachment, AttachmentType, RegionProps, Skin,
 };
 
 /// Error types related to [`AttachmentLoader`](`crate::AttachmentLoader`).
