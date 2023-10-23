@@ -476,12 +476,16 @@ macro_rules! c_accessor_string_mut {
             }
         }
 
+        /// # Errors
+        ///
+        /// Returns [`std::ffi::NulError`] if an interior nul byte is found.
         $(#[$($attrss)*])*
-        pub fn $rust_set(&mut self, value: String) {
-            let c_str = std::ffi::CString::new(value).expect("Null byte found in provided string");
+        pub fn $rust_set(&mut self, value: String) -> Result<(), std::ffi::NulError> {
+            let c_str = std::ffi::CString::new(value)?;
             unsafe {
                 self.c_ptr_mut().$c = c_str.into_raw();
             }
+            Ok(())
         }
     };
 }
