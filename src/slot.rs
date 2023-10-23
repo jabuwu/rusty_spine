@@ -55,19 +55,17 @@ impl Slot {
     // TODO: add attachment() accessor?
 
     /// Sets the attachment for this slot.
-    ///
-    /// # Safety
-    ///
-    /// The attachment must be compatible with this slot, usually by originating from it.
-    pub unsafe fn set_attachment(&mut self, attachment: Option<Attachment>) {
-        attachment.map_or_else(
-            || {
-                spSlot_setAttachment(self.c_ptr(), std::ptr::null_mut());
-            },
-            |attachment| {
-                spSlot_setAttachment(self.c_ptr(), attachment.c_ptr());
-            },
-        );
+    pub fn set_attachment(&mut self, attachment: Option<Attachment>) {
+        unsafe {
+            attachment.map_or_else(
+                || {
+                    spSlot_setAttachment(self.c_ptr(), std::ptr::null_mut());
+                },
+                |attachment| {
+                    spSlot_setAttachment(self.c_ptr(), attachment.c_ptr());
+                },
+            );
+        }
     }
 
     /// Sets this slot to the setup pose.
