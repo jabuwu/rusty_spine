@@ -6,10 +6,23 @@ use crate::{
     c_interface::SyncPtr,
     slot::Slot,
     texture_region::TextureRegion,
+    Color,
 };
 
 #[cfg(feature = "mint")]
 use mint::Vector2;
+
+#[derive(Debug)]
+pub struct RegionProps {
+    pub x: f32,
+    pub y: f32,
+    pub scale_x: f32,
+    pub scale_y: f32,
+    pub rotation: f32,
+    pub width: f32,
+    pub height: f32,
+    pub color: Color,
+}
 
 /// An attachment which draws a texture.
 ///
@@ -57,52 +70,71 @@ impl RegionAttachment {
         }
     }
 
+    pub fn update_from_props(&mut self, props: &RegionProps) {
+        self.set_x(props.x);
+        self.set_y(props.y);
+        self.set_scale_x(props.scale_x);
+        self.set_scale_y(props.scale_y);
+        self.set_rotation(props.rotation);
+        self.set_width(props.width);
+        self.set_height(props.height);
+        *self.color_mut() = props.color;
+        self.update_region();
+    }
+
     c_attachment_accessors!();
-    c_accessor_string!(path, path);
-    c_accessor!(
+    c_accessor_string_mut!(path, set_path, path);
+    c_accessor_mut!(
         /// The local x translation.
         x,
+        set_x,
         x,
         f32
     );
-    c_accessor!(
+    c_accessor_mut!(
         /// The local y translation.
         y,
+        set_y,
         y,
         f32
     );
-    c_accessor!(
+    c_accessor_mut!(
         /// The local scaleX.
         scale_x,
+        set_scale_x,
         scaleX,
         f32
     );
-    c_accessor!(
+    c_accessor_mut!(
         /// The local scaleY.
         scale_y,
+        set_scale_y,
         scaleY,
         f32
     );
     // TODO: docs: in degrees? counter-clockwise?
-    c_accessor!(
+    c_accessor_mut!(
         /// The local rotation.
         rotation,
+        set_rotation,
         rotation,
         f32
     );
-    c_accessor!(
+    c_accessor_mut!(
         /// The width of the region attachment in Spine.
         width,
+        set_width,
         width,
         f32
     );
-    c_accessor!(
+    c_accessor_mut!(
         /// The height of the region attachment in Spine.
         height,
+        set_height,
         height,
         f32
     );
-    c_accessor_color!(color, color);
+    c_accessor_color_mut!(color, color_mut, color);
     c_accessor_passthrough!(uvs, uvs, [c_float; 8]);
     c_accessor_passthrough!(offset, offset, [c_float; 8]);
     c_accessor_renderer_object!();

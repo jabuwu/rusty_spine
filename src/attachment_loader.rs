@@ -4,7 +4,7 @@ use crate::{
         spAttachmentLoader_dispose,
     },
     c_interface::{NewFromPtr, SyncPtr},
-    Atlas, Attachment, AttachmentType, Skin,
+    Atlas, Attachment, AttachmentType, RegionAttachment, RegionProps, Skin,
 };
 
 /// Error types related to [`AttachmentLoader`](`crate::AttachmentLoader`).
@@ -81,6 +81,31 @@ impl AttachmentLoader {
                 Ok(Attachment::new_from_ptr(attachment))
             }
         }
+    }
+
+    /// Convenience function for creating a [`RegionAttachment`](`crate::RegionAttachment`).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`AttachmentLoaderError::CreateAttachmentFailed`] if creating the attachment failed.
+    /// Check error1() and error2() for more information.
+    /// Returns [`AttachmentLoaderError::InvalidArgument`] if `name` or `path` contain a null byte.
+    pub fn create_region_attachment(
+        &self,
+        skin: Option<Skin>,
+        name: &str,
+        path: &str,
+        props: &RegionProps,
+    ) -> Result<Attachment, AttachmentLoaderError> {
+        let attachment = self.create_attachment(skin, AttachmentType::Region, name, path)?;
+
+        let Some(mut region) = attachment.as_region() else {
+            return Err(AttachmentLoaderError::CreateAttachmentFailed);
+        };
+
+        region.update_from_props(props);
+
+        Ok(attachment)
     }
 
     c_accessor_string!(error1, error1);
