@@ -24428,10 +24428,6 @@ pub unsafe extern "C" fn spSlot_create(
 }
 #[no_mangle]
 pub unsafe extern "C" fn spSlot_dispose(mut self_0: *mut spSlot) {
-    if (*self_0).attachment != std::ptr::null_mut() {
-        spAttachment_dispose((*self_0).attachment);
-    }
-
     _spFree((*self_0).deform as *mut c_void);
     _spFree((*self_0).darkColor as *mut c_void);
     _spFree(self_0 as *mut c_void);
@@ -24452,14 +24448,6 @@ pub unsafe extern "C" fn spSlot_setAttachment(
 ) {
     if attachment == (*self_0).attachment {
         return;
-    }
-
-    if attachment != std::ptr::null_mut() {
-        (*attachment).refCount += 1;
-    }
-
-    if (*self_0).attachment != std::ptr::null_mut() {
-        spAttachment_dispose((*self_0).attachment);
     }
 
     if isVertexAttachment(attachment) == 0
