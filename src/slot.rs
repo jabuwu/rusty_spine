@@ -2,10 +2,10 @@ use crate::{
     attachment::Attachment,
     bone::Bone,
     c::{
-        spAttachment, spAttachment_dispose, spBlendMode, spBone, spBoneData,
-        spBoundingBoxAttachment, spClippingAttachment, spMeshAttachment, spPointAttachment,
-        spRegionAttachment, spSkeleton, spSlot, spSlotData, spSlotData_setAttachmentName,
-        spSlot_setAttachment, spSlot_setToSetupPose,
+        spAttachment, spBlendMode, spBone, spBoneData, spBoundingBoxAttachment,
+        spClippingAttachment, spMeshAttachment, spPointAttachment, spRegionAttachment, spSkeleton,
+        spSlot, spSlotData, spSlotData_setAttachmentName, spSlot_setAttachment,
+        spSlot_setToSetupPose,
     },
     c_interface::{to_c_str, CTmpRef, NewFromPtr, SyncPtr},
     AttachmentType, BoneData, BoundingBoxAttachment, ClippingAttachment, MeshAttachment,
@@ -55,6 +55,10 @@ impl Slot {
     // TODO: add attachment() accessor?
 
     /// Sets the attachment for this slot.
+    //
+    /// # Safety
+    ///
+    /// The attachment must be compatible with this slot, usually by originating from it.
     pub unsafe fn set_attachment(&mut self, attachment: Option<Attachment>) {
         attachment.map_or_else(
             || {
