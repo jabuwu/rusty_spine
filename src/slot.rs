@@ -55,7 +55,7 @@ impl Slot {
     // TODO: add attachment() accessor?
 
     /// Sets the attachment for this slot.
-    //
+    ///
     /// # Safety
     ///
     /// The attachment must be compatible with this slot, usually by originating from it.
