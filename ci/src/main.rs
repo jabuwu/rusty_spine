@@ -118,6 +118,7 @@ fn doc_check(sh: &Shell) -> anyhow::Result<()> {
         sh,
         "cargo doc --workspace --all-features --no-deps --document-private-items"
     )
+    .env("RUSTDOCFLAGS", "-Dwarnings")
     .run()?;
     Ok(())
 }

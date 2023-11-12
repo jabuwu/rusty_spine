@@ -1,4 +1,5 @@
 # 0.7.0 (UNRELEASED)
+- Add `AttachmentLoader` for creating region attachments
 - Removed unnecessary feature `use_libc`, use `libc` instead
 - More clippy fixes
 - Fixes for pointer, abi, and memory undefined behavior
