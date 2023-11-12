@@ -24449,6 +24449,7 @@ pub unsafe extern "C" fn spSlot_setAttachment(
     if attachment == (*self_0).attachment {
         return;
     }
+
     if isVertexAttachment(attachment) == 0
         || isVertexAttachment((*self_0).attachment) == 0
         || (*(attachment as *mut spVertexAttachment)).timelineAttachment
