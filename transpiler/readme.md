@@ -3,7 +3,7 @@ To run the transpiler, you must have Docker installed. It will take a while as i
 ```
 git clone https://github.com/EsotericSoftware/spine-runtimes.git
 cd spine-runtimes
-git checkout f85fb25a35d69a659e3d8d01a99b1fc93f759778
+git checkout c960402c08ae6814ac55cd2e3675a587977f424a
 cd ..
 cargo run
 ```

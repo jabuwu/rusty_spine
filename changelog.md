@@ -1,5 +1,10 @@
 # 0.7.0 (UNRELEASED)
-- Removed unnecessary feature `use_libc`, use `libc` instead
+- Upstream fixes
+  - Reduce allocations ([EsotericSoftware/spine-runtimes#2325](https://github.com/EsotericSoftware/spine-runtimes/issues/2325))
+  - Fix double free of sequences in mesh attachments ([EsotericSoftware/spine-runtimes#2394](https://github.com/EsotericSoftware/spine-runtimes/issues/2394))
+  - Fix buffer overflow when loading sequences with less than 10 frames ([EsotericSoftware/spine-runtimes#2397](https://github.com/EsotericSoftware/spine-runtimes/issues/2397))
+  - Fix incorrect allocation of TransformTimeline ([EsotericSoftware/spine-runtimes#2401](https://github.com/EsotericSoftware/spine-runtimes/issues/2401))
+- Remove unnecessary feature `use_libc`, use `libc` instead
 - More clippy fixes
 - Fixes for pointer, abi, and memory undefined behavior
 - Lots of docs
