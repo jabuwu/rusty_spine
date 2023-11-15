@@ -1,4 +1,4 @@
-# 0.7.0 (UNRELEASED)
+# 0.7.0
 - Add `AttachmentLoader` for creating region attachments
 - Upstream fixes
   - Reduce allocations ([EsotericSoftware/spine-runtimes#2325](https://github.com/EsotericSoftware/spine-runtimes/issues/2325))
