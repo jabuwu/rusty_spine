@@ -197,7 +197,11 @@ pub fn c_fixes_after_preprocessor(input: &str, output: &str) {
     src = replace_identifier(src, "ftell", "spine_ftell", 0);
     src = replace_identifier(src, "fread", "spine_fread", 0);
     src = replace_identifier(src, "fclose", "spine_fclose", 0);
-    src = replace_identifier(src, "fclose", "spine_fclose", 0);
+    src = replace_identifier(src, "acosf", "spine_acosf", 0);
+    src = replace_identifier(src, "atan2f", "spine_atan2f", 0);
+    src = replace_identifier(src, "cosf", "spine_cosf", 0);
+    src = replace_identifier(src, "pow", "spine_pow", 0);
+    src = replace_identifier(src, "fmodf", "spine_fmodf", 0);
     write(output, src).unwrap();
 }
 
