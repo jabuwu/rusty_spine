@@ -1,4 +1,5 @@
 # 0.7.0 (UNRELEASED)
+- Add `AttachmentLoader` for creating region attachments
 - Upstream fixes
   - Reduce allocations ([EsotericSoftware/spine-runtimes#2325](https://github.com/EsotericSoftware/spine-runtimes/issues/2325))
   - Fix double free of sequences in mesh attachments ([EsotericSoftware/spine-runtimes#2394](https://github.com/EsotericSoftware/spine-runtimes/issues/2394))

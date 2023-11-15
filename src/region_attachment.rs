@@ -12,6 +12,7 @@ use crate::{
 #[cfg(feature = "mint")]
 use mint::Vector2;
 
+/// Properties for updating [`RegionAttachment`].
 #[derive(Debug)]
 pub struct RegionProps {
     pub x: f32,

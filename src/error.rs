@@ -13,6 +13,8 @@ pub enum SpineError {
     FailedToReadFile { file: String },
     /// An error when a specified path is not utf-8.
     PathNotUtf8,
+    /// Failed to create the requested type.
+    CreationFailed { what: String },
 }
 
 impl SpineError {
@@ -26,6 +28,12 @@ impl SpineError {
         Self::NotFound {
             what: what.to_owned(),
             name: name.to_owned(),
+        }
+    }
+
+    pub(crate) fn new_creation_failed(what: &str) -> Self {
+        Self::CreationFailed {
+            what: what.to_owned(),
         }
     }
 }
@@ -58,6 +66,10 @@ impl fmt::Display for SpineError {
             }
             SpineError::PathNotUtf8 => {
                 write!(f, "Path not utf-8")?;
+                Ok(())
+            }
+            SpineError::CreationFailed { what } => {
+                write!(f, "Failed to create {what}")?;
                 Ok(())
             }
         }
