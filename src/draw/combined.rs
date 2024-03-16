@@ -198,6 +198,7 @@ impl CombinedDrawer {
                     .dark_color()
                     .unwrap_or_else(|| Color::new_rgba(0.0, 0.0, 0.0, 0.0));
                 if self.premultiplied_alpha {
+                    dark_color *= color.a;
                     dark_color.a = 1.0;
                     dark_color.premultiply_alpha();
                 }
@@ -285,6 +286,7 @@ impl CombinedDrawer {
                     .dark_color()
                     .unwrap_or_else(|| Color::new_rgba(0.0, 0.0, 0.0, 0.0));
                 if self.premultiplied_alpha {
+                    dark_color *= color.a;
                     dark_color.a = 1.0;
                     dark_color.premultiply_alpha();
                 } else {
