@@ -371,20 +371,21 @@ macro_rules! c_ptr {
         /// Get a pointer to the underlying [`spine-c`](`crate::c`) type.
         #[inline]
         #[must_use]
+        #[allow(clippy::missing_const_for_fn)]
         pub const fn c_ptr(&self) -> *mut $c_type {
             self.$member.0
         }
 
         #[inline]
         #[must_use]
-        #[allow(dead_code)]
+        #[allow(dead_code, clippy::missing_const_for_fn)]
         pub(crate) unsafe fn c_ptr_ref(&self) -> &$c_type {
             &*self.$member.0
         }
 
         #[inline]
         #[must_use]
-        #[allow(dead_code, clippy::mut_from_ref)]
+        #[allow(dead_code, clippy::mut_from_ref, clippy::missing_const_for_fn)]
         pub(crate) unsafe fn c_ptr_mut(&self) -> &mut $c_type {
             &mut *self.$member.0
         }
@@ -1124,13 +1125,13 @@ macro_rules! c_handle_indexed_decl {
     };
 }
 
-/// Used to isolate this unwrap() in one place in the codebase. It is necessary to avoid proceeding
+/// Used to isolate this `unwrap()` in one place in the codebase. It is necessary to avoid proceeding
 /// with corrupt data, but the panic (ideally) never happens.
 pub(crate) fn to_c_str(rust_string: &str) -> CString {
     CString::new(rust_string).unwrap()
 }
 
-/// Used to isolate this unwrap() in one place in the codebase. It is necessary to avoid proceeding
+/// Used to isolate this `unwrap()` in one place in the codebase. It is necessary to avoid proceeding
 /// with corrupt data, but the panic (ideally) never happens.
 pub(crate) fn from_c_str(c_string: &CStr) -> &str {
     c_string.to_str().unwrap()
