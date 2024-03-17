@@ -131,6 +131,19 @@ impl Color {
     }
 }
 
+impl Mul<f32> for Color {
+    type Output = Color;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        Color {
+            r: self.r * rhs,
+            g: self.g * rhs,
+            b: self.b * rhs,
+            a: self.a * rhs,
+        }
+    }
+}
+
 impl Mul<Color> for Color {
     type Output = Color;
 
@@ -141,6 +154,15 @@ impl Mul<Color> for Color {
             b: self.b * rhs.b,
             a: self.a * rhs.a,
         }
+    }
+}
+
+impl MulAssign<f32> for Color {
+    fn mul_assign(&mut self, rhs: f32) {
+        self.r *= rhs;
+        self.g *= rhs;
+        self.b *= rhs;
+        self.a *= rhs;
     }
 }
 

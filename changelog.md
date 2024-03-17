@@ -1,3 +1,6 @@
+# 0.7.1 (UNRELEASED)
+- Fix dark color applying incorrectly when using premultiplied alpha
+
 # 0.7.0
 - Add `AttachmentLoader` for creating region attachments
 - Upstream fixes

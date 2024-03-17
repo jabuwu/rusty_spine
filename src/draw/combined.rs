@@ -1,4 +1,4 @@
-use crate::{c::c_void, BlendMode, Color, Skeleton, SkeletonClipping};
+use crate::{c::c_void, BlendMode, Skeleton, SkeletonClipping};
 
 use super::{ColorSpace, CullDirection};
 
@@ -186,21 +186,19 @@ impl CombinedDrawer {
                 slot.attachment().and_then(|a| a.as_mesh())
             {
                 let mut color = mesh_attachment.color() * slot.color() * skeleton.color();
+                let mut dark_color = slot.dark_color().unwrap_or_default();
                 if self.premultiplied_alpha {
                     color.premultiply_alpha();
+                    dark_color *= color.a;
+                    dark_color.a = 1.0;
+                } else {
+                    dark_color.a = 0.;
                 }
                 color = match self.color_space {
                     ColorSpace::SRGB => color,
                     ColorSpace::Linear => color.nonlinear_to_linear(),
                 };
 
-                let mut dark_color = slot
-                    .dark_color()
-                    .unwrap_or_else(|| Color::new_rgba(0.0, 0.0, 0.0, 0.0));
-                if self.premultiplied_alpha {
-                    dark_color.a = 1.0;
-                    dark_color.premultiply_alpha();
-                }
                 dark_color = match self.color_space {
                     ColorSpace::SRGB => dark_color,
                     ColorSpace::Linear => dark_color.nonlinear_to_linear(),
@@ -273,23 +271,19 @@ impl CombinedDrawer {
                 (color, dark_color)
             } else if let Some(region_attachment) = slot.attachment().and_then(|a| a.as_region()) {
                 let mut color = region_attachment.color() * slot.color() * skeleton.color();
+                let mut dark_color = slot.dark_color().unwrap_or_default();
                 if self.premultiplied_alpha {
                     color.premultiply_alpha();
+                    dark_color *= color.a;
+                    dark_color.a = 1.0;
+                } else {
+                    dark_color.a = 0.;
                 }
                 color = match self.color_space {
                     ColorSpace::SRGB => color,
                     ColorSpace::Linear => color.nonlinear_to_linear(),
                 };
 
-                let mut dark_color = slot
-                    .dark_color()
-                    .unwrap_or_else(|| Color::new_rgba(0.0, 0.0, 0.0, 0.0));
-                if self.premultiplied_alpha {
-                    dark_color.a = 1.0;
-                    dark_color.premultiply_alpha();
-                } else {
-                    dark_color.a = 0.0;
-                }
                 dark_color = match self.color_space {
                     ColorSpace::SRGB => dark_color,
                     ColorSpace::Linear => dark_color.nonlinear_to_linear(),
