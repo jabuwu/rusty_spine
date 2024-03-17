@@ -1,4 +1,4 @@
-use crate::{c::c_void, BlendMode, Color, Skeleton, SkeletonClipping};
+use crate::{c::c_void, BlendMode, Skeleton, SkeletonClipping};
 
 use super::{ColorSpace, CullDirection};
 
