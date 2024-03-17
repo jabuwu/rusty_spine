@@ -284,13 +284,13 @@ impl SimpleDrawer {
                 );
 
             color *= slot.color() * skeleton.color();
-            let mut dark_color = slot
-                .dark_color()
-                .unwrap_or_else(|| Color::new_rgba(0.0, 0.0, 0.0, 0.0));
+            let mut dark_color = slot.dark_color().unwrap_or_default();
             if self.premultiplied_alpha {
                 color.premultiply_alpha();
                 dark_color *= color.a;
                 dark_color.a = 1.0;
+            } else {
+                dark_color.a = 0.;
             }
             color = match self.color_space {
                 ColorSpace::SRGB => color,
