@@ -1,3 +1,7 @@
+# 0.8.0
+- use `c_accessor_mut!` for TrackEntry's `track_time`.  It is supposed to be mutable according
+to the documentation
+
 # 0.7.1
 - Fix dark color applying incorrectly with premultiplied alpha (using draw functions)
 
