@@ -756,6 +756,7 @@ impl TrackEntry {
         /// time determines [`animation_time`](`Self::animation_time`). The track time can be set
         /// to start the animation at a time other than 0, without affecting looping.
         track_time,
+        /// Set the track time, see [`track_time`](`Self::track_time`).
         set_track_time,
         trackTime,
         f32
