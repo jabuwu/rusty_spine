@@ -155,6 +155,7 @@ impl SkeletonController {
     pub fn update(&mut self, delta_seconds: f32) {
         self.animation_state.update(delta_seconds);
         self.animation_state.apply(&mut self.skeleton);
+        self.skeleton.update(delta_seconds);
         self.skeleton.update_world_transform();
     }
 

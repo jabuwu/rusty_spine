@@ -674,7 +674,7 @@ impl TrackEntry {
         eventThreshold,
         f32
     );
-    c_accessor_mut!(
+    /*c_accessor_mut!(
         /// When the mix percentage ([`mix_time`](`Self::mix_time`) /
         /// [`mix_duration`](`Self::mix_duration`)) is less than the `attachment_threshold`,
         /// attachment timelines are applied while this animation is being mixed out. Defaults to 0,
@@ -685,8 +685,8 @@ impl TrackEntry {
         set_attachment_threshold,
         attachmentThreshold,
         f32
-    );
-    c_accessor_mut!(
+    );*/
+    /*c_accessor_mut!(
         /// When the mix percentage ([`mix_time`](`Self::mix_time`) /
         /// [`mix_duration`](`Self::mix_duration`)) is less than the `draw_order_threshold`, draw
         /// order timelines are applied while this animation is being mixed out. Defaults to 0, so
@@ -697,7 +697,7 @@ impl TrackEntry {
         set_draw_order_threshold,
         drawOrderThreshold,
         f32
-    );
+    );*/
     c_accessor_mut!(
         /// Seconds when this animation starts, both initially and after looping. Defaults to 0.
         ///

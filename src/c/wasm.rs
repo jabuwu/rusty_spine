@@ -38,7 +38,7 @@ use crate::c::FILE;
 use std::alloc::Layout;
 use std::any::Any;
 use std::collections::HashMap;
-use std::ffi::{CStr, CString};
+use std::ffi::{CStr};
 use std::sync::{Arc, Mutex, Once};
 
 pub mod types {
@@ -973,15 +973,6 @@ pub(crate) fn printf(c_format: *const c_char, args: &[Box<dyn Any>]) {
     print!("{}", fmt(&format, args));
 }
 
-pub(crate) fn sprintf(c_str: *mut c_char, c_format: *const c_char, args: &[Box<dyn Any>]) {
-    let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
-    let result = fmt(&format, args);
-    unsafe {
-        let str = CString::new(result).unwrap();
-        spine_strcpy(c_str, str.as_ptr());
-    }
-}
-
 pub(crate) fn sscanf(c_str: *const c_char, c_format: *const c_char, args: *mut c_uint) {
     let str = unsafe { CStr::from_ptr(c_str).to_str().unwrap().to_owned() };
     let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
@@ -997,17 +988,6 @@ macro_rules! spine_printf {
     };
     ($format:expr, $($arg:expr),+ $(,)? ) => {
         crate::c::wasm::printf($format, &[
-            $(Box::new($arg)),+
-        ]);
-    };
-}
-
-macro_rules! spine_sprintf {
-    ($str:expr, $format:expr) => {
-        crate::c::wasm::sprintf($str, $format, vec![]);
-    };
-    ($str:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
-        crate::c::wasm::sprintf($str, $format, &[
             $(Box::new($arg)),+
         ]);
     };

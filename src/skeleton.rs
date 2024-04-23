@@ -3,12 +3,7 @@ use std::{borrow::Cow, sync::Arc};
 use crate::{
     bone::Bone,
     c::{
-        spBone, spSkeleton, spSkeletonData, spSkeleton_create, spSkeleton_dispose,
-        spSkeleton_getAttachmentForSlotIndex, spSkeleton_getAttachmentForSlotName,
-        spSkeleton_setAttachment, spSkeleton_setBonesToSetupPose, spSkeleton_setSkin,
-        spSkeleton_setSkinByName, spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose,
-        spSkeleton_updateCache, spSkeleton_updateWorldTransform,
-        spSkeleton_updateWorldTransformWith, spSkin, spSlot,
+        spBone, spSkeleton, spSkeletonData, spSkeleton_create, spSkeleton_dispose, spSkeleton_getAttachmentForSlotIndex, spSkeleton_getAttachmentForSlotName, spSkeleton_setAttachment, spSkeleton_setBonesToSetupPose, spSkeleton_setSkin, spSkeleton_setSkinByName, spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose, spSkeleton_update, spSkeleton_updateCache, spSkeleton_updateWorldTransform, spSkeleton_updateWorldTransformWith, spSkin, spSlot, SP_PHYSICS_UPDATE
     },
     c_interface::{to_c_str, CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::SpineError,
@@ -50,6 +45,12 @@ impl Skeleton {
         }
     }
 
+    pub fn update(&mut self, delta: f32) {
+        unsafe {
+            spSkeleton_update(self.c_ptr(), delta);
+        }
+    }
+
     /// Caches information about bones and constraints. Must be called if the skin is modified or if
     /// bones, constraints, or weighted path attachments are added or removed.
     pub fn update_cache(&mut self) {
@@ -65,7 +66,7 @@ impl Skeleton {
     /// in the Spine Runtimes Guide.
     pub fn update_world_transform(&mut self) {
         unsafe {
-            spSkeleton_updateWorldTransform(self.c_ptr());
+            spSkeleton_updateWorldTransform(self.c_ptr(), SP_PHYSICS_UPDATE);
         }
     }
 
@@ -80,7 +81,7 @@ impl Skeleton {
     ///
     /// The bone must originate from this skeleton.
     pub unsafe fn update_world_transform_with(&mut self, parent: &Bone) {
-        spSkeleton_updateWorldTransformWith(self.c_ptr(), parent.c_ptr());
+        spSkeleton_updateWorldTransformWith(self.c_ptr(), parent.c_ptr(), SP_PHYSICS_UPDATE);
     }
 
     /// Sets the bones, constraints, slots, and draw order to their setup pose values.

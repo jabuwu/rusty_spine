@@ -481,6 +481,24 @@ impl Stage {
                 backface_culling: true,
             },
             SpineDemo {
+                atlas_path: "assets/celestial-circus/export/celestial-circus.atlas",
+                skeleton_path: SpineSkeletonPath::Json("assets/celestial-circus/export/celestial-circus-pro.json"),
+                animation: "swing",
+                position: Vec2::new(0., -120.),
+                scale: 0.2,
+                skin: None,
+                backface_culling: true,
+            },
+            SpineDemo {
+                atlas_path: "assets/cloud-pot/export/cloud-pot.atlas",
+                skeleton_path: SpineSkeletonPath::Json("assets/cloud-pot/export/cloud-pot.json"),
+                animation: "playing-in-the-rain",
+                position: Vec2::new(0., -220.),
+                scale: 0.4,
+                skin: None,
+                backface_culling: true,
+            },
+            /*SpineDemo {
                 atlas_path: "assets/dragon/export/dragon.atlas",
                 skeleton_path: SpineSkeletonPath::Json("assets/dragon/export/dragon-ess.json"),
                 animation: "flying",
@@ -488,7 +506,7 @@ impl Stage {
                 scale: 0.7,
                 skin: None,
                 backface_culling: true,
-            },
+            },*/
             SpineDemo {
                 atlas_path: "assets/goblins/export/goblins.atlas",
                 skeleton_path: SpineSkeletonPath::Json("assets/goblins/export/goblins-pro.json"),

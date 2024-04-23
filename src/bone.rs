@@ -5,7 +5,7 @@ use crate::{
         spBone_rotateWorld, spBone_setToSetupPose, spBone_setYDown, spBone_update,
         spBone_updateAppliedTransform, spBone_updateWorldTransform,
         spBone_updateWorldTransformWith, spBone_worldToLocal, spBone_worldToLocalRotation,
-        spSkeleton, spTransformMode,
+        spSkeleton, spInherit,
     },
     c_interface::{NewFromPtr, SyncPtr},
     Skeleton,
@@ -626,9 +626,9 @@ impl BoneData {
     c_accessor_bool!(skin_required, skinRequired);
     c_accessor_enum!(
         /// The transform mode for how parent world transforms affect this bone.
-        transform_mode,
-        transformMode,
-        TransformMode
+        set_inherit,
+        inherit,
+        Inherit
     );
     c_accessor_tmp_ptr_optional!(parent, parent, BoneData, spBoneData);
 }
@@ -664,7 +664,7 @@ impl BoneData {
 /// The transform mode for how bones are affected by their parents.
 ///
 /// See [`BoneData::transform_mode`].
-pub enum TransformMode {
+pub enum Inherit {
     Normal = 0,
     OnlyTranslation = 1,
     NoRotationOrReflection = 2,
@@ -673,8 +673,8 @@ pub enum TransformMode {
     Unknown = 99,
 }
 
-impl From<spTransformMode> for TransformMode {
-    fn from(mode: spTransformMode) -> Self {
+impl From<spInherit> for Inherit {
+    fn from(mode: spInherit) -> Self {
         match mode {
             0 => Self::Normal,
             1 => Self::OnlyTranslation,
