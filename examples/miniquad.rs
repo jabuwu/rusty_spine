@@ -53,10 +53,7 @@ use std::sync::{Arc, Mutex};
 use glam::{Mat4, Vec2, Vec3};
 use miniquad::*;
 use rusty_spine::{
-    atlas::{AtlasFilter, AtlasFormat, AtlasWrap},
-    controller::{SkeletonController, SkeletonControllerSettings},
-    draw::{ColorSpace, CullDirection},
-    AnimationEvent, AnimationStateData, Atlas, BlendMode, Color, SkeletonBinary, SkeletonJson,
+    atlas::{AtlasFilter, AtlasFormat, AtlasWrap}, controller::{SkeletonController, SkeletonControllerSettings}, draw::{ColorSpace, CullDirection}, AnimationEvent, AnimationStateData, Atlas, BlendMode, Color, Physics, SkeletonBinary, SkeletonJson
 };
 
 const MAX_MESH_VERTICES: usize = 10000;
@@ -565,7 +562,7 @@ impl EventHandler for Stage {
     fn update(&mut self, _ctx: &mut Context) {
         let now = date::now();
         let dt = ((now - self.last_frame_time) as f32).max(0.001);
-        self.spine.controller.update(dt);
+        self.spine.controller.update(dt, Physics::Update);
         self.last_frame_time = now;
     }
 

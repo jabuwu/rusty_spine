@@ -3,19 +3,19 @@ use std::{borrow::Cow, sync::Arc};
 use crate::{
     bone::Bone,
     c::{
-        spBone, spSkeleton, spSkeletonData, spSkeleton_create, spSkeleton_dispose,
+        spBone, spPhysics, spSkeleton, spSkeletonData, spSkeleton_create, spSkeleton_dispose,
         spSkeleton_getAttachmentForSlotIndex, spSkeleton_getAttachmentForSlotName,
         spSkeleton_setAttachment, spSkeleton_setBonesToSetupPose, spSkeleton_setSkin,
         spSkeleton_setSkinByName, spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose,
         spSkeleton_update, spSkeleton_updateCache, spSkeleton_updateWorldTransform,
-        spSkeleton_updateWorldTransformWith, spSkin, spSlot, SP_PHYSICS_UPDATE,
+        spSkeleton_updateWorldTransformWith, spSkin, spSlot,
     },
     c_interface::{to_c_str, CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::SpineError,
     skeleton_data::SkeletonData,
     skin::Skin,
     slot::Slot,
-    Attachment,
+    Attachment, Physics,
 };
 
 #[allow(unused_imports)]
@@ -69,9 +69,9 @@ impl Skeleton {
     /// See
     /// [`World transforms`](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms)
     /// in the Spine Runtimes Guide.
-    pub fn update_world_transform(&mut self) {
+    pub fn update_world_transform(&mut self, physics: Physics) {
         unsafe {
-            spSkeleton_updateWorldTransform(self.c_ptr(), SP_PHYSICS_UPDATE);
+            spSkeleton_updateWorldTransform(self.c_ptr(), physics as spPhysics);
         }
     }
 
@@ -85,8 +85,8 @@ impl Skeleton {
     /// # Safety
     ///
     /// The bone must originate from this skeleton.
-    pub unsafe fn update_world_transform_with(&mut self, parent: &Bone) {
-        spSkeleton_updateWorldTransformWith(self.c_ptr(), parent.c_ptr(), SP_PHYSICS_UPDATE);
+    pub unsafe fn update_world_transform_with(&mut self, parent: &Bone, physics: Physics) {
+        spSkeleton_updateWorldTransformWith(self.c_ptr(), parent.c_ptr(), physics as spPhysics);
     }
 
     /// Sets the bones, constraints, slots, and draw order to their setup pose values.
