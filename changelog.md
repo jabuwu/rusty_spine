@@ -1,3 +1,6 @@
+# 0.8.0 (UNRELEASED)
+- Add `TrackEntry::set_track_time`
+
 # 0.7.1
 - Fix dark color applying incorrectly with premultiplied alpha (using draw functions)
 
