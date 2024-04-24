@@ -1149,8 +1149,8 @@ mod tests {
             let mut dst: [super::c_char; 10] = [10; 10];
             let src = CString::new("1234").unwrap();
             spine_strncpy(dst.as_mut_ptr(), src.as_ptr(), 10);
-            for i in 4..10 {
-                assert_eq!(dst[i], 0 as super::c_char);
+            for item in dst.iter().skip(4) {
+                assert_eq!(*item, 0 as super::c_char);
             }
             let string = CStr::from_ptr(dst.as_ptr()).to_string_lossy().to_string();
             assert_eq!(string.as_str(), "1234");
@@ -1219,10 +1219,10 @@ mod tests {
         spine_snprintf!(
             error_msg.as_mut_ptr(),
             255 as super::c_int as super::size_t,
-            b"Skeleton version %s does not match runtime version %s\0" as *const u8
-                as *const super::c_char,
-            b"4.1\0" as *const u8 as *const super::c_char,
-            b"4.2\0" as *const u8 as *const super::c_char,
+            (b"Skeleton version %s does not match runtime version %s\0" as *const u8)
+                .cast::<super::c_char>(),
+            (b"4.1\0" as *const u8).cast::<super::c_char>(),
+            (b"4.2\0" as *const u8).cast::<super::c_char>(),
         );
         let string = unsafe { CStr::from_ptr(error_msg.as_ptr()) }
             .to_string_lossy()
@@ -1236,10 +1236,10 @@ mod tests {
         spine_snprintf!(
             error_msg.as_mut_ptr(),
             16 as super::c_int as super::size_t,
-            b"Skeleton version %s does not match runtime version %s\0" as *const u8
-                as *const super::c_char,
-            b"4.1\0" as *const u8 as *const super::c_char,
-            b"4.2\0" as *const u8 as *const super::c_char,
+            (b"Skeleton version %s does not match runtime version %s\0" as *const u8)
+                .cast::<super::c_char>(),
+            (b"4.1\0" as *const u8).cast::<super::c_char>(),
+            (b"4.2\0" as *const u8).cast::<super::c_char>(),
         );
         let string = unsafe { CStr::from_ptr(error_msg.as_ptr()) }
             .to_string_lossy()
