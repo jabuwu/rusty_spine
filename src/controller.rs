@@ -18,7 +18,7 @@
 //!     SkeletonController::new(skeleton_data.clone(), animation_state_data);
 //!
 //! // Update for one frame
-//! skeleton_controller.update(0.016);
+//! skeleton_controller.update(0.016, Physics::Update);
 //!
 //! // Get renderable mesh data
 //! // Note: if slot_index is not important, use the much faster
