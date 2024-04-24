@@ -1,4 +1,8 @@
 # 0.8.0 (UNRELEASED)
+- Upgrade runtime to Spine 4.2
+- Add `Physics` enum
+  - Add `physics` parameter to `Skeleton::update_world_transform` and `Skeleton::update_world_transform_with`
+  - Add `physics` parameter to `Controller::update`
 - Add `TrackEntry::set_track_time`
 
 # 0.7.1
