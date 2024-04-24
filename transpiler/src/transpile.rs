@@ -177,6 +177,7 @@ pub fn c_fixes_after_preprocessor(input: &str, output: &str) {
     src = replace_identifier(src, "memcpy", "spine_memcpy", 0);
     src = replace_identifier(src, "memset", "spine_memset", 0);
     src = replace_identifier(src, "strcpy", "spine_strcpy", 0);
+    src = replace_identifier(src, "strncpy", "spine_strncpy", 0);
     src = replace_identifier(src, "strcmp", "spine_strcmp", 0);
     src = replace_identifier(src, "strrchr", "spine_strrchr", 0);
     src = replace_identifier(src, "sqrtf", "spine_sqrtf", 0);
@@ -187,7 +188,7 @@ pub fn c_fixes_after_preprocessor(input: &str, output: &str) {
     src = replace_identifier(src, "realloc", "spine_realloc", 0);
     src = replace_identifier(src, "free", "spine_free", 0);
     src = replace_identifier(src, "strtol", "spine_strtol", 0);
-    src = replace_identifier(src, "sprintf", "spine_sprintf", 0);
+    src = replace_identifier(src, "snprintf", "spine_snprintf", 0);
     src = replace_identifier(src, "printf", "spine_printf", 0);
     src = replace_identifier(src, "sscanf", "spine_sscanf", 0);
     src = replace_identifier(src, "strtoul", "spine_strtoul", 0);
@@ -200,8 +201,10 @@ pub fn c_fixes_after_preprocessor(input: &str, output: &str) {
     src = replace_identifier(src, "acosf", "spine_acosf", 0);
     src = replace_identifier(src, "atan2f", "spine_atan2f", 0);
     src = replace_identifier(src, "cosf", "spine_cosf", 0);
+    src = replace_identifier(src, "sinf", "spine_sinf", 0);
     src = replace_identifier(src, "pow", "spine_pow", 0);
     src = replace_identifier(src, "fmodf", "spine_fmodf", 0);
+    src = replace_identifier(src, "ceil", "spine_ceil", 0);
     write(output, src).unwrap();
 }
 
@@ -232,10 +235,7 @@ pub fn rust_fixes(input: &str, output: &str) {
     let mut src = read_to_string(input).unwrap();
     src = src.replace("libc::", "");
     src = src.replace("#![register_tool(c2rust)]\n", "");
-    src = src.replace(
-        "#![feature(extern_types, label_break_value, register_tool)]\n",
-        "",
-    );
+    src = src.replace("#![feature(extern_types, label_break_value)]\n", "");
     src = src.replace("pub type _IO_wide_data;", "");
     src = src.replace("pub type _IO_codecvt;", "");
     src = src.replace("pub type _IO_marker;", "");
@@ -250,7 +250,7 @@ pub use crate::c::environment::types::*;
         "",
     );
     src = src.replace(
-        "fn spine_sprintf(\n        __s: *mut c_char,\n        __format: *const c_char,\n        _: ...\n    ) -> c_int;",
+        "fn spine_snprintf(\n        __s: *mut c_char,\n        __maxlen: size_t,\n        __format: *const c_char,\n        _: ...\n    ) -> c_int;",
         "",
     );
     src = src.replace(
@@ -258,7 +258,7 @@ pub use crate::c::environment::types::*;
         "",
     );
     src = replace_identifier(src, "spine_printf", "spine_printf!", 0);
-    src = replace_identifier(src, "spine_sprintf", "spine_sprintf!", 0);
+    src = replace_identifier(src, "spine_snprintf", "spine_snprintf!", 0);
     src = replace_identifier(src, "spine_sscanf", "spine_sscanf!", 0);
     write(output, src).unwrap();
 }

@@ -105,7 +105,7 @@ c_handle_decl!(
     /// # #[path="./test.rs"]
     /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, SkinHandle};
-    /// # let (skeleton, _) = test::TestAsset::spineboy().instance();
+    /// # let (skeleton, _) = test::TestAsset::spineboy().instance(true);
     /// let skeleton_data = skeleton.data();
     /// let skin_handles: Vec<SkinHandle> = skeleton_data.skins().map(|skin| skin.handle()).collect();
     /// for skin_handle in skin_handles.iter() {
@@ -163,7 +163,7 @@ mod test {
     /// Check that dropped skins don't segfault.
     #[test]
     fn skin_drop() {
-        let (skeleton, _) = TestAsset::spineboy().instance();
+        let (skeleton, _) = TestAsset::spineboy().instance(true);
         drop(skeleton.data().default_skin());
         drop(Skin::new("test"));
     }

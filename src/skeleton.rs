@@ -3,7 +3,12 @@ use std::{borrow::Cow, sync::Arc};
 use crate::{
     bone::Bone,
     c::{
-        spBone, spSkeleton, spSkeletonData, spSkeleton_create, spSkeleton_dispose, spSkeleton_getAttachmentForSlotIndex, spSkeleton_getAttachmentForSlotName, spSkeleton_setAttachment, spSkeleton_setBonesToSetupPose, spSkeleton_setSkin, spSkeleton_setSkinByName, spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose, spSkeleton_update, spSkeleton_updateCache, spSkeleton_updateWorldTransform, spSkeleton_updateWorldTransformWith, spSkin, spSlot, SP_PHYSICS_UPDATE
+        spBone, spSkeleton, spSkeletonData, spSkeleton_create, spSkeleton_dispose,
+        spSkeleton_getAttachmentForSlotIndex, spSkeleton_getAttachmentForSlotName,
+        spSkeleton_setAttachment, spSkeleton_setBonesToSetupPose, spSkeleton_setSkin,
+        spSkeleton_setSkinByName, spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose,
+        spSkeleton_update, spSkeleton_updateCache, spSkeleton_updateWorldTransform,
+        spSkeleton_updateWorldTransformWith, spSkin, spSlot, SP_PHYSICS_UPDATE,
     },
     c_interface::{to_c_str, CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::SpineError,
@@ -170,7 +175,7 @@ impl Skeleton {
     /// # #[path="./test.rs"]
     /// # mod test;
     /// # use rusty_spine::{AnimationState, AnimationEvent};
-    /// # let (mut skeleton, _) = test::TestAsset::spineboy().instance();
+    /// # let (mut skeleton, _) = test::TestAsset::spineboy().instance(true);
     /// skeleton.set_skins_by_name("combined-skin", ["hat", "suit", "tie"]);
     /// ```
     ///

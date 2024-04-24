@@ -24,7 +24,7 @@ use crate::AnimationState;
 /// ```
 /// # #[path="./test.rs"]
 /// # mod test;
-/// # let mut animation_state_data = test::TestAsset::spineboy().animation_state_data();
+/// # let mut animation_state_data = test::TestAsset::spineboy().animation_state_data(true);
 /// animation_state_data.set_mix_by_name("walk", "run", 0.2);
 /// ```
 ///
@@ -34,7 +34,7 @@ use crate::AnimationState;
 /// ```
 /// # #[path="./test.rs"]
 /// # mod test;
-/// # let mut animation_state_data = test::TestAsset::spineboy().animation_state_data();
+/// # let mut animation_state_data = test::TestAsset::spineboy().animation_state_data(true);
 /// animation_state_data.set_mix_by_name("walk", "run", 0.2);
 /// animation_state_data.set_mix_by_name("run", "walk", 0.2);
 /// ```

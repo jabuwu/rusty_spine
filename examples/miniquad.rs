@@ -482,7 +482,9 @@ impl Stage {
             },
             SpineDemo {
                 atlas_path: "assets/celestial-circus/export/celestial-circus.atlas",
-                skeleton_path: SpineSkeletonPath::Json("assets/celestial-circus/export/celestial-circus-pro.json"),
+                skeleton_path: SpineSkeletonPath::Json(
+                    "assets/celestial-circus/export/celestial-circus-pro.json",
+                ),
                 animation: "swing",
                 position: Vec2::new(0., -120.),
                 scale: 0.2,

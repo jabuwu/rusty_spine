@@ -1,98 +1,48 @@
-#![allow(dead_code, mutable_transmutes, non_camel_case_types, non_snake_case, non_upper_case_globals, unused_assignments, unused_mut)]
+#![allow(
+    dead_code,
+    mutable_transmutes,
+    non_camel_case_types,
+    non_snake_case,
+    non_upper_case_globals,
+    unused_assignments,
+    unused_mut
+)]
 extern "C" {
-    fn spine_memcpy(
-        __dest: *mut c_void,
-        __src: *const c_void,
-        __n: size_t,
-    ) -> *mut c_void;
-    fn spine_memmove(
-        __dest: *mut c_void,
-        __src: *const c_void,
-        __n: size_t,
-    ) -> *mut c_void;
+
+    fn spine_memcpy(__dest: *mut c_void, __src: *const c_void, __n: size_t) -> *mut c_void;
+    fn spine_memmove(__dest: *mut c_void, __src: *const c_void, __n: size_t) -> *mut c_void;
     fn spine_acosf(__x: c_float) -> c_float;
     fn spine_atan2f(__y: c_float, __x: c_float) -> c_float;
-    fn spine_memset(
-        __s: *mut c_void,
-        __c: c_int,
-        __n: size_t,
-    ) -> *mut c_void;
+    fn spine_memset(__s: *mut c_void, __c: c_int, __n: size_t) -> *mut c_void;
     fn spine_cosf(__x: c_float) -> c_float;
-    fn sinf(_: c_float) -> c_float;
-    fn spine_strcasecmp(
-        __s1: *const c_char,
-        __s2: *const c_char,
-    ) -> c_int;
-    fn spine_strcpy(
-        __dest: *mut c_char,
-        __src: *const c_char,
-    ) -> *mut c_char;
-    fn strncpy(
-        _: *mut c_char,
-        _: *const c_char,
-        _: c_ulong,
-    ) -> *mut c_char;
-    fn spine_strncat(
-        __dest: *mut c_char,
-        __src: *const c_char,
-        __n: size_t,
-    ) -> *mut c_char;
+    fn spine_sinf(__x: c_float) -> c_float;
+    fn spine_strcasecmp(__s1: *const c_char, __s2: *const c_char) -> c_int;
+    fn spine_strcpy(__dest: *mut c_char, __src: *const c_char) -> *mut c_char;
+    fn spine_strncpy(__dest: *mut c_char, __src: *const c_char, __n: size_t) -> *mut c_char;
+    fn spine_strncat(__dest: *mut c_char, __src: *const c_char, __n: size_t) -> *mut c_char;
     fn spine_strcmp(__s1: *const c_char, __s2: *const c_char) -> c_int;
-    fn spine_strncmp(
-        __s1: *const c_char,
-        __s2: *const c_char,
-        __n: size_t,
-    ) -> c_int;
+    fn spine_strncmp(__s1: *const c_char, __s2: *const c_char, __n: size_t) -> c_int;
     fn spine_pow(__x: c_double, __y: c_double) -> c_double;
     fn spine_sqrtf(__x: c_float) -> c_float;
-    fn ceil(_: c_double) -> c_double;
+    fn spine_ceil(__x: c_double) -> c_double;
     fn _spAtlasPage_createTexture(self_0: *mut spAtlasPage, path: *const c_char);
     fn _spAtlasPage_disposeTexture(self_0: *mut spAtlasPage);
-    fn _spUtil_readFile(
-        path: *const c_char,
-        length: *mut c_int,
-    ) -> *mut c_char;
+    fn _spUtil_readFile(path: *const c_char, length: *mut c_int) -> *mut c_char;
     fn spine_fmodf(__x: c_float, __y: c_float) -> c_float;
-    fn spine_strtol(
-        __nptr: *const c_char,
-        __endptr: *mut *mut c_char,
-        __base: c_int,
-    ) -> c_long;
-    fn spine_strtoul(
-        __nptr: *const c_char,
-        __endptr: *mut *mut c_char,
-        __base: c_int,
-    ) -> c_ulong;
+    fn spine_strtol(__nptr: *const c_char, __endptr: *mut *mut c_char, __base: c_int) -> c_long;
+    fn spine_strtoul(__nptr: *const c_char, __endptr: *mut *mut c_char, __base: c_int) -> c_ulong;
     fn spine_fclose(__stream: *mut FILE) -> c_int;
-    fn spine_fopen(
-        __filename: *const c_char,
-        __modes: *const c_char,
-    ) -> *mut FILE;
+    fn spine_fopen(__filename: *const c_char, __modes: *const c_char) -> *mut FILE;
     fn spine_strrchr(__s: *const c_char, __c: c_int) -> *mut c_char;
-    
-    fn snprintf(
-        _: *mut c_char,
-        _: c_ulong,
-        _: *const c_char,
-        _: ...
-    ) -> c_int;
+
     fn spine_strlen(__s: *const c_char) -> size_t;
-    
+
     fn spine_rand() -> c_int;
     fn spine_malloc(__size: size_t) -> *mut c_void;
     fn spine_realloc(__ptr: *mut c_void, __size: size_t) -> *mut c_void;
     fn spine_free(__ptr: *mut c_void);
-    fn spine_fread(
-        __ptr: *mut c_void,
-        __size: size_t,
-        __n: size_t,
-        __stream: *mut FILE,
-    ) -> size_t;
-    fn spine_fseek(
-        __stream: *mut FILE,
-        __off: c_long,
-        __whence: c_int,
-    ) -> c_int;
+    fn spine_fread(__ptr: *mut c_void, __size: size_t, __n: size_t, __stream: *mut FILE) -> size_t;
+    fn spine_fseek(__stream: *mut FILE, __off: c_long, __whence: c_int) -> c_int;
     fn spine_ftell(__stream: *mut FILE) -> c_long;
 }
 #[derive(Copy, Clone)]
@@ -145,8 +95,8 @@ pub struct spAttachment {
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct _spAttachmentVtable {
-    pub dispose: Option::<unsafe extern "C" fn(*mut spAttachment) -> ()>,
-    pub copy: Option::<unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment>,
+    pub dispose: Option<unsafe extern "C" fn(*mut spAttachment) -> ()>,
+    pub copy: Option<unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment>,
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -625,7 +575,7 @@ pub struct spFloatArray {
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct _spTimelineVtable {
-    pub apply: Option::<
+    pub apply: Option<
         unsafe extern "C" fn(
             *mut spTimeline,
             *mut spSkeleton,
@@ -638,8 +588,8 @@ pub struct _spTimelineVtable {
             spMixDirection,
         ) -> (),
     >,
-    pub dispose: Option::<unsafe extern "C" fn(*mut spTimeline) -> ()>,
-    pub setBezier: Option::<
+    pub dispose: Option<unsafe extern "C" fn(*mut spTimeline) -> ()>,
+    pub setBezier: Option<
         unsafe extern "C" fn(
             *mut spTimeline,
             c_int,
@@ -1121,7 +1071,7 @@ pub type spSkinEntry = _Entry;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct _spAttachmentLoaderVtable {
-    pub createAttachment: Option::<
+    pub createAttachment: Option<
         unsafe extern "C" fn(
             *mut spAttachmentLoader,
             *mut spSkin,
@@ -1131,13 +1081,11 @@ pub struct _spAttachmentLoaderVtable {
             *mut spSequence,
         ) -> *mut spAttachment,
     >,
-    pub configureAttachment: Option::<
-        unsafe extern "C" fn(*mut spAttachmentLoader, *mut spAttachment) -> (),
-    >,
-    pub disposeAttachment: Option::<
-        unsafe extern "C" fn(*mut spAttachmentLoader, *mut spAttachment) -> (),
-    >,
-    pub dispose: Option::<unsafe extern "C" fn(*mut spAttachmentLoader) -> ()>,
+    pub configureAttachment:
+        Option<unsafe extern "C" fn(*mut spAttachmentLoader, *mut spAttachment) -> ()>,
+    pub disposeAttachment:
+        Option<unsafe extern "C" fn(*mut spAttachmentLoader, *mut spAttachment) -> ()>,
+    pub dispose: Option<unsafe extern "C" fn(*mut spAttachmentLoader) -> ()>,
 }
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -1231,13 +1179,8 @@ pub struct spAnimationState {
     pub userData: *mut c_void,
     pub unkeyedState: c_int,
 }
-pub type spAnimationStateListener = Option::<
-    unsafe extern "C" fn(
-        *mut spAnimationState,
-        spEventType,
-        *mut spTrackEntry,
-        *mut spEvent,
-    ) -> (),
+pub type spAnimationStateListener = Option<
+    unsafe extern "C" fn(*mut spAnimationState, spEventType, *mut spTrackEntry, *mut spEvent) -> (),
 >;
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -1495,8 +1438,7 @@ pub unsafe extern "C" fn spPropertyIdArray_create(
     ) as *mut spPropertyIdArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<spPropertyId>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -1520,16 +1462,12 @@ pub unsafe extern "C" fn spPropertyIdArray_setSize(
 ) -> *mut spPropertyIdArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<spPropertyId>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -1546,8 +1484,7 @@ pub unsafe extern "C" fn spPropertyIdArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<spPropertyId>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -1559,16 +1496,12 @@ pub unsafe extern "C" fn spPropertyIdArray_add(
     mut value: spPropertyId,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<spPropertyId>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -1611,8 +1544,9 @@ pub unsafe extern "C" fn spPropertyIdArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<spPropertyId>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -1636,9 +1570,7 @@ pub unsafe extern "C" fn spPropertyIdArray_contains(
     return 0 as c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spPropertyIdArray_pop(
-    mut self_0: *mut spPropertyIdArray,
-) -> spPropertyId {
+pub unsafe extern "C" fn spPropertyIdArray_pop(mut self_0: *mut spPropertyIdArray) -> spPropertyId {
     (*self_0).size -= 1;
     let mut item: spPropertyId = *((*self_0).items).offset((*self_0).size as isize);
     return item;
@@ -1661,8 +1593,7 @@ pub unsafe extern "C" fn spTimelineArray_create(
     ) as *mut spTimelineArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spTimeline>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -1686,16 +1617,12 @@ pub unsafe extern "C" fn spTimelineArray_setSize(
 ) -> *mut spTimelineArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spTimeline>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -1712,8 +1639,7 @@ pub unsafe extern "C" fn spTimelineArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<*mut spTimeline>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -1725,16 +1651,12 @@ pub unsafe extern "C" fn spTimelineArray_add(
     mut value: *mut spTimeline,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spTimeline>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -1778,8 +1700,9 @@ pub unsafe extern "C" fn spTimelineArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<*mut spTimeline>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -1803,17 +1726,13 @@ pub unsafe extern "C" fn spTimelineArray_contains(
     return 0 as c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spTimelineArray_pop(
-    mut self_0: *mut spTimelineArray,
-) -> *mut spTimeline {
+pub unsafe extern "C" fn spTimelineArray_pop(mut self_0: *mut spTimelineArray) -> *mut spTimeline {
     (*self_0).size -= 1;
     let mut item: *mut spTimeline = *((*self_0).items).offset((*self_0).size as isize);
     return item;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spTimelineArray_peek(
-    mut self_0: *mut spTimelineArray,
-) -> *mut spTimeline {
+pub unsafe extern "C" fn spTimelineArray_peek(mut self_0: *mut spTimelineArray) -> *mut spTimeline {
     return *((*self_0).items).offset(((*self_0).size - 1 as c_int) as isize);
 }
 #[no_mangle]
@@ -1831,18 +1750,14 @@ pub unsafe extern "C" fn spAnimation_create(
         b"spine.c\0" as *const u8 as *const c_char,
         43 as c_int,
     ) as *mut spAnimation;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         44 as c_int,
     ) as *mut c_char;
     spine_strcpy((*self_0).name, name);
-    (*self_0)
-        .timelines = if !timelines.is_null() {
+    (*self_0).timelines = if !timelines.is_null() {
         timelines
     } else {
         spTimelineArray_create(1 as c_int)
@@ -1896,9 +1811,7 @@ pub unsafe extern "C" fn spAnimation_hasTimeline(
     while i < n {
         ii = 0 as c_int;
         while ii < idsCount {
-            if *((*(*self_0).timelineIds).items).offset(i as isize)
-                == *ids.offset(ii as isize)
-            {
+            if *((*(*self_0).timelineIds).items).offset(i as isize) == *ids.offset(ii as isize) {
                 return 1 as c_int;
             }
             ii += 1;
@@ -1944,10 +1857,7 @@ pub unsafe extern "C" fn spAnimation_apply(
         i += 1;
     }
 }
-unsafe extern "C" fn search(
-    mut values: *mut spFloatArray,
-    mut time: c_float,
-) -> c_int {
+unsafe extern "C" fn search(mut values: *mut spFloatArray, mut time: c_float) -> c_int {
     let mut i: c_int = 0;
     let mut n: c_int = 0;
     let mut items: *mut c_float = (*values).items;
@@ -1987,8 +1897,8 @@ pub unsafe extern "C" fn _spTimeline_init(
     mut propertyIds: *mut spPropertyId,
     mut propertyIdsCount: c_int,
     mut type_0: spTimelineType,
-    mut dispose: Option::<unsafe extern "C" fn(*mut spTimeline) -> ()>,
-    mut apply: Option::<
+    mut dispose: Option<unsafe extern "C" fn(*mut spTimeline) -> ()>,
+    mut apply: Option<
         unsafe extern "C" fn(
             *mut spTimeline,
             *mut spSkeleton,
@@ -2001,7 +1911,7 @@ pub unsafe extern "C" fn _spTimeline_init(
             spMixDirection,
         ) -> (),
     >,
-    mut setBezier: Option::<
+    mut setBezier: Option<
         unsafe extern "C" fn(
             *mut spTimeline,
             c_int,
@@ -2052,10 +1962,7 @@ pub unsafe extern "C" fn spTimeline_apply(
     mut blend: spMixBlend,
     mut direction: spMixDirection,
 ) {
-    ((*self_0).vtable.apply)
-        .expect(
-            "non-null function pointer",
-        )(
+    ((*self_0).vtable.apply).expect("non-null function pointer")(
         self_0,
         skeleton,
         lastTime,
@@ -2083,29 +1990,13 @@ pub unsafe extern "C" fn spTimeline_setBezier(
     mut value2: c_float,
 ) {
     if ((*self_0).vtable.setBezier).is_some() {
-        ((*self_0).vtable.setBezier)
-            .expect(
-                "non-null function pointer",
-            )(
-            self_0,
-            bezier,
-            frame,
-            value,
-            time1,
-            value1,
-            cx1,
-            cy1,
-            cx2,
-            cy2,
-            time2,
-            value2,
+        ((*self_0).vtable.setBezier).expect("non-null function pointer")(
+            self_0, bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2,
         );
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spTimeline_getDuration(
-    mut self_0: *const spTimeline,
-) -> c_float {
+pub unsafe extern "C" fn spTimeline_getDuration(mut self_0: *const spTimeline) -> c_float {
     return *((*(*self_0).frames).items)
         .offset(((*(*self_0).frames).size - (*self_0).frameEntries) as isize);
 }
@@ -2118,8 +2009,8 @@ pub unsafe extern "C" fn _spCurveTimeline_init(
     mut propertyIds: *mut spPropertyId,
     mut propertyIdsCount: c_int,
     mut type_0: spTimelineType,
-    mut dispose: Option::<unsafe extern "C" fn(*mut spTimeline) -> ()>,
-    mut apply: Option::<
+    mut dispose: Option<unsafe extern "C" fn(*mut spTimeline) -> ()>,
+    mut apply: Option<
         unsafe extern "C" fn(
             *mut spTimeline,
             *mut spSkeleton,
@@ -2132,7 +2023,7 @@ pub unsafe extern "C" fn _spCurveTimeline_init(
             spMixDirection,
         ) -> (),
     >,
-    mut setBezier: Option::<
+    mut setBezier: Option<
         unsafe extern "C" fn(
             *mut spTimeline,
             c_int,
@@ -2162,10 +2053,7 @@ pub unsafe extern "C" fn _spCurveTimeline_init(
     );
     (*self_0).curves = spFloatArray_create(frameCount + bezierCount * 18 as c_int);
     (*(*self_0).curves).size = frameCount + bezierCount * 18 as c_int;
-    *((*(*self_0).curves).items)
-        .offset(
-            (frameCount - 1 as c_int) as isize,
-        ) = 1 as c_int as c_float;
+    *((*(*self_0).curves).items).offset((frameCount - 1 as c_int) as isize) = 1 as c_int as c_float;
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spCurveTimeline_dispose(mut self_0: *mut spTimeline) {
@@ -2203,20 +2091,18 @@ pub unsafe extern "C" fn _spCurveTimeline_setBezier(
     if value == 0 as c_int as c_float {
         *curves.offset(frame as isize) = (2 as c_int + i) as c_float;
     }
-    tmpx = ((time1 - cx1 * 2 as c_int as c_float + cx2) as c_double
-        * 0.03f64) as c_float;
-    tmpy = ((value1 - cy1 * 2 as c_int as c_float + cy2) as c_double
-        * 0.03f64) as c_float;
-    dddx = (((cx1 - cx2) * 3 as c_int as c_float - time1 + time2)
-        as c_double * 0.006f64) as c_float;
-    dddy = (((cy1 - cy2) * 3 as c_int as c_float - value1 + value2)
-        as c_double * 0.006f64) as c_float;
+    tmpx = ((time1 - cx1 * 2 as c_int as c_float + cx2) as c_double * 0.03f64) as c_float;
+    tmpy = ((value1 - cy1 * 2 as c_int as c_float + cy2) as c_double * 0.03f64) as c_float;
+    dddx =
+        (((cx1 - cx2) * 3 as c_int as c_float - time1 + time2) as c_double * 0.006f64) as c_float;
+    dddy =
+        (((cy1 - cy2) * 3 as c_int as c_float - value1 + value2) as c_double * 0.006f64) as c_float;
     ddx = tmpx * 2 as c_int as c_float + dddx;
     ddy = tmpy * 2 as c_int as c_float + dddy;
-    dx = ((cx1 - time1) as c_double * 0.3f64 + tmpx as c_double
-        + dddx as c_double * 0.16666667f64) as c_float;
-    dy = ((cy1 - value1) as c_double * 0.3f64 + tmpy as c_double
-        + dddy as c_double * 0.16666667f64) as c_float;
+    dx = ((cx1 - time1) as c_double * 0.3f64 + tmpx as c_double + dddx as c_double * 0.16666667f64)
+        as c_float;
+    dy = ((cy1 - value1) as c_double * 0.3f64 + tmpy as c_double + dddy as c_double * 0.16666667f64)
+        as c_float;
     x = time1 + dx;
     y = value1 + dy;
     n = i + 18 as c_int;
@@ -2276,16 +2162,14 @@ pub unsafe extern "C" fn spCurveTimeline_setLinear(
     mut self_0: *mut spCurveTimeline,
     mut frame: c_int,
 ) {
-    *((*(*self_0).curves).items)
-        .offset(frame as isize) = 0 as c_int as c_float;
+    *((*(*self_0).curves).items).offset(frame as isize) = 0 as c_int as c_float;
 }
 #[no_mangle]
 pub unsafe extern "C" fn spCurveTimeline_setStepped(
     mut self_0: *mut spCurveTimeline,
     mut frame: c_int,
 ) {
-    *((*(*self_0).curves).items)
-        .offset(frame as isize) = 1 as c_int as c_float;
+    *((*(*self_0).curves).items).offset(frame as isize) = 1 as c_int as c_float;
 }
 #[no_mangle]
 pub unsafe extern "C" fn spCurveTimeline1_setFrame(
@@ -2322,24 +2206,15 @@ pub unsafe extern "C" fn spCurveTimeline1_getCurveValue(
     match curveType {
         0 => {
             let mut before: c_float = *frames.offset(i as isize);
-            let mut value: c_float = *frames
-                .offset((i + 1 as c_int) as isize);
+            let mut value: c_float = *frames.offset((i + 1 as c_int) as isize);
             return value
-                + (time - before)
-                    / (*frames.offset((i + 2 as c_int) as isize) - before)
-                    * (*frames.offset((i + 2 as c_int + 1 as c_int) as isize)
-                        - value);
+                + (time - before) / (*frames.offset((i + 2 as c_int) as isize) - before)
+                    * (*frames.offset((i + 2 as c_int + 1 as c_int) as isize) - value);
         }
         1 => return *frames.offset((i + 1 as c_int) as isize),
         _ => {}
     }
-    return _spCurveTimeline_getBezierValue(
-        self_0,
-        time,
-        i,
-        1 as c_int,
-        curveType - 2 as c_int,
-    );
+    return _spCurveTimeline_getBezierValue(self_0, time, i, 1 as c_int, curveType - 2 as c_int);
 }
 #[no_mangle]
 pub unsafe extern "C" fn spCurveTimeline1_getRelativeValue(
@@ -2447,16 +2322,16 @@ pub unsafe extern "C" fn spCurveTimeline1_getScaleValue(
                         -value
                     } else {
                         value
-                    })
-                        * (if setup < 0 as c_int as c_float {
-                            -1.0f32
+                    }) * (if setup < 0 as c_int as c_float {
+                        -1.0f32
+                    } else {
+                        if setup > 0 as c_int as c_float {
+                            1.0f32
                         } else {
-                            (if setup > 0 as c_int as c_float {
-                                1.0f32
-                            } else {
-                                0.0f32
-                            })
-                        }) - setup) * alpha;
+                            0.0f32
+                        }
+                    }) - setup)
+                        * alpha;
             }
             1 | 2 => {
                 return current
@@ -2464,16 +2339,16 @@ pub unsafe extern "C" fn spCurveTimeline1_getScaleValue(
                         -value
                     } else {
                         value
-                    })
-                        * (if current < 0 as c_int as c_float {
-                            -1.0f32
+                    }) * (if current < 0 as c_int as c_float {
+                        -1.0f32
+                    } else {
+                        if current > 0 as c_int as c_float {
+                            1.0f32
                         } else {
-                            (if current > 0 as c_int as c_float {
-                                1.0f32
-                            } else {
-                                0.0f32
-                            })
-                        }) - current) * alpha;
+                            0.0f32
+                        }
+                    }) - current)
+                        * alpha;
             }
             _ => {}
         }
@@ -2485,16 +2360,15 @@ pub unsafe extern "C" fn spCurveTimeline1_getScaleValue(
                     -setup
                 } else {
                     setup
-                })
-                    * (if value < 0 as c_int as c_float {
-                        -1.0f32
+                }) * (if value < 0 as c_int as c_float {
+                    -1.0f32
+                } else {
+                    if value > 0 as c_int as c_float {
+                        1.0f32
                     } else {
-                        (if value > 0 as c_int as c_float {
-                            1.0f32
-                        } else {
-                            0.0f32
-                        })
-                    });
+                        0.0f32
+                    }
+                });
                 return s + (value - s) * alpha;
             }
             1 | 2 => {
@@ -2502,16 +2376,15 @@ pub unsafe extern "C" fn spCurveTimeline1_getScaleValue(
                     -current
                 } else {
                     current
-                })
-                    * (if value < 0 as c_int as c_float {
-                        -1.0f32
+                }) * (if value < 0 as c_int as c_float {
+                    -1.0f32
+                } else {
+                    if value > 0 as c_int as c_float {
+                        1.0f32
                     } else {
-                        (if value > 0 as c_int as c_float {
-                            1.0f32
-                        } else {
-                            0.0f32
-                        })
-                    });
+                        0.0f32
+                    }
+                });
                 return s + (value - s) * alpha;
             }
             _ => {}
@@ -2537,20 +2410,18 @@ pub unsafe extern "C" fn spCurveTimeline2_setFrame(
 pub unsafe extern "C" fn _spRotateTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut self_0: *mut spRotateTimeline = timeline as *mut spRotateTimeline;
-    let mut bone: *mut spBone = *((*skeleton).bones)
-        .offset((*self_0).boneIndex as isize);
+    let mut bone: *mut spBone = *((*skeleton).bones).offset((*self_0).boneIndex as isize);
     if (*bone).active != 0 {
-        (*bone)
-            .rotation = spCurveTimeline1_getRelativeValue(
+        (*bone).rotation = spCurveTimeline1_getRelativeValue(
             &mut (*self_0).super_0,
             time,
             alpha,
@@ -2573,9 +2444,8 @@ pub unsafe extern "C" fn spRotateTimeline_create(
         434 as c_int,
     ) as *mut spRotateTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_ROTATE as c_int as spPropertyId)
-        << 32 as c_int | boneIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_ROTATE as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -2633,13 +2503,13 @@ pub unsafe extern "C" fn spRotateTimeline_setFrame(
 pub unsafe extern "C" fn _spTranslateTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut bone: *mut spBone = 0 as *mut spBone;
     let mut x: c_float = 0.;
@@ -2676,14 +2546,9 @@ pub unsafe extern "C" fn _spTranslateTimeline_apply(
             let mut before: c_float = *frames.offset(i as isize);
             x = *frames.offset((i + 1 as c_int) as isize);
             y = *frames.offset((i + 2 as c_int) as isize);
-            t = (time - before)
-                / (*frames.offset((i + 3 as c_int) as isize) - before);
-            x
-                += (*frames.offset((i + 3 as c_int + 1 as c_int) as isize)
-                    - x) * t;
-            y
-                += (*frames.offset((i + 3 as c_int + 2 as c_int) as isize)
-                    - y) * t;
+            t = (time - before) / (*frames.offset((i + 3 as c_int) as isize) - before);
+            x += (*frames.offset((i + 3 as c_int + 1 as c_int) as isize) - x) * t;
+            y += (*frames.offset((i + 3 as c_int + 2 as c_int) as isize) - y) * t;
         }
         1 => {
             x = *frames.offset((i + 1 as c_int) as isize);
@@ -2735,12 +2600,10 @@ pub unsafe extern "C" fn spTranslateTimeline_create(
         524 as c_int,
     ) as *mut spTranslateTimeline;
     let mut ids: [spPropertyId; 2] = [0; 2];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_X as c_int as spPropertyId) << 32 as c_int
-        | boneIndex as c_ulong;
-    ids[1 as c_int
-        as usize] = (SP_PROPERTY_Y as c_int as spPropertyId) << 32 as c_int
-        | boneIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_X as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
+    ids[1 as c_int as usize] =
+        (SP_PROPERTY_Y as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -2799,13 +2662,13 @@ pub unsafe extern "C" fn spTranslateTimeline_setFrame(
 pub unsafe extern "C" fn _spTranslateXTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut bone: *mut spBone = 0 as *mut spBone;
     let mut x: c_float = 0.;
@@ -2855,9 +2718,8 @@ pub unsafe extern "C" fn spTranslateXTimeline_create(
         585 as c_int,
     ) as *mut spTranslateXTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_X as c_int as spPropertyId) << 32 as c_int
-        | boneIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_X as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -2915,13 +2777,13 @@ pub unsafe extern "C" fn spTranslateXTimeline_setFrame(
 pub unsafe extern "C" fn _spTranslateYTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut bone: *mut spBone = 0 as *mut spBone;
     let mut y: c_float = 0.;
@@ -2971,9 +2833,8 @@ pub unsafe extern "C" fn spTranslateYTimeline_create(
         645 as c_int,
     ) as *mut spTranslateYTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_Y as c_int as spPropertyId) << 32 as c_int
-        | boneIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_Y as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -3031,10 +2892,10 @@ pub unsafe extern "C" fn spTranslateYTimeline_setFrame(
 pub unsafe extern "C" fn _spScaleTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
     mut direction: spMixDirection,
@@ -3074,14 +2935,9 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
             let mut before: c_float = *frames.offset(i as isize);
             x = *frames.offset((i + 1 as c_int) as isize);
             y = *frames.offset((i + 2 as c_int) as isize);
-            t = (time - before)
-                / (*frames.offset((i + 3 as c_int) as isize) - before);
-            x
-                += (*frames.offset((i + 3 as c_int + 1 as c_int) as isize)
-                    - x) * t;
-            y
-                += (*frames.offset((i + 3 as c_int + 2 as c_int) as isize)
-                    - y) * t;
+            t = (time - before) / (*frames.offset((i + 3 as c_int) as isize) - before);
+            x += (*frames.offset((i + 3 as c_int + 1 as c_int) as isize) - x) * t;
+            y += (*frames.offset((i + 3 as c_int + 2 as c_int) as isize) - y) * t;
         }
         1 => {
             x = *frames.offset((i + 1 as c_int) as isize);
@@ -3117,65 +2973,67 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
     } else {
         let mut bx: c_float = 0.;
         let mut by: c_float = 0.;
-        if direction as c_uint
-            == SP_MIX_DIRECTION_OUT as c_int as c_uint
-        {
+        if direction as c_uint == SP_MIX_DIRECTION_OUT as c_int as c_uint {
             match blend as c_uint {
                 0 => {
                     bx = (*(*bone).data).scaleX;
                     by = (*(*bone).data).scaleY;
-                    (*bone)
-                        .scaleX = bx
+                    (*bone).scaleX = bx
                         + ((if x < 0 as c_int as c_float { -x } else { x })
                             * (if bx < 0 as c_int as c_float {
                                 -1.0f32
                             } else {
-                                (if bx > 0 as c_int as c_float {
+                                if bx > 0 as c_int as c_float {
                                     1.0f32
                                 } else {
                                     0.0f32
-                                })
-                            }) - bx) * alpha;
-                    (*bone)
-                        .scaleY = by
+                                }
+                            })
+                            - bx)
+                            * alpha;
+                    (*bone).scaleY = by
                         + ((if y < 0 as c_int as c_float { -y } else { y })
                             * (if by < 0 as c_int as c_float {
                                 -1.0f32
                             } else {
-                                (if by > 0 as c_int as c_float {
+                                if by > 0 as c_int as c_float {
                                     1.0f32
                                 } else {
                                     0.0f32
-                                })
-                            }) - by) * alpha;
+                                }
+                            })
+                            - by)
+                            * alpha;
                 }
                 1 | 2 => {
                     bx = (*bone).scaleX;
                     by = (*bone).scaleY;
-                    (*bone)
-                        .scaleX = bx
+                    (*bone).scaleX = bx
                         + ((if x < 0 as c_int as c_float { -x } else { x })
                             * (if bx < 0 as c_int as c_float {
                                 -1.0f32
                             } else {
-                                (if bx > 0 as c_int as c_float {
+                                if bx > 0 as c_int as c_float {
                                     1.0f32
                                 } else {
                                     0.0f32
-                                })
-                            }) - bx) * alpha;
-                    (*bone)
-                        .scaleY = by
+                                }
+                            })
+                            - bx)
+                            * alpha;
+                    (*bone).scaleY = by
                         + ((if y < 0 as c_int as c_float { -y } else { y })
                             * (if by < 0 as c_int as c_float {
                                 -1.0f32
                             } else {
-                                (if by > 0 as c_int as c_float {
+                                if by > 0 as c_int as c_float {
                                     1.0f32
                                 } else {
                                     0.0f32
-                                })
-                            }) - by) * alpha;
+                                }
+                            })
+                            - by)
+                            * alpha;
                 }
                 3 => {
                     (*bone).scaleX += (x - (*(*bone).data).scaleX) * alpha;
@@ -3190,30 +3048,28 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                         -(*(*bone).data).scaleX
                     } else {
                         (*(*bone).data).scaleX
-                    })
-                        * (if x < 0 as c_int as c_float {
-                            -1.0f32
+                    }) * (if x < 0 as c_int as c_float {
+                        -1.0f32
+                    } else {
+                        if x > 0 as c_int as c_float {
+                            1.0f32
                         } else {
-                            (if x > 0 as c_int as c_float {
-                                1.0f32
-                            } else {
-                                0.0f32
-                            })
-                        });
+                            0.0f32
+                        }
+                    });
                     by = (if (*(*bone).data).scaleY < 0 as c_int as c_float {
                         -(*(*bone).data).scaleY
                     } else {
                         (*(*bone).data).scaleY
-                    })
-                        * (if y < 0 as c_int as c_float {
-                            -1.0f32
+                    }) * (if y < 0 as c_int as c_float {
+                        -1.0f32
+                    } else {
+                        if y > 0 as c_int as c_float {
+                            1.0f32
                         } else {
-                            (if y > 0 as c_int as c_float {
-                                1.0f32
-                            } else {
-                                0.0f32
-                            })
-                        });
+                            0.0f32
+                        }
+                    });
                     (*bone).scaleX = bx + (x - bx) * alpha;
                     (*bone).scaleY = by + (y - by) * alpha;
                 }
@@ -3222,30 +3078,28 @@ pub unsafe extern "C" fn _spScaleTimeline_apply(
                         -(*bone).scaleX
                     } else {
                         (*bone).scaleX
-                    })
-                        * (if x < 0 as c_int as c_float {
-                            -1.0f32
+                    }) * (if x < 0 as c_int as c_float {
+                        -1.0f32
+                    } else {
+                        if x > 0 as c_int as c_float {
+                            1.0f32
                         } else {
-                            (if x > 0 as c_int as c_float {
-                                1.0f32
-                            } else {
-                                0.0f32
-                            })
-                        });
+                            0.0f32
+                        }
+                    });
                     by = (if (*bone).scaleY < 0 as c_int as c_float {
                         -(*bone).scaleY
                     } else {
                         (*bone).scaleY
-                    })
-                        * (if y < 0 as c_int as c_float {
-                            -1.0f32
+                    }) * (if y < 0 as c_int as c_float {
+                        -1.0f32
+                    } else {
+                        if y > 0 as c_int as c_float {
+                            1.0f32
                         } else {
-                            (if y > 0 as c_int as c_float {
-                                1.0f32
-                            } else {
-                                0.0f32
-                            })
-                        });
+                            0.0f32
+                        }
+                    });
                     (*bone).scaleX = bx + (x - bx) * alpha;
                     (*bone).scaleY = by + (y - by) * alpha;
                 }
@@ -3271,12 +3125,10 @@ pub unsafe extern "C" fn spScaleTimeline_create(
         770 as c_int,
     ) as *mut spScaleTimeline;
     let mut ids: [spPropertyId; 2] = [0; 2];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_SCALEX as c_int as spPropertyId)
-        << 32 as c_int | boneIndex as c_ulong;
-    ids[1 as c_int
-        as usize] = (SP_PROPERTY_SCALEY as c_int as spPropertyId)
-        << 32 as c_int | boneIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_SCALEX as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
+    ids[1 as c_int as usize] =
+        (SP_PROPERTY_SCALEY as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -3335,20 +3187,18 @@ pub unsafe extern "C" fn spScaleTimeline_setFrame(
 pub unsafe extern "C" fn _spScaleXTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
     mut direction: spMixDirection,
 ) {
     let mut self_0: *mut spScaleXTimeline = timeline as *mut spScaleXTimeline;
-    let mut bone: *mut spBone = *((*skeleton).bones)
-        .offset((*self_0).boneIndex as isize);
+    let mut bone: *mut spBone = *((*skeleton).bones).offset((*self_0).boneIndex as isize);
     if (*bone).active != 0 {
-        (*bone)
-            .scaleX = spCurveTimeline1_getScaleValue(
+        (*bone).scaleX = spCurveTimeline1_getScaleValue(
             &mut (*self_0).super_0,
             time,
             alpha,
@@ -3372,9 +3222,8 @@ pub unsafe extern "C" fn spScaleXTimeline_create(
         800 as c_int,
     ) as *mut spScaleXTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_SCALEX as c_int as spPropertyId)
-        << 32 as c_int | boneIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_SCALEX as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -3432,20 +3281,18 @@ pub unsafe extern "C" fn spScaleXTimeline_setFrame(
 pub unsafe extern "C" fn _spScaleYTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
     mut direction: spMixDirection,
 ) {
     let mut self_0: *mut spScaleYTimeline = timeline as *mut spScaleYTimeline;
-    let mut bone: *mut spBone = *((*skeleton).bones)
-        .offset((*self_0).boneIndex as isize);
+    let mut bone: *mut spBone = *((*skeleton).bones).offset((*self_0).boneIndex as isize);
     if (*bone).active != 0 {
-        (*bone)
-            .scaleY = spCurveTimeline1_getScaleValue(
+        (*bone).scaleY = spCurveTimeline1_getScaleValue(
             &mut (*self_0).super_0,
             time,
             alpha,
@@ -3469,9 +3316,8 @@ pub unsafe extern "C" fn spScaleYTimeline_create(
         829 as c_int,
     ) as *mut spScaleYTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_SCALEY as c_int as spPropertyId)
-        << 32 as c_int | boneIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_SCALEY as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -3529,13 +3375,13 @@ pub unsafe extern "C" fn spScaleYTimeline_setFrame(
 pub unsafe extern "C" fn _spShearTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut bone: *mut spBone = 0 as *mut spBone;
     let mut x: c_float = 0.;
@@ -3572,14 +3418,9 @@ pub unsafe extern "C" fn _spShearTimeline_apply(
             let mut before: c_float = *frames.offset(i as isize);
             x = *frames.offset((i + 1 as c_int) as isize);
             y = *frames.offset((i + 2 as c_int) as isize);
-            t = (time - before)
-                / (*frames.offset((i + 3 as c_int) as isize) - before);
-            x
-                += (*frames.offset((i + 3 as c_int + 1 as c_int) as isize)
-                    - x) * t;
-            y
-                += (*frames.offset((i + 3 as c_int + 2 as c_int) as isize)
-                    - y) * t;
+            t = (time - before) / (*frames.offset((i + 3 as c_int) as isize) - before);
+            x += (*frames.offset((i + 3 as c_int + 1 as c_int) as isize) - x) * t;
+            y += (*frames.offset((i + 3 as c_int + 2 as c_int) as isize) - y) * t;
         }
         1 => {
             x = *frames.offset((i + 1 as c_int) as isize);
@@ -3631,12 +3472,10 @@ pub unsafe extern "C" fn spShearTimeline_create(
         917 as c_int,
     ) as *mut spShearTimeline;
     let mut ids: [spPropertyId; 2] = [0; 2];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_SHEARX as c_int as spPropertyId)
-        << 32 as c_int | boneIndex as c_ulong;
-    ids[1 as c_int
-        as usize] = (SP_PROPERTY_SHEARY as c_int as spPropertyId)
-        << 32 as c_int | boneIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_SHEARX as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
+    ids[1 as c_int as usize] =
+        (SP_PROPERTY_SHEARY as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -3695,20 +3534,18 @@ pub unsafe extern "C" fn spShearTimeline_setFrame(
 pub unsafe extern "C" fn _spShearXTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut self_0: *mut spShearXTimeline = timeline as *mut spShearXTimeline;
-    let mut bone: *mut spBone = *((*skeleton).bones)
-        .offset((*self_0).boneIndex as isize);
+    let mut bone: *mut spBone = *((*skeleton).bones).offset((*self_0).boneIndex as isize);
     if (*bone).active != 0 {
-        (*bone)
-            .shearX = spCurveTimeline1_getRelativeValue(
+        (*bone).shearX = spCurveTimeline1_getRelativeValue(
             &mut (*self_0).super_0,
             time,
             alpha,
@@ -3731,9 +3568,8 @@ pub unsafe extern "C" fn spShearXTimeline_create(
         948 as c_int,
     ) as *mut spShearXTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_SHEARX as c_int as spPropertyId)
-        << 32 as c_int | boneIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_SHEARX as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -3791,20 +3627,18 @@ pub unsafe extern "C" fn spShearXTimeline_setFrame(
 pub unsafe extern "C" fn _spShearYTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut self_0: *mut spShearYTimeline = timeline as *mut spShearYTimeline;
-    let mut bone: *mut spBone = *((*skeleton).bones)
-        .offset((*self_0).boneIndex as isize);
+    let mut bone: *mut spBone = *((*skeleton).bones).offset((*self_0).boneIndex as isize);
     if (*bone).active != 0 {
-        (*bone)
-            .shearY = spCurveTimeline1_getRelativeValue(
+        (*bone).shearY = spCurveTimeline1_getRelativeValue(
             &mut (*self_0).super_0,
             time,
             alpha,
@@ -3827,9 +3661,8 @@ pub unsafe extern "C" fn spShearYTimeline_create(
         978 as c_int,
     ) as *mut spShearYTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_SHEARY as c_int as spPropertyId)
-        << 32 as c_int | boneIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_SHEARY as c_int as spPropertyId) << 32 as c_int | boneIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -3892,13 +3725,13 @@ static mut COLOR_A: c_int = 4 as c_int;
 pub unsafe extern "C" fn _spRGBATimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut slot: *mut spSlot = 0 as *mut spSlot;
     let mut i: c_int = 0;
@@ -4019,12 +3852,10 @@ pub unsafe extern "C" fn spRGBATimeline_create(
         1075 as c_int,
     ) as *mut spRGBATimeline;
     let mut ids: [spPropertyId; 2] = [0; 2];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_RGB as c_int as spPropertyId) << 32 as c_int
-        | slotIndex as c_ulong;
-    ids[1 as c_int
-        as usize] = (SP_PROPERTY_ALPHA as c_int as spPropertyId)
-        << 32 as c_int | slotIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_RGB as c_int as spPropertyId) << 32 as c_int | slotIndex as c_ulong;
+    ids[1 as c_int as usize] =
+        (SP_PROPERTY_ALPHA as c_int as spPropertyId) << 32 as c_int | slotIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         framesCount,
@@ -4091,13 +3922,13 @@ pub unsafe extern "C" fn spRGBATimeline_setFrame(
 pub unsafe extern "C" fn _spRGBTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut slot: *mut spSlot = 0 as *mut spSlot;
     let mut i: c_int = 0;
@@ -4144,8 +3975,7 @@ pub unsafe extern "C" fn _spRGBTimeline_apply(
             r = *frames.offset((i + COLOR_R) as isize);
             g = *frames.offset((i + COLOR_G) as isize);
             b = *frames.offset((i + COLOR_B) as isize);
-            t = (time - before)
-                / (*frames.offset((i + 4 as c_int) as isize) - before);
+            t = (time - before) / (*frames.offset((i + 4 as c_int) as isize) - before);
             r += (*frames.offset((i + 4 as c_int + COLOR_R) as isize) - r) * t;
             g += (*frames.offset((i + 4 as c_int + COLOR_G) as isize) - g) * t;
             b += (*frames.offset((i + 4 as c_int + COLOR_B) as isize) - b) * t;
@@ -4208,9 +4038,8 @@ pub unsafe extern "C" fn spRGBTimeline_create(
         1181 as c_int,
     ) as *mut spRGBTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_RGB as c_int as spPropertyId) << 32 as c_int
-        | slotIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_RGB as c_int as spPropertyId) << 32 as c_int | slotIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         framesCount,
@@ -4275,13 +4104,13 @@ pub unsafe extern "C" fn spRGBTimeline_setFrame(
 pub unsafe extern "C" fn _spAlphaTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut slot: *mut spSlot = 0 as *mut spSlot;
     let mut a: c_float = 0.;
@@ -4331,9 +4160,8 @@ pub unsafe extern "C" fn spAlphaTimeline_create(
         1244 as c_int,
     ) as *mut spAlphaTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_ALPHA as c_int as spPropertyId)
-        << 32 as c_int | slotIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_ALPHA as c_int as spPropertyId) << 32 as c_int | slotIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -4395,13 +4223,13 @@ static mut COLOR_B2: c_int = 7 as c_int;
 pub unsafe extern "C" fn _spRGBA2Timeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut slot: *mut spSlot = 0 as *mut spSlot;
     let mut i: c_int = 0;
@@ -4433,12 +4261,7 @@ pub unsafe extern "C" fn _spRGBA2Timeline_apply(
         match blend as c_uint {
             0 => {
                 spColor_setFromColor(light, setupLight);
-                spColor_setFromFloats3(
-                    dark,
-                    (*setupDark).r,
-                    (*setupDark).g,
-                    (*setupDark).b,
-                );
+                spColor_setFromFloats3(dark, (*setupDark).r, (*setupDark).g, (*setupDark).b);
                 return;
             }
             1 => {
@@ -4476,8 +4299,7 @@ pub unsafe extern "C" fn _spRGBA2Timeline_apply(
             r2 = *frames.offset((i + COLOR_R2) as isize);
             g2 = *frames.offset((i + COLOR_G2) as isize);
             b2 = *frames.offset((i + COLOR_B2) as isize);
-            t = (time - before)
-                / (*frames.offset((i + RGBA2_ENTRIES) as isize) - before);
+            t = (time - before) / (*frames.offset((i + RGBA2_ENTRIES) as isize) - before);
             r += (*frames.offset((i + RGBA2_ENTRIES + COLOR_R) as isize) - r) * t;
             g += (*frames.offset((i + RGBA2_ENTRIES + COLOR_G) as isize) - g) * t;
             b += (*frames.offset((i + RGBA2_ENTRIES + COLOR_B) as isize) - b) * t;
@@ -4582,15 +4404,12 @@ pub unsafe extern "C" fn spRGBA2Timeline_create(
         1371 as c_int,
     ) as *mut spRGBA2Timeline;
     let mut ids: [spPropertyId; 3] = [0; 3];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_RGB as c_int as spPropertyId) << 32 as c_int
-        | slotIndex as c_ulong;
-    ids[1 as c_int
-        as usize] = (SP_PROPERTY_ALPHA as c_int as spPropertyId)
-        << 32 as c_int | slotIndex as c_ulong;
-    ids[2 as c_int
-        as usize] = (SP_PROPERTY_RGB2 as c_int as spPropertyId)
-        << 32 as c_int | slotIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_RGB as c_int as spPropertyId) << 32 as c_int | slotIndex as c_ulong;
+    ids[1 as c_int as usize] =
+        (SP_PROPERTY_ALPHA as c_int as spPropertyId) << 32 as c_int | slotIndex as c_ulong;
+    ids[2 as c_int as usize] =
+        (SP_PROPERTY_RGB2 as c_int as spPropertyId) << 32 as c_int | slotIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         framesCount,
@@ -4667,13 +4486,13 @@ static mut COLOR2_B2: c_int = 7 as c_int;
 pub unsafe extern "C" fn _spRGB2Timeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut slot: *mut spSlot = 0 as *mut spSlot;
     let mut i: c_int = 0;
@@ -4834,12 +4653,10 @@ pub unsafe extern "C" fn spRGB2Timeline_create(
         1504 as c_int,
     ) as *mut spRGB2Timeline;
     let mut ids: [spPropertyId; 2] = [0; 2];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_RGB as c_int as spPropertyId) << 32 as c_int
-        | slotIndex as c_ulong;
-    ids[1 as c_int
-        as usize] = (SP_PROPERTY_RGB2 as c_int as spPropertyId)
-        << 32 as c_int | slotIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_RGB as c_int as spPropertyId) << 32 as c_int | slotIndex as c_ulong;
+    ids[1 as c_int as usize] =
+        (SP_PROPERTY_RGB2 as c_int as spPropertyId) << 32 as c_int | slotIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         framesCount,
@@ -4917,11 +4734,7 @@ unsafe extern "C" fn _spSetAttachment(
         if attachmentName.is_null() {
             0 as *mut spAttachment
         } else {
-            spSkeleton_getAttachmentForSlotIndex(
-                skeleton,
-                (*timeline).slotIndex,
-                attachmentName,
-            )
+            spSkeleton_getAttachmentForSlotIndex(skeleton, (*timeline).slotIndex, attachmentName)
         },
     );
 }
@@ -4929,19 +4742,18 @@ unsafe extern "C" fn _spSetAttachment(
 pub unsafe extern "C" fn _spAttachmentTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
-    mut alpha: c_float,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
+    mut _alpha: c_float,
     mut blend: spMixBlend,
     mut direction: spMixDirection,
 ) {
     let mut attachmentName: *const c_char = 0 as *const c_char;
     let mut self_0: *mut spAttachmentTimeline = timeline as *mut spAttachmentTimeline;
     let mut frames: *mut c_float = (*(*self_0).super_0.frames).items;
-    let mut slot: *mut spSlot = *((*skeleton).slots)
-        .offset((*self_0).slotIndex as isize);
+    let mut slot: *mut spSlot = *((*skeleton).slots).offset((*self_0).slotIndex as isize);
     if (*(*slot).bone).active == 0 {
         return;
     }
@@ -4967,8 +4779,8 @@ pub unsafe extern "C" fn _spAttachmentTimeline_apply(
         }
         return;
     }
-    attachmentName = *((*self_0).attachmentNames)
-        .offset(search((*self_0).super_0.frames, time) as isize);
+    attachmentName =
+        *((*self_0).attachmentNames).offset(search((*self_0).super_0.frames, time) as isize);
     _spSetAttachment(self_0, skeleton, slot, attachmentName);
 }
 #[no_mangle]
@@ -4994,9 +4806,8 @@ pub unsafe extern "C" fn spAttachmentTimeline_create(
         1581 as c_int,
     ) as *mut spAttachmentTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_ATTACHMENT as c_int as spPropertyId)
-        << 32 as c_int | slotIndex as c_ulong;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_ATTACHMENT as c_int as spPropertyId) << 32 as c_int | slotIndex as c_ulong;
     _spTimeline_init(
         &mut (*self_0).super_0,
         framesCount,
@@ -5004,9 +4815,7 @@ pub unsafe extern "C" fn spAttachmentTimeline_create(
         ids.as_mut_ptr(),
         1 as c_int,
         SP_TIMELINE_ATTACHMENT,
-        Some(
-            _spAttachmentTimeline_dispose as unsafe extern "C" fn(*mut spTimeline) -> (),
-        ),
+        Some(_spAttachmentTimeline_dispose as unsafe extern "C" fn(*mut spTimeline) -> ()),
         Some(
             _spAttachmentTimeline_apply
                 as unsafe extern "C" fn(
@@ -5023,8 +4832,7 @@ pub unsafe extern "C" fn spAttachmentTimeline_create(
         ),
         None,
     );
-    (*self_0)
-        .attachmentNames = _spCalloc(
+    (*self_0).attachmentNames = _spCalloc(
         framesCount as size_t,
         ::core::mem::size_of::<*mut c_char>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -5046,10 +4854,7 @@ pub unsafe extern "C" fn spAttachmentTimeline_setFrame(
         let ref mut fresh3 = *((*self_0).attachmentNames).offset(frame as isize);
         *fresh3 = _spMalloc(
             (::core::mem::size_of::<c_char>() as c_ulong)
-                .wrapping_mul(
-                    (spine_strlen(attachmentName))
-                        .wrapping_add(1 as c_int as c_ulong),
-                ),
+                .wrapping_mul((spine_strlen(attachmentName)).wrapping_add(1 as c_int as c_ulong)),
             b"spine.c\0" as *const u8 as *const c_char,
             1596 as c_int,
         ) as *mut c_char;
@@ -5066,34 +4871,31 @@ pub unsafe extern "C" fn _spDeformTimeline_setBezier(
     mut frame: c_int,
     mut value: c_float,
     mut time1: c_float,
-    mut value1: c_float,
+    mut _value1: c_float,
     mut cx1: c_float,
     mut cy1: c_float,
     mut cx2: c_float,
     mut cy2: c_float,
     mut time2: c_float,
-    mut value2: c_float,
+    mut _value2: c_float,
 ) {
     let mut self_0: *mut spDeformTimeline = timeline as *mut spDeformTimeline;
     let mut n: c_int = 0;
-    let mut i: c_int = (*self_0).super_0.super_0.frameCount
-        + bezier * 18 as c_int;
+    let mut i: c_int = (*self_0).super_0.super_0.frameCount + bezier * 18 as c_int;
     let mut curves: *mut c_float = (*(*self_0).super_0.curves).items;
-    let mut tmpx: c_float = ((time1 - cx1 * 2 as c_int as c_float
-        + cx2) as c_double * 0.03f64) as c_float;
-    let mut tmpy: c_float = (cy2 as c_double * 0.03f64
-        - cy1 as c_double * 0.06f64) as c_float;
-    let mut dddx: c_float = (((cx1 - cx2) * 3 as c_int as c_float
-        - time1 + time2) as c_double * 0.006f64) as c_float;
-    let mut dddy: c_float = (((cy1 - cy2) as c_double + 0.33333333f64)
-        * 0.018f64) as c_float;
+    let mut tmpx: c_float =
+        ((time1 - cx1 * 2 as c_int as c_float + cx2) as c_double * 0.03f64) as c_float;
+    let mut tmpy: c_float = (cy2 as c_double * 0.03f64 - cy1 as c_double * 0.06f64) as c_float;
+    let mut dddx: c_float =
+        (((cx1 - cx2) * 3 as c_int as c_float - time1 + time2) as c_double * 0.006f64) as c_float;
+    let mut dddy: c_float = (((cy1 - cy2) as c_double + 0.33333333f64) * 0.018f64) as c_float;
     let mut ddx: c_float = tmpx * 2 as c_int as c_float + dddx;
     let mut ddy: c_float = tmpy * 2 as c_int as c_float + dddy;
     let mut dx: c_float = ((cx1 - time1) as c_double * 0.3f64
-        + tmpx as c_double + dddx as c_double * 0.16666667f64)
-        as c_float;
-    let mut dy: c_float = (cy1 as c_double * 0.3f64 + tmpy as c_double
-        + dddy as c_double * 0.16666667f64) as c_float;
+        + tmpx as c_double
+        + dddx as c_double * 0.16666667f64) as c_float;
+    let mut dy: c_float =
+        (cy1 as c_double * 0.3f64 + tmpy as c_double + dddy as c_double * 0.16666667f64) as c_float;
     let mut x: c_float = time1 + dx;
     let mut y: c_float = dy;
     if value == 0 as c_int as c_float {
@@ -5161,13 +4963,13 @@ pub unsafe extern "C" fn _spDeformTimeline_getCurvePercent(
 pub unsafe extern "C" fn _spDeformTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut frame: c_int = 0;
     let mut i: c_int = 0;
@@ -5180,8 +4982,7 @@ pub unsafe extern "C" fn _spDeformTimeline_apply(
     let mut frameVertices: *mut *mut c_float = 0 as *mut *mut c_float;
     let mut deformArray: *mut c_float = 0 as *mut c_float;
     let mut self_0: *mut spDeformTimeline = timeline as *mut spDeformTimeline;
-    let mut slot: *mut spSlot = *((*skeleton).slots)
-        .offset((*self_0).slotIndex as isize);
+    let mut slot: *mut spSlot = *((*skeleton).slots).offset((*self_0).slotIndex as isize);
     if (*(*slot).bone).active == 0 {
         return;
     }
@@ -5190,8 +4991,8 @@ pub unsafe extern "C" fn _spDeformTimeline_apply(
     }
     match (*(*slot).attachment).type_0 as c_uint {
         1 | 6 | 2 | 4 => {
-            let mut vertexAttachment: *mut spVertexAttachment = (*slot).attachment
-                as *mut spVertexAttachment;
+            let mut vertexAttachment: *mut spVertexAttachment =
+                (*slot).attachment as *mut spVertexAttachment;
             if (*vertexAttachment).timelineAttachment != (*self_0).attachment {
                 return;
             }
@@ -5204,10 +5005,8 @@ pub unsafe extern "C" fn _spDeformTimeline_apply(
     if (*slot).deformCount < vertexCount {
         if (*slot).deformCapacity < vertexCount {
             _spFree((*slot).deform as *mut c_void);
-            (*slot)
-                .deform = _spMalloc(
-                (::core::mem::size_of::<c_float>() as c_ulong)
-                    .wrapping_mul(vertexCount as c_ulong),
+            (*slot).deform = _spMalloc(
+                (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(vertexCount as c_ulong),
                 b"spine.c\0" as *const u8 as *const c_char,
                 1699 as c_int,
             ) as *mut c_float;
@@ -5220,8 +5019,8 @@ pub unsafe extern "C" fn _spDeformTimeline_apply(
     frameVertices = (*self_0).frameVertices;
     deformArray = (*slot).deform;
     if time < *frames.offset(0 as c_int as isize) {
-        let mut vertexAttachment_0: *mut spVertexAttachment = (*slot).attachment
-            as *mut spVertexAttachment;
+        let mut vertexAttachment_0: *mut spVertexAttachment =
+            (*slot).attachment as *mut spVertexAttachment;
         match blend as c_uint {
             0 => {
                 (*slot).deformCount = 0 as c_int;
@@ -5234,13 +5033,12 @@ pub unsafe extern "C" fn _spDeformTimeline_apply(
                 }
                 (*slot).deformCount = vertexCount;
                 if ((*vertexAttachment_0).bones).is_null() {
-                    let mut setupVertices: *mut c_float = (*vertexAttachment_0)
-                        .vertices;
+                    let mut setupVertices: *mut c_float = (*vertexAttachment_0).vertices;
                     i = 0 as c_int;
                     while i < vertexCount {
-                        *deformArray.offset(i as isize)
-                            += (*setupVertices.offset(i as isize)
-                                - *deformArray.offset(i as isize)) * alpha;
+                        *deformArray.offset(i as isize) += (*setupVertices.offset(i as isize)
+                            - *deformArray.offset(i as isize))
+                            * alpha;
                         i += 1;
                     }
                 } else {
@@ -5258,27 +5056,24 @@ pub unsafe extern "C" fn _spDeformTimeline_apply(
     }
     (*slot).deformCount = vertexCount;
     if time >= *frames.offset((framesCount - 1 as c_int) as isize) {
-        let mut lastVertices: *const c_float = *((*self_0).frameVertices)
-            .offset((framesCount - 1 as c_int) as isize);
+        let mut lastVertices: *const c_float =
+            *((*self_0).frameVertices).offset((framesCount - 1 as c_int) as isize);
         if alpha == 1 as c_int as c_float {
             if blend as c_uint == SP_MIX_BLEND_ADD as c_int as c_uint {
-                let mut vertexAttachment_1: *mut spVertexAttachment = (*slot).attachment
-                    as *mut spVertexAttachment;
+                let mut vertexAttachment_1: *mut spVertexAttachment =
+                    (*slot).attachment as *mut spVertexAttachment;
                 if ((*vertexAttachment_1).bones).is_null() {
-                    let mut setupVertices_0: *mut c_float = (*vertexAttachment_1)
-                        .vertices;
+                    let mut setupVertices_0: *mut c_float = (*vertexAttachment_1).vertices;
                     i = 0 as c_int;
                     while i < vertexCount {
-                        *deformArray.offset(i as isize)
-                            += *lastVertices.offset(i as isize)
-                                - *setupVertices_0.offset(i as isize);
+                        *deformArray.offset(i as isize) +=
+                            *lastVertices.offset(i as isize) - *setupVertices_0.offset(i as isize);
                         i += 1;
                     }
                 } else {
                     i = 0 as c_int;
                     while i < vertexCount {
-                        *deformArray.offset(i as isize)
-                            += *lastVertices.offset(i as isize);
+                        *deformArray.offset(i as isize) += *lastVertices.offset(i as isize);
                         i += 1;
                     }
                 }
@@ -5287,38 +5082,28 @@ pub unsafe extern "C" fn _spDeformTimeline_apply(
                     deformArray as *mut c_void,
                     lastVertices as *const c_void,
                     (vertexCount as c_ulong)
-                        .wrapping_mul(
-                            ::core::mem::size_of::<c_float>() as c_ulong,
-                        ),
+                        .wrapping_mul(::core::mem::size_of::<c_float>() as c_ulong),
                 );
             }
         } else {
-            let mut vertexAttachment_2: *mut spVertexAttachment = 0
-                as *mut spVertexAttachment;
+            let mut vertexAttachment_2: *mut spVertexAttachment = 0 as *mut spVertexAttachment;
             match blend as c_uint {
                 0 => {
                     vertexAttachment_2 = (*slot).attachment as *mut spVertexAttachment;
                     if ((*vertexAttachment_2).bones).is_null() {
-                        let mut setupVertices_1: *mut c_float = (*vertexAttachment_2)
-                            .vertices;
+                        let mut setupVertices_1: *mut c_float = (*vertexAttachment_2).vertices;
                         i = 0 as c_int;
                         while i < vertexCount {
-                            let mut setup: c_float = *setupVertices_1
-                                .offset(i as isize);
-                            *deformArray
-                                .offset(
-                                    i as isize,
-                                ) = setup
-                                + (*lastVertices.offset(i as isize) - setup) * alpha;
+                            let mut setup: c_float = *setupVertices_1.offset(i as isize);
+                            *deformArray.offset(i as isize) =
+                                setup + (*lastVertices.offset(i as isize) - setup) * alpha;
                             i += 1;
                         }
                     } else {
                         i = 0 as c_int;
                         while i < vertexCount {
-                            *deformArray
-                                .offset(
-                                    i as isize,
-                                ) = *lastVertices.offset(i as isize) * alpha;
+                            *deformArray.offset(i as isize) =
+                                *lastVertices.offset(i as isize) * alpha;
                             i += 1;
                         }
                     }
@@ -5326,29 +5111,28 @@ pub unsafe extern "C" fn _spDeformTimeline_apply(
                 1 | 2 => {
                     i = 0 as c_int;
                     while i < vertexCount {
-                        *deformArray.offset(i as isize)
-                            += (*lastVertices.offset(i as isize)
-                                - *deformArray.offset(i as isize)) * alpha;
+                        *deformArray.offset(i as isize) += (*lastVertices.offset(i as isize)
+                            - *deformArray.offset(i as isize))
+                            * alpha;
                         i += 1;
                     }
                 }
                 3 => {
                     vertexAttachment_2 = (*slot).attachment as *mut spVertexAttachment;
                     if ((*vertexAttachment_2).bones).is_null() {
-                        let mut setupVertices_2: *mut c_float = (*vertexAttachment_2)
-                            .vertices;
+                        let mut setupVertices_2: *mut c_float = (*vertexAttachment_2).vertices;
                         i = 0 as c_int;
                         while i < vertexCount {
-                            *deformArray.offset(i as isize)
-                                += (*lastVertices.offset(i as isize)
-                                    - *setupVertices_2.offset(i as isize)) * alpha;
+                            *deformArray.offset(i as isize) += (*lastVertices.offset(i as isize)
+                                - *setupVertices_2.offset(i as isize))
+                                * alpha;
                             i += 1;
                         }
                     } else {
                         i = 0 as c_int;
                         while i < vertexCount {
-                            *deformArray.offset(i as isize)
-                                += *lastVertices.offset(i as isize) * alpha;
+                            *deformArray.offset(i as isize) +=
+                                *lastVertices.offset(i as isize) * alpha;
                             i += 1;
                         }
                     }
@@ -5364,26 +5148,24 @@ pub unsafe extern "C" fn _spDeformTimeline_apply(
     nextVertices = *frameVertices.offset((frame + 1 as c_int) as isize);
     if alpha == 1 as c_int as c_float {
         if blend as c_uint == SP_MIX_BLEND_ADD as c_int as c_uint {
-            let mut vertexAttachment_3: *mut spVertexAttachment = (*slot).attachment
-                as *mut spVertexAttachment;
+            let mut vertexAttachment_3: *mut spVertexAttachment =
+                (*slot).attachment as *mut spVertexAttachment;
             if ((*vertexAttachment_3).bones).is_null() {
-                let mut setupVertices_3: *mut c_float = (*vertexAttachment_3)
-                    .vertices;
+                let mut setupVertices_3: *mut c_float = (*vertexAttachment_3).vertices;
                 i = 0 as c_int;
                 while i < vertexCount {
                     let mut prev: c_float = *prevVertices.offset(i as isize);
-                    *deformArray.offset(i as isize)
-                        += prev + (*nextVertices.offset(i as isize) - prev) * percent
-                            - *setupVertices_3.offset(i as isize);
+                    *deformArray.offset(i as isize) += prev
+                        + (*nextVertices.offset(i as isize) - prev) * percent
+                        - *setupVertices_3.offset(i as isize);
                     i += 1;
                 }
             } else {
                 i = 0 as c_int;
                 while i < vertexCount {
                     let mut prev_0: c_float = *prevVertices.offset(i as isize);
-                    *deformArray.offset(i as isize)
-                        += prev_0
-                            + (*nextVertices.offset(i as isize) - prev_0) * percent;
+                    *deformArray.offset(i as isize) +=
+                        prev_0 + (*nextVertices.offset(i as isize) - prev_0) * percent;
                     i += 1;
                 }
             }
@@ -5391,44 +5173,33 @@ pub unsafe extern "C" fn _spDeformTimeline_apply(
             i = 0 as c_int;
             while i < vertexCount {
                 let mut prev_1: c_float = *prevVertices.offset(i as isize);
-                *deformArray
-                    .offset(
-                        i as isize,
-                    ) = prev_1 + (*nextVertices.offset(i as isize) - prev_1) * percent;
+                *deformArray.offset(i as isize) =
+                    prev_1 + (*nextVertices.offset(i as isize) - prev_1) * percent;
                 i += 1;
             }
         }
     } else {
-        let mut vertexAttachment_4: *mut spVertexAttachment = 0
-            as *mut spVertexAttachment;
+        let mut vertexAttachment_4: *mut spVertexAttachment = 0 as *mut spVertexAttachment;
         match blend as c_uint {
             0 => {
                 vertexAttachment_4 = (*slot).attachment as *mut spVertexAttachment;
                 if ((*vertexAttachment_4).bones).is_null() {
-                    let mut setupVertices_4: *mut c_float = (*vertexAttachment_4)
-                        .vertices;
+                    let mut setupVertices_4: *mut c_float = (*vertexAttachment_4).vertices;
                     i = 0 as c_int;
                     while i < vertexCount {
                         let mut prev_2: c_float = *prevVertices.offset(i as isize);
-                        let mut setup_0: c_float = *setupVertices_4
-                            .offset(i as isize);
-                        *deformArray
-                            .offset(
-                                i as isize,
-                            ) = setup_0
-                            + (prev_2
-                                + (*nextVertices.offset(i as isize) - prev_2) * percent
-                                - setup_0) * alpha;
+                        let mut setup_0: c_float = *setupVertices_4.offset(i as isize);
+                        *deformArray.offset(i as isize) = setup_0
+                            + (prev_2 + (*nextVertices.offset(i as isize) - prev_2) * percent
+                                - setup_0)
+                                * alpha;
                         i += 1;
                     }
                 } else {
                     i = 0 as c_int;
                     while i < vertexCount {
                         let mut prev_3: c_float = *prevVertices.offset(i as isize);
-                        *deformArray
-                            .offset(
-                                i as isize,
-                            ) = (prev_3
+                        *deformArray.offset(i as isize) = (prev_3
                             + (*nextVertices.offset(i as isize) - prev_3) * percent)
                             * alpha;
                         i += 1;
@@ -5439,35 +5210,33 @@ pub unsafe extern "C" fn _spDeformTimeline_apply(
                 i = 0 as c_int;
                 while i < vertexCount {
                     let mut prev_4: c_float = *prevVertices.offset(i as isize);
-                    *deformArray.offset(i as isize)
-                        += (prev_4
-                            + (*nextVertices.offset(i as isize) - prev_4) * percent
-                            - *deformArray.offset(i as isize)) * alpha;
+                    *deformArray.offset(i as isize) += (prev_4
+                        + (*nextVertices.offset(i as isize) - prev_4) * percent
+                        - *deformArray.offset(i as isize))
+                        * alpha;
                     i += 1;
                 }
             }
             3 => {
                 vertexAttachment_4 = (*slot).attachment as *mut spVertexAttachment;
                 if ((*vertexAttachment_4).bones).is_null() {
-                    let mut setupVertices_5: *mut c_float = (*vertexAttachment_4)
-                        .vertices;
+                    let mut setupVertices_5: *mut c_float = (*vertexAttachment_4).vertices;
                     i = 0 as c_int;
                     while i < vertexCount {
                         let mut prev_5: c_float = *prevVertices.offset(i as isize);
-                        *deformArray.offset(i as isize)
-                            += (prev_5
-                                + (*nextVertices.offset(i as isize) - prev_5) * percent
-                                - *setupVertices_5.offset(i as isize)) * alpha;
+                        *deformArray.offset(i as isize) += (prev_5
+                            + (*nextVertices.offset(i as isize) - prev_5) * percent
+                            - *setupVertices_5.offset(i as isize))
+                            * alpha;
                         i += 1;
                     }
                 } else {
                     i = 0 as c_int;
                     while i < vertexCount {
                         let mut prev_6: c_float = *prevVertices.offset(i as isize);
-                        *deformArray.offset(i as isize)
-                            += (prev_6
-                                + (*nextVertices.offset(i as isize) - prev_6) * percent)
-                                * alpha;
+                        *deformArray.offset(i as isize) += (prev_6
+                            + (*nextVertices.offset(i as isize) - prev_6) * percent)
+                            * alpha;
                         i += 1;
                     }
                 }
@@ -5503,11 +5272,9 @@ pub unsafe extern "C" fn spDeformTimeline_create(
         1885 as c_int,
     ) as *mut spDeformTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_DEFORM as c_int as spPropertyId)
-        << 32 as c_int
-        | ((slotIndex << 16 as c_int | (*attachment).id) as c_uint
-            & 0xffffffff as c_uint) as c_ulong;
+    ids[0 as c_int as usize] = (SP_PROPERTY_DEFORM as c_int as spPropertyId) << 32 as c_int
+        | ((slotIndex << 16 as c_int | (*attachment).id) as c_uint & 0xffffffff as c_uint)
+            as c_ulong;
     _spCurveTimeline_init(
         &mut (*self_0).super_0,
         framesCount,
@@ -5549,8 +5316,7 @@ pub unsafe extern "C" fn spDeformTimeline_create(
                 ) -> (),
         ),
     );
-    (*self_0)
-        .frameVertices = _spCalloc(
+    (*self_0).frameVertices = _spCalloc(
         framesCount as size_t,
         ::core::mem::size_of::<*mut c_float>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -5596,17 +5362,16 @@ static mut DELAY: c_int = 2 as c_int;
 pub unsafe extern "C" fn _spSequenceTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
-    mut alpha: c_float,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
+    mut _alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut self_0: *mut spSequenceTimeline = timeline as *mut spSequenceTimeline;
-    let mut slot: *mut spSlot = *((*skeleton).slots)
-        .offset((*self_0).slotIndex as isize);
+    let mut slot: *mut spSlot = *((*skeleton).slots).offset((*self_0).slotIndex as isize);
     let mut slotAttachment: *mut spAttachment = 0 as *mut spAttachment;
     let mut frames: *mut c_float = 0 as *mut c_float;
     let mut i: c_int = 0;
@@ -5627,8 +5392,8 @@ pub unsafe extern "C" fn _spSequenceTimeline_apply(
         }
         match (*slotAttachment).type_0 as c_uint {
             1 | 6 | 2 | 4 => {
-                let mut vertexAttachment: *mut spVertexAttachment = (*slot).attachment
-                    as *mut spVertexAttachment;
+                let mut vertexAttachment: *mut spVertexAttachment =
+                    (*slot).attachment as *mut spVertexAttachment;
                 if (*vertexAttachment).timelineAttachment != (*self_0).attachment {
                     return;
                 }
@@ -5649,14 +5414,10 @@ pub unsafe extern "C" fn _spSequenceTimeline_apply(
     before = *frames.offset(i as isize);
     modeAndIndex = *frames.offset((i + MODE) as isize) as c_int;
     delay = *frames.offset((i + DELAY) as isize);
-    if (*(*self_0).attachment).type_0 as c_uint
-        == SP_ATTACHMENT_REGION as c_int as c_uint
-    {
+    if (*(*self_0).attachment).type_0 as c_uint == SP_ATTACHMENT_REGION as c_int as c_uint {
         sequence = (*((*self_0).attachment as *mut spRegionAttachment)).sequence;
     }
-    if (*(*self_0).attachment).type_0 as c_uint
-        == SP_ATTACHMENT_MESH as c_int as c_uint
-    {
+    if (*(*self_0).attachment).type_0 as c_uint == SP_ATTACHMENT_MESH as c_int as c_uint {
         sequence = (*((*self_0).attachment as *mut spMeshAttachment)).sequence;
     }
     if sequence.is_null() {
@@ -5666,8 +5427,7 @@ pub unsafe extern "C" fn _spSequenceTimeline_apply(
     count = (*(*sequence).regions).size;
     mode = modeAndIndex & 0xf as c_int;
     if mode != 0 as c_int {
-        index
-            += (((time - before) / delay) as c_double + 0.0001f64) as c_int;
+        index += (((time - before) / delay) as c_double + 0.0001f64) as c_int;
         match mode {
             1 => {
                 index = if (count - 1 as c_int) < index {
@@ -5681,7 +5441,11 @@ pub unsafe extern "C" fn _spSequenceTimeline_apply(
             }
             3 => {
                 let mut n: c_int = (count << 1 as c_int) - 2 as c_int;
-                index = if n == 0 as c_int { 0 as c_int } else { index % n };
+                index = if n == 0 as c_int {
+                    0 as c_int
+                } else {
+                    index % n
+                };
                 if index >= count {
                     index = n - index;
                 }
@@ -5697,8 +5461,7 @@ pub unsafe extern "C" fn _spSequenceTimeline_apply(
                 index = count - 1 as c_int - index % count;
             }
             6 => {
-                let mut n_0: c_int = (count << 1 as c_int)
-                    - 2 as c_int;
+                let mut n_0: c_int = (count << 1 as c_int) - 2 as c_int;
                 index = if n_0 == 0 as c_int {
                     0 as c_int
                 } else {
@@ -5714,7 +5477,7 @@ pub unsafe extern "C" fn _spSequenceTimeline_apply(
     (*slot).sequenceIndex = index;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spSequenceTimeline_dispose(mut timeline: *mut spTimeline) {}
+pub unsafe extern "C" fn _spSequenceTimeline_dispose(mut _timeline: *mut spTimeline) {}
 #[no_mangle]
 pub unsafe extern "C" fn spSequenceTimeline_create(
     mut framesCount: c_int,
@@ -5729,21 +5492,14 @@ pub unsafe extern "C" fn spSequenceTimeline_create(
         2003 as c_int,
     ) as *mut spSequenceTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    if (*attachment).type_0 as c_uint
-        == SP_ATTACHMENT_REGION as c_int as c_uint
-    {
+    if (*attachment).type_0 as c_uint == SP_ATTACHMENT_REGION as c_int as c_uint {
         sequenceId = (*(*(attachment as *mut spRegionAttachment)).sequence).id;
     }
-    if (*attachment).type_0 as c_uint
-        == SP_ATTACHMENT_MESH as c_int as c_uint
-    {
+    if (*attachment).type_0 as c_uint == SP_ATTACHMENT_MESH as c_int as c_uint {
         sequenceId = (*(*(attachment as *mut spMeshAttachment)).sequence).id;
     }
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_SEQUENCE as c_int as spPropertyId)
-        << 32 as c_int
-        | ((slotIndex << 16 as c_int | sequenceId) as c_uint
-            & 0xffffffff as c_uint) as c_ulong;
+    ids[0 as c_int as usize] = (SP_PROPERTY_SEQUENCE as c_int as spPropertyId) << 32 as c_int
+        | ((slotIndex << 16 as c_int | sequenceId) as c_uint & 0xffffffff as c_uint) as c_ulong;
     _spTimeline_init(
         &mut (*self_0).super_0,
         framesCount,
@@ -5784,10 +5540,7 @@ pub unsafe extern "C" fn spSequenceTimeline_setFrame(
     let mut frames: *mut c_float = (*(*self_0).super_0.frames).items;
     frame *= SEQUENCE_ENTRIES;
     *frames.offset(frame as isize) = time;
-    *frames
-        .offset(
-            (frame + MODE) as isize,
-        ) = (mode | index << 4 as c_int) as c_float;
+    *frames.offset((frame + MODE) as isize) = (mode | index << 4 as c_int) as c_float;
     *frames.offset((frame + DELAY) as isize) = delay;
 }
 #[no_mangle]
@@ -5823,7 +5576,7 @@ pub unsafe extern "C" fn _spEventTimeline_apply(
         );
         lastTime = -(1 as c_int) as c_float;
     } else if lastTime >= *frames.offset((framesCount - 1 as c_int) as isize) {
-        return
+        return;
     }
     if time < *frames.offset(0 as c_int as isize) {
         return;
@@ -5860,9 +5613,7 @@ pub unsafe extern "C" fn _spEventTimeline_dispose(mut timeline: *mut spTimeline)
     _spFree((*self_0).events as *mut c_void);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spEventTimeline_create(
-    mut framesCount: c_int,
-) -> *mut spEventTimeline {
+pub unsafe extern "C" fn spEventTimeline_create(mut framesCount: c_int) -> *mut spEventTimeline {
     let mut self_0: *mut spEventTimeline = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<spEventTimeline>() as c_ulong,
@@ -5870,9 +5621,7 @@ pub unsafe extern "C" fn spEventTimeline_create(
         2073 as c_int,
     ) as *mut spEventTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_EVENT as c_int as spPropertyId)
-        << 32 as c_int;
+    ids[0 as c_int as usize] = (SP_PROPERTY_EVENT as c_int as spPropertyId) << 32 as c_int;
     _spTimeline_init(
         &mut (*self_0).super_0,
         framesCount,
@@ -5897,8 +5646,7 @@ pub unsafe extern "C" fn spEventTimeline_create(
         ),
         None,
     );
-    (*self_0)
-        .events = _spCalloc(
+    (*self_0).events = _spCalloc(
         framesCount as size_t,
         ::core::mem::size_of::<*mut spEvent>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -5921,11 +5669,11 @@ pub unsafe extern "C" fn spEventTimeline_setFrame(
 pub unsafe extern "C" fn _spDrawOrderTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
-    mut alpha: c_float,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
+    mut _alpha: c_float,
     mut blend: spMixBlend,
     mut direction: spMixDirection,
 ) {
@@ -5957,8 +5705,8 @@ pub unsafe extern "C" fn _spDrawOrderTimeline_apply(
         }
         return;
     }
-    drawOrderToSetupIndex = *((*self_0).drawOrders)
-        .offset(search((*self_0).super_0.frames, time) as isize);
+    drawOrderToSetupIndex =
+        *((*self_0).drawOrders).offset(search((*self_0).super_0.frames, time) as isize);
     if drawOrderToSetupIndex.is_null() {
         spine_memcpy(
             (*skeleton).drawOrder as *mut c_void,
@@ -5970,8 +5718,8 @@ pub unsafe extern "C" fn _spDrawOrderTimeline_apply(
         i = 0 as c_int;
         while i < (*self_0).slotsCount {
             let ref mut fresh9 = *((*skeleton).drawOrder).offset(i as isize);
-            *fresh9 = *((*skeleton).slots)
-                .offset(*drawOrderToSetupIndex.offset(i as isize) as isize);
+            *fresh9 =
+                *((*skeleton).slots).offset(*drawOrderToSetupIndex.offset(i as isize) as isize);
             i += 1;
         }
     };
@@ -5999,9 +5747,7 @@ pub unsafe extern "C" fn spDrawOrderTimeline_create(
         2135 as c_int,
     ) as *mut spDrawOrderTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_DRAWORDER as c_int as spPropertyId)
-        << 32 as c_int;
+    ids[0 as c_int as usize] = (SP_PROPERTY_DRAWORDER as c_int as spPropertyId) << 32 as c_int;
     _spTimeline_init(
         &mut (*self_0).super_0,
         framesCount,
@@ -6009,9 +5755,7 @@ pub unsafe extern "C" fn spDrawOrderTimeline_create(
         ids.as_mut_ptr(),
         1 as c_int,
         SP_TIMELINE_DRAWORDER,
-        Some(
-            _spDrawOrderTimeline_dispose as unsafe extern "C" fn(*mut spTimeline) -> (),
-        ),
+        Some(_spDrawOrderTimeline_dispose as unsafe extern "C" fn(*mut spTimeline) -> ()),
         Some(
             _spDrawOrderTimeline_apply
                 as unsafe extern "C" fn(
@@ -6028,8 +5772,7 @@ pub unsafe extern "C" fn spDrawOrderTimeline_create(
         ),
         None,
     );
-    (*self_0)
-        .drawOrders = _spCalloc(
+    (*self_0).drawOrders = _spCalloc(
         framesCount as size_t,
         ::core::mem::size_of::<*mut c_int>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -6070,17 +5813,16 @@ pub unsafe extern "C" fn spDrawOrderTimeline_setFrame(
 pub unsafe extern "C" fn _spInheritTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
-    mut alpha: c_float,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
+    mut _alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut self_0: *mut spInheritTimeline = timeline as *mut spInheritTimeline;
-    let mut bone: *mut spBone = *((*skeleton).bones)
-        .offset((*self_0).boneIndex as isize);
+    let mut bone: *mut spBone = *((*skeleton).bones).offset((*self_0).boneIndex as isize);
     let mut frames: *mut c_float = (*(*self_0).super_0.frames).items;
     if (*bone).active == 0 {
         return;
@@ -6093,12 +5835,11 @@ pub unsafe extern "C" fn _spInheritTimeline_apply(
         }
         return;
     }
-    let mut idx: c_int = search2((*self_0).super_0.frames, time, 2 as c_int)
-        + 1 as c_int;
+    let mut idx: c_int = search2((*self_0).super_0.frames, time, 2 as c_int) + 1 as c_int;
     (*bone).inherit = *frames.offset(idx as isize) as spInherit;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spInheritTimeline_dispose(mut timeline: *mut spTimeline) {}
+pub unsafe extern "C" fn _spInheritTimeline_dispose(mut _timeline: *mut spTimeline) {}
 #[no_mangle]
 pub unsafe extern "C" fn spInheritTimeline_create(
     mut framesCount: c_int,
@@ -6111,9 +5852,7 @@ pub unsafe extern "C" fn spInheritTimeline_create(
         2188 as c_int,
     ) as *mut spInheritTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_INHERIT as c_int as spPropertyId)
-        << 32 as c_int;
+    ids[0 as c_int as usize] = (SP_PROPERTY_INHERIT as c_int as spPropertyId) << 32 as c_int;
     _spTimeline_init(
         &mut (*self_0).super_0,
         framesCount,
@@ -6150,8 +5889,7 @@ pub unsafe extern "C" fn spInheritTimeline_setFrame(
 ) {
     frame *= 2 as c_int;
     *((*(*self_0).super_0.frames).items).offset(frame as isize) = time;
-    *((*(*self_0).super_0.frames).items)
-        .offset((frame + 1 as c_int) as isize) = inherit as c_float;
+    *((*(*self_0).super_0.frames).items).offset((frame + 1 as c_int) as isize) = inherit as c_float;
 }
 static mut IKCONSTRAINT_ENTRIES: c_int = 6 as c_int;
 static mut IKCONSTRAINT_MIX: c_int = 1 as c_int;
@@ -6163,10 +5901,10 @@ static mut IKCONSTRAINT_STRETCH: c_int = 5 as c_int;
 pub unsafe extern "C" fn _spIkConstraintTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
     mut direction: spMixDirection,
@@ -6177,12 +5915,10 @@ pub unsafe extern "C" fn _spIkConstraintTimeline_apply(
     let mut softness: c_float = 0.;
     let mut t: c_float = 0.;
     let mut constraint: *mut spIkConstraint = 0 as *mut spIkConstraint;
-    let mut self_0: *mut spIkConstraintTimeline = timeline
-        as *mut spIkConstraintTimeline;
+    let mut self_0: *mut spIkConstraintTimeline = timeline as *mut spIkConstraintTimeline;
     let mut frames: *mut c_float = (*(*self_0).super_0.super_0.frames).items;
     let mut curves: *mut c_float = (*(*self_0).super_0.curves).items;
-    constraint = *((*skeleton).ikConstraints)
-        .offset((*self_0).ikConstraintIndex as isize);
+    constraint = *((*skeleton).ikConstraints).offset((*self_0).ikConstraintIndex as isize);
     if (*constraint).active == 0 {
         return;
     }
@@ -6197,10 +5933,9 @@ pub unsafe extern "C" fn _spIkConstraintTimeline_apply(
                 return;
             }
             1 => {
-                (*constraint).mix
-                    += ((*(*constraint).data).mix - (*constraint).mix) * alpha;
-                (*constraint).softness
-                    += ((*(*constraint).data).softness - (*constraint).softness) * alpha;
+                (*constraint).mix += ((*(*constraint).data).mix - (*constraint).mix) * alpha;
+                (*constraint).softness +=
+                    ((*(*constraint).data).softness - (*constraint).softness) * alpha;
                 (*constraint).bendDirection = (*(*constraint).data).bendDirection;
                 (*constraint).compress = (*(*constraint).data).compress;
                 (*constraint).stretch = (*(*constraint).data).stretch;
@@ -6216,16 +5951,13 @@ pub unsafe extern "C" fn _spIkConstraintTimeline_apply(
             let mut before: c_float = *frames.offset(i as isize);
             mix = *frames.offset((i + IKCONSTRAINT_MIX) as isize);
             softness = *frames.offset((i + IKCONSTRAINT_SOFTNESS) as isize);
-            t = (time - before)
-                / (*frames.offset((i + IKCONSTRAINT_ENTRIES) as isize) - before);
-            mix
-                += (*frames
-                    .offset((i + IKCONSTRAINT_ENTRIES + IKCONSTRAINT_MIX) as isize)
-                    - mix) * t;
-            softness
-                += (*frames
-                    .offset((i + IKCONSTRAINT_ENTRIES + IKCONSTRAINT_SOFTNESS) as isize)
-                    - softness) * t;
+            t = (time - before) / (*frames.offset((i + IKCONSTRAINT_ENTRIES) as isize) - before);
+            mix +=
+                (*frames.offset((i + IKCONSTRAINT_ENTRIES + IKCONSTRAINT_MIX) as isize) - mix) * t;
+            softness += (*frames
+                .offset((i + IKCONSTRAINT_ENTRIES + IKCONSTRAINT_SOFTNESS) as isize)
+                - softness)
+                * t;
         }
         1 => {
             mix = *frames.offset((i + IKCONSTRAINT_MIX) as isize);
@@ -6249,42 +5981,30 @@ pub unsafe extern "C" fn _spIkConstraintTimeline_apply(
         }
     }
     if blend as c_uint == SP_MIX_BLEND_SETUP as c_int as c_uint {
-        (*constraint)
-            .mix = (*(*constraint).data).mix + (mix - (*(*constraint).data).mix) * alpha;
-        (*constraint)
-            .softness = (*(*constraint).data).softness
-            + (softness - (*(*constraint).data).softness) * alpha;
-        if direction as c_uint
-            == SP_MIX_DIRECTION_OUT as c_int as c_uint
-        {
+        (*constraint).mix = (*(*constraint).data).mix + (mix - (*(*constraint).data).mix) * alpha;
+        (*constraint).softness =
+            (*(*constraint).data).softness + (softness - (*(*constraint).data).softness) * alpha;
+        if direction as c_uint == SP_MIX_DIRECTION_OUT as c_int as c_uint {
             (*constraint).bendDirection = (*(*constraint).data).bendDirection;
             (*constraint).compress = (*(*constraint).data).compress;
             (*constraint).stretch = (*(*constraint).data).stretch;
         } else {
-            (*constraint)
-                .bendDirection = *frames
-                .offset((i + IKCONSTRAINT_BEND_DIRECTION) as isize) as c_int;
-            (*constraint)
-                .compress = (*frames.offset((i + IKCONSTRAINT_COMPRESS) as isize)
+            (*constraint).bendDirection =
+                *frames.offset((i + IKCONSTRAINT_BEND_DIRECTION) as isize) as c_int;
+            (*constraint).compress = (*frames.offset((i + IKCONSTRAINT_COMPRESS) as isize)
                 != 0 as c_int as c_float) as c_int;
-            (*constraint)
-                .stretch = (*frames.offset((i + IKCONSTRAINT_STRETCH) as isize)
+            (*constraint).stretch = (*frames.offset((i + IKCONSTRAINT_STRETCH) as isize)
                 != 0 as c_int as c_float) as c_int;
         }
     } else {
         (*constraint).mix += (mix - (*constraint).mix) * alpha;
         (*constraint).softness += (softness - (*constraint).softness) * alpha;
-        if direction as c_uint
-            == SP_MIX_DIRECTION_IN as c_int as c_uint
-        {
-            (*constraint)
-                .bendDirection = *frames
-                .offset((i + IKCONSTRAINT_BEND_DIRECTION) as isize) as c_int;
-            (*constraint)
-                .compress = (*frames.offset((i + IKCONSTRAINT_COMPRESS) as isize)
+        if direction as c_uint == SP_MIX_DIRECTION_IN as c_int as c_uint {
+            (*constraint).bendDirection =
+                *frames.offset((i + IKCONSTRAINT_BEND_DIRECTION) as isize) as c_int;
+            (*constraint).compress = (*frames.offset((i + IKCONSTRAINT_COMPRESS) as isize)
                 != 0 as c_int as c_float) as c_int;
-            (*constraint)
-                .stretch = (*frames.offset((i + IKCONSTRAINT_STRETCH) as isize)
+            (*constraint).stretch = (*frames.offset((i + IKCONSTRAINT_STRETCH) as isize)
                 != 0 as c_int as c_float) as c_int;
         }
     };
@@ -6302,9 +6022,8 @@ pub unsafe extern "C" fn spIkConstraintTimeline_create(
         2298 as c_int,
     ) as *mut spIkConstraintTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_IKCONSTRAINT as c_int as spPropertyId)
-        << 32 as c_int | ikConstraintIndex as c_ulong;
+    ids[0 as c_int as usize] = (SP_PROPERTY_IKCONSTRAINT as c_int as spPropertyId) << 32 as c_int
+        | ikConstraintIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         framesCount,
@@ -6365,20 +6084,14 @@ pub unsafe extern "C" fn spIkConstraintTimeline_setFrame(
     *frames.offset(frame as isize) = time;
     *frames.offset((frame + IKCONSTRAINT_MIX) as isize) = mix;
     *frames.offset((frame + IKCONSTRAINT_SOFTNESS) as isize) = softness;
-    *frames
-        .offset(
-            (frame + IKCONSTRAINT_BEND_DIRECTION) as isize,
-        ) = bendDirection as c_float;
-    *frames
-        .offset(
-            (frame + IKCONSTRAINT_COMPRESS) as isize,
-        ) = (if compress != 0 { 1 as c_int } else { 0 as c_int })
-        as c_float;
-    *frames
-        .offset(
-            (frame + IKCONSTRAINT_STRETCH) as isize,
-        ) = (if stretch != 0 { 1 as c_int } else { 0 as c_int })
-        as c_float;
+    *frames.offset((frame + IKCONSTRAINT_BEND_DIRECTION) as isize) = bendDirection as c_float;
+    *frames.offset((frame + IKCONSTRAINT_COMPRESS) as isize) = (if compress != 0 {
+        1 as c_int
+    } else {
+        0 as c_int
+    }) as c_float;
+    *frames.offset((frame + IKCONSTRAINT_STRETCH) as isize) =
+        (if stretch != 0 { 1 as c_int } else { 0 as c_int }) as c_float;
 }
 static mut TRANSFORMCONSTRAINT_ENTRIES: c_int = 7 as c_int;
 static mut TRANSFORMCONSTRAINT_ROTATE: c_int = 1 as c_int;
@@ -6391,13 +6104,13 @@ static mut TRANSFORMCONSTRAINT_SHEARY: c_int = 6 as c_int;
 pub unsafe extern "C" fn _spTransformConstraintTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut i: c_int = 0;
     let mut curveType: c_int = 0;
@@ -6409,13 +6122,13 @@ pub unsafe extern "C" fn _spTransformConstraintTimeline_apply(
     let mut shearY: c_float = 0.;
     let mut t: c_float = 0.;
     let mut constraint: *mut spTransformConstraint = 0 as *mut spTransformConstraint;
-    let mut self_0: *mut spTransformConstraintTimeline = timeline
-        as *mut spTransformConstraintTimeline;
+    let mut self_0: *mut spTransformConstraintTimeline =
+        timeline as *mut spTransformConstraintTimeline;
     let mut frames: *mut c_float = 0 as *mut c_float;
     let mut curves: *mut c_float = 0 as *mut c_float;
     let mut data: *mut spTransformConstraintData = 0 as *mut spTransformConstraintData;
-    constraint = *((*skeleton).transformConstraints)
-        .offset((*self_0).transformConstraintIndex as isize);
+    constraint =
+        *((*skeleton).transformConstraints).offset((*self_0).transformConstraintIndex as isize);
     if (*constraint).active == 0 {
         return;
     }
@@ -6434,24 +6147,23 @@ pub unsafe extern "C" fn _spTransformConstraintTimeline_apply(
                 return;
             }
             1 => {
-                (*constraint).mixRotate
-                    += ((*data).mixRotate - (*constraint).mixRotate) * alpha;
+                (*constraint).mixRotate += ((*data).mixRotate - (*constraint).mixRotate) * alpha;
                 (*constraint).mixX += ((*data).mixX - (*constraint).mixX) * alpha;
                 (*constraint).mixY += ((*data).mixY - (*constraint).mixY) * alpha;
-                (*constraint).mixScaleX
-                    += ((*data).mixScaleX - (*constraint).mixScaleX) * alpha;
-                (*constraint).mixScaleY
-                    += ((*data).mixScaleY - (*constraint).mixScaleY) * alpha;
-                (*constraint).mixShearY
-                    += ((*data).mixShearY - (*constraint).mixShearY) * alpha;
+                (*constraint).mixScaleX += ((*data).mixScaleX - (*constraint).mixScaleX) * alpha;
+                (*constraint).mixScaleY += ((*data).mixScaleY - (*constraint).mixScaleY) * alpha;
+                (*constraint).mixShearY += ((*data).mixShearY - (*constraint).mixShearY) * alpha;
                 return;
             }
             _ => return,
         }
     }
-    i = search2((*self_0).super_0.super_0.frames, time, TRANSFORMCONSTRAINT_ENTRIES);
-    curveType = *curves.offset((i / TRANSFORMCONSTRAINT_ENTRIES) as isize)
-        as c_int;
+    i = search2(
+        (*self_0).super_0.super_0.frames,
+        time,
+        TRANSFORMCONSTRAINT_ENTRIES,
+    );
+    curveType = *curves.offset((i / TRANSFORMCONSTRAINT_ENTRIES) as isize) as c_int;
     match curveType {
         0 => {
             let mut before: c_float = *frames.offset(i as isize);
@@ -6463,42 +6175,30 @@ pub unsafe extern "C" fn _spTransformConstraintTimeline_apply(
             shearY = *frames.offset((i + TRANSFORMCONSTRAINT_SHEARY) as isize);
             t = (time - before)
                 / (*frames.offset((i + TRANSFORMCONSTRAINT_ENTRIES) as isize) - before);
-            rotate
-                += (*frames
-                    .offset(
-                        (i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_ROTATE)
-                            as isize,
-                    ) - rotate) * t;
-            x
-                += (*frames
-                    .offset(
-                        (i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_X)
-                            as isize,
-                    ) - x) * t;
-            y
-                += (*frames
-                    .offset(
-                        (i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_Y)
-                            as isize,
-                    ) - y) * t;
-            scaleX
-                += (*frames
-                    .offset(
-                        (i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_SCALEX)
-                            as isize,
-                    ) - scaleX) * t;
-            scaleY
-                += (*frames
-                    .offset(
-                        (i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_SCALEY)
-                            as isize,
-                    ) - scaleY) * t;
-            shearY
-                += (*frames
-                    .offset(
-                        (i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_SHEARY)
-                            as isize,
-                    ) - shearY) * t;
+            rotate += (*frames
+                .offset((i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_ROTATE) as isize)
+                - rotate)
+                * t;
+            x += (*frames
+                .offset((i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_X) as isize)
+                - x)
+                * t;
+            y += (*frames
+                .offset((i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_Y) as isize)
+                - y)
+                * t;
+            scaleX += (*frames
+                .offset((i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_SCALEX) as isize)
+                - scaleX)
+                * t;
+            scaleY += (*frames
+                .offset((i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_SCALEY) as isize)
+                - scaleY)
+                * t;
+            shearY += (*frames
+                .offset((i + TRANSFORMCONSTRAINT_ENTRIES + TRANSFORMCONSTRAINT_SHEARY) as isize)
+                - shearY)
+                * t;
         }
         1 => {
             rotate = *frames.offset((i + TRANSFORMCONSTRAINT_ROTATE) as isize);
@@ -6554,16 +6254,12 @@ pub unsafe extern "C" fn _spTransformConstraintTimeline_apply(
         }
     }
     if blend as c_uint == SP_MIX_BLEND_SETUP as c_int as c_uint {
-        (*constraint)
-            .mixRotate = (*data).mixRotate + (rotate - (*data).mixRotate) * alpha;
+        (*constraint).mixRotate = (*data).mixRotate + (rotate - (*data).mixRotate) * alpha;
         (*constraint).mixX = (*data).mixX + (x - (*data).mixX) * alpha;
         (*constraint).mixY = (*data).mixY + (y - (*data).mixY) * alpha;
-        (*constraint)
-            .mixScaleX = (*data).mixScaleX + (scaleX - (*data).mixScaleX) * alpha;
-        (*constraint)
-            .mixScaleY = (*data).mixScaleY + (scaleY - (*data).mixScaleY) * alpha;
-        (*constraint)
-            .mixShearY = (*data).mixShearY + (shearY - (*data).mixShearY) * alpha;
+        (*constraint).mixScaleX = (*data).mixScaleX + (scaleX - (*data).mixScaleX) * alpha;
+        (*constraint).mixScaleY = (*data).mixScaleY + (scaleY - (*data).mixScaleY) * alpha;
+        (*constraint).mixShearY = (*data).mixShearY + (shearY - (*data).mixShearY) * alpha;
     } else {
         (*constraint).mixRotate += (rotate - (*constraint).mixRotate) * alpha;
         (*constraint).mixX += (x - (*constraint).mixX) * alpha;
@@ -6584,11 +6280,12 @@ pub unsafe extern "C" fn spTransformConstraintTimeline_create(
         ::core::mem::size_of::<spTransformConstraintTimeline>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
         2439 as c_int,
-    ) as *mut spTransformConstraintTimeline;
+    )
+        as *mut spTransformConstraintTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_TRANSFORMCONSTRAINT as c_int as spPropertyId)
-        << 32 as c_int | transformConstraintIndex as c_ulong;
+    ids[0 as c_int as usize] = (SP_PROPERTY_TRANSFORMCONSTRAINT as c_int as spPropertyId)
+        << 32 as c_int
+        | transformConstraintIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         framesCount,
@@ -6661,21 +6358,20 @@ static mut PATHCONSTRAINTPOSITION_VALUE: c_int = 1 as c_int;
 pub unsafe extern "C" fn _spPathConstraintPositionTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
-    let mut self_0: *mut spPathConstraintPositionTimeline = timeline
-        as *mut spPathConstraintPositionTimeline;
-    let mut constraint: *mut spPathConstraint = *((*skeleton).pathConstraints)
-        .offset((*self_0).pathConstraintIndex as isize);
+    let mut self_0: *mut spPathConstraintPositionTimeline =
+        timeline as *mut spPathConstraintPositionTimeline;
+    let mut constraint: *mut spPathConstraint =
+        *((*skeleton).pathConstraints).offset((*self_0).pathConstraintIndex as isize);
     if (*constraint).active != 0 {
-        (*constraint)
-            .position = spCurveTimeline1_getAbsoluteValue(
+        (*constraint).position = spCurveTimeline1_getAbsoluteValue(
             &mut (*self_0).super_0,
             time,
             alpha,
@@ -6696,11 +6392,12 @@ pub unsafe extern "C" fn spPathConstraintPositionTimeline_create(
         ::core::mem::size_of::<spPathConstraintPositionTimeline>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
         2481 as c_int,
-    ) as *mut spPathConstraintPositionTimeline;
+    )
+        as *mut spPathConstraintPositionTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_PATHCONSTRAINT_POSITION as c_int as spPropertyId)
-        << 32 as c_int | pathConstraintIndex as c_ulong;
+    ids[0 as c_int as usize] = (SP_PROPERTY_PATHCONSTRAINT_POSITION as c_int as spPropertyId)
+        << 32 as c_int
+        | pathConstraintIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         framesCount,
@@ -6763,21 +6460,20 @@ static mut PATHCONSTRAINTSPACING_VALUE: c_int = 1 as c_int;
 pub unsafe extern "C" fn _spPathConstraintSpacingTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
-    let mut self_0: *mut spPathConstraintSpacingTimeline = timeline
-        as *mut spPathConstraintSpacingTimeline;
-    let mut constraint: *mut spPathConstraint = *((*skeleton).pathConstraints)
-        .offset((*self_0).pathConstraintIndex as isize);
+    let mut self_0: *mut spPathConstraintSpacingTimeline =
+        timeline as *mut spPathConstraintSpacingTimeline;
+    let mut constraint: *mut spPathConstraint =
+        *((*skeleton).pathConstraints).offset((*self_0).pathConstraintIndex as isize);
     if (*constraint).active != 0 {
-        (*constraint)
-            .spacing = spCurveTimeline1_getAbsoluteValue(
+        (*constraint).spacing = spCurveTimeline1_getAbsoluteValue(
             &mut (*self_0).super_0,
             time,
             alpha,
@@ -6798,11 +6494,12 @@ pub unsafe extern "C" fn spPathConstraintSpacingTimeline_create(
         ::core::mem::size_of::<spPathConstraintSpacingTimeline>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
         2517 as c_int,
-    ) as *mut spPathConstraintSpacingTimeline;
+    )
+        as *mut spPathConstraintSpacingTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_PATHCONSTRAINT_SPACING as c_int as spPropertyId)
-        << 32 as c_int | pathConstraintIndex as c_ulong;
+    ids[0 as c_int as usize] = (SP_PROPERTY_PATHCONSTRAINT_SPACING as c_int as spPropertyId)
+        << 32 as c_int
+        | pathConstraintIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         framesCount,
@@ -6867,13 +6564,13 @@ static mut PATHCONSTRAINTMIX_Y: c_int = 3 as c_int;
 pub unsafe extern "C" fn _spPathConstraintMixTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
     let mut i: c_int = 0;
     let mut curveType: c_int = 0;
@@ -6882,12 +6579,10 @@ pub unsafe extern "C" fn _spPathConstraintMixTimeline_apply(
     let mut y: c_float = 0.;
     let mut t: c_float = 0.;
     let mut constraint: *mut spPathConstraint = 0 as *mut spPathConstraint;
-    let mut self_0: *mut spPathConstraintMixTimeline = timeline
-        as *mut spPathConstraintMixTimeline;
+    let mut self_0: *mut spPathConstraintMixTimeline = timeline as *mut spPathConstraintMixTimeline;
     let mut frames: *mut c_float = 0 as *mut c_float;
     let mut curves: *mut c_float = 0 as *mut c_float;
-    constraint = *((*skeleton).pathConstraints)
-        .offset((*self_0).pathConstraintIndex as isize);
+    constraint = *((*skeleton).pathConstraints).offset((*self_0).pathConstraintIndex as isize);
     if (*constraint).active == 0 {
         return;
     }
@@ -6902,19 +6597,20 @@ pub unsafe extern "C" fn _spPathConstraintMixTimeline_apply(
                 return;
             }
             1 => {
-                (*constraint).mixRotate
-                    += ((*(*constraint).data).mixRotate - (*constraint).mixRotate)
-                        * alpha;
-                (*constraint).mixX
-                    += ((*(*constraint).data).mixX - (*constraint).mixX) * alpha;
-                (*constraint).mixY
-                    += ((*(*constraint).data).mixY - (*constraint).mixY) * alpha;
+                (*constraint).mixRotate +=
+                    ((*(*constraint).data).mixRotate - (*constraint).mixRotate) * alpha;
+                (*constraint).mixX += ((*(*constraint).data).mixX - (*constraint).mixX) * alpha;
+                (*constraint).mixY += ((*(*constraint).data).mixY - (*constraint).mixY) * alpha;
             }
             _ => {}
         }
         return;
     }
-    i = search2((*self_0).super_0.super_0.frames, time, PATHCONSTRAINTMIX_ENTRIES);
+    i = search2(
+        (*self_0).super_0.super_0.frames,
+        time,
+        PATHCONSTRAINTMIX_ENTRIES,
+    );
     curveType = *curves.offset((i >> 2 as c_int) as isize) as c_int;
     match curveType {
         0 => {
@@ -6924,22 +6620,16 @@ pub unsafe extern "C" fn _spPathConstraintMixTimeline_apply(
             y = *frames.offset((i + PATHCONSTRAINTMIX_Y) as isize);
             t = (time - before)
                 / (*frames.offset((i + PATHCONSTRAINTMIX_ENTRIES) as isize) - before);
-            rotate
-                += (*frames
-                    .offset(
-                        (i + PATHCONSTRAINTMIX_ENTRIES + PATHCONSTRAINTMIX_ROTATE)
-                            as isize,
-                    ) - rotate) * t;
-            x
-                += (*frames
-                    .offset(
-                        (i + PATHCONSTRAINTMIX_ENTRIES + PATHCONSTRAINTMIX_X) as isize,
-                    ) - x) * t;
-            y
-                += (*frames
-                    .offset(
-                        (i + PATHCONSTRAINTMIX_ENTRIES + PATHCONSTRAINTMIX_Y) as isize,
-                    ) - y) * t;
+            rotate += (*frames
+                .offset((i + PATHCONSTRAINTMIX_ENTRIES + PATHCONSTRAINTMIX_ROTATE) as isize)
+                - rotate)
+                * t;
+            x += (*frames.offset((i + PATHCONSTRAINTMIX_ENTRIES + PATHCONSTRAINTMIX_X) as isize)
+                - x)
+                * t;
+            y += (*frames.offset((i + PATHCONSTRAINTMIX_ENTRIES + PATHCONSTRAINTMIX_Y) as isize)
+                - y)
+                * t;
         }
         1 => {
             rotate = *frames.offset((i + PATHCONSTRAINTMIX_ROTATE) as isize);
@@ -6972,8 +6662,7 @@ pub unsafe extern "C" fn _spPathConstraintMixTimeline_apply(
     }
     if blend as c_uint == SP_MIX_BLEND_SETUP as c_int as c_uint {
         let mut data: *mut spPathConstraintData = (*constraint).data;
-        (*constraint)
-            .mixRotate = (*data).mixRotate + (rotate - (*data).mixRotate) * alpha;
+        (*constraint).mixRotate = (*data).mixRotate + (rotate - (*data).mixRotate) * alpha;
         (*constraint).mixX = (*data).mixX + (x - (*data).mixX) * alpha;
         (*constraint).mixY = (*data).mixY + (y - (*data).mixY) * alpha;
     } else {
@@ -6995,9 +6684,9 @@ pub unsafe extern "C" fn spPathConstraintMixTimeline_create(
         2623 as c_int,
     ) as *mut spPathConstraintMixTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_PATHCONSTRAINT_MIX as c_int as spPropertyId)
-        << 32 as c_int | pathConstraintIndex as c_ulong;
+    ids[0 as c_int as usize] = (SP_PROPERTY_PATHCONSTRAINT_MIX as c_int as spPropertyId)
+        << 32 as c_int
+        | pathConstraintIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         framesCount,
@@ -7141,32 +6830,27 @@ pub unsafe extern "C" fn _spPhysicsConstraintTimeline_setup(
 pub unsafe extern "C" fn _spPhysicsConstraintTimeline_apply(
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
-    mut lastTime: c_float,
+    mut _lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
-    mut direction: spMixDirection,
+    mut _direction: spMixDirection,
 ) {
-    let mut self_0: *mut spPhysicsConstraintTimeline = timeline
-        as *mut spPhysicsConstraintTimeline;
+    let mut self_0: *mut spPhysicsConstraintTimeline = timeline as *mut spPhysicsConstraintTimeline;
     let mut type_0: spTimelineType = (*self_0).super_0.super_0.type_0;
     let mut frames: *mut c_float = (*(*self_0).super_0.super_0.frames).items;
     if (*self_0).physicsConstraintIndex == -(1 as c_int) {
-        let mut value: c_float = if time
-            >= *frames.offset(0 as c_int as isize)
-        {
+        let mut value: c_float = if time >= *frames.offset(0 as c_int as isize) {
             spCurveTimeline1_getCurveValue(&mut (*self_0).super_0, time)
         } else {
             0 as c_int as c_float
         };
-        let mut physicsConstraints: *mut *mut spPhysicsConstraint = (*skeleton)
-            .physicsConstraints;
+        let mut physicsConstraints: *mut *mut spPhysicsConstraint = (*skeleton).physicsConstraints;
         let mut i: c_int = 0 as c_int;
         while i < (*skeleton).physicsConstraintsCount {
-            let mut constraint: *mut spPhysicsConstraint = *physicsConstraints
-                .offset(i as isize);
+            let mut constraint: *mut spPhysicsConstraint = *physicsConstraints.offset(i as isize);
             if (*constraint).active != 0
                 && _spPhysicsConstraintTimeline_global((*constraint).data, type_0) != 0
             {
@@ -7187,9 +6871,8 @@ pub unsafe extern "C" fn _spPhysicsConstraintTimeline_apply(
             i += 1;
         }
     } else {
-        let mut constraint_0: *mut spPhysicsConstraint = *((*skeleton)
-            .physicsConstraints)
-            .offset((*self_0).physicsConstraintIndex as isize);
+        let mut constraint_0: *mut spPhysicsConstraint =
+            *((*skeleton).physicsConstraints).offset((*self_0).physicsConstraintIndex as isize);
         if (*constraint_0).active != 0 {
             _spPhysicsConstraintTimeline_set(
                 constraint_0,
@@ -7247,8 +6930,7 @@ pub unsafe extern "C" fn spPhysicsConstraintTimeline_create(
             id = SP_PROPERTY_PHYSICSCONSTRAINT_INERTIA as c_int as spPropertyId;
         }
     }
-    ids[0 as c_int
-        as usize] = id << 32 as c_int | physicsConstraintIndex as c_ulong;
+    ids[0 as c_int as usize] = id << 32 as c_int | physicsConstraintIndex as c_ulong;
     _spCurveTimeline_init(
         &mut (*timeline).super_0,
         frameCount,
@@ -7308,18 +6990,18 @@ pub unsafe extern "C" fn _spPhysicsConstraintResetTimeline_apply(
     mut skeleton: *mut spSkeleton,
     mut lastTime: c_float,
     mut time: c_float,
-    mut firedEvents: *mut *mut spEvent,
-    mut eventsCount: *mut c_int,
+    mut _firedEvents: *mut *mut spEvent,
+    mut _eventsCount: *mut c_int,
     mut alpha: c_float,
     mut blend: spMixBlend,
     mut direction: spMixDirection,
 ) {
-    let mut self_0: *mut spPhysicsConstraintResetTimeline = timeline
-        as *mut spPhysicsConstraintResetTimeline;
+    let mut self_0: *mut spPhysicsConstraintResetTimeline =
+        timeline as *mut spPhysicsConstraintResetTimeline;
     let mut constraint: *mut spPhysicsConstraint = 0 as *mut spPhysicsConstraint;
     if (*self_0).physicsConstraintIndex != -(1 as c_int) {
-        constraint = *((*skeleton).physicsConstraints)
-            .offset((*self_0).physicsConstraintIndex as isize);
+        constraint =
+            *((*skeleton).physicsConstraints).offset((*self_0).physicsConstraintIndex as isize);
         if (*constraint).active == 0 {
             return;
         }
@@ -7338,27 +7020,21 @@ pub unsafe extern "C" fn _spPhysicsConstraintResetTimeline_apply(
             direction,
         );
         lastTime = -(1 as c_int) as c_float;
-    } else if lastTime
-        >= *frames.offset(((*self_0).super_0.frameCount - 1 as c_int) as isize)
-    {
-        return
+    } else if lastTime >= *frames.offset(((*self_0).super_0.frameCount - 1 as c_int) as isize) {
+        return;
     }
     if time < *frames.offset(0 as c_int as isize) {
         return;
     }
     if lastTime < *frames.offset(0 as c_int as isize)
         || time
-            >= *frames
-                .offset(
-                    (search((*self_0).super_0.frames, lastTime) + 1 as c_int)
-                        as isize,
-                )
+            >= *frames.offset((search((*self_0).super_0.frames, lastTime) + 1 as c_int) as isize)
     {
         if !constraint.is_null() {
             spPhysicsConstraint_reset(constraint);
         } else {
-            let mut physicsConstraints: *mut *mut spPhysicsConstraint = (*skeleton)
-                .physicsConstraints;
+            let mut physicsConstraints: *mut *mut spPhysicsConstraint =
+                (*skeleton).physicsConstraints;
             let mut i: c_int = 0 as c_int;
             while i < (*skeleton).physicsConstraintsCount {
                 constraint = *physicsConstraints.offset(i as isize);
@@ -7371,9 +7047,8 @@ pub unsafe extern "C" fn _spPhysicsConstraintResetTimeline_apply(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spPhysicsConstraintResetTimeline_dispose(
-    mut timeline: *mut spTimeline,
-) {}
+pub unsafe extern "C" fn _spPhysicsConstraintResetTimeline_dispose(mut _timeline: *mut spTimeline) {
+}
 #[no_mangle]
 pub unsafe extern "C" fn spPhysicsConstraintResetTimeline_create(
     mut framesCount: c_int,
@@ -7384,11 +7059,11 @@ pub unsafe extern "C" fn spPhysicsConstraintResetTimeline_create(
         ::core::mem::size_of::<spPhysicsConstraintResetTimeline>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
         2851 as c_int,
-    ) as *mut spPhysicsConstraintResetTimeline;
+    )
+        as *mut spPhysicsConstraintResetTimeline;
     let mut ids: [spPropertyId; 1] = [0; 1];
-    ids[0 as c_int
-        as usize] = (SP_PROPERTY_PHYSICSCONSTRAINT_RESET as c_int as spPropertyId)
-        << 32 as c_int;
+    ids[0 as c_int as usize] =
+        (SP_PROPERTY_PHYSICSCONSTRAINT_RESET as c_int as spPropertyId) << 32 as c_int;
     _spTimeline_init(
         &mut (*self_0).super_0,
         framesCount,
@@ -7439,8 +7114,7 @@ pub unsafe extern "C" fn spTrackEntryArray_create(
     ) as *mut spTrackEntryArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spTrackEntry>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -7464,16 +7138,12 @@ pub unsafe extern "C" fn spTrackEntryArray_setSize(
 ) -> *mut spTrackEntryArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spTrackEntry>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -7490,8 +7160,7 @@ pub unsafe extern "C" fn spTrackEntryArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<*mut spTrackEntry>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -7503,16 +7172,12 @@ pub unsafe extern "C" fn spTrackEntryArray_add(
     mut value: *mut spTrackEntry,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spTrackEntry>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -7556,8 +7221,9 @@ pub unsafe extern "C" fn spTrackEntryArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<*mut spTrackEntry>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -7594,8 +7260,7 @@ pub unsafe extern "C" fn spTrackEntryArray_peek(
 ) -> *mut spTrackEntry {
     return *((*self_0).items).offset(((*self_0).size - 1 as c_int) as isize);
 }
-static mut SP_EMPTY_ANIMATION: *mut spAnimation = 0 as *const spAnimation
-    as *mut spAnimation;
+static mut SP_EMPTY_ANIMATION: *mut spAnimation = 0 as *const spAnimation as *mut spAnimation;
 #[no_mangle]
 pub unsafe extern "C" fn spAnimationState_disposeStatics() {
     if !SP_EMPTY_ANIMATION.is_null() {
@@ -7616,8 +7281,7 @@ pub unsafe extern "C" fn _spEventQueue_create(
     (*self_0).state = state;
     (*self_0).objectsCount = 0 as c_int;
     (*self_0).objectsCapacity = 16 as c_int;
-    (*self_0)
-        .objects = _spCalloc(
+    (*self_0).objects = _spCalloc(
         (*self_0).objectsCapacity as size_t,
         ::core::mem::size_of::<_spEventQueueItem>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -7752,20 +7416,16 @@ pub unsafe extern "C" fn _spEventQueue_drain(mut self_0: *mut _spEventQueue) {
     (*self_0).drainDisabled = 1 as c_int;
     i = 0 as c_int;
     while i < (*self_0).objectsCount {
-        let mut type_0: spEventType = (*((*self_0).objects).offset(i as isize)).type_0
-            as spEventType;
-        let mut entry: *mut spTrackEntry = (*((*self_0).objects)
-            .offset((i + 1 as c_int) as isize))
-            .entry;
+        let mut type_0: spEventType =
+            (*((*self_0).objects).offset(i as isize)).type_0 as spEventType;
+        let mut entry: *mut spTrackEntry =
+            (*((*self_0).objects).offset((i + 1 as c_int) as isize)).entry;
         let mut event: *mut spEvent = 0 as *mut spEvent;
         let mut current_block_22: u64;
         match type_0 as c_uint {
             0 | 1 | 3 => {
                 if ((*entry).listener).is_some() {
-                    ((*entry).listener)
-                        .expect(
-                            "non-null function pointer",
-                        )(
+                    ((*entry).listener).expect("non-null function pointer")(
                         &mut (*(*self_0).state).super_0,
                         type_0,
                         entry,
@@ -7773,10 +7433,7 @@ pub unsafe extern "C" fn _spEventQueue_drain(mut self_0: *mut _spEventQueue) {
                     );
                 }
                 if ((*(*self_0).state).super_0.listener).is_some() {
-                    ((*(*self_0).state).super_0.listener)
-                        .expect(
-                            "non-null function pointer",
-                        )(
+                    ((*(*self_0).state).super_0.listener).expect("non-null function pointer")(
                         &mut (*(*self_0).state).super_0,
                         type_0,
                         entry,
@@ -7787,10 +7444,7 @@ pub unsafe extern "C" fn _spEventQueue_drain(mut self_0: *mut _spEventQueue) {
             }
             2 => {
                 if ((*entry).listener).is_some() {
-                    ((*entry).listener)
-                        .expect(
-                            "non-null function pointer",
-                        )(
+                    ((*entry).listener).expect("non-null function pointer")(
                         &mut (*(*self_0).state).super_0,
                         type_0,
                         entry,
@@ -7798,35 +7452,35 @@ pub unsafe extern "C" fn _spEventQueue_drain(mut self_0: *mut _spEventQueue) {
                     );
                 }
                 if ((*(*self_0).state).super_0.listener).is_some() {
-                    ((*(*self_0).state).super_0.listener)
-                        .expect(
-                            "non-null function pointer",
-                        )(
+                    ((*(*self_0).state).super_0.listener).expect("non-null function pointer")(
                         &mut (*(*self_0).state).super_0,
                         type_0,
                         entry,
                         0 as *mut spEvent,
                     );
                 }
-                current_block_22 = 4264312688947386234;
+                current_block_22 = 8217970944285102440;
             }
             4 => {
-                current_block_22 = 4264312688947386234;
+                current_block_22 = 8217970944285102440;
             }
             5 => {
-                event = (*((*self_0).objects).offset((i + 2 as c_int) as isize))
-                    .event;
+                event = (*((*self_0).objects).offset((i + 2 as c_int) as isize)).event;
                 if ((*entry).listener).is_some() {
-                    ((*entry).listener)
-                        .expect(
-                            "non-null function pointer",
-                        )(&mut (*(*self_0).state).super_0, type_0, entry, event);
+                    ((*entry).listener).expect("non-null function pointer")(
+                        &mut (*(*self_0).state).super_0,
+                        type_0,
+                        entry,
+                        event,
+                    );
                 }
                 if ((*(*self_0).state).super_0.listener).is_some() {
-                    ((*(*self_0).state).super_0.listener)
-                        .expect(
-                            "non-null function pointer",
-                        )(&mut (*(*self_0).state).super_0, type_0, entry, event);
+                    ((*(*self_0).state).super_0.listener).expect("non-null function pointer")(
+                        &mut (*(*self_0).state).super_0,
+                        type_0,
+                        entry,
+                        event,
+                    );
                 }
                 i += 1;
                 current_block_22 = 10043043949733653460;
@@ -7836,12 +7490,9 @@ pub unsafe extern "C" fn _spEventQueue_drain(mut self_0: *mut _spEventQueue) {
             }
         }
         match current_block_22 {
-            4264312688947386234 => {
+            8217970944285102440 => {
                 if ((*entry).listener).is_some() {
-                    ((*entry).listener)
-                        .expect(
-                            "non-null function pointer",
-                        )(
+                    ((*entry).listener).expect("non-null function pointer")(
                         &mut (*(*self_0).state).super_0,
                         SP_ANIMATION_DISPOSE,
                         entry,
@@ -7849,10 +7500,7 @@ pub unsafe extern "C" fn _spEventQueue_drain(mut self_0: *mut _spEventQueue) {
                     );
                 }
                 if ((*(*self_0).state).super_0.listener).is_some() {
-                    ((*(*self_0).state).super_0.listener)
-                        .expect(
-                            "non-null function pointer",
-                        )(
+                    ((*(*self_0).state).super_0.listener).expect("non-null function pointer")(
                         &mut (*(*self_0).state).super_0,
                         SP_ANIMATION_DISPOSE,
                         entry,
@@ -7869,23 +7517,17 @@ pub unsafe extern "C" fn _spEventQueue_drain(mut self_0: *mut _spEventQueue) {
     (*self_0).drainDisabled = 0 as c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spAnimationState_enableQueue(
-    mut self_0: *mut spAnimationState,
-) {
+pub unsafe extern "C" fn _spAnimationState_enableQueue(mut self_0: *mut spAnimationState) {
     let mut internal: *mut _spAnimationState = self_0 as *mut _spAnimationState;
     (*(*internal).queue).drainDisabled = 0 as c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spAnimationState_disableQueue(
-    mut self_0: *mut spAnimationState,
-) {
+pub unsafe extern "C" fn _spAnimationState_disableQueue(mut self_0: *mut spAnimationState) {
     let mut internal: *mut _spAnimationState = self_0 as *mut _spAnimationState;
     (*(*internal).queue).drainDisabled = 1 as c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spAnimationState_disposeTrackEntry(
-    mut entry: *mut spTrackEntry,
-) {
+pub unsafe extern "C" fn _spAnimationState_disposeTrackEntry(mut entry: *mut spTrackEntry) {
     spIntArray_dispose((*entry).timelineMode);
     spTrackEntryArray_dispose((*entry).timelineHoldMix);
     _spFree((*entry).timelinesRotation as *mut c_void);
@@ -7902,31 +7544,39 @@ pub unsafe extern "C" fn _spAnimationState_disposeTrackEntries(
         while !from.is_null() {
             let mut nextFrom: *mut spTrackEntry = (*from).mixingFrom;
             if ((*entry).listener).is_some() {
-                ((*entry).listener)
-                    .expect(
-                        "non-null function pointer",
-                    )(state, SP_ANIMATION_DISPOSE, from, 0 as *mut spEvent);
+                ((*entry).listener).expect("non-null function pointer")(
+                    state,
+                    SP_ANIMATION_DISPOSE,
+                    from,
+                    0 as *mut spEvent,
+                );
             }
             if ((*state).listener).is_some() {
-                ((*state).listener)
-                    .expect(
-                        "non-null function pointer",
-                    )(state, SP_ANIMATION_DISPOSE, from, 0 as *mut spEvent);
+                ((*state).listener).expect("non-null function pointer")(
+                    state,
+                    SP_ANIMATION_DISPOSE,
+                    from,
+                    0 as *mut spEvent,
+                );
             }
             _spAnimationState_disposeTrackEntry(from);
             from = nextFrom;
         }
         if ((*entry).listener).is_some() {
-            ((*entry).listener)
-                .expect(
-                    "non-null function pointer",
-                )(state, SP_ANIMATION_DISPOSE, entry, 0 as *mut spEvent);
+            ((*entry).listener).expect("non-null function pointer")(
+                state,
+                SP_ANIMATION_DISPOSE,
+                entry,
+                0 as *mut spEvent,
+            );
         }
         if ((*state).listener).is_some() {
-            ((*state).listener)
-                .expect(
-                    "non-null function pointer",
-                )(state, SP_ANIMATION_DISPOSE, entry, 0 as *mut spEvent);
+            ((*state).listener).expect("non-null function pointer")(
+                state,
+                SP_ANIMATION_DISPOSE,
+                entry,
+                0 as *mut spEvent,
+            );
         }
         _spAnimationState_disposeTrackEntry(entry);
         entry = next;
@@ -7956,15 +7606,13 @@ pub unsafe extern "C" fn spAnimationState_create(
     (*self_0).data = data;
     (*self_0).timeScale = 1 as c_int as c_float;
     (*internal).queue = _spEventQueue_create(internal);
-    (*internal)
-        .events = _spCalloc(
+    (*internal).events = _spCalloc(
         128 as c_int as size_t,
         ::core::mem::size_of::<*mut spEvent>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
         3122 as c_int,
     ) as *mut *mut spEvent;
-    (*internal)
-        .propertyIDs = _spCalloc(
+    (*internal).propertyIDs = _spCalloc(
         128 as c_int as size_t,
         ::core::mem::size_of::<spPropertyId>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -7979,10 +7627,7 @@ pub unsafe extern "C" fn spAnimationState_dispose(mut self_0: *mut spAnimationSt
     let mut internal: *mut _spAnimationState = self_0 as *mut _spAnimationState;
     i = 0 as c_int;
     while i < (*self_0).tracksCount {
-        _spAnimationState_disposeTrackEntries(
-            self_0,
-            *((*self_0).tracks).offset(i as isize),
-        );
+        _spAnimationState_disposeTrackEntries(self_0, *((*self_0).tracks).offset(i as isize));
         i += 1;
     }
     _spFree((*self_0).tracks as *mut c_void);
@@ -8028,26 +7673,16 @@ pub unsafe extern "C" fn spAnimationState_update(
                 _ => {
                     next = (*current).next;
                     if !next.is_null() {
-                        let mut nextTime: c_float = (*current).trackLast
-                            - (*next).delay;
+                        let mut nextTime: c_float = (*current).trackLast - (*next).delay;
                         if nextTime >= 0 as c_int as c_float {
                             (*next).delay = 0 as c_int as c_float;
-                            (*next).trackTime
-                                += if (*current).timeScale
-                                    == 0 as c_int as c_float
-                                {
-                                    0 as c_int as c_float
-                                } else {
-                                    (nextTime / (*current).timeScale + delta)
-                                        * (*next).timeScale
-                                };
+                            (*next).trackTime += if (*current).timeScale == 0 as c_int as c_float {
+                                0 as c_int as c_float
+                            } else {
+                                (nextTime / (*current).timeScale + delta) * (*next).timeScale
+                            };
                             (*current).trackTime += currentDelta;
-                            _spAnimationState_setCurrent(
-                                self_0,
-                                i,
-                                next,
-                                1 as c_int,
-                            );
+                            _spAnimationState_setCurrent(self_0, i, next, 1 as c_int);
                             while !((*next).mixingFrom).is_null() {
                                 (*next).mixTime += delta;
                                 next = (*next).mixingFrom;
@@ -8071,11 +7706,7 @@ pub unsafe extern "C" fn spAnimationState_update(
                         16559507199688588974 => {}
                         _ => {
                             if !((*current).mixingFrom).is_null()
-                                && _spAnimationState_updateMixingFrom(
-                                    self_0,
-                                    current,
-                                    delta,
-                                ) != 0
+                                && _spAnimationState_updateMixingFrom(self_0, current, delta) != 0
                             {
                                 let mut from: *mut spTrackEntry = (*current).mixingFrom;
                                 (*current).mixingFrom = 0 as *mut spTrackEntry;
@@ -8112,11 +7743,8 @@ pub unsafe extern "C" fn _spAnimationState_updateMixingFrom(
     finished = _spAnimationState_updateMixingFrom(self_0, from, delta);
     (*from).animationLast = (*from).nextAnimationLast;
     (*from).trackLast = (*from).nextTrackLast;
-    if (*to).mixTime > 0 as c_int as c_float
-        && (*to).mixTime >= (*to).mixDuration
-    {
-        if (*from).totalAlpha == 0 as c_int as c_float
-            || (*to).mixDuration == 0 as c_int as c_float
+    if (*to).mixTime > 0 as c_int as c_float && (*to).mixTime >= (*to).mixDuration {
+        if (*from).totalAlpha == 0 as c_int as c_float || (*to).mixDuration == 0 as c_int as c_float
         {
             (*to).mixingFrom = (*from).mixingFrom;
             if !((*from).mixingFrom).is_null() {
@@ -8175,20 +7803,11 @@ pub unsafe extern "C" fn spAnimationState_apply(
             }) as spMixBlend;
             alpha = (*current).alpha;
             if !((*current).mixingFrom).is_null() {
-                alpha
-                    *= _spAnimationState_applyMixingFrom(
-                        self_0,
-                        current,
-                        skeleton,
-                        blend,
-                    );
-            } else if (*current).trackTime >= (*current).trackEnd
-                && ((*current).next).is_null()
-            {
+                alpha *= _spAnimationState_applyMixingFrom(self_0, current, skeleton, blend);
+            } else if (*current).trackTime >= (*current).trackEnd && ((*current).next).is_null() {
                 alpha = 0 as c_int as c_float;
             }
-            let mut attachments: c_int = (alpha
-                >= (*current).alphaAttachmentThreshold) as c_int;
+            let mut attachments: c_int = (alpha >= (*current).alphaAttachmentThreshold) as c_int;
             animationLast = (*current).animationLast;
             animationTime = spTrackEntry_getAnimationTime(current);
             timelineCount = (*(*(*current).animation).timelines).size;
@@ -8200,15 +7819,12 @@ pub unsafe extern "C" fn spAnimationState_apply(
             }
             timelines = (*(*(*current).animation).timelines).items;
             if i == 0 as c_int && alpha == 1 as c_int as c_float
-                || blend as c_uint
-                    == SP_MIX_BLEND_ADD as c_int as c_uint
+                || blend as c_uint == SP_MIX_BLEND_ADD as c_int as c_uint
             {
                 ii = 0 as c_int;
                 while ii < timelineCount {
                     timeline = *timelines.offset(ii as isize);
-                    if (*timeline).type_0 as c_uint
-                        == SP_TIMELINE_ATTACHMENT as c_int as c_uint
-                    {
+                    if (*timeline).type_0 as c_uint == SP_TIMELINE_ATTACHMENT as c_int as c_uint {
                         _spAnimationState_applyAttachmentTimeline(
                             self_0,
                             timeline,
@@ -8236,28 +7852,22 @@ pub unsafe extern "C" fn spAnimationState_apply(
                 let mut timelineMode: *mut spIntArray = (*current).timelineMode;
                 shortestRotation = (*current).shortestRotation;
                 firstFrame = (shortestRotation == 0
-                    && (*current).timelinesRotationCount
-                        != timelineCount << 1 as c_int) as c_int;
+                    && (*current).timelinesRotationCount != timelineCount << 1 as c_int)
+                    as c_int;
                 if firstFrame != 0 {
-                    _spAnimationState_resizeTimelinesRotation(
-                        current,
-                        timelineCount << 1 as c_int,
-                    );
+                    _spAnimationState_resizeTimelinesRotation(current, timelineCount << 1 as c_int);
                 }
                 timelinesRotation = (*current).timelinesRotation;
                 ii = 0 as c_int;
                 while ii < timelineCount {
                     timeline = *timelines.offset(ii as isize);
-                    timelineBlend = (if *((*timelineMode).items).offset(ii as isize)
-                        == 0 as c_int
-                    {
+                    timelineBlend = (if *((*timelineMode).items).offset(ii as isize) == 0 as c_int {
                         blend as c_uint
                     } else {
                         SP_MIX_BLEND_SETUP as c_int as c_uint
                     }) as spMixBlend;
                     if shortestRotation == 0
-                        && (*timeline).type_0 as c_uint
-                            == SP_TIMELINE_ROTATE as c_int as c_uint
+                        && (*timeline).type_0 as c_uint == SP_TIMELINE_ROTATE as c_int as c_uint
                     {
                         _spAnimationState_applyRotateTimeline(
                             self_0,
@@ -8417,10 +8027,7 @@ pub unsafe extern "C" fn _spAnimationState_applyMixingFrom(
             && (*from).timelinesRotationCount != timelineCount << 1 as c_int)
             as c_int;
         if firstFrame != 0 {
-            _spAnimationState_resizeTimelinesRotation(
-                from,
-                timelineCount << 1 as c_int,
-            );
+            _spAnimationState_resizeTimelinesRotation(from, timelineCount << 1 as c_int);
         }
         timelinesRotation = (*from).timelinesRotation;
         (*from).totalAlpha = 0 as c_int as c_float;
@@ -8462,13 +8069,11 @@ pub unsafe extern "C" fn _spAnimationState_applyMixingFrom(
                     holdMix = *((*timelineHoldMix).items).offset(i as isize);
                     alpha = alphaHold
                         * (if 0 as c_int as c_float
-                            > 1 as c_int as c_float
-                                - (*holdMix).mixTime / (*holdMix).mixDuration
+                            > 1 as c_int as c_float - (*holdMix).mixTime / (*holdMix).mixDuration
                         {
                             0 as c_int as c_float
                         } else {
-                            1 as c_int as c_float
-                                - (*holdMix).mixTime / (*holdMix).mixDuration
+                            1 as c_int as c_float - (*holdMix).mixTime / (*holdMix).mixDuration
                         });
                     current_block_62 = 12829669402821218572;
                 }
@@ -8477,8 +8082,7 @@ pub unsafe extern "C" fn _spAnimationState_applyMixingFrom(
                 12829669402821218572 => {
                     (*from).totalAlpha += alpha;
                     if shortestRotation == 0
-                        && (*timeline_0).type_0 as c_uint
-                            == SP_TIMELINE_ROTATE as c_int as c_uint
+                        && (*timeline_0).type_0 as c_uint == SP_TIMELINE_ROTATE as c_int as c_uint
                     {
                         _spAnimationState_applyRotateTimeline(
                             self_0,
@@ -8500,15 +8104,14 @@ pub unsafe extern "C" fn _spAnimationState_applyMixingFrom(
                             skeleton,
                             applyTime,
                             timelineBlend,
-                            (attachments != 0
-                                && alpha >= (*from).alphaAttachmentThreshold) as c_int,
+                            (attachments != 0 && alpha >= (*from).alphaAttachmentThreshold)
+                                as c_int,
                         );
                     } else {
                         if drawOrder != 0
                             && (*timeline_0).type_0 as c_uint
                                 == SP_TIMELINE_DRAWORDER as c_int as c_uint
-                            && timelineBlend as c_uint
-                                == SP_MIX_BLEND_SETUP as c_int as c_uint
+                            && timelineBlend as c_uint == SP_MIX_BLEND_SETUP as c_int as c_uint
                         {
                             direction = SP_MIX_DIRECTION_IN;
                         }
@@ -8550,11 +8153,7 @@ unsafe extern "C" fn _spAnimationState_setAttachment(
         if attachmentName.is_null() {
             0 as *mut spAttachment
         } else {
-            spSkeleton_getAttachmentForSlotIndex(
-                skeleton,
-                (*(*slot).data).index,
-                attachmentName,
-            )
+            spSkeleton_getAttachmentForSlotIndex(skeleton, (*(*slot).data).index, attachmentName)
         },
     );
     if attachments != 0 {
@@ -8585,8 +8184,7 @@ pub unsafe extern "C" fn _spAnimationState_applyAttachmentTimeline(
     mut blend: spMixBlend,
     mut attachments: c_int,
 ) {
-    let mut attachmentTimeline: *mut spAttachmentTimeline = 0
-        as *mut spAttachmentTimeline;
+    let mut attachmentTimeline: *mut spAttachmentTimeline = 0 as *mut spAttachmentTimeline;
     let mut slot: *mut spSlot = 0 as *mut spSlot;
     let mut frames: *mut c_float = 0 as *mut c_float;
     attachmentTimeline = timeline as *mut spAttachmentTimeline;
@@ -8612,14 +8210,11 @@ pub unsafe extern "C" fn _spAnimationState_applyAttachmentTimeline(
             self_0,
             skeleton,
             slot,
-            *((*attachmentTimeline).attachmentNames)
-                .offset(
-                    binarySearch1(
-                        frames,
-                        (*(*attachmentTimeline).super_0.frames).size,
-                        time,
-                    ) as isize,
-                ),
+            *((*attachmentTimeline).attachmentNames).offset(binarySearch1(
+                frames,
+                (*(*attachmentTimeline).super_0.frames).size,
+                time,
+            ) as isize),
             attachments,
         );
     }
@@ -8629,7 +8224,7 @@ pub unsafe extern "C" fn _spAnimationState_applyAttachmentTimeline(
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spAnimationState_applyRotateTimeline(
-    mut self_0: *mut spAnimationState,
+    mut _self_0: *mut spAnimationState,
     mut timeline: *mut spTimeline,
     mut skeleton: *mut spSkeleton,
     mut time: c_float,
@@ -8687,9 +8282,7 @@ pub unsafe extern "C" fn _spAnimationState_applyRotateTimeline(
             return;
         }
     } else {
-        r1 = if blend as c_uint
-            == SP_MIX_BLEND_SETUP as c_int as c_uint
-        {
+        r1 = if blend as c_uint == SP_MIX_BLEND_SETUP as c_int as c_uint {
             (*(*bone).data).rotation
         } else {
             (*bone).rotation
@@ -8698,9 +8291,8 @@ pub unsafe extern "C" fn _spAnimationState_applyRotateTimeline(
             + spCurveTimeline1_getCurveValue(&mut (*rotateTimeline).super_0, time);
     }
     diff = r2 - r1;
-    diff
-        -= ceil((diff / 360 as c_int as c_float) as c_double - 0.5f64)
-            as c_float * 360 as c_int as c_float;
+    diff -= spine_ceil((diff / 360 as c_int as c_float) as c_double - 0.5f64) as c_float
+        * 360 as c_int as c_float;
     if diff == 0 as c_int as c_float {
         total = *timelinesRotation.offset(i as isize);
     } else {
@@ -8726,21 +8318,20 @@ pub unsafe extern "C" fn _spAnimationState_applyRotateTimeline(
             && (if lastDiff < 0 as c_int as c_float {
                 -1.0f32
             } else {
-                (if lastDiff > 0 as c_int as c_float {
+                if lastDiff > 0 as c_int as c_float {
                     1.0f32
                 } else {
                     0.0f32
-                })
-            })
-                != (if diff < 0 as c_int as c_float {
-                    -1.0f32
+                }
+            }) != (if diff < 0 as c_int as c_float {
+                -1.0f32
+            } else {
+                if diff > 0 as c_int as c_float {
+                    1.0f32
                 } else {
-                    (if diff > 0 as c_int as c_float {
-                        1.0f32
-                    } else {
-                        0.0f32
-                    })
-                })
+                    0.0f32
+                }
+            })
         {
             if (if lastTotal - loops < 0 as c_int as c_float {
                 -(lastTotal - loops)
@@ -8748,46 +8339,43 @@ pub unsafe extern "C" fn _spAnimationState_applyRotateTimeline(
                 lastTotal - loops
             }) > 180 as c_int as c_float
             {
-                total
-                    += 360 as c_int as c_float
-                        * (if lastTotal < 0 as c_int as c_float {
-                            -1.0f32
+                total += 360 as c_int as c_float
+                    * (if lastTotal < 0 as c_int as c_float {
+                        -1.0f32
+                    } else {
+                        if lastTotal > 0 as c_int as c_float {
+                            1.0f32
                         } else {
-                            (if lastTotal > 0 as c_int as c_float {
-                                1.0f32
-                            } else {
-                                0.0f32
-                            })
-                        });
+                            0.0f32
+                        }
+                    });
                 dir = current;
             } else if loops != 0 as c_int as c_float {
-                total
-                    -= 360 as c_int as c_float
-                        * (if lastTotal < 0 as c_int as c_float {
-                            -1.0f32
+                total -= 360 as c_int as c_float
+                    * (if lastTotal < 0 as c_int as c_float {
+                        -1.0f32
+                    } else {
+                        if lastTotal > 0 as c_int as c_float {
+                            1.0f32
                         } else {
-                            (if lastTotal > 0 as c_int as c_float {
-                                1.0f32
-                            } else {
-                                0.0f32
-                            })
-                        });
+                            0.0f32
+                        }
+                    });
             } else {
                 dir = current;
             }
         }
         if dir != current {
-            total
-                += 360 as c_int as c_float
-                    * (if lastTotal < 0 as c_int as c_float {
-                        -1.0f32
+            total += 360 as c_int as c_float
+                * (if lastTotal < 0 as c_int as c_float {
+                    -1.0f32
+                } else {
+                    if lastTotal > 0 as c_int as c_float {
+                        1.0f32
                     } else {
-                        (if lastTotal > 0 as c_int as c_float {
-                            1.0f32
-                        } else {
-                            0.0f32
-                        })
-                    });
+                        0.0f32
+                    }
+                });
         }
         *timelinesRotation.offset(i as isize) = total;
     }
@@ -8828,13 +8416,12 @@ pub unsafe extern "C" fn _spAnimationState_queueEvents(
             complete = -(1 as c_int);
         } else {
             let mut cycles: c_int = ((*entry).trackTime / duration) as c_int;
-            complete = (cycles > 0 as c_int
-                && cycles > ((*entry).trackLast / duration) as c_int)
-                as c_int;
+            complete =
+                (cycles > 0 as c_int && cycles > ((*entry).trackLast / duration) as c_int) as c_int;
         }
     } else {
-        complete = (animationTime >= animationEnd
-            && (*entry).animationLast < animationEnd) as c_int;
+        complete =
+            (animationTime >= animationEnd && (*entry).animationLast < animationEnd) as c_int;
     }
     if complete != 0 {
         _spEventQueue_complete((*internal).queue, entry);
@@ -8848,9 +8435,7 @@ pub unsafe extern "C" fn _spAnimationState_queueEvents(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spAnimationState_clearTracks(
-    mut self_0: *mut spAnimationState,
-) {
+pub unsafe extern "C" fn spAnimationState_clearTracks(mut self_0: *mut spAnimationState) {
     let mut internal: *mut _spAnimationState = self_0 as *mut _spAnimationState;
     let mut i: c_int = 0;
     let mut n: c_int = 0;
@@ -8919,13 +8504,9 @@ pub unsafe extern "C" fn _spAnimationState_setCurrent(
         (*current).mixingFrom = from;
         (*from).mixingTo = current;
         (*current).mixTime = 0 as c_int as c_float;
-        if !((*from).mixingFrom).is_null()
-            && (*from).mixDuration > 0 as c_int as c_float
-        {
-            (*current).interruptAlpha
-                *= if (1 as c_int as c_float)
-                    < (*from).mixTime / (*from).mixDuration
-                {
+        if !((*from).mixingFrom).is_null() && (*from).mixDuration > 0 as c_int as c_float {
+            (*current).interruptAlpha *=
+                if (1 as c_int as c_float) < (*from).mixTime / (*from).mixDuration {
                     1 as c_int as c_float
                 } else {
                     (*from).mixTime / (*from).mixDuration
@@ -8942,10 +8523,8 @@ pub unsafe extern "C" fn spAnimationState_setAnimationByName(
     mut animationName: *const c_char,
     mut loop_0: c_int,
 ) -> *mut spTrackEntry {
-    let mut animation: *mut spAnimation = spSkeletonData_findAnimation(
-        (*(*self_0).data).skeletonData,
-        animationName,
-    );
+    let mut animation: *mut spAnimation =
+        spSkeletonData_findAnimation((*(*self_0).data).skeletonData, animationName);
     return spAnimationState_setAnimation(self_0, trackIndex, animation, loop_0);
 }
 #[no_mangle]
@@ -8958,10 +8537,7 @@ pub unsafe extern "C" fn spAnimationState_setAnimation(
     let mut entry: *mut spTrackEntry = 0 as *mut spTrackEntry;
     let mut internal: *mut _spAnimationState = self_0 as *mut _spAnimationState;
     let mut interrupt: c_int = 1 as c_int;
-    let mut current: *mut spTrackEntry = _spAnimationState_expandToIndex(
-        self_0,
-        trackIndex,
-    );
+    let mut current: *mut spTrackEntry = _spAnimationState_expandToIndex(self_0, trackIndex);
     if !current.is_null() {
         if (*current).nextTrackLast == -(1 as c_int) as c_float {
             let ref mut fresh22 = *((*self_0).tracks).offset(trackIndex as isize);
@@ -8988,10 +8564,8 @@ pub unsafe extern "C" fn spAnimationState_addAnimationByName(
     mut loop_0: c_int,
     mut delay: c_float,
 ) -> *mut spTrackEntry {
-    let mut animation: *mut spAnimation = spSkeletonData_findAnimation(
-        (*(*self_0).data).skeletonData,
-        animationName,
-    );
+    let mut animation: *mut spAnimation =
+        spSkeletonData_findAnimation((*(*self_0).data).skeletonData, animationName);
     return spAnimationState_addAnimation(self_0, trackIndex, animation, loop_0, delay);
 }
 #[no_mangle]
@@ -9004,10 +8578,7 @@ pub unsafe extern "C" fn spAnimationState_addAnimation(
 ) -> *mut spTrackEntry {
     let mut entry: *mut spTrackEntry = 0 as *mut spTrackEntry;
     let mut internal: *mut _spAnimationState = self_0 as *mut _spAnimationState;
-    let mut last: *mut spTrackEntry = _spAnimationState_expandToIndex(
-        self_0,
-        trackIndex,
-    );
+    let mut last: *mut spTrackEntry = _spAnimationState_expandToIndex(self_0, trackIndex);
     if !last.is_null() {
         while !((*last).next).is_null() {
             last = (*last).next;
@@ -9033,12 +8604,8 @@ pub unsafe extern "C" fn spAnimationState_setEmptyAnimation(
     mut trackIndex: c_int,
     mut mixDuration: c_float,
 ) -> *mut spTrackEntry {
-    let mut entry: *mut spTrackEntry = spAnimationState_setAnimation(
-        self_0,
-        trackIndex,
-        SP_EMPTY_ANIMATION,
-        0 as c_int,
-    );
+    let mut entry: *mut spTrackEntry =
+        spAnimationState_setAnimation(self_0, trackIndex, SP_EMPTY_ANIMATION, 0 as c_int);
     (*entry).mixDuration = mixDuration;
     (*entry).trackEnd = mixDuration;
     return entry;
@@ -9050,13 +8617,8 @@ pub unsafe extern "C" fn spAnimationState_addEmptyAnimation(
     mut mixDuration: c_float,
     mut delay: c_float,
 ) -> *mut spTrackEntry {
-    let mut entry: *mut spTrackEntry = spAnimationState_addAnimation(
-        self_0,
-        trackIndex,
-        SP_EMPTY_ANIMATION,
-        0 as c_int,
-        delay,
-    );
+    let mut entry: *mut spTrackEntry =
+        spAnimationState_addAnimation(self_0, trackIndex, SP_EMPTY_ANIMATION, 0 as c_int, delay);
     if delay <= 0 as c_int as c_float {
         (*entry).delay += (*entry).mixDuration - mixDuration;
     }
@@ -9081,11 +8643,7 @@ pub unsafe extern "C" fn spAnimationState_setEmptyAnimations(
     while i < n {
         current = *((*self_0).tracks).offset(i as isize);
         if !current.is_null() {
-            spAnimationState_setEmptyAnimation(
-                self_0,
-                (*current).trackIndex,
-                mixDuration,
-            );
+            spAnimationState_setEmptyAnimation(self_0, (*current).trackIndex, mixDuration);
         }
         i += 1;
     }
@@ -9156,8 +8714,7 @@ pub unsafe extern "C" fn _spAnimationState_trackEntry(
     (*entry).timeScale = 1 as c_int as c_float;
     (*entry).alpha = 1 as c_int as c_float;
     (*entry).mixTime = 0 as c_int as c_float;
-    (*entry)
-        .mixDuration = if last.is_null() {
+    (*entry).mixDuration = if last.is_null() {
         0 as c_int as c_float
     } else {
         spAnimationStateData_getMix((*self_0).data, (*last).animation, animation)
@@ -9183,9 +8740,7 @@ pub unsafe extern "C" fn spAnimationState_clearNext(
     (*entry).next = 0 as *mut spTrackEntry;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spAnimationState_animationsChanged(
-    mut self_0: *mut spAnimationState,
-) {
+pub unsafe extern "C" fn _spAnimationState_animationsChanged(mut self_0: *mut spAnimationState) {
     let mut internal: *mut _spAnimationState = self_0 as *mut _spAnimationState;
     let mut i: c_int = 0;
     let mut n: c_int = 0;
@@ -9202,8 +8757,7 @@ pub unsafe extern "C" fn _spAnimationState_animationsChanged(
             }
             loop {
                 if ((*entry).mixingTo).is_null()
-                    || (*entry).mixBlend as c_uint
-                        != SP_MIX_BLEND_ADD as c_int as c_uint
+                    || (*entry).mixBlend as c_uint != SP_MIX_BLEND_ADD as c_int as c_uint
                 {
                     _spTrackEntry_computeHold(entry, self_0);
                 }
@@ -9274,10 +8828,7 @@ pub unsafe extern "C" fn _spAnimationState_addPropertyID(
         }
         i += 1;
     }
-    _spAnimationState_ensureCapacityPropertyIDs(
-        self_0,
-        (*internal).propertyIDsCount + 1 as c_int,
-    );
+    _spAnimationState_ensureCapacityPropertyIDs(self_0, (*internal).propertyIDsCount + 1 as c_int);
     *((*internal).propertyIDs).offset((*internal).propertyIDsCount as isize) = id;
     (*internal).propertyIDsCount += 1;
     return 1 as c_int;
@@ -9318,12 +8869,9 @@ pub unsafe extern "C" fn spAnimationState_clearListenerNotifications(
     _spEventQueue_clear((*internal).queue);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spTrackEntry_getAnimationTime(
-    mut entry: *mut spTrackEntry,
-) -> c_float {
+pub unsafe extern "C" fn spTrackEntry_getAnimationTime(mut entry: *mut spTrackEntry) -> c_float {
     if (*entry).loop_0 != 0 {
-        let mut duration: c_float = (*entry).animationEnd
-            - (*entry).animationStart;
+        let mut duration: c_float = (*entry).animationEnd - (*entry).animationStart;
         if duration == 0 as c_int as c_float {
             return (*entry).animationStart;
         }
@@ -9336,23 +8884,17 @@ pub unsafe extern "C" fn spTrackEntry_getAnimationTime(
     };
 }
 #[no_mangle]
-pub unsafe extern "C" fn spTrackEntry_resetRotationDirections(
-    mut entry: *mut spTrackEntry,
-) {
+pub unsafe extern "C" fn spTrackEntry_resetRotationDirections(mut entry: *mut spTrackEntry) {
     _spFree((*entry).timelinesRotation as *mut c_void);
     (*entry).timelinesRotation = 0 as *mut c_float;
     (*entry).timelinesRotationCount = 0 as c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spTrackEntry_getTrackComplete(
-    mut entry: *mut spTrackEntry,
-) -> c_float {
+pub unsafe extern "C" fn spTrackEntry_getTrackComplete(mut entry: *mut spTrackEntry) -> c_float {
     let mut duration: c_float = (*entry).animationEnd - (*entry).animationStart;
     if duration != 0 as c_int as c_float {
         if (*entry).loop_0 != 0 {
-            return duration
-                * (1 as c_int + ((*entry).trackTime / duration) as c_int)
-                    as c_float;
+            return duration * (1 as c_int + ((*entry).trackTime / duration) as c_int) as c_float;
         }
         if (*entry).trackTime < duration {
             return duration;
@@ -9373,11 +8915,8 @@ pub unsafe extern "C" fn spTrackEntry_setMixDuration(
     (*entry).delay = delay;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spTrackEntry_wasApplied(
-    mut entry: *mut spTrackEntry,
-) -> c_int {
-    return ((*entry).nextTrackLast != -(1 as c_int) as c_float)
-        as c_int;
+pub unsafe extern "C" fn spTrackEntry_wasApplied(mut entry: *mut spTrackEntry) -> c_int {
+    return ((*entry).nextTrackLast != -(1 as c_int) as c_float) as c_int;
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spTrackEntry_computeHold(
@@ -9396,27 +8935,19 @@ pub unsafe extern "C" fn _spTrackEntry_computeHold(
     timelinesCount = (*(*(*entry).animation).timelines).size;
     timelineMode = (*spIntArray_setSize((*entry).timelineMode, timelinesCount)).items;
     spTrackEntryArray_clear((*entry).timelineHoldMix);
-    timelineHoldMix = (*spTrackEntryArray_setSize(
-        (*entry).timelineHoldMix,
-        timelinesCount,
-    ))
-        .items;
+    timelineHoldMix = (*spTrackEntryArray_setSize((*entry).timelineHoldMix, timelinesCount)).items;
     if !to.is_null() && (*to).holdPrevious != 0 {
         i = 0 as c_int;
         while i < timelinesCount {
-            let mut ids: *mut spPropertyId = ((**timelines.offset(i as isize))
-                .propertyIds)
-                .as_mut_ptr();
-            let mut numIds: c_int = (**timelines.offset(i as isize))
-                .propertyIdsCount;
-            *timelineMode
-                .offset(
-                    i as isize,
-                ) = if _spAnimationState_addPropertyIDs(state, ids, numIds) != 0 {
-                3 as c_int
-            } else {
-                2 as c_int
-            };
+            let mut ids: *mut spPropertyId =
+                ((**timelines.offset(i as isize)).propertyIds).as_mut_ptr();
+            let mut numIds: c_int = (**timelines.offset(i as isize)).propertyIdsCount;
+            *timelineMode.offset(i as isize) =
+                if _spAnimationState_addPropertyIDs(state, ids, numIds) != 0 {
+                    3 as c_int
+                } else {
+                    2 as c_int
+                };
             i += 1;
         }
         return;
@@ -9429,12 +8960,9 @@ pub unsafe extern "C" fn _spTrackEntry_computeHold(
         if _spAnimationState_addPropertyIDs(state, ids_0, numIds_0) == 0 {
             *timelineMode.offset(i as isize) = 0 as c_int;
         } else if to.is_null()
-            || (*timeline).type_0 as c_uint
-                == SP_TIMELINE_ATTACHMENT as c_int as c_uint
-            || (*timeline).type_0 as c_uint
-                == SP_TIMELINE_DRAWORDER as c_int as c_uint
-            || (*timeline).type_0 as c_uint
-                == SP_TIMELINE_EVENT as c_int as c_uint
+            || (*timeline).type_0 as c_uint == SP_TIMELINE_ATTACHMENT as c_int as c_uint
+            || (*timeline).type_0 as c_uint == SP_TIMELINE_DRAWORDER as c_int as c_uint
+            || (*timeline).type_0 as c_uint == SP_TIMELINE_EVENT as c_int as c_uint
             || spAnimation_hasTimeline((*to).animation, ids_0, numIds_0) == 0
         {
             *timelineMode.offset(i as isize) = 1 as c_int;
@@ -9479,9 +9007,7 @@ pub unsafe extern "C" fn _ToEntry_dispose(mut self_0: *mut _ToEntry) {
     _spFree(self_0 as *mut c_void);
 }
 #[no_mangle]
-pub unsafe extern "C" fn _FromEntry_create(
-    mut from: *mut spAnimation,
-) -> *mut _FromEntry {
+pub unsafe extern "C" fn _FromEntry_create(mut from: *mut spAnimation) -> *mut _FromEntry {
     let mut self_0: *mut _FromEntry = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<_FromEntry>() as c_ulong,
@@ -9509,9 +9035,7 @@ pub unsafe extern "C" fn spAnimationStateData_create(
     return self_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spAnimationStateData_dispose(
-    mut self_0: *mut spAnimationStateData,
-) {
+pub unsafe extern "C" fn spAnimationStateData_dispose(mut self_0: *mut spAnimationStateData) {
     let mut toEntry: *mut _ToEntry = 0 as *mut _ToEntry;
     let mut nextToEntry: *mut _ToEntry = 0 as *mut _ToEntry;
     let mut nextFromEntry: *mut _FromEntry = 0 as *mut _FromEntry;
@@ -9537,10 +9061,7 @@ pub unsafe extern "C" fn spAnimationStateData_setMixByName(
     mut duration: c_float,
 ) {
     let mut to: *mut spAnimation = 0 as *mut spAnimation;
-    let mut from: *mut spAnimation = spSkeletonData_findAnimation(
-        (*self_0).skeletonData,
-        fromName,
-    );
+    let mut from: *mut spAnimation = spSkeletonData_findAnimation((*self_0).skeletonData, fromName);
     if from.is_null() {
         return;
     }
@@ -9605,9 +9126,7 @@ pub unsafe extern "C" fn spAnimationStateData_getMix(
     return (*self_0).defaultMix;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spFloatArray_create(
-    mut initialCapacity: c_int,
-) -> *mut spFloatArray {
+pub unsafe extern "C" fn spFloatArray_create(mut initialCapacity: c_int) -> *mut spFloatArray {
     let mut array: *mut spFloatArray = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<spFloatArray>() as c_ulong,
@@ -9616,8 +9135,7 @@ pub unsafe extern "C" fn spFloatArray_create(
     ) as *mut spFloatArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<c_float>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -9641,16 +9159,12 @@ pub unsafe extern "C" fn spFloatArray_setSize(
 ) -> *mut spFloatArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<c_float>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -9667,29 +9181,20 @@ pub unsafe extern "C" fn spFloatArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
-        (::core::mem::size_of::<c_float>() as c_ulong)
-            .wrapping_mul((*self_0).capacity as c_ulong),
+        (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul((*self_0).capacity as c_ulong),
     ) as *mut c_float;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spFloatArray_add(
-    mut self_0: *mut spFloatArray,
-    mut value: c_float,
-) {
+pub unsafe extern "C" fn spFloatArray_add(mut self_0: *mut spFloatArray, mut value: c_float) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<c_float>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -9725,15 +9230,13 @@ pub unsafe extern "C" fn spFloatArray_addAllValues(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spFloatArray_removeAt(
-    mut self_0: *mut spFloatArray,
-    mut index: c_int,
-) {
+pub unsafe extern "C" fn spFloatArray_removeAt(mut self_0: *mut spFloatArray, mut index: c_int) {
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<c_float>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -9757,23 +9260,17 @@ pub unsafe extern "C" fn spFloatArray_contains(
     return 0 as c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spFloatArray_pop(
-    mut self_0: *mut spFloatArray,
-) -> c_float {
+pub unsafe extern "C" fn spFloatArray_pop(mut self_0: *mut spFloatArray) -> c_float {
     (*self_0).size -= 1;
     let mut item: c_float = *((*self_0).items).offset((*self_0).size as isize);
     return item;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spFloatArray_peek(
-    mut self_0: *mut spFloatArray,
-) -> c_float {
+pub unsafe extern "C" fn spFloatArray_peek(mut self_0: *mut spFloatArray) -> c_float {
     return *((*self_0).items).offset(((*self_0).size - 1 as c_int) as isize);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spIntArray_create(
-    mut initialCapacity: c_int,
-) -> *mut spIntArray {
+pub unsafe extern "C" fn spIntArray_create(mut initialCapacity: c_int) -> *mut spIntArray {
     let mut array: *mut spIntArray = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<spIntArray>() as c_ulong,
@@ -9782,8 +9279,7 @@ pub unsafe extern "C" fn spIntArray_create(
     ) as *mut spIntArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<c_int>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -9807,16 +9303,12 @@ pub unsafe extern "C" fn spIntArray_setSize(
 ) -> *mut spIntArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<c_int>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -9833,29 +9325,20 @@ pub unsafe extern "C" fn spIntArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
-        (::core::mem::size_of::<c_int>() as c_ulong)
-            .wrapping_mul((*self_0).capacity as c_ulong),
+        (::core::mem::size_of::<c_int>() as c_ulong).wrapping_mul((*self_0).capacity as c_ulong),
     ) as *mut c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spIntArray_add(
-    mut self_0: *mut spIntArray,
-    mut value: c_int,
-) {
+pub unsafe extern "C" fn spIntArray_add(mut self_0: *mut spIntArray, mut value: c_int) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<c_int>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -9891,15 +9374,13 @@ pub unsafe extern "C" fn spIntArray_addAllValues(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spIntArray_removeAt(
-    mut self_0: *mut spIntArray,
-    mut index: c_int,
-) {
+pub unsafe extern "C" fn spIntArray_removeAt(mut self_0: *mut spIntArray, mut index: c_int) {
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<c_int>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -9933,9 +9414,7 @@ pub unsafe extern "C" fn spIntArray_peek(mut self_0: *mut spIntArray) -> c_int {
     return *((*self_0).items).offset(((*self_0).size - 1 as c_int) as isize);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spShortArray_create(
-    mut initialCapacity: c_int,
-) -> *mut spShortArray {
+pub unsafe extern "C" fn spShortArray_create(mut initialCapacity: c_int) -> *mut spShortArray {
     let mut array: *mut spShortArray = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<spShortArray>() as c_ulong,
@@ -9944,8 +9423,7 @@ pub unsafe extern "C" fn spShortArray_create(
     ) as *mut spShortArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<c_short>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -9969,16 +9447,12 @@ pub unsafe extern "C" fn spShortArray_setSize(
 ) -> *mut spShortArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<c_short>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -9995,29 +9469,20 @@ pub unsafe extern "C" fn spShortArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
-        (::core::mem::size_of::<c_short>() as c_ulong)
-            .wrapping_mul((*self_0).capacity as c_ulong),
+        (::core::mem::size_of::<c_short>() as c_ulong).wrapping_mul((*self_0).capacity as c_ulong),
     ) as *mut c_short;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spShortArray_add(
-    mut self_0: *mut spShortArray,
-    mut value: c_short,
-) {
+pub unsafe extern "C" fn spShortArray_add(mut self_0: *mut spShortArray, mut value: c_short) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<c_short>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10053,15 +9518,13 @@ pub unsafe extern "C" fn spShortArray_addAllValues(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spShortArray_removeAt(
-    mut self_0: *mut spShortArray,
-    mut index: c_int,
-) {
+pub unsafe extern "C" fn spShortArray_removeAt(mut self_0: *mut spShortArray, mut index: c_int) {
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<c_short>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -10085,17 +9548,13 @@ pub unsafe extern "C" fn spShortArray_contains(
     return 0 as c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spShortArray_pop(
-    mut self_0: *mut spShortArray,
-) -> c_short {
+pub unsafe extern "C" fn spShortArray_pop(mut self_0: *mut spShortArray) -> c_short {
     (*self_0).size -= 1;
     let mut item: c_short = *((*self_0).items).offset((*self_0).size as isize);
     return item;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spShortArray_peek(
-    mut self_0: *mut spShortArray,
-) -> c_short {
+pub unsafe extern "C" fn spShortArray_peek(mut self_0: *mut spShortArray) -> c_short {
     return *((*self_0).items).offset(((*self_0).size - 1 as c_int) as isize);
 }
 #[no_mangle]
@@ -10110,8 +9569,7 @@ pub unsafe extern "C" fn spUnsignedShortArray_create(
     ) as *mut spUnsignedShortArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<c_ushort>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -10120,16 +9578,12 @@ pub unsafe extern "C" fn spUnsignedShortArray_create(
     return array;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spUnsignedShortArray_dispose(
-    mut self_0: *mut spUnsignedShortArray,
-) {
+pub unsafe extern "C" fn spUnsignedShortArray_dispose(mut self_0: *mut spUnsignedShortArray) {
     _spFree((*self_0).items as *mut c_void);
     _spFree(self_0 as *mut c_void);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spUnsignedShortArray_clear(
-    mut self_0: *mut spUnsignedShortArray,
-) {
+pub unsafe extern "C" fn spUnsignedShortArray_clear(mut self_0: *mut spUnsignedShortArray) {
     (*self_0).size = 0 as c_int;
 }
 #[no_mangle]
@@ -10139,16 +9593,12 @@ pub unsafe extern "C" fn spUnsignedShortArray_setSize(
 ) -> *mut spUnsignedShortArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<c_ushort>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10165,11 +9615,9 @@ pub unsafe extern "C" fn spUnsignedShortArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
-        (::core::mem::size_of::<c_ushort>() as c_ulong)
-            .wrapping_mul((*self_0).capacity as c_ulong),
+        (::core::mem::size_of::<c_ushort>() as c_ulong).wrapping_mul((*self_0).capacity as c_ulong),
     ) as *mut c_ushort;
 }
 #[no_mangle]
@@ -10178,16 +9626,12 @@ pub unsafe extern "C" fn spUnsignedShortArray_add(
     mut value: c_ushort,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<c_ushort>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10230,8 +9674,9 @@ pub unsafe extern "C" fn spUnsignedShortArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<c_ushort>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -10280,8 +9725,7 @@ pub unsafe extern "C" fn spArrayFloatArray_create(
     ) as *mut spArrayFloatArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spFloatArray>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -10305,16 +9749,12 @@ pub unsafe extern "C" fn spArrayFloatArray_setSize(
 ) -> *mut spArrayFloatArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spFloatArray>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10331,8 +9771,7 @@ pub unsafe extern "C" fn spArrayFloatArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<*mut spFloatArray>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10344,16 +9783,12 @@ pub unsafe extern "C" fn spArrayFloatArray_add(
     mut value: *mut spFloatArray,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spFloatArray>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10397,8 +9832,9 @@ pub unsafe extern "C" fn spArrayFloatArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<*mut spFloatArray>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -10447,8 +9883,7 @@ pub unsafe extern "C" fn spArrayShortArray_create(
     ) as *mut spArrayShortArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spShortArray>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -10472,16 +9907,12 @@ pub unsafe extern "C" fn spArrayShortArray_setSize(
 ) -> *mut spArrayShortArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spShortArray>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10498,8 +9929,7 @@ pub unsafe extern "C" fn spArrayShortArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<*mut spShortArray>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10511,16 +9941,12 @@ pub unsafe extern "C" fn spArrayShortArray_add(
     mut value: *mut spShortArray,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spShortArray>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10564,8 +9990,9 @@ pub unsafe extern "C" fn spArrayShortArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<*mut spShortArray>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -10614,8 +10041,7 @@ pub unsafe extern "C" fn spKeyValueArray_create(
     ) as *mut spKeyValueArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<spKeyValue>() as c_ulong,
         b"_file_name_\0" as *const u8 as *const c_char,
@@ -10639,16 +10065,12 @@ pub unsafe extern "C" fn spKeyValueArray_setSize(
 ) -> *mut spKeyValueArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<spKeyValue>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10665,8 +10087,7 @@ pub unsafe extern "C" fn spKeyValueArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<spKeyValue>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10678,16 +10099,12 @@ pub unsafe extern "C" fn spKeyValueArray_add(
     mut value: spKeyValue,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<spKeyValue>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -10741,17 +10158,13 @@ pub unsafe extern "C" fn spKeyValueArray_contains(
     return 0 as c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spKeyValueArray_pop(
-    mut self_0: *mut spKeyValueArray,
-) -> spKeyValue {
+pub unsafe extern "C" fn spKeyValueArray_pop(mut self_0: *mut spKeyValueArray) -> spKeyValue {
     (*self_0).size -= 1;
     let mut item: spKeyValue = *((*self_0).items).offset((*self_0).size as isize);
     return item;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spKeyValueArray_peek(
-    mut self_0: *mut spKeyValueArray,
-) -> spKeyValue {
+pub unsafe extern "C" fn spKeyValueArray_peek(mut self_0: *mut spKeyValueArray) -> spKeyValue {
     return *((*self_0).items).offset(((*self_0).size - 1 as c_int) as isize);
 }
 #[no_mangle]
@@ -10766,12 +10179,9 @@ pub unsafe extern "C" fn spAtlasPage_create(
         4281 as c_int,
     ) as *mut spAtlasPage;
     (*self_0).atlas = atlas;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         4283 as c_int,
     ) as *mut c_char;
@@ -10810,43 +10220,29 @@ pub unsafe extern "C" fn spAtlasRegion_dispose(mut self_0: *mut spAtlasRegion) {
     i = 0 as c_int;
     n = (*(*self_0).keyValues).size;
     while i < n {
-        _spFree(
-            (*((*(*self_0).keyValues).items).offset(i as isize)).name
-                as *mut c_void,
-        );
+        _spFree((*((*(*self_0).keyValues).items).offset(i as isize)).name as *mut c_void);
         i += 1;
     }
     spKeyValueArray_dispose((*self_0).keyValues);
     _spFree(self_0 as *mut c_void);
 }
 unsafe extern "C" fn ss_trim(mut self_0: *mut SimpleString) -> *mut SimpleString {
-    while isspace_(*(*self_0).start as c_uchar as c_int) != 0
-        && (*self_0).start < (*self_0).end
-    {
+    while isspace_(*(*self_0).start as c_uchar as c_int) != 0 && (*self_0).start < (*self_0).end {
         (*self_0).start = ((*self_0).start).offset(1);
     }
     if (*self_0).start == (*self_0).end {
-        (*self_0)
-            .length = ((*self_0).end).offset_from((*self_0).start) as c_long
-            as c_int;
+        (*self_0).length = ((*self_0).end).offset_from((*self_0).start) as c_long as c_int;
         return self_0;
     }
     (*self_0).end = ((*self_0).end).offset(-1);
-    while *(*self_0).end as c_uchar as c_int == '\r' as i32
-        && (*self_0).end >= (*self_0).start
-    {
+    while *(*self_0).end as c_uchar as c_int == '\r' as i32 && (*self_0).end >= (*self_0).start {
         (*self_0).end = ((*self_0).end).offset(-1);
     }
     (*self_0).end = ((*self_0).end).offset(1);
-    (*self_0)
-        .length = ((*self_0).end).offset_from((*self_0).start) as c_long
-        as c_int;
+    (*self_0).length = ((*self_0).end).offset_from((*self_0).start) as c_long as c_int;
     return self_0;
 }
-unsafe extern "C" fn ss_indexOf(
-    mut self_0: *mut SimpleString,
-    mut needle: c_char,
-) -> c_int {
+unsafe extern "C" fn ss_indexOf(mut self_0: *mut SimpleString, mut needle: c_char) -> c_int {
     let mut c: *mut c_char = (*self_0).start;
     while c < (*self_0).end {
         if *c as c_int == needle as c_int {
@@ -10886,10 +10282,7 @@ unsafe extern "C" fn ss_substr(
     result.length = e - s;
     return result;
 }
-unsafe extern "C" fn ss_substr2(
-    mut self_0: *mut SimpleString,
-    mut s: c_int,
-) -> SimpleString {
+unsafe extern "C" fn ss_substr2(mut self_0: *mut SimpleString, mut s: c_int) -> SimpleString {
     let mut result: SimpleString = SimpleString {
         start: 0 as *mut c_char,
         end: 0 as *mut c_char,
@@ -10897,14 +10290,10 @@ unsafe extern "C" fn ss_substr2(
     };
     result.start = ((*self_0).start).offset(s as isize);
     result.end = (*self_0).end;
-    result
-        .length = (result.end).offset_from(result.start) as c_long as c_int;
+    result.length = (result.end).offset_from(result.start) as c_long as c_int;
     return result;
 }
-unsafe extern "C" fn ss_equals(
-    mut self_0: *mut SimpleString,
-    mut str: *const c_char,
-) -> c_int {
+unsafe extern "C" fn ss_equals(mut self_0: *mut SimpleString, mut str: *const c_char) -> c_int {
     let mut i: c_int = 0;
     let mut otherLen: c_int = spine_strlen(str) as c_int;
     if (*self_0).length != otherLen {
@@ -10912,9 +10301,7 @@ unsafe extern "C" fn ss_equals(
     }
     i = 0 as c_int;
     while i < (*self_0).length {
-        if *((*self_0).start).offset(i as isize) as c_int
-            != *str.offset(i as isize) as c_int
-        {
+        if *((*self_0).start).offset(i as isize) as c_int != *str.offset(i as isize) as c_int {
             return 0 as c_int;
         }
         i += 1;
@@ -10937,16 +10324,14 @@ unsafe extern "C" fn ss_copy(mut self_0: *mut SimpleString) -> *mut c_char {
     return string;
 }
 unsafe extern "C" fn ss_toInt(mut self_0: *mut SimpleString) -> c_int {
-    return spine_strtol((*self_0).start, &mut (*self_0).end, 10 as c_int)
-        as c_int;
+    return spine_strtol((*self_0).start, &mut (*self_0).end, 10 as c_int) as c_int;
 }
 unsafe extern "C" fn ai_readLine(mut self_0: *mut AtlasInput) -> *mut SimpleString {
     if (*self_0).index >= (*self_0).end as *mut c_char {
         return 0 as *mut SimpleString;
     }
     (*self_0).line.start = (*self_0).index;
-    while (*self_0).index < (*self_0).end as *mut c_char
-        && *(*self_0).index as c_int != '\n' as i32
+    while (*self_0).index < (*self_0).end as *mut c_char && *(*self_0).index as c_int != '\n' as i32
     {
         (*self_0).index = ((*self_0).index).offset(1);
     }
@@ -10955,10 +10340,8 @@ unsafe extern "C" fn ai_readLine(mut self_0: *mut AtlasInput) -> *mut SimpleStri
         (*self_0).index = ((*self_0).index).offset(1);
     }
     (*self_0).line = *ss_trim(&mut (*self_0).line);
-    (*self_0)
-        .line
-        .length = ((*self_0).line.end).offset_from((*self_0).line.start) as c_long
-        as c_int;
+    (*self_0).line.length =
+        ((*self_0).line.end).offset_from((*self_0).line.start) as c_long as c_int;
     return &mut (*self_0).line;
 }
 unsafe extern "C" fn ai_readEntry(
@@ -10989,11 +10372,7 @@ unsafe extern "C" fn ai_readEntry(
     i = 1 as c_int;
     lastMatch = colon + 1 as c_int;
     loop {
-        let mut comma: c_int = ss_indexOf2(
-            line,
-            ',' as i32 as c_char,
-            lastMatch,
-        );
+        let mut comma: c_int = ss_indexOf2(line, ',' as i32 as c_char, lastMatch);
         if comma == -(1 as c_int) {
             substr = ss_substr2(line, lastMatch);
             *entry.offset(i as isize) = *ss_trim(&mut substr);
@@ -11006,7 +10385,7 @@ unsafe extern "C" fn ai_readEntry(
             return 4 as c_int;
         }
         i += 1;
-    };
+    }
 }
 static mut formatNames: [*const c_char; 8] = [
     b"\0" as *const u8 as *const c_char,
@@ -11075,10 +10454,9 @@ pub unsafe extern "C" fn spAtlas_create(
     let mut count: c_int = 0;
     let mut dirLength: c_int = spine_strlen(dir) as c_int;
     let mut needsSlash: c_int = (dirLength > 0 as c_int
-        && *dir.offset((dirLength - 1 as c_int) as isize) as c_int
-            != '/' as i32
-        && *dir.offset((dirLength - 1 as c_int) as isize) as c_int
-            != '\\' as i32) as c_int;
+        && *dir.offset((dirLength - 1 as c_int) as isize) as c_int != '/' as i32
+        && *dir.offset((dirLength - 1 as c_int) as isize) as c_int != '\\' as i32)
+        as c_int;
     self_0 = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<spAtlas>() as c_ulong,
@@ -11150,21 +10528,14 @@ pub unsafe extern "C" fn spAtlas_create(
                     b"size\0" as *const u8 as *const c_char,
                 ) != 0
                 {
-                    (*page)
-                        .width = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
-                    );
-                    (*page)
-                        .height = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(2 as c_int as isize),
-                    );
+                    (*page).width = ss_toInt(&mut *entry.as_mut_ptr().offset(1 as c_int as isize));
+                    (*page).height = ss_toInt(&mut *entry.as_mut_ptr().offset(2 as c_int as isize));
                 } else if ss_equals(
                     &mut *entry.as_mut_ptr().offset(0 as c_int as isize),
                     b"format\0" as *const u8 as *const c_char,
                 ) != 0
                 {
-                    (*page)
-                        .format = indexOf(
+                    (*page).format = indexOf(
                         formatNames.as_mut_ptr(),
                         8 as c_int,
                         &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
@@ -11174,14 +10545,12 @@ pub unsafe extern "C" fn spAtlas_create(
                     b"filter\0" as *const u8 as *const c_char,
                 ) != 0
                 {
-                    (*page)
-                        .minFilter = indexOf(
+                    (*page).minFilter = indexOf(
                         textureFilterNames.as_mut_ptr(),
                         8 as c_int,
                         &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
                     ) as spAtlasFilter;
-                    (*page)
-                        .magFilter = indexOf(
+                    (*page).magFilter = indexOf(
                         textureFilterNames.as_mut_ptr(),
                         8 as c_int,
                         &mut *entry.as_mut_ptr().offset(2 as c_int as isize),
@@ -11212,8 +10581,7 @@ pub unsafe extern "C" fn spAtlas_create(
                     b"pma\0" as *const u8 as *const c_char,
                 ) != 0
                 {
-                    (*page)
-                        .pma = ss_equals(
+                    (*page).pma = ss_equals(
                         &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
                         b"true\0" as *const u8 as *const c_char,
                     );
@@ -11242,107 +10610,59 @@ pub unsafe extern "C" fn spAtlas_create(
                     b"xy\0" as *const u8 as *const c_char,
                 ) != 0
                 {
-                    (*region)
-                        .x = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
-                    );
-                    (*region)
-                        .y = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(2 as c_int as isize),
-                    );
+                    (*region).x = ss_toInt(&mut *entry.as_mut_ptr().offset(1 as c_int as isize));
+                    (*region).y = ss_toInt(&mut *entry.as_mut_ptr().offset(2 as c_int as isize));
                 } else if ss_equals(
                     &mut *entry.as_mut_ptr().offset(0 as c_int as isize),
                     b"size\0" as *const u8 as *const c_char,
                 ) != 0
                 {
-                    (*region)
-                        .super_0
-                        .width = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
-                    );
-                    (*region)
-                        .super_0
-                        .height = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(2 as c_int as isize),
-                    );
+                    (*region).super_0.width =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(1 as c_int as isize));
+                    (*region).super_0.height =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(2 as c_int as isize));
                 } else if ss_equals(
                     &mut *entry.as_mut_ptr().offset(0 as c_int as isize),
                     b"bounds\0" as *const u8 as *const c_char,
                 ) != 0
                 {
-                    (*region)
-                        .x = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
-                    );
-                    (*region)
-                        .y = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(2 as c_int as isize),
-                    );
-                    (*region)
-                        .super_0
-                        .width = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(3 as c_int as isize),
-                    );
-                    (*region)
-                        .super_0
-                        .height = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(4 as c_int as isize),
-                    );
+                    (*region).x = ss_toInt(&mut *entry.as_mut_ptr().offset(1 as c_int as isize));
+                    (*region).y = ss_toInt(&mut *entry.as_mut_ptr().offset(2 as c_int as isize));
+                    (*region).super_0.width =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(3 as c_int as isize));
+                    (*region).super_0.height =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(4 as c_int as isize));
                 } else if ss_equals(
                     &mut *entry.as_mut_ptr().offset(0 as c_int as isize),
                     b"offset\0" as *const u8 as *const c_char,
                 ) != 0
                 {
-                    (*region)
-                        .super_0
-                        .offsetX = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
-                    ) as c_float;
-                    (*region)
-                        .super_0
-                        .offsetY = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(2 as c_int as isize),
-                    ) as c_float;
+                    (*region).super_0.offsetX =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(1 as c_int as isize)) as c_float;
+                    (*region).super_0.offsetY =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(2 as c_int as isize)) as c_float;
                 } else if ss_equals(
                     &mut *entry.as_mut_ptr().offset(0 as c_int as isize),
                     b"orig\0" as *const u8 as *const c_char,
                 ) != 0
                 {
-                    (*region)
-                        .super_0
-                        .originalWidth = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
-                    );
-                    (*region)
-                        .super_0
-                        .originalHeight = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(2 as c_int as isize),
-                    );
+                    (*region).super_0.originalWidth =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(1 as c_int as isize));
+                    (*region).super_0.originalHeight =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(2 as c_int as isize));
                 } else if ss_equals(
                     &mut *entry.as_mut_ptr().offset(0 as c_int as isize),
                     b"offsets\0" as *const u8 as *const c_char,
                 ) != 0
                 {
-                    (*region)
-                        .super_0
-                        .offsetX = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
-                    ) as c_float;
-                    (*region)
-                        .super_0
-                        .offsetY = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(2 as c_int as isize),
-                    ) as c_float;
-                    (*region)
-                        .super_0
-                        .originalWidth = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(3 as c_int as isize),
-                    );
-                    (*region)
-                        .super_0
-                        .originalHeight = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(4 as c_int as isize),
-                    );
+                    (*region).super_0.offsetX =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(1 as c_int as isize)) as c_float;
+                    (*region).super_0.offsetY =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(2 as c_int as isize)) as c_float;
+                    (*region).super_0.originalWidth =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(3 as c_int as isize));
+                    (*region).super_0.originalHeight =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(4 as c_int as isize));
                 } else if ss_equals(
                     &mut *entry.as_mut_ptr().offset(0 as c_int as isize),
                     b"rotate\0" as *const u8 as *const c_char,
@@ -11359,40 +10679,28 @@ pub unsafe extern "C" fn spAtlas_create(
                         b"false\0" as *const u8 as *const c_char,
                     ) == 0
                     {
-                        (*region)
-                            .super_0
-                            .degrees = ss_toInt(
-                            &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
-                        );
+                        (*region).super_0.degrees =
+                            ss_toInt(&mut *entry.as_mut_ptr().offset(1 as c_int as isize));
                     }
                 } else if ss_equals(
                     &mut *entry.as_mut_ptr().offset(0 as c_int as isize),
                     b"index\0" as *const u8 as *const c_char,
                 ) != 0
                 {
-                    (*region)
-                        .index = ss_toInt(
-                        &mut *entry.as_mut_ptr().offset(1 as c_int as isize),
-                    );
+                    (*region).index =
+                        ss_toInt(&mut *entry.as_mut_ptr().offset(1 as c_int as isize));
                 } else {
                     let mut i: c_int = 0 as c_int;
                     let mut keyValue: spKeyValue = spKeyValue {
                         name: 0 as *mut c_char,
                         values: [0.; 5],
                     };
-                    keyValue
-                        .name = ss_copy(
-                        &mut *entry.as_mut_ptr().offset(0 as c_int as isize),
-                    );
+                    keyValue.name = ss_copy(&mut *entry.as_mut_ptr().offset(0 as c_int as isize));
                     i = 0 as c_int;
                     while i < count {
-                        keyValue
-                            .values[i
-                            as usize] = ss_toInt(
-                            &mut *entry
-                                .as_mut_ptr()
-                                .offset((i + 1 as c_int) as isize),
-                        ) as c_float;
+                        keyValue.values[i as usize] =
+                            ss_toInt(&mut *entry.as_mut_ptr().offset((i + 1 as c_int) as isize))
+                                as c_float;
                         i += 1;
                     }
                     spKeyValueArray_add((*region).keyValues, keyValue);
@@ -11404,30 +10712,18 @@ pub unsafe extern "C" fn spAtlas_create(
                 (*region).super_0.originalWidth = (*region).super_0.width;
                 (*region).super_0.originalHeight = (*region).super_0.height;
             }
-            (*region)
-                .super_0
-                .u = (*region).x as c_float / (*page).width as c_float;
-            (*region)
-                .super_0
-                .v = (*region).y as c_float / (*page).height as c_float;
+            (*region).super_0.u = (*region).x as c_float / (*page).width as c_float;
+            (*region).super_0.v = (*region).y as c_float / (*page).height as c_float;
             if (*region).super_0.degrees == 90 as c_int {
-                (*region)
-                    .super_0
-                    .u2 = ((*region).x + (*region).super_0.height) as c_float
-                    / (*page).width as c_float;
-                (*region)
-                    .super_0
-                    .v2 = ((*region).y + (*region).super_0.width) as c_float
-                    / (*page).height as c_float;
+                (*region).super_0.u2 =
+                    ((*region).x + (*region).super_0.height) as c_float / (*page).width as c_float;
+                (*region).super_0.v2 =
+                    ((*region).y + (*region).super_0.width) as c_float / (*page).height as c_float;
             } else {
-                (*region)
-                    .super_0
-                    .u2 = ((*region).x + (*region).super_0.width) as c_float
-                    / (*page).width as c_float;
-                (*region)
-                    .super_0
-                    .v2 = ((*region).y + (*region).super_0.height) as c_float
-                    / (*page).height as c_float;
+                (*region).super_0.u2 =
+                    ((*region).x + (*region).super_0.width) as c_float / (*page).width as c_float;
+                (*region).super_0.v2 =
+                    ((*region).y + (*region).super_0.height) as c_float / (*page).height as c_float;
             }
         }
     }
@@ -11530,11 +10826,10 @@ unsafe extern "C" fn loadSequence(
         spSequence_getPath(sequence, basePath, i, path);
         let ref mut fresh33 = *((*regions).items).offset(i as isize);
         *fresh33 = &mut (*(spAtlas_findRegion
-            as unsafe extern "C" fn(
-                *const spAtlas,
-                *const c_char,
-            ) -> *mut spAtlasRegion)(atlas, path))
-            .super_0;
+            as unsafe extern "C" fn(*const spAtlas, *const c_char) -> *mut spAtlasRegion)(
+            atlas, path,
+        ))
+        .super_0;
         if (*((*regions).items).offset(i as isize)).is_null() {
             _spFree(path as *mut c_void);
             return 0 as c_int;
@@ -11549,19 +10844,16 @@ unsafe extern "C" fn loadSequence(
 #[no_mangle]
 pub unsafe extern "C" fn _spAtlasAttachmentLoader_createAttachment(
     mut loader: *mut spAttachmentLoader,
-    mut skin: *mut spSkin,
+    mut _skin: *mut spSkin,
     mut type_0: spAttachmentType,
     mut name: *const c_char,
     mut path: *const c_char,
     mut sequence: *mut spSequence,
 ) -> *mut spAttachment {
-    let mut self_0: *mut spAtlasAttachmentLoader = loader
-        as *mut spAtlasAttachmentLoader;
+    let mut self_0: *mut spAtlasAttachmentLoader = loader as *mut spAtlasAttachmentLoader;
     match type_0 as c_uint {
         0 => {
-            let mut attachment: *mut spRegionAttachment = spRegionAttachment_create(
-                name,
-            );
+            let mut attachment: *mut spRegionAttachment = spRegionAttachment_create(name);
             if !sequence.is_null() {
                 if loadSequence((*self_0).atlas, path, sequence) == 0 {
                     spAttachment_dispose(&mut (*attachment).super_0);
@@ -11574,10 +10866,7 @@ pub unsafe extern "C" fn _spAtlasAttachmentLoader_createAttachment(
                     return 0 as *mut spAttachment;
                 }
             } else {
-                let mut region: *mut spAtlasRegion = spAtlas_findRegion(
-                    (*self_0).atlas,
-                    path,
-                );
+                let mut region: *mut spAtlasRegion = spAtlas_findRegion((*self_0).atlas, path);
                 if region.is_null() {
                     spAttachment_dispose(&mut (*attachment).super_0);
                     _spAttachmentLoader_setError(
@@ -11606,10 +10895,7 @@ pub unsafe extern "C" fn _spAtlasAttachmentLoader_createAttachment(
                     return 0 as *mut spAttachment;
                 }
             } else {
-                let mut region_0: *mut spAtlasRegion = spAtlas_findRegion(
-                    (*self_0).atlas,
-                    path,
-                );
+                let mut region_0: *mut spAtlasRegion = spAtlas_findRegion((*self_0).atlas, path);
                 if region_0.is_null() {
                     _spAttachmentLoader_setError(
                         loader,
@@ -11625,34 +10911,34 @@ pub unsafe extern "C" fn _spAtlasAttachmentLoader_createAttachment(
         }
         1 => {
             return &mut (*(spBoundingBoxAttachment_create
-                as unsafe extern "C" fn(
-                    *const c_char,
-                ) -> *mut spBoundingBoxAttachment)(name))
-                .super_0
-                .super_0;
+                as unsafe extern "C" fn(*const c_char) -> *mut spBoundingBoxAttachment)(
+                name
+            ))
+            .super_0
+            .super_0;
         }
         4 => {
             return &mut (*(spPathAttachment_create
-                as unsafe extern "C" fn(
-                    *const c_char,
-                ) -> *mut spPathAttachment)(name))
-                .super_0
-                .super_0;
+                as unsafe extern "C" fn(*const c_char) -> *mut spPathAttachment)(
+                name
+            ))
+            .super_0
+            .super_0;
         }
         5 => {
             return &mut (*(spPointAttachment_create
-                as unsafe extern "C" fn(
-                    *const c_char,
-                ) -> *mut spPointAttachment)(name))
-                .super_0;
+                as unsafe extern "C" fn(*const c_char) -> *mut spPointAttachment)(
+                name
+            ))
+            .super_0;
         }
         6 => {
             return &mut (*(spClippingAttachment_create
-                as unsafe extern "C" fn(
-                    *const c_char,
-                ) -> *mut spClippingAttachment)(name))
-                .super_0
-                .super_0;
+                as unsafe extern "C" fn(*const c_char) -> *mut spClippingAttachment)(
+                name
+            ))
+            .super_0
+            .super_0;
         }
         _ => {
             _spAttachmentLoader_setUnknownTypeError(loader, type_0);
@@ -11672,10 +10958,7 @@ pub unsafe extern "C" fn spAtlasAttachmentLoader_create(
     ) as *mut spAtlasAttachmentLoader;
     _spAttachmentLoader_init(
         &mut (*self_0).super_0,
-        Some(
-            _spAttachmentLoader_deinit
-                as unsafe extern "C" fn(*mut spAttachmentLoader) -> (),
-        ),
+        Some(_spAttachmentLoader_deinit as unsafe extern "C" fn(*mut spAttachmentLoader) -> ()),
         Some(
             _spAtlasAttachmentLoader_createAttachment
                 as unsafe extern "C" fn(
@@ -11698,11 +10981,10 @@ pub unsafe extern "C" fn _spAttachment_init(
     mut self_0: *mut spAttachment,
     mut name: *const c_char,
     mut type_0: spAttachmentType,
-    mut dispose: Option::<unsafe extern "C" fn(*mut spAttachment) -> ()>,
-    mut copy: Option::<unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment>,
+    mut dispose: Option<unsafe extern "C" fn(*mut spAttachment) -> ()>,
+    mut copy: Option<unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment>,
 ) {
-    (*self_0)
-        .vtable = _spCalloc(
+    (*self_0).vtable = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<_spAttachmentVtable>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -11712,12 +10994,9 @@ pub unsafe extern "C" fn _spAttachment_init(
     *fresh35 = dispose;
     let ref mut fresh36 = (*((*self_0).vtable as *mut _spAttachmentVtable)).copy;
     *fresh36 = copy;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         4818 as c_int,
     ) as *mut c_char;
@@ -11733,9 +11012,7 @@ pub unsafe extern "C" fn _spAttachment_deinit(mut self_0: *mut spAttachment) {
     _spFree((*self_0).name as *mut c_void);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spAttachment_copy(
-    mut self_0: *mut spAttachment,
-) -> *mut spAttachment {
+pub unsafe extern "C" fn spAttachment_copy(mut self_0: *mut spAttachment) -> *mut spAttachment {
     return ((*((*self_0).vtable as *mut _spAttachmentVtable)).copy)
         .expect("non-null function pointer")(self_0);
 }
@@ -11750,8 +11027,8 @@ pub unsafe extern "C" fn spAttachment_dispose(mut self_0: *mut spAttachment) {
 #[no_mangle]
 pub unsafe extern "C" fn _spAttachmentLoader_init(
     mut self_0: *mut spAttachmentLoader,
-    mut dispose: Option::<unsafe extern "C" fn(*mut spAttachmentLoader) -> ()>,
-    mut createAttachment: Option::<
+    mut dispose: Option<unsafe extern "C" fn(*mut spAttachmentLoader) -> ()>,
+    mut createAttachment: Option<
         unsafe extern "C" fn(
             *mut spAttachmentLoader,
             *mut spSkin,
@@ -11761,45 +11038,37 @@ pub unsafe extern "C" fn _spAttachmentLoader_init(
             *mut spSequence,
         ) -> *mut spAttachment,
     >,
-    mut configureAttachment: Option::<
+    mut configureAttachment: Option<
         unsafe extern "C" fn(*mut spAttachmentLoader, *mut spAttachment) -> (),
     >,
-    mut disposeAttachment: Option::<
+    mut disposeAttachment: Option<
         unsafe extern "C" fn(*mut spAttachmentLoader, *mut spAttachment) -> (),
     >,
 ) {
-    (*self_0)
-        .vtable = _spCalloc(
+    (*self_0).vtable = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<_spAttachmentLoaderVtable>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
         4888 as c_int,
     ) as *mut _spAttachmentLoaderVtable as *const c_void;
-    let ref mut fresh37 = (*((*self_0).vtable as *mut _spAttachmentLoaderVtable))
-        .dispose;
+    let ref mut fresh37 = (*((*self_0).vtable as *mut _spAttachmentLoaderVtable)).dispose;
     *fresh37 = dispose;
-    let ref mut fresh38 = (*((*self_0).vtable as *mut _spAttachmentLoaderVtable))
-        .createAttachment;
+    let ref mut fresh38 = (*((*self_0).vtable as *mut _spAttachmentLoaderVtable)).createAttachment;
     *fresh38 = createAttachment;
-    let ref mut fresh39 = (*((*self_0).vtable as *mut _spAttachmentLoaderVtable))
-        .configureAttachment;
+    let ref mut fresh39 =
+        (*((*self_0).vtable as *mut _spAttachmentLoaderVtable)).configureAttachment;
     *fresh39 = configureAttachment;
-    let ref mut fresh40 = (*((*self_0).vtable as *mut _spAttachmentLoaderVtable))
-        .disposeAttachment;
+    let ref mut fresh40 = (*((*self_0).vtable as *mut _spAttachmentLoaderVtable)).disposeAttachment;
     *fresh40 = disposeAttachment;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spAttachmentLoader_deinit(
-    mut self_0: *mut spAttachmentLoader,
-) {
+pub unsafe extern "C" fn _spAttachmentLoader_deinit(mut self_0: *mut spAttachmentLoader) {
     _spFree((*self_0).vtable as *mut c_void);
     _spFree((*self_0).error1 as *mut c_void);
     _spFree((*self_0).error2 as *mut c_void);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spAttachmentLoader_dispose(
-    mut self_0: *mut spAttachmentLoader,
-) {
+pub unsafe extern "C" fn spAttachmentLoader_dispose(mut self_0: *mut spAttachmentLoader) {
     ((*((*self_0).vtable as *mut _spAttachmentLoaderVtable)).dispose)
         .expect("non-null function pointer")(self_0);
     _spFree(self_0 as *mut c_void);
@@ -11825,9 +11094,7 @@ pub unsafe extern "C" fn spAttachmentLoader_configureAttachment(
     mut self_0: *mut spAttachmentLoader,
     mut attachment: *mut spAttachment,
 ) {
-    if ((*((*self_0).vtable as *mut _spAttachmentLoaderVtable)).configureAttachment)
-        .is_none()
-    {
+    if ((*((*self_0).vtable as *mut _spAttachmentLoaderVtable)).configureAttachment).is_none() {
         return;
     }
     ((*((*self_0).vtable as *mut _spAttachmentLoaderVtable)).configureAttachment)
@@ -11838,9 +11105,7 @@ pub unsafe extern "C" fn spAttachmentLoader_disposeAttachment(
     mut self_0: *mut spAttachmentLoader,
     mut attachment: *mut spAttachment,
 ) {
-    if ((*((*self_0).vtable as *mut _spAttachmentLoaderVtable)).disposeAttachment)
-        .is_none()
-    {
+    if ((*((*self_0).vtable as *mut _spAttachmentLoaderVtable)).disposeAttachment).is_none() {
         return;
     }
     ((*((*self_0).vtable as *mut _spAttachmentLoaderVtable)).disposeAttachment)
@@ -11854,22 +11119,16 @@ pub unsafe extern "C" fn _spAttachmentLoader_setError(
 ) {
     _spFree((*self_0).error1 as *mut c_void);
     _spFree((*self_0).error2 as *mut c_void);
-    (*self_0)
-        .error1 = _spMalloc(
+    (*self_0).error1 = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(error1)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(error1)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         4929 as c_int,
     ) as *mut c_char;
     spine_strcpy((*self_0).error1, error1);
-    (*self_0)
-        .error2 = _spMalloc(
+    (*self_0).error2 = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(error2)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(error2)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         4930 as c_int,
     ) as *mut c_char;
@@ -11881,9 +11140,9 @@ pub unsafe extern "C" fn _spAttachmentLoader_setUnknownTypeError(
     mut type_0: spAttachmentType,
 ) {
     let mut buffer: [c_char; 16] = [0; 16];
-    snprintf(
+    spine_snprintf!(
         buffer.as_mut_ptr(),
-        16 as c_int as c_ulong,
+        16 as c_int as size_t,
         b"%d\0" as *const u8 as *const c_char,
         type_0 as c_uint,
     );
@@ -11972,8 +11231,11 @@ pub unsafe extern "C" fn spBone_updateWorldTransformWith(
     let mut pd: c_float = 0.;
     let mut sx: c_float = (*(*self_0).skeleton).scaleX;
     let mut sy: c_float = (*(*self_0).skeleton).scaleY
-        * (if spBone_isYDown() != 0 { -(1 as c_int) } else { 1 as c_int })
-            as c_float;
+        * (if spBone_isYDown() != 0 {
+            -(1 as c_int)
+        } else {
+            1 as c_int
+        }) as c_float;
     let mut parent: *mut spBone = (*self_0).parent;
     (*self_0).ax = x;
     (*self_0).ay = y;
@@ -11983,14 +11245,14 @@ pub unsafe extern "C" fn spBone_updateWorldTransformWith(
     (*self_0).ashearX = shearX;
     (*self_0).ashearY = shearY;
     if parent.is_null() {
-        let mut rx: c_float = (rotation + shearX)
+        let mut rx: c_float =
+            (rotation + shearX) * (3.1415926535897932385f32 / 180 as c_int as c_float);
+        let mut ry: c_float = (rotation + 90 as c_int as c_float + shearY)
             * (3.1415926535897932385f32 / 180 as c_int as c_float);
-        let mut ry: c_float = (rotation + 90 as c_int as c_float
-            + shearY) * (3.1415926535897932385f32 / 180 as c_int as c_float);
         (*self_0).a = spine_cosf(rx) * scaleX * sx;
         (*self_0).b = spine_cosf(ry) * scaleY * sx;
-        (*self_0).c = sinf(rx) * scaleX * sy;
-        (*self_0).d = sinf(ry) * scaleY * sy;
+        (*self_0).c = spine_sinf(rx) * scaleX * sy;
+        (*self_0).d = spine_sinf(ry) * scaleY * sy;
         (*self_0).worldX = x * sx + (*(*self_0).skeleton).x;
         (*self_0).worldY = y * sy + (*(*self_0).skeleton).y;
         return;
@@ -12003,15 +11265,14 @@ pub unsafe extern "C" fn spBone_updateWorldTransformWith(
     (*self_0).worldY = pc * x + pd * y + (*parent).worldY;
     match (*self_0).inherit as c_uint {
         0 => {
-            let mut rx_0: c_float = (rotation + shearX)
-                * (3.1415926535897932385f32 / 180 as c_int as c_float);
-            let mut ry_0: c_float = (rotation + 90 as c_int as c_float
-                + shearY)
+            let mut rx_0: c_float =
+                (rotation + shearX) * (3.1415926535897932385f32 / 180 as c_int as c_float);
+            let mut ry_0: c_float = (rotation + 90 as c_int as c_float + shearY)
                 * (3.1415926535897932385f32 / 180 as c_int as c_float);
             let mut la: c_float = spine_cosf(rx_0) * scaleX;
             let mut lb: c_float = spine_cosf(ry_0) * scaleY;
-            let mut lc: c_float = sinf(rx_0) * scaleX;
-            let mut ld: c_float = sinf(ry_0) * scaleY;
+            let mut lc: c_float = spine_sinf(rx_0) * scaleX;
+            let mut ld: c_float = spine_sinf(ry_0) * scaleY;
             (*self_0).a = pa * la + pb * lc;
             (*self_0).b = pa * lb + pb * ld;
             (*self_0).c = pc * la + pd * lc;
@@ -12019,15 +11280,14 @@ pub unsafe extern "C" fn spBone_updateWorldTransformWith(
             return;
         }
         1 => {
-            let mut rx_1: c_float = (rotation + shearX)
-                * (3.1415926535897932385f32 / 180 as c_int as c_float);
-            let mut ry_1: c_float = (rotation + 90 as c_int as c_float
-                + shearY)
+            let mut rx_1: c_float =
+                (rotation + shearX) * (3.1415926535897932385f32 / 180 as c_int as c_float);
+            let mut ry_1: c_float = (rotation + 90 as c_int as c_float + shearY)
                 * (3.1415926535897932385f32 / 180 as c_int as c_float);
             (*self_0).a = spine_cosf(rx_1) * scaleX;
             (*self_0).b = spine_cosf(ry_1) * scaleY;
-            (*self_0).c = sinf(rx_1) * scaleX;
-            (*self_0).d = sinf(ry_1) * scaleY;
+            (*self_0).c = spine_sinf(rx_1) * scaleX;
+            (*self_0).d = spine_sinf(ry_1) * scaleY;
         }
         2 => {
             let mut s: c_float = pa * pa + pc * pc;
@@ -12042,25 +11302,21 @@ pub unsafe extern "C" fn spBone_updateWorldTransformWith(
                 pc /= sy;
                 pb = pc * s;
                 pd = pa * s;
-                prx = spine_atan2f(pc, pa)
-                    * (180 as c_int as c_float / 3.1415926535897932385f32);
+                prx = spine_atan2f(pc, pa) * (180 as c_int as c_float / 3.1415926535897932385f32);
             } else {
                 pa = 0 as c_int as c_float;
                 pc = 0 as c_int as c_float;
                 prx = 90 as c_int as c_float
-                    - spine_atan2f(pd, pb)
-                        * (180 as c_int as c_float
-                            / 3.1415926535897932385f32);
+                    - spine_atan2f(pd, pb) * (180 as c_int as c_float / 3.1415926535897932385f32);
             }
-            let mut rx_2: c_float = (rotation + shearX - prx)
-                * (3.1415926535897932385f32 / 180 as c_int as c_float);
-            let mut ry_2: c_float = (rotation + shearY - prx
-                + 90 as c_int as c_float)
+            let mut rx_2: c_float =
+                (rotation + shearX - prx) * (3.1415926535897932385f32 / 180 as c_int as c_float);
+            let mut ry_2: c_float = (rotation + shearY - prx + 90 as c_int as c_float)
                 * (3.1415926535897932385f32 / 180 as c_int as c_float);
             let mut la_0: c_float = spine_cosf(rx_2) * scaleX;
             let mut lb_0: c_float = spine_cosf(ry_2) * scaleY;
-            let mut lc_0: c_float = sinf(rx_2) * scaleX;
-            let mut ld_0: c_float = sinf(ry_2) * scaleY;
+            let mut lc_0: c_float = spine_sinf(rx_2) * scaleX;
+            let mut ld_0: c_float = spine_sinf(ry_2) * scaleY;
             (*self_0).a = pa * la_0 - pb * lc_0;
             (*self_0).b = pa * lb_0 - pb * ld_0;
             (*self_0).c = pc * la_0 + pd * lc_0;
@@ -12069,30 +11325,27 @@ pub unsafe extern "C" fn spBone_updateWorldTransformWith(
         3 | 4 => {
             rotation *= 3.1415926535897932385f32 / 180 as c_int as c_float;
             let mut cosine: c_float = spine_cosf(rotation);
-            let mut sine: c_float = sinf(rotation);
+            let mut sine: c_float = spine_sinf(rotation);
             let mut za: c_float = (pa * cosine + pb * sine) / sx;
             let mut zc: c_float = (pc * cosine + pd * sine) / sy;
             let mut s_0: c_float = spine_sqrtf(za * za + zc * zc);
-            if (*(*self_0).data).inherit as c_uint
-                == SP_INHERIT_NOSCALE as c_int as c_uint
+            if (*(*self_0).data).inherit as c_uint == SP_INHERIT_NOSCALE as c_int as c_uint
                 && (pa * pd - pb * pc < 0 as c_int as c_float) as c_int
                     != ((sx < 0 as c_int as c_float) as c_int
-                        != (sy < 0 as c_int as c_float) as c_int)
-                        as c_int
+                        != (sy < 0 as c_int as c_float) as c_int) as c_int
             {
                 s_0 = -s_0;
             }
-            rotation = 3.1415926535897932385f32 / 2 as c_int as c_float
-                + spine_atan2f(zc, za);
+            rotation = 3.1415926535897932385f32 / 2 as c_int as c_float + spine_atan2f(zc, za);
             let mut zb: c_float = spine_cosf(rotation) * s_0;
-            let mut zd: c_float = sinf(rotation) * s_0;
+            let mut zd: c_float = spine_sinf(rotation) * s_0;
             shearX *= 3.1415926535897932385f32 / 180 as c_int as c_float;
             shearY = (90 as c_int as c_float + shearY)
                 * (3.1415926535897932385f32 / 180 as c_int as c_float);
             let mut la_1: c_float = spine_cosf(shearX) * scaleX;
             let mut lb_1: c_float = spine_cosf(shearY) * scaleY;
-            let mut lc_1: c_float = sinf(shearX) * scaleX;
-            let mut ld_1: c_float = sinf(shearY) * scaleY;
+            let mut lc_1: c_float = spine_sinf(shearX) * scaleX;
+            let mut ld_1: c_float = spine_sinf(shearY) * scaleY;
             (*self_0).a = za * la_1 + zb * lc_1;
             (*self_0).b = za * lb_1 + zb * ld_1;
             (*self_0).c = zc * la_1 + zd * lc_1;
@@ -12117,29 +11370,21 @@ pub unsafe extern "C" fn spBone_setToSetupPose(mut self_0: *mut spBone) {
     (*self_0).inherit = (*(*self_0).data).inherit;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spBone_getWorldRotationX(
-    mut self_0: *mut spBone,
-) -> c_float {
+pub unsafe extern "C" fn spBone_getWorldRotationX(mut self_0: *mut spBone) -> c_float {
     return spine_atan2f((*self_0).c, (*self_0).a)
         * (180 as c_int as c_float / 3.1415926535897932385f32);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spBone_getWorldRotationY(
-    mut self_0: *mut spBone,
-) -> c_float {
+pub unsafe extern "C" fn spBone_getWorldRotationY(mut self_0: *mut spBone) -> c_float {
     return spine_atan2f((*self_0).d, (*self_0).b)
         * (180 as c_int as c_float / 3.1415926535897932385f32);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spBone_getWorldScaleX(
-    mut self_0: *mut spBone,
-) -> c_float {
+pub unsafe extern "C" fn spBone_getWorldScaleX(mut self_0: *mut spBone) -> c_float {
     return spine_sqrtf((*self_0).a * (*self_0).a + (*self_0).c * (*self_0).c);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spBone_getWorldScaleY(
-    mut self_0: *mut spBone,
-) -> c_float {
+pub unsafe extern "C" fn spBone_getWorldScaleY(mut self_0: *mut spBone) -> c_float {
     return spine_sqrtf((*self_0).b * (*self_0).b + (*self_0).d * (*self_0).d);
 }
 #[no_mangle]
@@ -12173,20 +11418,12 @@ pub unsafe extern "C" fn spBone_updateAppliedTransform(mut self_0: *mut spBone) 
     if parent.is_null() {
         (*self_0).ax = (*self_0).worldX - (*(*self_0).skeleton).x;
         (*self_0).ay = (*self_0).worldY - (*(*self_0).skeleton).y;
-        (*self_0)
-            .arotation = spine_atan2f((*self_0).c, (*self_0).a)
+        (*self_0).arotation = spine_atan2f((*self_0).c, (*self_0).a)
             * (180 as c_int as c_float / 3.1415926535897932385f32);
-        (*self_0)
-            .ascaleX = spine_sqrtf(
-            (*self_0).a * (*self_0).a + (*self_0).c * (*self_0).c,
-        );
-        (*self_0)
-            .ascaleY = spine_sqrtf(
-            (*self_0).b * (*self_0).b + (*self_0).d * (*self_0).d,
-        );
+        (*self_0).ascaleX = spine_sqrtf((*self_0).a * (*self_0).a + (*self_0).c * (*self_0).c);
+        (*self_0).ascaleY = spine_sqrtf((*self_0).b * (*self_0).b + (*self_0).d * (*self_0).d);
         (*self_0).ashearX = 0 as c_int as c_float;
-        (*self_0)
-            .ashearY = spine_atan2f(
+        (*self_0).ashearY = spine_atan2f(
             (*self_0).a * (*self_0).b + (*self_0).c * (*self_0).d,
             (*self_0).a * (*self_0).d - (*self_0).b * (*self_0).c,
         ) * (180 as c_int as c_float / 3.1415926535897932385f32);
@@ -12205,9 +11442,7 @@ pub unsafe extern "C" fn spBone_updateAppliedTransform(mut self_0: *mut spBone) 
     dy = (*self_0).worldY - (*parent).worldY;
     (*self_0).ax = dx * ia - dy * ib;
     (*self_0).ay = dy * id - dx * ic;
-    if (*self_0).inherit as c_uint
-        == SP_INHERIT_ONLYTRANSLATION as c_int as c_uint
-    {
+    if (*self_0).inherit as c_uint == SP_INHERIT_ONLYTRANSLATION as c_int as c_uint {
         ra = (*self_0).a;
         rb = (*self_0).b;
         rc = (*self_0).c;
@@ -12229,13 +11464,12 @@ pub unsafe extern "C" fn spBone_updateAppliedTransform(mut self_0: *mut spBone) 
                 ib = pb * pid;
             }
             3 | 4 => {
-                let mut r: c_float = (*self_0).rotation
-                    * (3.1415926535897932385f32 / 180 as c_int as c_float);
+                let mut r: c_float =
+                    (*self_0).rotation * (3.1415926535897932385f32 / 180 as c_int as c_float);
                 cosine = spine_cosf(r);
-                sine = sinf(r);
+                sine = spine_sinf(r);
                 pa = (pa * cosine + pb * sine) / (*(*self_0).skeleton).scaleX;
-                pc = (pc * cosine + pd * sine) / (*(*self_0).skeleton).scaleY
-                    * yDownScale;
+                pc = (pc * cosine + pd * sine) / (*(*self_0).skeleton).scaleY * yDownScale;
                 s = spine_sqrtf(pa * pa + pc * pc);
                 if s as c_double > 0.00001f64 {
                     s = 1 as c_int as c_float / s;
@@ -12243,21 +11477,17 @@ pub unsafe extern "C" fn spBone_updateAppliedTransform(mut self_0: *mut spBone) 
                 pa *= s;
                 pc *= s;
                 s = spine_sqrtf(pa * pa + pc * pc);
-                if (*self_0).inherit as c_uint
-                    == SP_INHERIT_NOSCALE as c_int as c_uint
+                if (*self_0).inherit as c_uint == SP_INHERIT_NOSCALE as c_int as c_uint
                     && (pid < 0 as c_int as c_float) as c_int
-                        != (((*(*self_0).skeleton).scaleX
-                            < 0 as c_int as c_float) as c_int
-                            != ((*(*self_0).skeleton).scaleY * yDownScale
-                                < 0 as c_int as c_float) as c_int)
-                            as c_int
+                        != (((*(*self_0).skeleton).scaleX < 0 as c_int as c_float) as c_int
+                            != ((*(*self_0).skeleton).scaleY * yDownScale < 0 as c_int as c_float)
+                                as c_int) as c_int
                 {
                     s = -s;
                 }
-                r = 3.1415926535897932385f32 / 2 as c_int as c_float
-                    + spine_atan2f(pc, pa);
+                r = 3.1415926535897932385f32 / 2 as c_int as c_float + spine_atan2f(pc, pa);
                 pb = spine_cosf(r) * s;
-                pd = sinf(r) * s;
+                pd = spine_sinf(r) * s;
                 pid = 1 as c_int as c_float / (pa * pd - pb * pc);
                 ia = pd * pid;
                 ib = pb * pid;
@@ -12276,20 +11506,16 @@ pub unsafe extern "C" fn spBone_updateAppliedTransform(mut self_0: *mut spBone) 
     if (*self_0).ascaleX > 0.0001f32 {
         let mut det: c_float = ra * rd - rb * rc;
         (*self_0).ascaleY = det / (*self_0).ascaleX;
-        (*self_0)
-            .ashearY = -(spine_atan2f(ra * rb + rc * rd, det)
+        (*self_0).ashearY = -(spine_atan2f(ra * rb + rc * rd, det)
             * (180 as c_int as c_float / 3.1415926535897932385f32));
-        (*self_0)
-            .arotation = spine_atan2f(rc, ra)
-            * (180 as c_int as c_float / 3.1415926535897932385f32);
+        (*self_0).arotation =
+            spine_atan2f(rc, ra) * (180 as c_int as c_float / 3.1415926535897932385f32);
     } else {
         (*self_0).ascaleX = 0 as c_int as c_float;
         (*self_0).ascaleY = spine_sqrtf(rb * rb + rd * rd);
         (*self_0).ashearY = 0 as c_int as c_float;
-        (*self_0)
-            .arotation = 90 as c_int as c_float
-            - spine_atan2f(rd, rb)
-                * (180 as c_int as c_float / 3.1415926535897932385f32);
+        (*self_0).arotation = 90 as c_int as c_float
+            - spine_atan2f(rd, rb) * (180 as c_int as c_float / 3.1415926535897932385f32);
     };
 }
 #[no_mangle]
@@ -12300,8 +11526,8 @@ pub unsafe extern "C" fn spBone_worldToLocal(
     mut localX: *mut c_float,
     mut localY: *mut c_float,
 ) {
-    let mut invDet: c_float = 1 as c_int as c_float
-        / ((*self_0).a * (*self_0).d - (*self_0).b * (*self_0).c);
+    let mut invDet: c_float =
+        1 as c_int as c_float / ((*self_0).a * (*self_0).d - (*self_0).b * (*self_0).c);
     let mut x: c_float = worldX - (*self_0).worldX;
     let mut y: c_float = worldY - (*self_0).worldY;
     *localX = x * (*self_0).d * invDet - y * (*self_0).b * invDet;
@@ -12356,13 +11582,14 @@ pub unsafe extern "C" fn spBone_worldToLocalRotation(
     mut worldRotation: c_float,
 ) -> c_float {
     worldRotation *= 3.1415926535897932385f32 / 180 as c_int as c_float;
-    let mut sine: c_float = sinf(worldRotation);
+    let mut sine: c_float = spine_sinf(worldRotation);
     let mut cosine: c_float = spine_cosf(worldRotation);
     return spine_atan2f(
         (*self_0).a * sine - (*self_0).c * cosine,
         (*self_0).d * cosine - (*self_0).b * sine,
     ) * (180 as c_int as c_float / 3.1415926535897932385f32)
-        + (*self_0).rotation - (*self_0).shearX;
+        + (*self_0).rotation
+        - (*self_0).shearX;
 }
 #[no_mangle]
 pub unsafe extern "C" fn spBone_localToWorldRotation(
@@ -12371,7 +11598,7 @@ pub unsafe extern "C" fn spBone_localToWorldRotation(
 ) -> c_float {
     localRotation = (localRotation - (*self_0).rotation - (*self_0).shearX)
         * (3.1415926535897932385f32 / 180 as c_int as c_float);
-    let mut sine: c_float = sinf(localRotation);
+    let mut sine: c_float = spine_sinf(localRotation);
     let mut cosine: c_float = spine_cosf(localRotation);
     return spine_atan2f(
         cosine * (*self_0).c + sine * (*self_0).d,
@@ -12379,12 +11606,9 @@ pub unsafe extern "C" fn spBone_localToWorldRotation(
     ) * (180 as c_int as c_float / 3.1415926535897932385f32);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spBone_rotateWorld(
-    mut self_0: *mut spBone,
-    mut degrees: c_float,
-) {
+pub unsafe extern "C" fn spBone_rotateWorld(mut self_0: *mut spBone, mut degrees: c_float) {
     degrees *= 3.1415926535897932385f32 / 180 as c_int as c_float;
-    let mut sine: c_float = sinf(degrees);
+    let mut sine: c_float = spine_sinf(degrees);
     let mut cosine: c_float = spine_cosf(degrees);
     let mut ra: c_float = (*self_0).a;
     let mut rb: c_float = (*self_0).b;
@@ -12406,12 +11630,9 @@ pub unsafe extern "C" fn spBoneData_create(
         5338 as c_int,
     ) as *mut spBoneData;
     (*self_0).index = index;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         5340 as c_int,
     ) as *mut c_char;
@@ -12431,11 +11652,8 @@ pub unsafe extern "C" fn spBoneData_dispose(mut self_0: *mut spBoneData) {
     _spFree(self_0 as *mut c_void);
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spBoundingBoxAttachment_dispose(
-    mut attachment: *mut spAttachment,
-) {
-    let mut self_0: *mut spBoundingBoxAttachment = attachment
-        as *mut spBoundingBoxAttachment;
+pub unsafe extern "C" fn _spBoundingBoxAttachment_dispose(mut attachment: *mut spAttachment) {
+    let mut self_0: *mut spBoundingBoxAttachment = attachment as *mut spBoundingBoxAttachment;
     _spVertexAttachment_deinit(&mut (*self_0).super_0);
     _spFree(self_0 as *mut c_void);
 }
@@ -12443,11 +11661,8 @@ pub unsafe extern "C" fn _spBoundingBoxAttachment_dispose(
 pub unsafe extern "C" fn _spBoundingBoxAttachment_copy(
     mut attachment: *mut spAttachment,
 ) -> *mut spAttachment {
-    let mut copy: *mut spBoundingBoxAttachment = spBoundingBoxAttachment_create(
-        (*attachment).name,
-    );
-    let mut self_0: *mut spBoundingBoxAttachment = attachment
-        as *mut spBoundingBoxAttachment;
+    let mut copy: *mut spBoundingBoxAttachment = spBoundingBoxAttachment_create((*attachment).name);
+    let mut self_0: *mut spBoundingBoxAttachment = attachment as *mut spBoundingBoxAttachment;
     spVertexAttachment_copyTo(&mut (*self_0).super_0, &mut (*copy).super_0);
     return &mut (*copy).super_0.super_0;
 }
@@ -12466,10 +11681,7 @@ pub unsafe extern "C" fn spBoundingBoxAttachment_create(
         &mut (*self_0).super_0.super_0,
         name,
         SP_ATTACHMENT_BOUNDING_BOX,
-        Some(
-            _spBoundingBoxAttachment_dispose
-                as unsafe extern "C" fn(*mut spAttachment) -> (),
-        ),
+        Some(_spBoundingBoxAttachment_dispose as unsafe extern "C" fn(*mut spAttachment) -> ()),
         Some(
             _spBoundingBoxAttachment_copy
                 as unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment,
@@ -12478,9 +11690,7 @@ pub unsafe extern "C" fn spBoundingBoxAttachment_create(
     return self_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spClippingAttachment_dispose(
-    mut attachment: *mut spAttachment,
-) {
+pub unsafe extern "C" fn _spClippingAttachment_dispose(mut attachment: *mut spAttachment) {
     let mut self_0: *mut spClippingAttachment = attachment as *mut spClippingAttachment;
     _spVertexAttachment_deinit(&mut (*self_0).super_0);
     _spFree(self_0 as *mut c_void);
@@ -12489,9 +11699,7 @@ pub unsafe extern "C" fn _spClippingAttachment_dispose(
 pub unsafe extern "C" fn _spClippingAttachment_copy(
     mut attachment: *mut spAttachment,
 ) -> *mut spAttachment {
-    let mut copy: *mut spClippingAttachment = spClippingAttachment_create(
-        (*attachment).name,
-    );
+    let mut copy: *mut spClippingAttachment = spClippingAttachment_create((*attachment).name);
     let mut self_0: *mut spClippingAttachment = attachment as *mut spClippingAttachment;
     spVertexAttachment_copyTo(&mut (*self_0).super_0, &mut (*copy).super_0);
     (*copy).endSlot = (*self_0).endSlot;
@@ -12512,10 +11720,7 @@ pub unsafe extern "C" fn spClippingAttachment_create(
         &mut (*self_0).super_0.super_0,
         name,
         SP_ATTACHMENT_CLIPPING,
-        Some(
-            _spClippingAttachment_dispose
-                as unsafe extern "C" fn(*mut spAttachment) -> (),
-        ),
+        Some(_spClippingAttachment_dispose as unsafe extern "C" fn(*mut spAttachment) -> ()),
         Some(
             _spClippingAttachment_copy
                 as unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment,
@@ -12527,8 +11732,7 @@ pub unsafe extern "C" fn spClippingAttachment_create(
 #[no_mangle]
 pub unsafe extern "C" fn spColor_create() -> *mut spColor {
     return _spMalloc(
-        (::core::mem::size_of::<spColor>() as c_ulong)
-            .wrapping_mul(1 as c_int as c_ulong),
+        (::core::mem::size_of::<spColor>() as c_ulong).wrapping_mul(1 as c_int as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         5498 as c_int,
     ) as *mut spColor;
@@ -12585,10 +11789,7 @@ pub unsafe extern "C" fn spColor_setFromColor3(
     (*self_0).b = (*otherColor).b;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spColor_addColor(
-    mut self_0: *mut spColor,
-    mut otherColor: *mut spColor,
-) {
+pub unsafe extern "C" fn spColor_addColor(mut self_0: *mut spColor, mut otherColor: *mut spColor) {
     (*self_0).r += (*otherColor).r;
     (*self_0).g += (*otherColor).g;
     (*self_0).b += (*otherColor).b;
@@ -12671,9 +11872,7 @@ static mut _spTimelineTypeNames: [*const c_char; 24] = [
     b"Event\0" as *const u8 as *const c_char,
 ];
 #[no_mangle]
-pub unsafe extern "C" fn spDebug_printSkeletonData(
-    mut skeletonData: *mut spSkeletonData,
-) {
+pub unsafe extern "C" fn spDebug_printSkeletonData(mut skeletonData: *mut spSkeletonData) {
     let mut i: c_int = 0;
     let mut n: c_int = 0;
     spDebug_printBoneDatas((*skeletonData).bones, (*skeletonData).bonesCount);
@@ -12703,9 +11902,7 @@ pub unsafe extern "C" fn _spDebug_printTimelineBase(mut timeline: *mut spTimelin
     spine_printf!(b"\n\0" as *const u8 as *const c_char);
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spDebug_printCurveTimeline(
-    mut timeline: *mut spCurveTimeline,
-) {
+pub unsafe extern "C" fn _spDebug_printCurveTimeline(mut timeline: *mut spCurveTimeline) {
     _spDebug_printTimelineBase(&mut (*timeline).super_0);
     spine_printf!(b"      curves: \0" as *const u8 as *const c_char);
     spDebug_printFloats((*(*timeline).curves).items, (*(*timeline).curves).size);
@@ -12726,14 +11923,14 @@ pub unsafe extern "C" fn spDebug_printTimeline(mut timeline: *mut spTimeline) {
             current_block_29 = 17233182392562552756;
         }
         2 => {
-            let mut t_1: *mut spPathConstraintPositionTimeline = timeline
-                as *mut spPathConstraintPositionTimeline;
+            let mut t_1: *mut spPathConstraintPositionTimeline =
+                timeline as *mut spPathConstraintPositionTimeline;
             _spDebug_printCurveTimeline(&mut (*t_1).super_0);
             current_block_29 = 17233182392562552756;
         }
         3 => {
-            let mut t_2: *mut spPathConstraintMixTimeline = timeline
-                as *mut spPathConstraintMixTimeline;
+            let mut t_2: *mut spPathConstraintMixTimeline =
+                timeline as *mut spPathConstraintMixTimeline;
             _spDebug_printCurveTimeline(&mut (*t_2).super_0);
             current_block_29 = 17233182392562552756;
         }
@@ -12763,14 +11960,12 @@ pub unsafe extern "C" fn spDebug_printTimeline(mut timeline: *mut spTimeline) {
             current_block_29 = 17233182392562552756;
         }
         9 => {
-            let mut t_8: *mut spTranslateXTimeline = timeline
-                as *mut spTranslateXTimeline;
+            let mut t_8: *mut spTranslateXTimeline = timeline as *mut spTranslateXTimeline;
             _spDebug_printCurveTimeline(&mut (*t_8).super_0);
             current_block_29 = 17233182392562552756;
         }
         10 => {
-            let mut t_9: *mut spTranslateYTimeline = timeline
-                as *mut spTranslateYTimeline;
+            let mut t_9: *mut spTranslateYTimeline = timeline as *mut spTranslateYTimeline;
             _spDebug_printCurveTimeline(&mut (*t_9).super_0);
             current_block_29 = 17233182392562552756;
         }
@@ -12785,8 +11980,7 @@ pub unsafe extern "C" fn spDebug_printTimeline(mut timeline: *mut spTimeline) {
             current_block_29 = 17233182392562552756;
         }
         13 => {
-            let mut t_12: *mut spTranslateTimeline = timeline
-                as *mut spTranslateTimeline;
+            let mut t_12: *mut spTranslateTimeline = timeline as *mut spTranslateTimeline;
             _spDebug_printCurveTimeline(&mut (*t_12).super_0);
             current_block_29 = 17233182392562552756;
         }
@@ -12796,14 +11990,13 @@ pub unsafe extern "C" fn spDebug_printTimeline(mut timeline: *mut spTimeline) {
             current_block_29 = 17233182392562552756;
         }
         17 => {
-            let mut t_14: *mut spIkConstraintTimeline = timeline
-                as *mut spIkConstraintTimeline;
+            let mut t_14: *mut spIkConstraintTimeline = timeline as *mut spIkConstraintTimeline;
             _spDebug_printCurveTimeline(&mut (*t_14).super_0);
             current_block_29 = 17233182392562552756;
         }
         18 => {
-            let mut t_15: *mut spPathConstraintMixTimeline = timeline
-                as *mut spPathConstraintMixTimeline;
+            let mut t_15: *mut spPathConstraintMixTimeline =
+                timeline as *mut spPathConstraintMixTimeline;
             _spDebug_printCurveTimeline(&mut (*t_15).super_0);
             current_block_29 = 17233182392562552756;
         }
@@ -12828,14 +12021,13 @@ pub unsafe extern "C" fn spDebug_printTimeline(mut timeline: *mut spTimeline) {
             current_block_29 = 17233182392562552756;
         }
         31 => {
-            let mut t_20: *mut spTransformConstraintTimeline = timeline
-                as *mut spTransformConstraintTimeline;
+            let mut t_20: *mut spTransformConstraintTimeline =
+                timeline as *mut spTransformConstraintTimeline;
             _spDebug_printCurveTimeline(&mut (*t_20).super_0);
             current_block_29 = 17233182392562552756;
         }
         32 => {
-            let mut t_21: *mut spDrawOrderTimeline = timeline
-                as *mut spDrawOrderTimeline;
+            let mut t_21: *mut spDrawOrderTimeline = timeline as *mut spDrawOrderTimeline;
             _spDebug_printTimelineBase(&mut (*t_21).super_0);
             current_block_29 = 17233182392562552756;
         }
@@ -12847,25 +12039,25 @@ pub unsafe extern "C" fn spDebug_printTimeline(mut timeline: *mut spTimeline) {
         15 => {
             let mut t_23: *mut spSequenceTimeline = timeline as *mut spSequenceTimeline;
             _spDebug_printTimelineBase(&mut (*t_23).super_0);
-            current_block_29 = 3158310971426640666;
+            current_block_29 = 4691093862513791344;
         }
         16 => {
-            current_block_29 = 3158310971426640666;
+            current_block_29 = 4691093862513791344;
         }
         _ => {
-            current_block_29 = 2747437779770811162;
+            current_block_29 = 2300254789029439552;
         }
     }
     match current_block_29 {
-        3158310971426640666 => {
+        4691093862513791344 => {
             let mut t_24: *mut spInheritTimeline = timeline as *mut spInheritTimeline;
             _spDebug_printTimelineBase(&mut (*t_24).super_0);
-            current_block_29 = 2747437779770811162;
+            current_block_29 = 2300254789029439552;
         }
         _ => {}
     }
     match current_block_29 {
-        2747437779770811162 => {
+        2300254789029439552 => {
             _spDebug_printTimelineBase(timeline);
         }
         _ => {}
@@ -12902,8 +12094,7 @@ pub unsafe extern "C" fn spDebug_printBoneDatas(
 #[no_mangle]
 pub unsafe extern "C" fn spDebug_printBoneData(mut boneData: *mut spBoneData) {
     spine_printf!(
-        b"Bone data %s: %f, %f, %f, %f, %f, %f %f\n\0" as *const u8
-            as *const c_char,
+        b"Bone data %s: %f, %f, %f, %f, %f, %f %f\n\0" as *const u8 as *const c_char,
         (*boneData).name,
         (*boneData).rotation as c_double,
         (*boneData).scaleX as c_double,
@@ -12919,10 +12110,7 @@ pub unsafe extern "C" fn spDebug_printSkeleton(mut skeleton: *mut spSkeleton) {
     spDebug_printBones((*skeleton).bones, (*skeleton).bonesCount);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spDebug_printBones(
-    mut bones: *mut *mut spBone,
-    mut numBones: c_int,
-) {
+pub unsafe extern "C" fn spDebug_printBones(mut bones: *mut *mut spBone, mut numBones: c_int) {
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < numBones {
@@ -12944,10 +12132,7 @@ pub unsafe extern "C" fn spDebug_printBone(mut bone: *mut spBone) {
     );
 }
 #[no_mangle]
-pub unsafe extern "C" fn spDebug_printFloats(
-    mut values: *mut c_float,
-    mut numFloats: c_int,
-) {
+pub unsafe extern "C" fn spDebug_printFloats(mut values: *mut c_float, mut numFloats: c_int) {
     let mut i: c_int = 0;
     spine_printf!(b"(%i) [\0" as *const u8 as *const c_char, numFloats);
     i = 0 as c_int;
@@ -12981,21 +12166,16 @@ pub unsafe extern "C" fn spEvent_dispose(mut self_0: *mut spEvent) {
     _spFree(self_0 as *mut c_void);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spEventData_create(
-    mut name: *const c_char,
-) -> *mut spEventData {
+pub unsafe extern "C" fn spEventData_create(mut name: *const c_char) -> *mut spEventData {
     let mut self_0: *mut spEventData = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<spEventData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
         5915 as c_int,
     ) as *mut spEventData;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         5916 as c_int,
     ) as *mut c_char;
@@ -13028,8 +12208,7 @@ pub unsafe extern "C" fn spIkConstraint_create(
     (*self_0).mix = (*data).mix;
     (*self_0).softness = (*data).softness;
     (*self_0).bonesCount = (*(*self_0).data).bonesCount;
-    (*self_0)
-        .bones = _spMalloc(
+    (*self_0).bones = _spMalloc(
         (::core::mem::size_of::<*mut spBone>() as c_ulong)
             .wrapping_mul((*self_0).bonesCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -13123,21 +12302,21 @@ pub unsafe extern "C" fn spIkConstraint_apply1(
                 * (if (*(*bone).skeleton).scaleX < 0 as c_int as c_float {
                     -1.0f32
                 } else {
-                    (if (*(*bone).skeleton).scaleX > 0 as c_int as c_float {
+                    if (*(*bone).skeleton).scaleX > 0 as c_int as c_float {
                         1.0f32
                     } else {
                         0.0f32
-                    })
+                    }
                 });
             ty = (targetY - (*bone).worldY)
                 * (if (*(*bone).skeleton).scaleY < 0 as c_int as c_float {
                     -1.0f32
                 } else {
-                    (if (*(*bone).skeleton).scaleY > 0 as c_int as c_float {
+                    if (*(*bone).skeleton).scaleY > 0 as c_int as c_float {
                         1.0f32
                     } else {
                         0.0f32
-                    })
+                    }
                 });
             current_block_16 = 7149356873433890176;
         }
@@ -13146,19 +12325,17 @@ pub unsafe extern "C" fn spIkConstraint_apply1(
                 -(pa * pd - pb * pc)
             } else {
                 pa * pd - pb * pc
-            })
-                / (if 0.0001f32 > pa * pa + pc * pc {
-                    0.0001f32
-                } else {
-                    pa * pa + pc * pc
-                });
+            }) / (if 0.0001f32 > pa * pa + pc * pc {
+                0.0001f32
+            } else {
+                pa * pa + pc * pc
+            });
             sa = pa / (*(*bone).skeleton).scaleX;
             sc = pc / (*(*bone).skeleton).scaleY;
             pb = -sc * s * (*(*bone).skeleton).scaleX;
             pd = sa * s * (*(*bone).skeleton).scaleY;
-            rotationIK
-                += spine_atan2f(sc, sa)
-                    * (180 as c_int as c_float / 3.1415926535897932385f32);
+            rotationIK +=
+                spine_atan2f(sc, sa) * (180 as c_int as c_float / 3.1415926535897932385f32);
             current_block_16 = 9103302926275267051;
         }
         _ => {
@@ -13170,8 +12347,7 @@ pub unsafe extern "C" fn spIkConstraint_apply1(
             let mut x: c_float = targetX - (*p).worldX;
             let mut y: c_float = targetY - (*p).worldY;
             let mut d: c_float = pa * pd - pb * pc;
-            if (if d < 0 as c_int as c_float { -d } else { d }) <= 0.0001f32
-            {
+            if (if d < 0 as c_int as c_float { -d } else { d }) <= 0.0001f32 {
                 tx = 0 as c_int as c_float;
                 ty = 0 as c_int as c_float;
             } else {
@@ -13181,9 +12357,7 @@ pub unsafe extern "C" fn spIkConstraint_apply1(
         }
         _ => {}
     }
-    rotationIK
-        += spine_atan2f(ty, tx)
-            * (180 as c_int as c_float / 3.1415926535897932385f32);
+    rotationIK += spine_atan2f(ty, tx) * (180 as c_int as c_float / 3.1415926535897932385f32);
     if (*bone).ascaleX < 0 as c_int as c_float {
         rotationIK += 180 as c_int as c_float;
     }
@@ -13207,8 +12381,7 @@ pub unsafe extern "C" fn spIkConstraint_apply1(
         b = (*(*bone).data).length * sx;
         dd = spine_sqrtf(tx * tx + ty * ty);
         if compress != 0 && dd < b || stretch != 0 && dd > b && b > 0.0001f32 {
-            s = (dd / b - 1 as c_int as c_float) * alpha
-                + 1 as c_int as c_float;
+            s = (dd / b - 1 as c_int as c_float) * alpha + 1 as c_int as c_float;
             sx *= s;
             if uniform != 0 {
                 sy *= s;
@@ -13309,8 +12482,7 @@ pub unsafe extern "C" fn spIkConstraint_apply2(
     }
     r = psx - psy;
     cx = (*child).ax;
-    u = ((if r < 0 as c_int as c_float { -r } else { r }) <= 0.0001f32)
-        as c_int;
+    u = ((if r < 0 as c_int as c_float { -r } else { r }) <= 0.0001f32) as c_int;
     if u == 0 || stretch != 0 {
         cy = 0 as c_int as c_float;
         cwx = (*parent).a * cx + (*parent).worldX;
@@ -13325,8 +12497,7 @@ pub unsafe extern "C" fn spIkConstraint_apply2(
     c = (*pp).c;
     d = (*pp).d;
     id = a * d - b * c;
-    id = if (if id < 0 as c_int as c_float { -id } else { id }) <= 0.0001f32
-    {
+    id = if (if id < 0 as c_int as c_float { -id } else { id }) <= 0.0001f32 {
         0 as c_int as c_float
     } else {
         1 as c_int as c_float / id
@@ -13339,13 +12510,7 @@ pub unsafe extern "C" fn spIkConstraint_apply2(
     l2 = (*(*child).data).length * csx;
     if (l1 as c_double) < 0.0001f64 {
         spIkConstraint_apply1(
-            parent,
-            targetX,
-            targetY,
-            0 as c_int,
-            stretch,
-            0 as c_int,
-            alpha,
+            parent, targetX, targetY, 0 as c_int, stretch, 0 as c_int, alpha,
         );
         spBone_updateWorldTransformWith(
             child,
@@ -13369,9 +12534,7 @@ pub unsafe extern "C" fn spIkConstraint_apply2(
         td = spine_sqrtf(dd);
         sd = td - l1 - l2 * psx + softness;
         if sd > 0 as c_int as c_float {
-            p = (if (1 as c_int as c_float)
-                < sd / (softness * 2 as c_int as c_float)
-            {
+            p = (if (1 as c_int as c_float) < sd / (softness * 2 as c_int as c_float) {
                 1 as c_int as c_float
             } else {
                 sd / (softness * 2 as c_int as c_float)
@@ -13385,8 +12548,7 @@ pub unsafe extern "C" fn spIkConstraint_apply2(
     if u != 0 {
         let mut cosine: c_float = 0.;
         l2 *= psx;
-        cosine = (dd - l1 * l1 - l2 * l2)
-            / (2 as c_int as c_float * l1 * l2);
+        cosine = (dd - l1 * l1 - l2 * l2) / (2 as c_int as c_float * l1 * l2);
         if cosine < -(1 as c_int) as c_float {
             cosine = -(1 as c_int) as c_float;
             a2 = 3.1415926535897932385f32 * bendDir as c_float;
@@ -13394,8 +12556,8 @@ pub unsafe extern "C" fn spIkConstraint_apply2(
             cosine = 1 as c_int as c_float;
             a2 = 0 as c_int as c_float;
             if stretch != 0 {
-                a = (spine_sqrtf(dd) / (l1 + l2) - 1 as c_int as c_float)
-                    * alpha + 1 as c_int as c_float;
+                a = (spine_sqrtf(dd) / (l1 + l2) - 1 as c_int as c_float) * alpha
+                    + 1 as c_int as c_float;
                 sx *= a;
                 if uniform != 0 {
                     sy *= a;
@@ -13405,7 +12567,7 @@ pub unsafe extern "C" fn spIkConstraint_apply2(
             a2 = spine_acosf(cosine) * bendDir as c_float;
         }
         a = l1 + l2 * cosine;
-        b = l2 * sinf(a2);
+        b = l2 * spine_sinf(a2);
         a1 = spine_atan2f(ty * a - tx * b, tx * a + ty * b);
     } else {
         a = psx * l2;
@@ -13459,12 +12621,10 @@ pub unsafe extern "C" fn spIkConstraint_apply2(
                 let mut maxDist: c_float = maxX * maxX;
                 let mut maxY: c_float = 0 as c_int as c_float;
                 c0 = -a * l1 / (aa - bb);
-                if c0 >= -(1 as c_int) as c_float
-                    && c0 <= 1 as c_int as c_float
-                {
+                if c0 >= -(1 as c_int) as c_float && c0 <= 1 as c_int as c_float {
                     c0 = spine_acosf(c0);
                     x = a * spine_cosf(c0) + l1;
-                    y = b * sinf(c0);
+                    y = b * spine_sinf(c0);
                     d = x * x + y * y;
                     if d < minDist {
                         minAngle = c0;
@@ -13491,8 +12651,8 @@ pub unsafe extern "C" fn spIkConstraint_apply2(
     }
     let mut os: c_float = spine_atan2f(cy, cx) * s2 as c_float;
     let mut rotation: c_float = (*parent).arotation;
-    a1 = (a1 - os) * (180 as c_int as c_float / 3.1415926535897932385f32)
-        + o1 as c_float - rotation;
+    a1 =
+        (a1 - os) * (180 as c_int as c_float / 3.1415926535897932385f32) + o1 as c_float - rotation;
     if a1 > 180 as c_int as c_float {
         a1 -= 360 as c_int as c_float;
     } else if a1 < -(180 as c_int) as c_float {
@@ -13509,8 +12669,10 @@ pub unsafe extern "C" fn spIkConstraint_apply2(
         0 as c_int as c_float,
     );
     rotation = (*child).arotation;
-    a2 = ((a2 + os) * (180 as c_int as c_float / 3.1415926535897932385f32)
-        - (*child).ashearX) * s2 as c_float + o2 as c_float - rotation;
+    a2 = ((a2 + os) * (180 as c_int as c_float / 3.1415926535897932385f32) - (*child).ashearX)
+        * s2 as c_float
+        + o2 as c_float
+        - rotation;
     if a2 > 180 as c_int as c_float {
         a2 -= 360 as c_int as c_float;
     } else if a2 < -(180 as c_int) as c_float {
@@ -13537,12 +12699,9 @@ pub unsafe extern "C" fn spIkConstraintData_create(
         b"spine.c\0" as *const u8 as *const c_char,
         6271 as c_int,
     ) as *mut spIkConstraintData;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         6272 as c_int,
     ) as *mut c_char;
@@ -13555,9 +12714,7 @@ pub unsafe extern "C" fn spIkConstraintData_create(
     return self_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spIkConstraintData_dispose(
-    mut self_0: *mut spIkConstraintData,
-) {
+pub unsafe extern "C" fn spIkConstraintData_dispose(mut self_0: *mut spIkConstraintData) {
     _spFree((*self_0).name as *mut c_void);
     _spFree((*self_0).bones as *mut c_void);
     _spFree(self_0 as *mut c_void);
@@ -13567,18 +12724,15 @@ static mut ep: *const c_char = 0 as *const c_char;
 pub unsafe extern "C" fn Json_getError() -> *const c_char {
     return ep;
 }
-unsafe extern "C" fn Json_strcasecmp(
-    mut s1: *const c_char,
-    mut s2: *const c_char,
-) -> c_int {
+unsafe extern "C" fn Json_strcasecmp(mut s1: *const c_char, mut s2: *const c_char) -> c_int {
     if !s1.is_null() && !s2.is_null() {
-        return spine_strcasecmp(s1, s2)
+        return spine_strcasecmp(s1, s2);
     } else if s1 < s2 {
-        return -(1 as c_int)
+        return -(1 as c_int);
     } else if s1 == s2 {
-        return 0 as c_int
+        return 0 as c_int;
     } else {
-        return 1 as c_int
+        return 1 as c_int;
     };
 }
 unsafe extern "C" fn Json_new() -> *mut Json {
@@ -13607,10 +12761,7 @@ pub unsafe extern "C" fn Json_dispose(mut c: *mut Json) {
         c = next;
     }
 }
-unsafe extern "C" fn parse_number(
-    mut item: *mut Json,
-    mut num: *const c_char,
-) -> *const c_char {
+unsafe extern "C" fn parse_number(mut item: *mut Json, mut num: *const c_char) -> *const c_char {
     let mut result: c_double = 0.0f64;
     let mut negative: c_int = 0 as c_int;
     let mut ptr: *mut c_char = num as *mut c_char;
@@ -13627,8 +12778,7 @@ unsafe extern "C" fn parse_number(
         let mut n: c_int = 0 as c_int;
         ptr = ptr.offset(1);
         while *ptr as c_int >= '0' as i32 && *ptr as c_int <= '9' as i32 {
-            fraction = fraction * 10.0f64
-                + (*ptr as c_int - '0' as i32) as c_double;
+            fraction = fraction * 10.0f64 + (*ptr as c_int - '0' as i32) as c_double;
             ptr = ptr.offset(1);
             n += 1;
         }
@@ -13648,8 +12798,7 @@ unsafe extern "C" fn parse_number(
             ptr = ptr.offset(1);
         }
         while *ptr as c_int >= '0' as i32 && *ptr as c_int <= '9' as i32 {
-            exponent = exponent * 10.0f64
-                + (*ptr as c_int - '0' as i32) as c_double;
+            exponent = exponent * 10.0f64 + (*ptr as c_int - '0' as i32) as c_double;
             ptr = ptr.offset(1);
         }
         if expNegative != 0 {
@@ -13677,10 +12826,7 @@ static mut firstByteMark: [c_uchar; 7] = [
     0xf8 as c_int as c_uchar,
     0xfc as c_int as c_uchar,
 ];
-unsafe extern "C" fn parse_string(
-    mut item: *mut Json,
-    mut str: *const c_char,
-) -> *const c_char {
+unsafe extern "C" fn parse_string(mut item: *mut Json, mut str: *const c_char) -> *const c_char {
     let mut ptr: *const c_char = str.offset(1 as c_int as isize);
     let mut ptr2: *mut c_char = 0 as *mut c_char;
     let mut out: *mut c_char = 0 as *mut c_char;
@@ -13691,12 +12837,10 @@ unsafe extern "C" fn parse_string(
         ep = str;
         return 0 as *const c_char;
     }
-    while *ptr as c_int != '"' as i32 && *ptr as c_int != 0
-        && {
-            len += 1;
-            len != 0
-        }
-    {
+    while *ptr as c_int != '"' as i32 && *ptr as c_int != 0 && {
+        len += 1;
+        len != 0
+    } {
         let fresh42 = ptr;
         ptr = ptr.offset(1);
         if *fresh42 as c_int == '\\' as i32 {
@@ -13704,8 +12848,7 @@ unsafe extern "C" fn parse_string(
         }
     }
     out = _spMalloc(
-        (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul((len + 1 as c_int) as c_ulong),
+        (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul((len + 1 as c_int) as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         6460 as c_int,
     ) as *mut c_char;
@@ -13757,17 +12900,12 @@ unsafe extern "C" fn parse_string(
                         &mut uc as *mut c_uint,
                     );
                     ptr = ptr.offset(4 as c_int as isize);
-                    if !(uc >= 0xdc00 as c_int as c_uint
-                        && uc <= 0xdfff as c_int as c_uint
+                    if !(uc >= 0xdc00 as c_int as c_uint && uc <= 0xdfff as c_int as c_uint
                         || uc == 0 as c_int as c_uint)
                     {
-                        if uc >= 0xd800 as c_int as c_uint
-                            && uc <= 0xdbff as c_int as c_uint
-                        {
-                            if *ptr.offset(1 as c_int as isize) as c_int
-                                != '\\' as i32
-                                || *ptr.offset(2 as c_int as isize) as c_int
-                                    != 'u' as i32
+                        if uc >= 0xd800 as c_int as c_uint && uc <= 0xdbff as c_int as c_uint {
+                            if *ptr.offset(1 as c_int as isize) as c_int != '\\' as i32
+                                || *ptr.offset(2 as c_int as isize) as c_int != 'u' as i32
                             {
                                 current_block_41 = 9441801433784995173;
                             } else {
@@ -13782,12 +12920,10 @@ unsafe extern "C" fn parse_string(
                                 {
                                     current_block_41 = 9441801433784995173;
                                 } else {
-                                    uc = (0x10000 as c_int as c_uint)
-                                        .wrapping_add(
-                                            (uc & 0x3ff as c_int as c_uint)
-                                                << 10 as c_int
-                                                | uc2 & 0x3ff as c_int as c_uint,
-                                        );
+                                    uc = (0x10000 as c_int as c_uint).wrapping_add(
+                                        (uc & 0x3ff as c_int as c_uint) << 10 as c_int
+                                            | uc2 & 0x3ff as c_int as c_uint,
+                                    );
                                     current_block_41 = 1608152415753874203;
                                 }
                             }
@@ -13811,48 +12947,51 @@ unsafe extern "C" fn parse_string(
                                     4 => {
                                         ptr2 = ptr2.offset(-1);
                                         *ptr2 = ((uc | 0x80 as c_int as c_uint)
-                                            & 0xbf as c_int as c_uint) as c_char;
+                                            & 0xbf as c_int as c_uint)
+                                            as c_char;
                                         uc >>= 6 as c_int;
-                                        current_block_38 = 2481446828879050954;
+                                        current_block_38 = 18358745234530413803;
                                     }
                                     3 => {
-                                        current_block_38 = 2481446828879050954;
+                                        current_block_38 = 18358745234530413803;
                                     }
                                     2 => {
-                                        current_block_38 = 12070832161501940938;
+                                        current_block_38 = 8206681848427200715;
                                     }
                                     1 => {
-                                        current_block_38 = 11419346003544691760;
+                                        current_block_38 = 2481446828879050954;
                                     }
                                     _ => {
                                         current_block_38 = 4567019141635105728;
                                     }
                                 }
                                 match current_block_38 {
+                                    18358745234530413803 => {
+                                        ptr2 = ptr2.offset(-1);
+                                        *ptr2 = ((uc | 0x80 as c_int as c_uint)
+                                            & 0xbf as c_int as c_uint)
+                                            as c_char;
+                                        uc >>= 6 as c_int;
+                                        current_block_38 = 8206681848427200715;
+                                    }
+                                    _ => {}
+                                }
+                                match current_block_38 {
+                                    8206681848427200715 => {
+                                        ptr2 = ptr2.offset(-1);
+                                        *ptr2 = ((uc | 0x80 as c_int as c_uint)
+                                            & 0xbf as c_int as c_uint)
+                                            as c_char;
+                                        uc >>= 6 as c_int;
+                                        current_block_38 = 2481446828879050954;
+                                    }
+                                    _ => {}
+                                }
+                                match current_block_38 {
                                     2481446828879050954 => {
                                         ptr2 = ptr2.offset(-1);
-                                        *ptr2 = ((uc | 0x80 as c_int as c_uint)
-                                            & 0xbf as c_int as c_uint) as c_char;
-                                        uc >>= 6 as c_int;
-                                        current_block_38 = 12070832161501940938;
-                                    }
-                                    _ => {}
-                                }
-                                match current_block_38 {
-                                    12070832161501940938 => {
-                                        ptr2 = ptr2.offset(-1);
-                                        *ptr2 = ((uc | 0x80 as c_int as c_uint)
-                                            & 0xbf as c_int as c_uint) as c_char;
-                                        uc >>= 6 as c_int;
-                                        current_block_38 = 11419346003544691760;
-                                    }
-                                    _ => {}
-                                }
-                                match current_block_38 {
-                                    11419346003544691760 => {
-                                        ptr2 = ptr2.offset(-1);
-                                        *ptr2 = (uc | firstByteMark[len as usize] as c_uint)
-                                            as c_char;
+                                        *ptr2 =
+                                            (uc | firstByteMark[len as usize] as c_uint) as c_char;
                                     }
                                     _ => {}
                                 }
@@ -13882,9 +13021,7 @@ unsafe extern "C" fn skip(mut in_0: *const c_char) -> *const c_char {
     if in_0.is_null() {
         return 0 as *const c_char;
     }
-    while *in_0 as c_int != 0
-        && *in_0 as c_uchar as c_int <= 32 as c_int
-    {
+    while *in_0 as c_int != 0 && *in_0 as c_uchar as c_int <= 32 as c_int {
         in_0 = in_0.offset(1);
     }
     return in_0;
@@ -13907,10 +13044,7 @@ pub unsafe extern "C" fn Json_create(mut value: *const c_char) -> *mut Json {
     }
     return c;
 }
-unsafe extern "C" fn parse_value(
-    mut item: *mut Json,
-    mut value: *const c_char,
-) -> *const c_char {
+unsafe extern "C" fn parse_value(mut item: *mut Json, mut value: *const c_char) -> *const c_char {
     match *value as c_int {
         110 => {
             if spine_strncmp(
@@ -13957,10 +13091,7 @@ unsafe extern "C" fn parse_value(
     ep = value;
     return 0 as *const c_char;
 }
-unsafe extern "C" fn parse_array(
-    mut item: *mut Json,
-    mut value: *const c_char,
-) -> *const c_char {
+unsafe extern "C" fn parse_array(mut item: *mut Json, mut value: *const c_char) -> *const c_char {
     let mut child: *mut Json = 0 as *mut Json;
     (*item).type_0 = 5 as c_int;
     value = skip(value.offset(1 as c_int as isize));
@@ -13996,10 +13127,7 @@ unsafe extern "C" fn parse_array(
     ep = value;
     return 0 as *const c_char;
 }
-unsafe extern "C" fn parse_object(
-    mut item: *mut Json,
-    mut value: *const c_char,
-) -> *const c_char {
+unsafe extern "C" fn parse_object(mut item: *mut Json, mut value: *const c_char) -> *const c_char {
     let mut child: *mut Json = 0 as *mut Json;
     (*item).type_0 = 6 as c_int;
     value = skip(value.offset(1 as c_int as isize));
@@ -14097,7 +13225,11 @@ pub unsafe extern "C" fn Json_getFloat(
     mut defaultValue: c_float,
 ) -> c_float {
     value = Json_getItem(value, name);
-    return if !value.is_null() { (*value).valueFloat } else { defaultValue };
+    return if !value.is_null() {
+        (*value).valueFloat
+    } else {
+        defaultValue
+    };
 }
 #[no_mangle]
 pub unsafe extern "C" fn Json_getInt(
@@ -14106,7 +13238,11 @@ pub unsafe extern "C" fn Json_getInt(
     mut defaultValue: c_int,
 ) -> c_int {
     value = Json_getItem(value, name);
-    return if !value.is_null() { (*value).valueInt } else { defaultValue };
+    return if !value.is_null() {
+        (*value).valueInt
+    } else {
+        defaultValue
+    };
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spMeshAttachment_dispose(mut attachment: *mut spAttachment) {
@@ -14134,36 +13270,30 @@ pub unsafe extern "C" fn _spMeshAttachment_copy(
     let mut self_0: *mut spMeshAttachment = attachment as *mut spMeshAttachment;
     if !((*self_0).parentMesh).is_null() {
         return &mut (*(spMeshAttachment_newLinkedMesh
-            as unsafe extern "C" fn(
-                *mut spMeshAttachment,
-            ) -> *mut spMeshAttachment)(self_0))
-            .super_0
-            .super_0;
+            as unsafe extern "C" fn(*mut spMeshAttachment) -> *mut spMeshAttachment)(
+            self_0
+        ))
+        .super_0
+        .super_0;
     }
     copy = spMeshAttachment_create((*attachment).name);
     (*copy).rendererObject = (*self_0).rendererObject;
     (*copy).region = (*self_0).region;
-    (*copy)
-        .sequence = if !((*self_0).sequence).is_null() {
+    (*copy).sequence = if !((*self_0).sequence).is_null() {
         spSequence_copy((*self_0).sequence)
     } else {
         0 as *mut spSequence
     };
-    (*copy)
-        .path = _spMalloc(
+    (*copy).path = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen((*self_0).path))
-                    .wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen((*self_0).path)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         6815 as c_int,
     ) as *mut c_char;
     spine_strcpy((*copy).path, (*self_0).path);
     spColor_setFromColor(&mut (*copy).color, &mut (*self_0).color);
     spVertexAttachment_copyTo(&mut (*self_0).super_0, &mut (*copy).super_0);
-    (*copy)
-        .regionUVs = _spMalloc(
+    (*copy).regionUVs = _spMalloc(
         (::core::mem::size_of::<c_float>() as c_ulong)
             .wrapping_mul((*self_0).super_0.worldVerticesLength as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -14175,8 +13305,7 @@ pub unsafe extern "C" fn _spMeshAttachment_copy(
         ((*self_0).super_0.worldVerticesLength as c_ulong)
             .wrapping_mul(::core::mem::size_of::<c_float>() as c_ulong),
     );
-    (*copy)
-        .uvs = _spMalloc(
+    (*copy).uvs = _spMalloc(
         (::core::mem::size_of::<c_float>() as c_ulong)
             .wrapping_mul((*self_0).super_0.worldVerticesLength as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -14189,8 +13318,7 @@ pub unsafe extern "C" fn _spMeshAttachment_copy(
             .wrapping_mul(::core::mem::size_of::<c_float>() as c_ulong),
     );
     (*copy).trianglesCount = (*self_0).trianglesCount;
-    (*copy)
-        .triangles = _spMalloc(
+    (*copy).triangles = _spMalloc(
         (::core::mem::size_of::<c_ushort>() as c_ulong)
             .wrapping_mul((*self_0).trianglesCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -14205,8 +13333,7 @@ pub unsafe extern "C" fn _spMeshAttachment_copy(
     (*copy).hullLength = (*self_0).hullLength;
     if (*self_0).edgesCount > 0 as c_int {
         (*copy).edgesCount = (*self_0).edgesCount;
-        (*copy)
-            .edges = _spMalloc(
+        (*copy).edges = _spMalloc(
             (::core::mem::size_of::<c_ushort>() as c_ulong)
                 .wrapping_mul((*self_0).edgesCount as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -14227,18 +13354,12 @@ pub unsafe extern "C" fn _spMeshAttachment_copy(
 pub unsafe extern "C" fn spMeshAttachment_newLinkedMesh(
     mut self_0: *mut spMeshAttachment,
 ) -> *mut spMeshAttachment {
-    let mut copy: *mut spMeshAttachment = spMeshAttachment_create(
-        (*self_0).super_0.super_0.name,
-    );
+    let mut copy: *mut spMeshAttachment = spMeshAttachment_create((*self_0).super_0.super_0.name);
     (*copy).rendererObject = (*self_0).rendererObject;
     (*copy).region = (*self_0).region;
-    (*copy)
-        .path = _spMalloc(
+    (*copy).path = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen((*self_0).path))
-                    .wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen((*self_0).path)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         6843 as c_int,
     ) as *mut c_char;
@@ -14247,7 +13368,11 @@ pub unsafe extern "C" fn spMeshAttachment_newLinkedMesh(
     (*copy).super_0.timelineAttachment = (*self_0).super_0.timelineAttachment;
     spMeshAttachment_setParentMesh(
         copy,
-        if !((*self_0).parentMesh).is_null() { (*self_0).parentMesh } else { self_0 },
+        if !((*self_0).parentMesh).is_null() {
+            (*self_0).parentMesh
+        } else {
+            self_0
+        },
     );
     if !((*copy).region).is_null() {
         spMeshAttachment_updateRegion(copy);
@@ -14255,9 +13380,7 @@ pub unsafe extern "C" fn spMeshAttachment_newLinkedMesh(
     return copy;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spMeshAttachment_create(
-    mut name: *const c_char,
-) -> *mut spMeshAttachment {
+pub unsafe extern "C" fn spMeshAttachment_create(mut name: *const c_char) -> *mut spMeshAttachment {
     let mut self_0: *mut spMeshAttachment = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<spMeshAttachment>() as c_ulong,
@@ -14278,16 +13401,13 @@ pub unsafe extern "C" fn spMeshAttachment_create(
         SP_ATTACHMENT_MESH,
         Some(_spMeshAttachment_dispose as unsafe extern "C" fn(*mut spAttachment) -> ()),
         Some(
-            _spMeshAttachment_copy
-                as unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment,
+            _spMeshAttachment_copy as unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment,
         ),
     );
     return self_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spMeshAttachment_updateRegion(
-    mut self_0: *mut spMeshAttachment,
-) {
+pub unsafe extern "C" fn spMeshAttachment_updateRegion(mut self_0: *mut spMeshAttachment) {
     let mut i: c_int = 0;
     let mut n: c_int = 0;
     let mut uvs: *mut c_float = 0 as *mut c_float;
@@ -14297,10 +13417,8 @@ pub unsafe extern "C" fn spMeshAttachment_updateRegion(
     let mut height: c_float = 0.;
     let mut verticesLength: c_int = (*self_0).super_0.worldVerticesLength;
     _spFree((*self_0).uvs as *mut c_void);
-    (*self_0)
-        .uvs = _spMalloc(
-        (::core::mem::size_of::<c_float>() as c_ulong)
-            .wrapping_mul(verticesLength as c_ulong),
+    (*self_0).uvs = _spMalloc(
+        (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(verticesLength as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         6865 as c_int,
     ) as *mut c_float;
@@ -14310,63 +13428,47 @@ pub unsafe extern "C" fn spMeshAttachment_updateRegion(
     v = (*(*self_0).region).v;
     match (*(*self_0).region).degrees {
         90 => {
-            let mut textureWidth: c_float = (*(*self_0).region).height
-                as c_float / ((*(*self_0).region).u2 - (*(*self_0).region).u);
-            let mut textureHeight: c_float = (*(*self_0).region).width
-                as c_float / ((*(*self_0).region).v2 - (*(*self_0).region).v);
-            u
-                -= ((*(*self_0).region).originalHeight as c_float
-                    - (*(*self_0).region).offsetY
-                    - (*(*self_0).region).height as c_float) / textureWidth;
-            v
-                -= ((*(*self_0).region).originalWidth as c_float
-                    - (*(*self_0).region).offsetX
-                    - (*(*self_0).region).width as c_float) / textureHeight;
+            let mut textureWidth: c_float = (*(*self_0).region).height as c_float
+                / ((*(*self_0).region).u2 - (*(*self_0).region).u);
+            let mut textureHeight: c_float = (*(*self_0).region).width as c_float
+                / ((*(*self_0).region).v2 - (*(*self_0).region).v);
+            u -= ((*(*self_0).region).originalHeight as c_float
+                - (*(*self_0).region).offsetY
+                - (*(*self_0).region).height as c_float)
+                / textureWidth;
+            v -= ((*(*self_0).region).originalWidth as c_float
+                - (*(*self_0).region).offsetX
+                - (*(*self_0).region).width as c_float)
+                / textureHeight;
             width = (*(*self_0).region).originalHeight as c_float / textureWidth;
             height = (*(*self_0).region).originalWidth as c_float / textureHeight;
             i = 0 as c_int;
             while i < n {
-                *uvs
-                    .offset(
-                        i as isize,
-                    ) = u
-                    + *((*self_0).regionUVs).offset((i + 1 as c_int) as isize)
-                        * width;
-                *uvs
-                    .offset(
-                        (i + 1 as c_int) as isize,
-                    ) = v
-                    + (1 as c_int as c_float
-                        - *((*self_0).regionUVs).offset(i as isize)) * height;
+                *uvs.offset(i as isize) =
+                    u + *((*self_0).regionUVs).offset((i + 1 as c_int) as isize) * width;
+                *uvs.offset((i + 1 as c_int) as isize) = v
+                    + (1 as c_int as c_float - *((*self_0).regionUVs).offset(i as isize)) * height;
                 i += 2 as c_int;
             }
             return;
         }
         180 => {
-            let mut textureWidth_0: c_float = (*(*self_0).region).width
-                as c_float / ((*(*self_0).region).u2 - (*(*self_0).region).u);
-            let mut textureHeight_0: c_float = (*(*self_0).region).height
-                as c_float / ((*(*self_0).region).v2 - (*(*self_0).region).v);
-            u
-                -= ((*(*self_0).region).originalWidth as c_float
-                    - (*(*self_0).region).offsetX
-                    - (*(*self_0).region).width as c_float) / textureWidth_0;
+            let mut textureWidth_0: c_float = (*(*self_0).region).width as c_float
+                / ((*(*self_0).region).u2 - (*(*self_0).region).u);
+            let mut textureHeight_0: c_float = (*(*self_0).region).height as c_float
+                / ((*(*self_0).region).v2 - (*(*self_0).region).v);
+            u -= ((*(*self_0).region).originalWidth as c_float
+                - (*(*self_0).region).offsetX
+                - (*(*self_0).region).width as c_float)
+                / textureWidth_0;
             v -= (*(*self_0).region).offsetY / textureHeight_0;
             width = (*(*self_0).region).originalWidth as c_float / textureWidth_0;
-            height = (*(*self_0).region).originalHeight as c_float
-                / textureHeight_0;
+            height = (*(*self_0).region).originalHeight as c_float / textureHeight_0;
             i = 0 as c_int;
             while i < n {
-                *uvs
-                    .offset(
-                        i as isize,
-                    ) = u
-                    + (1 as c_int as c_float
-                        - *((*self_0).regionUVs).offset(i as isize)) * width;
-                *uvs
-                    .offset(
-                        (i + 1 as c_int) as isize,
-                    ) = v
+                *uvs.offset(i as isize) =
+                    u + (1 as c_int as c_float - *((*self_0).regionUVs).offset(i as isize)) * width;
+                *uvs.offset((i + 1 as c_int) as isize) = v
                     + (1 as c_int as c_float
                         - *((*self_0).regionUVs).offset((i + 1 as c_int) as isize))
                         * height;
@@ -14375,57 +13477,43 @@ pub unsafe extern "C" fn spMeshAttachment_updateRegion(
             return;
         }
         270 => {
-            let mut textureHeight_1: c_float = (*(*self_0).region).height
-                as c_float / ((*(*self_0).region).v2 - (*(*self_0).region).v);
-            let mut textureWidth_1: c_float = (*(*self_0).region).width
-                as c_float / ((*(*self_0).region).u2 - (*(*self_0).region).u);
+            let mut textureHeight_1: c_float = (*(*self_0).region).height as c_float
+                / ((*(*self_0).region).v2 - (*(*self_0).region).v);
+            let mut textureWidth_1: c_float = (*(*self_0).region).width as c_float
+                / ((*(*self_0).region).u2 - (*(*self_0).region).u);
             u -= (*(*self_0).region).offsetY / textureWidth_1;
             v -= (*(*self_0).region).offsetX / textureHeight_1;
             width = (*(*self_0).region).originalHeight as c_float / textureWidth_1;
-            height = (*(*self_0).region).originalWidth as c_float
-                / textureHeight_1;
+            height = (*(*self_0).region).originalWidth as c_float / textureHeight_1;
             i = 0 as c_int;
             while i < n {
-                *uvs
-                    .offset(
-                        i as isize,
-                    ) = u
+                *uvs.offset(i as isize) = u
                     + (1 as c_int as c_float
                         - *((*self_0).regionUVs).offset((i + 1 as c_int) as isize))
                         * width;
-                *uvs
-                    .offset(
-                        (i + 1 as c_int) as isize,
-                    ) = v + *((*self_0).regionUVs).offset(i as isize) * height;
+                *uvs.offset((i + 1 as c_int) as isize) =
+                    v + *((*self_0).regionUVs).offset(i as isize) * height;
                 i += 2 as c_int;
             }
             return;
         }
         _ => {
-            let mut textureWidth_2: c_float = (*(*self_0).region).width
-                as c_float / ((*(*self_0).region).u2 - (*(*self_0).region).u);
-            let mut textureHeight_2: c_float = (*(*self_0).region).height
-                as c_float / ((*(*self_0).region).v2 - (*(*self_0).region).v);
+            let mut textureWidth_2: c_float = (*(*self_0).region).width as c_float
+                / ((*(*self_0).region).u2 - (*(*self_0).region).u);
+            let mut textureHeight_2: c_float = (*(*self_0).region).height as c_float
+                / ((*(*self_0).region).v2 - (*(*self_0).region).v);
             u -= (*(*self_0).region).offsetX / textureWidth_2;
-            v
-                -= ((*(*self_0).region).originalHeight as c_float
-                    - (*(*self_0).region).offsetY
-                    - (*(*self_0).region).height as c_float) / textureHeight_2;
-            width = (*(*self_0).region).originalWidth as c_float / textureWidth_2;
-            height = (*(*self_0).region).originalHeight as c_float
+            v -= ((*(*self_0).region).originalHeight as c_float
+                - (*(*self_0).region).offsetY
+                - (*(*self_0).region).height as c_float)
                 / textureHeight_2;
+            width = (*(*self_0).region).originalWidth as c_float / textureWidth_2;
+            height = (*(*self_0).region).originalHeight as c_float / textureHeight_2;
             i = 0 as c_int;
             while i < n {
-                *uvs
-                    .offset(
-                        i as isize,
-                    ) = u + *((*self_0).regionUVs).offset(i as isize) * width;
-                *uvs
-                    .offset(
-                        (i + 1 as c_int) as isize,
-                    ) = v
-                    + *((*self_0).regionUVs).offset((i + 1 as c_int) as isize)
-                        * height;
+                *uvs.offset(i as isize) = u + *((*self_0).regionUVs).offset(i as isize) * width;
+                *uvs.offset((i + 1 as c_int) as isize) =
+                    v + *((*self_0).regionUVs).offset((i + 1 as c_int) as isize) * height;
                 i += 2 as c_int;
             }
         }
@@ -14446,9 +13534,7 @@ pub unsafe extern "C" fn spMeshAttachment_setParentMesh(
         (*self_0).triangles = (*parentMesh).triangles;
         (*self_0).trianglesCount = (*parentMesh).trianglesCount;
         (*self_0).hullLength = (*parentMesh).hullLength;
-        (*self_0)
-            .super_0
-            .worldVerticesLength = (*parentMesh).super_0.worldVerticesLength;
+        (*self_0).super_0.worldVerticesLength = (*parentMesh).super_0.worldVerticesLength;
         (*self_0).edges = (*parentMesh).edges;
         (*self_0).edgesCount = (*parentMesh).edgesCount;
         (*self_0).width = (*parentMesh).width;
@@ -14470,8 +13556,7 @@ pub unsafe extern "C" fn _spPathAttachment_copy(
     let mut self_0: *mut spPathAttachment = attachment as *mut spPathAttachment;
     spVertexAttachment_copyTo(&mut (*self_0).super_0, &mut (*copy).super_0);
     (*copy).lengthsLength = (*self_0).lengthsLength;
-    (*copy)
-        .lengths = _spMalloc(
+    (*copy).lengths = _spMalloc(
         (::core::mem::size_of::<c_float>() as c_ulong)
             .wrapping_mul((*self_0).lengthsLength as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -14488,9 +13573,7 @@ pub unsafe extern "C" fn _spPathAttachment_copy(
     return &mut (*copy).super_0.super_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spPathAttachment_create(
-    mut name: *const c_char,
-) -> *mut spPathAttachment {
+pub unsafe extern "C" fn spPathAttachment_create(mut name: *const c_char) -> *mut spPathAttachment {
     let mut self_0: *mut spPathAttachment = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<spPathAttachment>() as c_ulong,
@@ -14504,8 +13587,7 @@ pub unsafe extern "C" fn spPathAttachment_create(
         SP_ATTACHMENT_PATH,
         Some(_spPathAttachment_dispose as unsafe extern "C" fn(*mut spAttachment) -> ()),
         Some(
-            _spPathAttachment_copy
-                as unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment,
+            _spPathAttachment_copy as unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment,
         ),
     );
     return self_0;
@@ -14524,8 +13606,7 @@ pub unsafe extern "C" fn spPathConstraint_create(
     ) as *mut spPathConstraint;
     (*self_0).data = data;
     (*self_0).bonesCount = (*data).bonesCount;
-    (*self_0)
-        .bones = _spMalloc(
+    (*self_0).bones = _spMalloc(
         (::core::mem::size_of::<*mut spBone>() as c_ulong)
             .wrapping_mul((*self_0).bonesCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -14601,13 +13682,13 @@ pub unsafe extern "C" fn spPathConstraint_update(mut self_0: *mut spPathConstrai
     let mut mixX: c_float = (*self_0).mixX;
     let mut mixY: c_float = (*self_0).mixY;
     let mut lengthSpacing: c_int = 0;
-    let mut attachment: *mut spPathAttachment = (*(*self_0).target).attachment
-        as *mut spPathAttachment;
+    let mut attachment: *mut spPathAttachment =
+        (*(*self_0).target).attachment as *mut spPathAttachment;
     let mut data: *mut spPathConstraintData = (*self_0).data;
-    let mut tangents: c_int = ((*data).rotateMode as c_uint
-        == SP_ROTATE_MODE_TANGENT as c_int as c_uint) as c_int;
-    let mut scale: c_int = ((*data).rotateMode as c_uint
-        == SP_ROTATE_MODE_CHAIN_SCALE as c_int as c_uint) as c_int;
+    let mut tangents: c_int =
+        ((*data).rotateMode as c_uint == SP_ROTATE_MODE_TANGENT as c_int as c_uint) as c_int;
+    let mut scale: c_int =
+        ((*data).rotateMode as c_uint == SP_ROTATE_MODE_CHAIN_SCALE as c_int as c_uint) as c_int;
     let mut boneCount: c_int = (*self_0).bonesCount;
     let mut spacesCount: c_int = if tangents != 0 {
         boneCount
@@ -14623,8 +13704,7 @@ pub unsafe extern "C" fn spPathConstraint_update(mut self_0: *mut spPathConstrai
         return;
     }
     if attachment.is_null()
-        || (*attachment).super_0.super_0.type_0 as c_uint
-            != SP_ATTACHMENT_PATH as c_int as c_uint
+        || (*attachment).super_0.super_0.type_0 as c_uint != SP_ATTACHMENT_PATH as c_int as c_uint
     {
         return;
     }
@@ -14632,10 +13712,8 @@ pub unsafe extern "C" fn spPathConstraint_update(mut self_0: *mut spPathConstrai
         if !((*self_0).spaces).is_null() {
             _spFree((*self_0).spaces as *mut c_void);
         }
-        (*self_0)
-            .spaces = _spMalloc(
-            (::core::mem::size_of::<c_float>() as c_ulong)
-                .wrapping_mul(spacesCount as c_ulong),
+        (*self_0).spaces = _spMalloc(
+            (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(spacesCount as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
             7105 as c_int,
         ) as *mut c_float;
@@ -14650,10 +13728,8 @@ pub unsafe extern "C" fn spPathConstraint_update(mut self_0: *mut spPathConstrai
             if !((*self_0).lengths).is_null() {
                 _spFree((*self_0).lengths as *mut c_void);
             }
-            (*self_0)
-                .lengths = _spMalloc(
-                (::core::mem::size_of::<c_float>() as c_ulong)
-                    .wrapping_mul(boneCount as c_ulong),
+            (*self_0).lengths = _spMalloc(
+                (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(boneCount as c_ulong),
                 b"spine.c\0" as *const u8 as *const c_char,
                 7116 as c_int,
             ) as *mut c_float;
@@ -14738,42 +13814,31 @@ pub unsafe extern "C" fn spPathConstraint_update(mut self_0: *mut spPathConstrai
                         *lengths.offset(i as isize) = length;
                     }
                     i += 1;
-                    *spaces
-                        .offset(
-                            i as isize,
-                        ) = (if lengthSpacing != 0 {
+                    *spaces.offset(i as isize) = (if lengthSpacing != 0 {
                         setupLength + spacing
                     } else {
                         spacing
-                    }) * length / setupLength;
+                    }) * length
+                        / setupLength;
                 }
             }
         }
     }
-    positions = spPathConstraint_computeWorldPositions(
-        self_0,
-        attachment,
-        spacesCount,
-        tangents,
-    );
+    positions = spPathConstraint_computeWorldPositions(self_0, attachment, spacesCount, tangents);
     boneX = *positions.offset(0 as c_int as isize);
     boneY = *positions.offset(1 as c_int as isize);
     offsetRotation = (*(*self_0).data).offsetRotation;
     tip = 0 as c_int;
     if offsetRotation == 0 as c_int as c_float {
-        tip = ((*data).rotateMode as c_uint
-            == SP_ROTATE_MODE_CHAIN as c_int as c_uint) as c_int;
+        tip = ((*data).rotateMode as c_uint == SP_ROTATE_MODE_CHAIN as c_int as c_uint) as c_int;
     } else {
         tip = 0 as c_int;
         pa = (*(*self_0).target).bone;
-        offsetRotation
-            *= if (*pa).a * (*pa).d - (*pa).b * (*pa).c
-                > 0 as c_int as c_float
-            {
-                3.1415926535897932385f32 / 180 as c_int as c_float
-            } else {
-                -(3.1415926535897932385f32 / 180 as c_int as c_float)
-            };
+        offsetRotation *= if (*pa).a * (*pa).d - (*pa).b * (*pa).c > 0 as c_int as c_float {
+            3.1415926535897932385f32 / 180 as c_int as c_float
+        } else {
+            -(3.1415926535897932385f32 / 180 as c_int as c_float)
+        };
     }
     i = 0 as c_int;
     p = 3 as c_int;
@@ -14788,8 +13853,7 @@ pub unsafe extern "C" fn spPathConstraint_update(mut self_0: *mut spPathConstrai
         if scale != 0 {
             length = *lengths.offset(i as isize);
             if length != 0 as c_int as c_float {
-                s = (spine_sqrtf(dx * dx + dy * dy) / length
-                    - 1 as c_int as c_float) * mixRotate
+                s = (spine_sqrtf(dx * dx + dy * dy) / length - 1 as c_int as c_float) * mixRotate
                     + 1 as c_int as c_float;
                 (*bone_2).a *= s;
                 (*bone_2).c *= s;
@@ -14807,21 +13871,16 @@ pub unsafe extern "C" fn spPathConstraint_update(mut self_0: *mut spPathConstrai
             let mut sine: c_float = 0.;
             if tangents != 0 {
                 r = *positions.offset((p - 1 as c_int) as isize);
-            } else if *spaces.offset((i + 1 as c_int) as isize)
-                == 0 as c_int as c_float
-            {
+            } else if *spaces.offset((i + 1 as c_int) as isize) == 0 as c_int as c_float {
                 r = *positions.offset((p + 2 as c_int) as isize);
             } else {
                 r = spine_atan2f(dy, dx);
             }
-            r
-                -= spine_atan2f(c, a)
-                    - offsetRotation
-                        * (3.1415926535897932385f32
-                            / 180 as c_int as c_float);
+            r -= spine_atan2f(c, a)
+                - offsetRotation * (3.1415926535897932385f32 / 180 as c_int as c_float);
             if tip != 0 {
                 cosine = spine_cosf(r);
-                sine = sinf(r);
+                sine = spine_sinf(r);
                 length = (*(*bone_2).data).length;
                 boneX += (length * (cosine * a - sine * c) - dx) * mixRotate;
                 boneY += (length * (sine * a + cosine * c) - dy) * mixRotate;
@@ -14835,7 +13894,7 @@ pub unsafe extern "C" fn spPathConstraint_update(mut self_0: *mut spPathConstrai
             }
             r *= mixRotate;
             cosine = spine_cosf(r);
-            sine = sinf(r);
+            sine = spine_sinf(r);
             (*bone_2).a = cosine * a - sine * c;
             (*bone_2).b = cosine * b - sine * d;
             (*bone_2).c = sine * a + cosine * c;
@@ -14847,9 +13906,7 @@ pub unsafe extern "C" fn spPathConstraint_update(mut self_0: *mut spPathConstrai
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spPathConstraint_setToSetupPose(
-    mut self_0: *mut spPathConstraint,
-) {
+pub unsafe extern "C" fn spPathConstraint_setToSetupPose(mut self_0: *mut spPathConstraint) {
     let mut data: *mut spPathConstraintData = (*self_0).data;
     (*self_0).position = (*data).position;
     (*self_0).spacing = (*data).spacing;
@@ -14870,7 +13927,7 @@ unsafe extern "C" fn _addBeforePosition(
     let mut dy: c_float = *temp.offset((i + 3 as c_int) as isize) - y1;
     let mut r: c_float = spine_atan2f(dy, dx);
     *out.offset(o as isize) = x1 + p * spine_cosf(r);
-    *out.offset((o + 1 as c_int) as isize) = y1 + p * sinf(r);
+    *out.offset((o + 1 as c_int) as isize) = y1 + p * spine_sinf(r);
     *out.offset((o + 2 as c_int) as isize) = r;
 }
 unsafe extern "C" fn _addAfterPosition(
@@ -14886,7 +13943,7 @@ unsafe extern "C" fn _addAfterPosition(
     let mut dy: c_float = y1 - *temp.offset((i + 1 as c_int) as isize);
     let mut r: c_float = spine_atan2f(dy, dx);
     *out.offset(o as isize) = x1 + p * spine_cosf(r);
-    *out.offset((o + 1 as c_int) as isize) = y1 + p * sinf(r);
+    *out.offset((o + 1 as c_int) as isize) = y1 + p * spine_sinf(r);
     *out.offset((o + 2 as c_int) as isize) = r;
 }
 unsafe extern "C" fn _addCurvePosition(
@@ -14935,15 +13992,9 @@ unsafe extern "C" fn _addCurvePosition(
     *out.offset((o + 1 as c_int) as isize) = y;
     if tangents != 0 {
         if (p as c_double) < 0.001f64 {
-            *out
-                .offset(
-                    (o + 2 as c_int) as isize,
-                ) = spine_atan2f(cy1 - y1, cx1 - x1);
+            *out.offset((o + 2 as c_int) as isize) = spine_atan2f(cy1 - y1, cx1 - x1);
         } else {
-            *out
-                .offset(
-                    (o + 2 as c_int) as isize,
-                ) = spine_atan2f(
+            *out.offset((o + 2 as c_int) as isize) = spine_atan2f(
                 y - (y1 * uu + cy1 * ut * 2 as c_int as c_float + cy2 * tt),
                 x - (x1 * uu + cx1 * ut * 2 as c_int as c_float + cx2 * tt),
             );
@@ -14997,12 +14048,9 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
         if !((*self_0).positions).is_null() {
             _spFree((*self_0).positions as *mut c_void);
         }
-        (*self_0)
-            .positions = _spMalloc(
+        (*self_0).positions = _spMalloc(
             (::core::mem::size_of::<c_float>() as c_ulong)
-                .wrapping_mul(
-                    (spacesCount * 3 as c_int + 2 as c_int) as c_ulong,
-                ),
+                .wrapping_mul((spacesCount * 3 as c_int + 2 as c_int) as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
             7291 as c_int,
         ) as *mut c_float;
@@ -15017,9 +14065,7 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
         let mut lengths: *mut c_float = (*path).lengths;
         curveCount -= if closed != 0 { 1 as c_int } else { 2 as c_int };
         pathLength = *lengths.offset(curveCount as isize);
-        if (*(*self_0).data).positionMode as c_uint
-            == SP_POSITION_MODE_PERCENT as c_int as c_uint
-        {
+        if (*(*self_0).data).positionMode as c_uint == SP_POSITION_MODE_PERCENT as c_int as c_uint {
             position *= pathLength;
         }
         match (*(*self_0).data).spacingMode as c_uint {
@@ -15037,10 +14083,8 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
             if !((*self_0).world).is_null() {
                 _spFree((*self_0).world as *mut c_void);
             }
-            (*self_0)
-                .world = _spMalloc(
-                (::core::mem::size_of::<c_float>() as c_ulong)
-                    .wrapping_mul(8 as c_int as c_ulong),
+            (*self_0).world = _spMalloc(
+                (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(8 as c_int as c_ulong),
                 b"spine.c\0" as *const u8 as *const c_char,
                 7316 as c_int,
             ) as *mut c_float;
@@ -15105,8 +14149,8 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
                             if curve == 0 as c_int {
                                 p /= length;
                             } else {
-                                let mut prev: c_float = *lengths
-                                    .offset((curve - 1 as c_int) as isize);
+                                let mut prev: c_float =
+                                    *lengths.offset((curve - 1 as c_int) as isize);
                                 p = (p - prev) / (length - prev);
                             }
                             break;
@@ -15157,9 +14201,7 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
                         *world.offset(7 as c_int as isize),
                         out,
                         o,
-                        (tangents != 0
-                            || i > 0 as c_int
-                                && space == 0 as c_int as c_float)
+                        (tangents != 0 || i > 0 as c_int && space == 0 as c_int as c_float)
                             as c_int,
                     );
                 }
@@ -15176,8 +14218,7 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
             if !((*self_0).world).is_null() {
                 _spFree((*self_0).world as *mut c_void);
             }
-            (*self_0)
-                .world = _spMalloc(
+            (*self_0).world = _spMalloc(
                 (::core::mem::size_of::<c_float>() as c_ulong)
                     .wrapping_mul(verticesLength as c_ulong),
                 b"spine.c\0" as *const u8 as *const c_char,
@@ -15204,14 +14245,8 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
             verticesLength - 4 as c_int,
             2 as c_int,
         );
-        *world
-            .offset(
-                (verticesLength - 2 as c_int) as isize,
-            ) = *world.offset(0 as c_int as isize);
-        *world
-            .offset(
-                (verticesLength - 1 as c_int) as isize,
-            ) = *world.offset(1 as c_int as isize);
+        *world.offset((verticesLength - 2 as c_int) as isize) = *world.offset(0 as c_int as isize);
+        *world.offset((verticesLength - 1 as c_int) as isize) = *world.offset(1 as c_int as isize);
     } else {
         curveCount -= 1;
         verticesLength -= 4 as c_int;
@@ -15219,8 +14254,7 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
             if !((*self_0).world).is_null() {
                 _spFree((*self_0).world as *mut c_void);
             }
-            (*self_0)
-                .world = _spMalloc(
+            (*self_0).world = _spMalloc(
                 (::core::mem::size_of::<c_float>() as c_ulong)
                     .wrapping_mul(verticesLength as c_ulong),
                 b"spine.c\0" as *const u8 as *const c_char,
@@ -15243,10 +14277,8 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
         if !((*self_0).curves).is_null() {
             _spFree((*self_0).curves as *mut c_void);
         }
-        (*self_0)
-            .curves = _spMalloc(
-            (::core::mem::size_of::<c_float>() as c_ulong)
-                .wrapping_mul(curveCount as c_ulong),
+        (*self_0).curves = _spMalloc(
+            (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(curveCount as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
             7399 as c_int,
         ) as *mut c_float;
@@ -15297,9 +14329,7 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
         i += 1;
         w += 6 as c_int;
     }
-    if (*(*self_0).data).positionMode as c_uint
-        == SP_POSITION_MODE_PERCENT as c_int as c_uint
-    {
+    if (*(*self_0).data).positionMode as c_uint == SP_POSITION_MODE_PERCENT as c_int as c_uint {
         position *= pathLength;
     }
     match (*(*self_0).data).spacingMode as c_uint {
@@ -15335,13 +14365,7 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
             _addBeforePosition(p, world, 0 as c_int, out, o);
             current_block_195 = 5404178929002277151;
         } else if p > pathLength {
-            _addAfterPosition(
-                p - pathLength,
-                world,
-                verticesLength - 4 as c_int,
-                out,
-                o,
-            );
+            _addAfterPosition(p - pathLength, world, verticesLength - 4 as c_int, out, o);
             current_block_195 = 5404178929002277151;
         } else {
             current_block_195 = 15456862084301247793;
@@ -15356,8 +14380,7 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
                         if curve == 0 as c_int {
                             p /= length_0;
                         } else {
-                            let mut prev_0: c_float = *curves
-                                .offset((curve - 1 as c_int) as isize);
+                            let mut prev_0: c_float = *curves.offset((curve - 1 as c_int) as isize);
                             p = (p - prev_0) / (length_0 - prev_0);
                         }
                         break;
@@ -15375,14 +14398,10 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
                     cy2 = *world.offset((ii + 5 as c_int) as isize);
                     x2 = *world.offset((ii + 6 as c_int) as isize);
                     y2 = *world.offset((ii + 7 as c_int) as isize);
-                    tmpx = (x1 - cx1 * 2 as c_int as c_float + cx2)
-                        * 0.03f32;
-                    tmpy = (y1 - cy1 * 2 as c_int as c_float + cy2)
-                        * 0.03f32;
-                    dddfx = ((cx1 - cx2) * 3 as c_int as c_float - x1 + x2)
-                        * 0.006f32;
-                    dddfy = ((cy1 - cy2) * 3 as c_int as c_float - y1 + y2)
-                        * 0.006f32;
+                    tmpx = (x1 - cx1 * 2 as c_int as c_float + cx2) * 0.03f32;
+                    tmpy = (y1 - cy1 * 2 as c_int as c_float + cy2) * 0.03f32;
+                    dddfx = ((cx1 - cx2) * 3 as c_int as c_float - x1 + x2) * 0.006f32;
+                    dddfy = ((cy1 - cy2) * 3 as c_int as c_float - y1 + y2) * 0.006f32;
                     ddfx = tmpx * 2 as c_int as c_float + dddfx;
                     ddfy = tmpy * 2 as c_int as c_float + dddfy;
                     dfx = (cx1 - x1) * 0.3f32 + tmpx + dddfx * 0.16666667f32;
@@ -15418,10 +14437,9 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
                         if segment == 0 as c_int {
                             p /= length_1;
                         } else {
-                            let mut prev_1: c_float = *segments
-                                .offset((segment - 1 as c_int) as isize);
-                            p = segment as c_float
-                                + (p - prev_1) / (length_1 - prev_1);
+                            let mut prev_1: c_float =
+                                *segments.offset((segment - 1 as c_int) as isize);
+                            p = segment as c_float + (p - prev_1) / (length_1 - prev_1);
                         }
                         break;
                     }
@@ -15438,10 +14456,7 @@ pub unsafe extern "C" fn spPathConstraint_computeWorldPositions(
                     y2,
                     out,
                     o,
-                    (tangents != 0
-                        || i > 0 as c_int
-                            && space_0 == 0 as c_int as c_float)
-                        as c_int,
+                    (tangents != 0 || i > 0 as c_int && space_0 == 0 as c_int as c_float) as c_int,
                 );
             }
             _ => {}
@@ -15461,12 +14476,9 @@ pub unsafe extern "C" fn spPathConstraintData_create(
         b"spine.c\0" as *const u8 as *const c_char,
         7574 as c_int,
     ) as *mut spPathConstraintData;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         7575 as c_int,
     ) as *mut c_char;
@@ -15474,9 +14486,7 @@ pub unsafe extern "C" fn spPathConstraintData_create(
     return self_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spPathConstraintData_dispose(
-    mut self_0: *mut spPathConstraintData,
-) {
+pub unsafe extern "C" fn spPathConstraintData_dispose(mut self_0: *mut spPathConstraintData) {
     _spFree((*self_0).name as *mut c_void);
     _spFree((*self_0).bones as *mut c_void);
     _spFree(self_0 as *mut c_void);
@@ -15522,15 +14532,11 @@ pub unsafe extern "C" fn spPhysicsConstraint_create(
     return self_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spPhysicsConstraint_dispose(
-    mut self_0: *mut spPhysicsConstraint,
-) {
+pub unsafe extern "C" fn spPhysicsConstraint_dispose(mut self_0: *mut spPhysicsConstraint) {
     _spFree(self_0 as *mut c_void);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spPhysicsConstraint_reset(
-    mut self_0: *mut spPhysicsConstraint,
-) {
+pub unsafe extern "C" fn spPhysicsConstraint_reset(mut self_0: *mut spPhysicsConstraint) {
     (*self_0).remaining = 0 as c_int as c_float;
     (*self_0).lastTime = (*(*self_0).skeleton).time;
     (*self_0).reset = -(1 as c_int);
@@ -15544,9 +14550,7 @@ pub unsafe extern "C" fn spPhysicsConstraint_reset(
     (*self_0).scaleVelocity = 0 as c_int as c_float;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spPhysicsConstraint_setToSetupPose(
-    mut self_0: *mut spPhysicsConstraint,
-) {
+pub unsafe extern "C" fn spPhysicsConstraint_setToSetupPose(mut self_0: *mut spPhysicsConstraint) {
     (*self_0).inertia = (*(*self_0).data).inertia;
     (*self_0).strength = (*(*self_0).data).strength;
     (*self_0).damping = (*(*self_0).data).damping;
@@ -15564,15 +14568,12 @@ pub unsafe extern "C" fn spPhysicsConstraint_update(
     if mix == 0 as c_int as c_float {
         return;
     }
-    let mut x: c_int = ((*(*self_0).data).x > 0 as c_int as c_float)
+    let mut x: c_int = ((*(*self_0).data).x > 0 as c_int as c_float) as c_int;
+    let mut y: c_int = ((*(*self_0).data).y > 0 as c_int as c_float) as c_int;
+    let mut rotateOrShearX: c_int = ((*(*self_0).data).rotate > 0 as c_int as c_float
+        || (*(*self_0).data).shearX > 0 as c_int as c_float)
         as c_int;
-    let mut y: c_int = ((*(*self_0).data).y > 0 as c_int as c_float)
-        as c_int;
-    let mut rotateOrShearX: c_int = ((*(*self_0).data).rotate
-        > 0 as c_int as c_float
-        || (*(*self_0).data).shearX > 0 as c_int as c_float) as c_int;
-    let mut scaleX: c_int = ((*(*self_0).data).scaleX
-        > 0 as c_int as c_float) as c_int;
+    let mut scaleX: c_int = ((*(*self_0).data).scaleX > 0 as c_int as c_float) as c_int;
     let mut bone: *mut spBone = (*self_0).bone;
     let mut l: c_float = (*(*bone).data).length;
     let mut current_block_92: u64;
@@ -15600,9 +14601,7 @@ pub unsafe extern "C" fn spPhysicsConstraint_update(
     }
     match current_block_92 {
         2473556513754201174 => {
-            let mut delta: c_float = if (*(*self_0).skeleton).time
-                - (*self_0).lastTime > 0.0f32
-            {
+            let mut delta: c_float = if (*(*self_0).skeleton).time - (*self_0).lastTime > 0.0f32 {
                 (*(*self_0).skeleton).time - (*self_0).lastTime
             } else {
                 0.0f32
@@ -15625,14 +14624,24 @@ pub unsafe extern "C" fn spPhysicsConstraint_update(
                 if x != 0 || y != 0 {
                     if x != 0 {
                         let mut u: c_float = ((*self_0).ux - bx) * i;
-                        (*self_0).xOffset
-                            += if u > q { q } else if u < -q { -q } else { u };
+                        (*self_0).xOffset += if u > q {
+                            q
+                        } else if u < -q {
+                            -q
+                        } else {
+                            u
+                        };
                         (*self_0).ux = bx;
                     }
                     if y != 0 {
                         let mut u_0: c_float = ((*self_0).uy - by) * i;
-                        (*self_0).yOffset
-                            += if u_0 > q { q } else if u_0 < -q { -q } else { u_0 };
+                        (*self_0).yOffset += if u_0 > q {
+                            q
+                        } else if u_0 < -q {
+                            -q
+                        } else {
+                            u_0
+                        };
                         (*self_0).uy = by;
                     }
                     if a >= t {
@@ -15643,7 +14652,8 @@ pub unsafe extern "C" fn spPhysicsConstraint_update(
                         let mut m: c_float = (*self_0).massInverse * t;
                         let mut e: c_float = (*self_0).strength;
                         let mut w: c_float = (*self_0).wind * f;
-                        let mut g: c_float = (*self_0).gravity * f
+                        let mut g: c_float = (*self_0).gravity
+                            * f
                             * (if spBone_isYDown() != 0 {
                                 -(1 as c_int)
                             } else {
@@ -15692,24 +14702,19 @@ pub unsafe extern "C" fn spPhysicsConstraint_update(
                     }
                     if rotateOrShearX != 0 {
                         mr = ((*(*self_0).data).rotate + (*(*self_0).data).shearX) * mix;
-                        let mut r: c_float = spine_atan2f(
-                            dy + (*self_0).ty,
-                            dx + (*self_0).tx,
-                        ) - ca - (*self_0).rotateOffset * mr;
-                        (*self_0).rotateOffset
-                            += (r
-                                - ceil(
-                                    (r
-                                        * (1 as c_int as c_float
-                                            / (3.1415926535897932385f32
-                                                * 2 as c_int as c_float)) - 0.5f32)
-                                        as c_double,
-                                ) as c_float
-                                    * (3.1415926535897932385f32
-                                        * 2 as c_int as c_float)) * i;
+                        let mut r: c_float = spine_atan2f(dy + (*self_0).ty, dx + (*self_0).tx)
+                            - ca
+                            - (*self_0).rotateOffset * mr;
+                        (*self_0).rotateOffset += (r - spine_ceil(
+                            (r * (1 as c_int as c_float
+                                / (3.1415926535897932385f32 * 2 as c_int as c_float))
+                                - 0.5f32) as c_double,
+                        ) as c_float
+                            * (3.1415926535897932385f32 * 2 as c_int as c_float))
+                            * i;
                         r = (*self_0).rotateOffset * mr + ca;
                         c = spine_cosf(r);
-                        s = sinf(r);
+                        s = spine_sinf(r);
                         if scaleX != 0 {
                             r = l * spBone_getWorldScaleX(bone);
                             if r > 0 as c_int as c_float {
@@ -15718,7 +14723,7 @@ pub unsafe extern "C" fn spPhysicsConstraint_update(
                         }
                     } else {
                         c = spine_cosf(ca);
-                        s = sinf(ca);
+                        s = spine_sinf(ca);
                         let mut r_0: c_float = l * spBone_getWorldScaleX(bone);
                         if r_0 > 0 as c_int as c_float {
                             (*self_0).scaleOffset += (dx * c + dy * s) * i / r_0;
@@ -15740,24 +14745,22 @@ pub unsafe extern "C" fn spPhysicsConstraint_update(
                         while -(1 as c_int) != 0 {
                             a -= t;
                             if scaleX != 0 {
-                                (*self_0).scaleVelocity
-                                    += (w_0 * c - g_0 * s - (*self_0).scaleOffset * e_0) * m_0;
+                                (*self_0).scaleVelocity +=
+                                    (w_0 * c - g_0 * s - (*self_0).scaleOffset * e_0) * m_0;
                                 (*self_0).scaleOffset += (*self_0).scaleVelocity * t;
                                 (*self_0).scaleVelocity *= d;
                             }
                             if rotateOrShearX != 0 {
-                                (*self_0).rotateVelocity
-                                    -= ((w_0 * s + g_0 * c) * h + (*self_0).rotateOffset * e_0)
-                                        * m_0;
+                                (*self_0).rotateVelocity -=
+                                    ((w_0 * s + g_0 * c) * h + (*self_0).rotateOffset * e_0) * m_0;
                                 (*self_0).rotateOffset += (*self_0).rotateVelocity * t;
                                 (*self_0).rotateVelocity *= d;
                                 if a < t {
                                     break;
                                 }
-                                let mut r_1: c_float = (*self_0).rotateOffset * mr
-                                    + ca;
+                                let mut r_1: c_float = (*self_0).rotateOffset * mr + ca;
                                 c = spine_cosf(r_1);
-                                s = sinf(r_1);
+                                s = spine_sinf(r_1);
                             } else if a < t {
                                 break;
                             }
@@ -15780,21 +14783,21 @@ pub unsafe extern "C" fn spPhysicsConstraint_update(
             let mut r_2: c_float = 0 as c_int as c_float;
             if (*(*self_0).data).rotate > 0 as c_int as c_float {
                 r_2 = o * (*(*self_0).data).rotate;
-                s_0 = sinf(r_2);
+                s_0 = spine_sinf(r_2);
                 c_0 = spine_cosf(r_2);
                 a_0 = (*bone).b;
                 (*bone).b = c_0 * a_0 - s_0 * (*bone).d;
                 (*bone).d = s_0 * a_0 + c_0 * (*bone).d;
             }
             r_2 += o * (*(*self_0).data).shearX;
-            s_0 = sinf(r_2);
+            s_0 = spine_sinf(r_2);
             c_0 = spine_cosf(r_2);
             a_0 = (*bone).a;
             (*bone).a = c_0 * a_0 - s_0 * (*bone).c;
             (*bone).c = s_0 * a_0 + c_0 * (*bone).c;
         } else {
             o *= (*(*self_0).data).rotate;
-            s_0 = sinf(o);
+            s_0 = spine_sinf(o);
             c_0 = spine_cosf(o);
             a_0 = (*bone).a;
             (*bone).a = c_0 * a_0 - s_0 * (*bone).c;
@@ -15805,8 +14808,8 @@ pub unsafe extern "C" fn spPhysicsConstraint_update(
         }
     }
     if scaleX != 0 {
-        let mut s_1: c_float = 1 as c_int as c_float
-            + (*self_0).scaleOffset * mix * (*(*self_0).data).scaleX;
+        let mut s_1: c_float =
+            1 as c_int as c_float + (*self_0).scaleOffset * mix * (*(*self_0).data).scaleX;
         (*bone).a *= s_1;
         (*bone).c *= s_1;
     }
@@ -15823,10 +14826,9 @@ pub unsafe extern "C" fn spPhysicsConstraint_rotate(
     mut y: c_float,
     mut degrees: c_float,
 ) {
-    let mut r: c_float = degrees
-        * (3.1415926535897932385f32 / 180 as c_int as c_float);
+    let mut r: c_float = degrees * (3.1415926535897932385f32 / 180 as c_int as c_float);
     let mut cosine: c_float = spine_cosf(r);
-    let mut sine: c_float = sinf(r);
+    let mut sine: c_float = spine_sinf(r);
     let mut dx: c_float = (*self_0).cx - x;
     let mut dy: c_float = (*self_0).cy - y;
     spPhysicsConstraint_translate(
@@ -15856,12 +14858,9 @@ pub unsafe extern "C" fn spPhysicsConstraintData_create(
         b"spine.c\0" as *const u8 as *const c_char,
         7895 as c_int,
     ) as *mut spPhysicsConstraintData;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         7896 as c_int,
     ) as *mut c_char;
@@ -15891,9 +14890,7 @@ pub unsafe extern "C" fn spPhysicsConstraintData_create(
     return self_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spPhysicsConstraintData_dispose(
-    mut self_0: *mut spPhysicsConstraintData,
-) {
+pub unsafe extern "C" fn spPhysicsConstraintData_dispose(mut self_0: *mut spPhysicsConstraintData) {
     _spFree((*self_0).name as *mut c_void);
     _spFree(self_0 as *mut c_void);
 }
@@ -15929,12 +14926,9 @@ pub unsafe extern "C" fn spPointAttachment_create(
         &mut (*self_0).super_0,
         name,
         SP_ATTACHMENT_POINT,
+        Some(_spPointAttachment_dispose as unsafe extern "C" fn(*mut spAttachment) -> ()),
         Some(
-            _spPointAttachment_dispose as unsafe extern "C" fn(*mut spAttachment) -> (),
-        ),
-        Some(
-            _spPointAttachment_copy
-                as unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment,
+            _spPointAttachment_copy as unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment,
         ),
     );
     return self_0;
@@ -15954,14 +14948,12 @@ pub unsafe extern "C" fn spPointAttachment_computeWorldRotation(
     mut self_0: *mut spPointAttachment,
     mut bone: *mut spBone,
 ) -> c_float {
-    let mut r: c_float = (*self_0).rotation
-        * (3.1415926535897932385f32 / 180 as c_int as c_float);
+    let mut r: c_float = (*self_0).rotation * (3.1415926535897932385f32 / 180 as c_int as c_float);
     let mut cosine: c_float = spine_cosf(r);
-    let mut sine: c_float = sinf(r);
+    let mut sine: c_float = spine_sinf(r);
     let mut x: c_float = cosine * (*bone).a + sine * (*bone).b;
     let mut y: c_float = cosine * (*bone).c + sine * (*bone).d;
-    return spine_atan2f(y, x)
-        * (180 as c_int as c_float / 3.1415926535897932385f32);
+    return spine_atan2f(y, x) * (180 as c_int as c_float / 3.1415926535897932385f32);
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spRegionAttachment_dispose(mut attachment: *mut spAttachment) {
@@ -15978,18 +14970,12 @@ pub unsafe extern "C" fn _spRegionAttachment_copy(
     mut attachment: *mut spAttachment,
 ) -> *mut spAttachment {
     let mut self_0: *mut spRegionAttachment = attachment as *mut spRegionAttachment;
-    let mut copy: *mut spRegionAttachment = spRegionAttachment_create(
-        (*attachment).name,
-    );
+    let mut copy: *mut spRegionAttachment = spRegionAttachment_create((*attachment).name);
     (*copy).region = (*self_0).region;
     (*copy).rendererObject = (*self_0).rendererObject;
-    (*copy)
-        .path = _spMalloc(
+    (*copy).path = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen((*self_0).path))
-                    .wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen((*self_0).path)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         8047 as c_int,
     ) as *mut c_char;
@@ -16004,18 +14990,15 @@ pub unsafe extern "C" fn _spRegionAttachment_copy(
     spine_memcpy(
         ((*copy).uvs).as_mut_ptr() as *mut c_void,
         ((*self_0).uvs).as_mut_ptr() as *const c_void,
-        (::core::mem::size_of::<c_float>() as c_ulong)
-            .wrapping_mul(8 as c_int as c_ulong),
+        (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(8 as c_int as c_ulong),
     );
     spine_memcpy(
         ((*copy).offset).as_mut_ptr() as *mut c_void,
         ((*self_0).offset).as_mut_ptr() as *const c_void,
-        (::core::mem::size_of::<c_float>() as c_ulong)
-            .wrapping_mul(8 as c_int as c_ulong),
+        (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(8 as c_int as c_ulong),
     );
     spColor_setFromColor(&mut (*copy).color, &mut (*self_0).color);
-    (*copy)
-        .sequence = if !((*self_0).sequence).is_null() {
+    (*copy).sequence = if !((*self_0).sequence).is_null() {
         spSequence_copy((*self_0).sequence)
     } else {
         0 as *mut spSequence
@@ -16045,9 +15028,7 @@ pub unsafe extern "C" fn spRegionAttachment_create(
         &mut (*self_0).super_0,
         name,
         SP_ATTACHMENT_REGION,
-        Some(
-            _spRegionAttachment_dispose as unsafe extern "C" fn(*mut spAttachment) -> (),
-        ),
+        Some(_spRegionAttachment_dispose as unsafe extern "C" fn(*mut spAttachment) -> ()),
         Some(
             _spRegionAttachment_copy
                 as unsafe extern "C" fn(*mut spAttachment) -> *mut spAttachment,
@@ -16056,9 +15037,7 @@ pub unsafe extern "C" fn spRegionAttachment_create(
     return self_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spRegionAttachment_updateRegion(
-    mut self_0: *mut spRegionAttachment,
-) {
+pub unsafe extern "C" fn spRegionAttachment_updateRegion(mut self_0: *mut spRegionAttachment) {
     let mut regionScaleX: c_float = 0.;
     let mut regionScaleY: c_float = 0.;
     let mut localX: c_float = 0.;
@@ -16087,20 +15066,19 @@ pub unsafe extern "C" fn spRegionAttachment_updateRegion(
         (*self_0).uvs[7 as c_int as usize] = 0 as c_int as c_float;
         return;
     }
-    regionScaleX = (*self_0).width / (*(*self_0).region).originalWidth as c_float
-        * (*self_0).scaleX;
-    regionScaleY = (*self_0).height / (*(*self_0).region).originalHeight as c_float
-        * (*self_0).scaleY;
+    regionScaleX =
+        (*self_0).width / (*(*self_0).region).originalWidth as c_float * (*self_0).scaleX;
+    regionScaleY =
+        (*self_0).height / (*(*self_0).region).originalHeight as c_float * (*self_0).scaleY;
     localX = -(*self_0).width / 2 as c_int as c_float * (*self_0).scaleX
         + (*(*self_0).region).offsetX * regionScaleX;
     localY = -(*self_0).height / 2 as c_int as c_float * (*self_0).scaleY
         + (*(*self_0).region).offsetY * regionScaleY;
     localX2 = localX + (*(*self_0).region).width as c_float * regionScaleX;
     localY2 = localY + (*(*self_0).region).height as c_float * regionScaleY;
-    radians = (*self_0).rotation
-        * (3.1415926535897932385f32 / 180 as c_int as c_float);
+    radians = (*self_0).rotation * (3.1415926535897932385f32 / 180 as c_int as c_float);
     cosine = spine_cosf(radians);
-    sine = sinf(radians);
+    sine = spine_sinf(radians);
     localXCos = localX * cosine + (*self_0).x;
     localXSin = localX * sine;
     localYCos = localY * cosine + (*self_0).y;
@@ -16157,34 +15135,26 @@ pub unsafe extern "C" fn spRegionAttachment_computeWorldVertices(
     offsetX = *offsets.offset(BRX as c_int as isize);
     offsetY = *offsets.offset(BRY as c_int as isize);
     *vertices.offset(offset as isize) = offsetX * (*bone).a + offsetY * (*bone).b + x;
-    *vertices
-        .offset(
-            (offset + 1 as c_int) as isize,
-        ) = offsetX * (*bone).c + offsetY * (*bone).d + y;
+    *vertices.offset((offset + 1 as c_int) as isize) =
+        offsetX * (*bone).c + offsetY * (*bone).d + y;
     offset += stride;
     offsetX = *offsets.offset(BLX as c_int as isize);
     offsetY = *offsets.offset(BLY as c_int as isize);
     *vertices.offset(offset as isize) = offsetX * (*bone).a + offsetY * (*bone).b + x;
-    *vertices
-        .offset(
-            (offset + 1 as c_int) as isize,
-        ) = offsetX * (*bone).c + offsetY * (*bone).d + y;
+    *vertices.offset((offset + 1 as c_int) as isize) =
+        offsetX * (*bone).c + offsetY * (*bone).d + y;
     offset += stride;
     offsetX = *offsets.offset(ULX as c_int as isize);
     offsetY = *offsets.offset(ULY as c_int as isize);
     *vertices.offset(offset as isize) = offsetX * (*bone).a + offsetY * (*bone).b + x;
-    *vertices
-        .offset(
-            (offset + 1 as c_int) as isize,
-        ) = offsetX * (*bone).c + offsetY * (*bone).d + y;
+    *vertices.offset((offset + 1 as c_int) as isize) =
+        offsetX * (*bone).c + offsetY * (*bone).d + y;
     offset += stride;
     offsetX = *offsets.offset(URX as c_int as isize);
     offsetY = *offsets.offset(URY as c_int as isize);
     *vertices.offset(offset as isize) = offsetX * (*bone).a + offsetY * (*bone).b + x;
-    *vertices
-        .offset(
-            (offset + 1 as c_int) as isize,
-        ) = offsetX * (*bone).c + offsetY * (*bone).d + y;
+    *vertices.offset((offset + 1 as c_int) as isize) =
+        offsetX * (*bone).c + offsetY * (*bone).d + y;
 }
 #[no_mangle]
 pub unsafe extern "C" fn spTextureRegionArray_create(
@@ -16198,8 +15168,7 @@ pub unsafe extern "C" fn spTextureRegionArray_create(
     ) as *mut spTextureRegionArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spTextureRegion>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -16208,16 +15177,12 @@ pub unsafe extern "C" fn spTextureRegionArray_create(
     return array;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spTextureRegionArray_dispose(
-    mut self_0: *mut spTextureRegionArray,
-) {
+pub unsafe extern "C" fn spTextureRegionArray_dispose(mut self_0: *mut spTextureRegionArray) {
     _spFree((*self_0).items as *mut c_void);
     _spFree(self_0 as *mut c_void);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spTextureRegionArray_clear(
-    mut self_0: *mut spTextureRegionArray,
-) {
+pub unsafe extern "C" fn spTextureRegionArray_clear(mut self_0: *mut spTextureRegionArray) {
     (*self_0).size = 0 as c_int;
 }
 #[no_mangle]
@@ -16227,16 +15192,12 @@ pub unsafe extern "C" fn spTextureRegionArray_setSize(
 ) -> *mut spTextureRegionArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spTextureRegion>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -16253,8 +15214,7 @@ pub unsafe extern "C" fn spTextureRegionArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<*mut spTextureRegion>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -16266,16 +15226,12 @@ pub unsafe extern "C" fn spTextureRegionArray_add(
     mut value: *mut spTextureRegion,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spTextureRegion>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -16319,8 +15275,9 @@ pub unsafe extern "C" fn spTextureRegionArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<*mut spTextureRegion>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -16348,8 +15305,7 @@ pub unsafe extern "C" fn spTextureRegionArray_pop(
     mut self_0: *mut spTextureRegionArray,
 ) -> *mut spTextureRegion {
     (*self_0).size -= 1;
-    let mut item: *mut spTextureRegion = *((*self_0).items)
-        .offset((*self_0).size as isize);
+    let mut item: *mut spTextureRegion = *((*self_0).items).offset((*self_0).size as isize);
     return item;
 }
 #[no_mangle]
@@ -16360,9 +15316,7 @@ pub unsafe extern "C" fn spTextureRegionArray_peek(
 }
 static mut nextSequenceId: c_int = 0 as c_int;
 #[no_mangle]
-pub unsafe extern "C" fn spSequence_create(
-    mut numRegions: c_int,
-) -> *mut spSequence {
+pub unsafe extern "C" fn spSequence_create(mut numRegions: c_int) -> *mut spSequence {
     let mut self_0: *mut spSequence = _spCalloc(
         1 as c_int as size_t,
         ::core::mem::size_of::<spSequence>() as c_ulong,
@@ -16382,9 +15336,7 @@ pub unsafe extern "C" fn spSequence_dispose(mut self_0: *mut spSequence) {
     _spFree(self_0 as *mut c_void);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spSequence_copy(
-    mut self_0: *mut spSequence,
-) -> *mut spSequence {
+pub unsafe extern "C" fn spSequence_copy(mut self_0: *mut spSequence) -> *mut spSequence {
     let mut i: c_int = 0 as c_int;
     let mut copy: *mut spSequence = spSequence_create((*(*self_0).regions).size);
     while i < (*(*self_0).regions).size {
@@ -16412,22 +15364,16 @@ pub unsafe extern "C" fn spSequence_apply(
         index = (*(*self_0).regions).size - 1 as c_int;
     }
     region = *((*(*self_0).regions).items).offset(index as isize);
-    if (*attachment).type_0 as c_uint
-        == SP_ATTACHMENT_REGION as c_int as c_uint
-    {
-        let mut regionAttachment: *mut spRegionAttachment = attachment
-            as *mut spRegionAttachment;
+    if (*attachment).type_0 as c_uint == SP_ATTACHMENT_REGION as c_int as c_uint {
+        let mut regionAttachment: *mut spRegionAttachment = attachment as *mut spRegionAttachment;
         if (*regionAttachment).region != region {
             (*regionAttachment).rendererObject = region as *mut c_void;
             (*regionAttachment).region = region;
             spRegionAttachment_updateRegion(regionAttachment);
         }
     }
-    if (*attachment).type_0 as c_uint
-        == SP_ATTACHMENT_MESH as c_int as c_uint
-    {
-        let mut meshAttachment: *mut spMeshAttachment = attachment
-            as *mut spMeshAttachment;
+    if (*attachment).type_0 as c_uint == SP_ATTACHMENT_MESH as c_int as c_uint {
+        let mut meshAttachment: *mut spMeshAttachment = attachment as *mut spMeshAttachment;
         if (*meshAttachment).region != region {
             (*meshAttachment).rendererObject = region as *mut c_void;
             (*meshAttachment).region = region;
@@ -16450,10 +15396,7 @@ unsafe extern "C" fn num_digits(mut value: c_int) -> c_int {
     }
     return count;
 }
-unsafe extern "C" fn string_append(
-    mut str: *mut c_char,
-    mut b: *const c_char,
-) -> *mut c_char {
+unsafe extern "C" fn string_append(mut str: *mut c_char, mut b: *const c_char) -> *mut c_char {
     let mut lenB: c_int = spine_strlen(b) as c_int;
     spine_memcpy(
         str as *mut c_void,
@@ -16462,14 +15405,11 @@ unsafe extern "C" fn string_append(
     );
     return str.offset(lenB as isize);
 }
-unsafe extern "C" fn string_append_int(
-    mut str: *mut c_char,
-    mut value: c_int,
-) -> *mut c_char {
+unsafe extern "C" fn string_append_int(mut str: *mut c_char, mut value: c_int) -> *mut c_char {
     let mut intStr: [c_char; 20] = [0; 20];
-    snprintf(
+    spine_snprintf!(
         intStr.as_mut_ptr(),
-        20 as c_int as c_ulong,
+        20 as c_int as size_t,
         b"%i\0" as *const u8 as *const c_char,
         value,
     );
@@ -16492,9 +15432,7 @@ pub unsafe extern "C" fn spSequence_getPath(
     path = string_append_int(path, (*self_0).start + index);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spSkeleton_create(
-    mut data: *mut spSkeletonData,
-) -> *mut spSkeleton {
+pub unsafe extern "C" fn spSkeleton_create(mut data: *mut spSkeletonData) -> *mut spSkeleton {
     let mut i: c_int = 0;
     let mut childrenCounts: *mut c_int = 0 as *mut c_int;
     let mut internal: *mut _spSkeleton = _spCalloc(
@@ -16517,8 +15455,7 @@ pub unsafe extern "C" fn spSkeleton_create(
     (*self_0).scaleY = 1 as c_int as c_float;
     (*self_0).time = 0 as c_int as c_float;
     (*self_0).bonesCount = (*(*self_0).data).bonesCount;
-    (*self_0)
-        .bones = _spMalloc(
+    (*self_0).bones = _spMalloc(
         (::core::mem::size_of::<*mut spBone>() as c_ulong)
             .wrapping_mul((*self_0).bonesCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -16532,17 +15469,15 @@ pub unsafe extern "C" fn spSkeleton_create(
     ) as *mut c_int;
     i = 0 as c_int;
     while i < (*self_0).bonesCount {
-        let mut boneData: *mut spBoneData = *((*(*self_0).data).bones)
-            .offset(i as isize);
+        let mut boneData: *mut spBoneData = *((*(*self_0).data).bones).offset(i as isize);
         let mut newBone: *mut spBone = 0 as *mut spBone;
         if ((*boneData).parent).is_null() {
             newBone = spBone_create(boneData, self_0, 0 as *mut spBone);
         } else {
-            let mut parent: *mut spBone = *((*self_0).bones)
-                .offset((*(*boneData).parent).index as isize);
+            let mut parent: *mut spBone =
+                *((*self_0).bones).offset((*(*boneData).parent).index as isize);
             newBone = spBone_create(boneData, self_0, parent);
-            let ref mut fresh56 = *childrenCounts
-                .offset((*(*boneData).parent).index as isize);
+            let ref mut fresh56 = *childrenCounts.offset((*(*boneData).parent).index as isize);
             *fresh56 += 1;
         }
         let ref mut fresh57 = *((*self_0).bones).offset(i as isize);
@@ -16551,15 +15486,11 @@ pub unsafe extern "C" fn spSkeleton_create(
     }
     i = 0 as c_int;
     while i < (*self_0).bonesCount {
-        let mut boneData_0: *mut spBoneData = *((*(*self_0).data).bones)
-            .offset(i as isize);
+        let mut boneData_0: *mut spBoneData = *((*(*self_0).data).bones).offset(i as isize);
         let mut bone: *mut spBone = *((*self_0).bones).offset(i as isize);
-        (*bone)
-            .children = _spMalloc(
+        (*bone).children = _spMalloc(
             (::core::mem::size_of::<*mut spBone>() as c_ulong)
-                .wrapping_mul(
-                    *childrenCounts.offset((*boneData_0).index as isize) as c_ulong,
-                ),
+                .wrapping_mul(*childrenCounts.offset((*boneData_0).index as isize) as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
             8369 as c_int,
         ) as *mut *mut spBone;
@@ -16577,15 +15508,13 @@ pub unsafe extern "C" fn spSkeleton_create(
         }
         i += 1;
     }
-    (*self_0)
-        .root = if (*self_0).bonesCount > 0 as c_int {
+    (*self_0).root = if (*self_0).bonesCount > 0 as c_int {
         *((*self_0).bones).offset(0 as c_int as isize)
     } else {
         0 as *mut spBone
     };
     (*self_0).slotsCount = (*data).slotsCount;
-    (*self_0)
-        .slots = _spMalloc(
+    (*self_0).slots = _spMalloc(
         (::core::mem::size_of::<*mut spSlot>() as c_ulong)
             .wrapping_mul((*self_0).slotsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -16594,14 +15523,13 @@ pub unsafe extern "C" fn spSkeleton_create(
     i = 0 as c_int;
     while i < (*self_0).slotsCount {
         let mut slotData: *mut spSlotData = *((*data).slots).offset(i as isize);
-        let mut bone_1: *mut spBone = *((*self_0).bones)
-            .offset((*(*slotData).boneData).index as isize);
+        let mut bone_1: *mut spBone =
+            *((*self_0).bones).offset((*(*slotData).boneData).index as isize);
         let ref mut fresh60 = *((*self_0).slots).offset(i as isize);
         *fresh60 = spSlot_create(slotData, bone_1);
         i += 1;
     }
-    (*self_0)
-        .drawOrder = _spMalloc(
+    (*self_0).drawOrder = _spMalloc(
         (::core::mem::size_of::<*mut spSlot>() as c_ulong)
             .wrapping_mul((*self_0).slotsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -16614,8 +15542,7 @@ pub unsafe extern "C" fn spSkeleton_create(
             .wrapping_mul((*self_0).slotsCount as c_ulong),
     );
     (*self_0).ikConstraintsCount = (*data).ikConstraintsCount;
-    (*self_0)
-        .ikConstraints = _spMalloc(
+    (*self_0).ikConstraints = _spMalloc(
         (::core::mem::size_of::<*mut spIkConstraint>() as c_ulong)
             .wrapping_mul((*self_0).ikConstraintsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -16631,8 +15558,7 @@ pub unsafe extern "C" fn spSkeleton_create(
         i += 1;
     }
     (*self_0).transformConstraintsCount = (*data).transformConstraintsCount;
-    (*self_0)
-        .transformConstraints = _spMalloc(
+    (*self_0).transformConstraints = _spMalloc(
         (::core::mem::size_of::<*mut spTransformConstraint>() as c_ulong)
             .wrapping_mul((*self_0).transformConstraintsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -16648,8 +15574,7 @@ pub unsafe extern "C" fn spSkeleton_create(
         i += 1;
     }
     (*self_0).pathConstraintsCount = (*data).pathConstraintsCount;
-    (*self_0)
-        .pathConstraints = _spMalloc(
+    (*self_0).pathConstraints = _spMalloc(
         (::core::mem::size_of::<*mut spPathConstraint>() as c_ulong)
             .wrapping_mul((*self_0).pathConstraintsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -16665,8 +15590,7 @@ pub unsafe extern "C" fn spSkeleton_create(
         i += 1;
     }
     (*self_0).physicsConstraintsCount = (*data).physicsConstraintsCount;
-    (*self_0)
-        .physicsConstraints = _spMalloc(
+    (*self_0).physicsConstraints = _spMalloc(
         (::core::mem::size_of::<*mut spPhysicsConstraint>() as c_ulong)
             .wrapping_mul((*self_0).physicsConstraintsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -16720,9 +15644,7 @@ pub unsafe extern "C" fn spSkeleton_dispose(mut self_0: *mut spSkeleton) {
     _spFree((*self_0).ikConstraints as *mut c_void);
     i = 0 as c_int;
     while i < (*self_0).transformConstraintsCount {
-        spTransformConstraint_dispose(
-            *((*self_0).transformConstraints).offset(i as isize),
-        );
+        spTransformConstraint_dispose(*((*self_0).transformConstraints).offset(i as isize));
         i += 1;
     }
     _spFree((*self_0).transformConstraints as *mut c_void);
@@ -16749,8 +15671,7 @@ unsafe extern "C" fn _addToUpdateCache(
     let mut update: *mut _spUpdate = 0 as *mut _spUpdate;
     if (*internal).updateCacheCount == (*internal).updateCacheCapacity {
         (*internal).updateCacheCapacity *= 2 as c_int;
-        (*internal)
-            .updateCache = _spRealloc(
+        (*internal).updateCache = _spRealloc(
             (*internal).updateCache as *mut c_void,
             (::core::mem::size_of::<_spUpdate>() as c_ulong)
                 .wrapping_mul((*internal).updateCacheCapacity as c_ulong),
@@ -16779,9 +15700,7 @@ unsafe extern "C" fn _sortPathConstraintAttachmentBones(
     let mut pathAttachment: *mut spPathAttachment = attachment as *mut spPathAttachment;
     let mut pathBones: *mut c_int = 0 as *mut c_int;
     let mut pathBonesCount: c_int = 0;
-    if (*pathAttachment).super_0.super_0.type_0 as c_uint
-        != SP_ATTACHMENT_PATH as c_int as c_uint
-    {
+    if (*pathAttachment).super_0.super_0.type_0 as c_uint != SP_ATTACHMENT_PATH as c_int as c_uint {
         return;
     }
     pathBones = (*pathAttachment).super_0.bones;
@@ -16824,10 +15743,7 @@ unsafe extern "C" fn _sortPathConstraintAttachment(
         entry = (*entry).next;
     }
 }
-unsafe extern "C" fn _sortReset(
-    mut bones: *mut *mut spBone,
-    mut bonesCount: c_int,
-) {
+unsafe extern "C" fn _sortReset(mut bones: *mut *mut spBone, mut bonesCount: c_int) {
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < bonesCount {
@@ -16848,8 +15764,7 @@ unsafe extern "C" fn _sortIkConstraint(
     let mut target: *mut spBone = (*constraint).target;
     let mut constrained: *mut *mut spBone = 0 as *mut *mut spBone;
     let mut parent: *mut spBone = 0 as *mut spBone;
-    (*constraint)
-        .active = ((*(*constraint).target).active != 0
+    (*constraint).active = ((*(*constraint).target).active != 0
         && ((*(*constraint).data).skinRequired == 0
             || !((*internal).super_0.skin).is_null()
                 && spIkConstraintDataArray_contains(
@@ -16864,21 +15779,13 @@ unsafe extern "C" fn _sortIkConstraint(
     parent = *constrained.offset(0 as c_int as isize);
     _sortBone(internal, parent);
     if (*constraint).bonesCount == 1 as c_int {
-        _addToUpdateCache(
-            internal,
-            SP_UPDATE_IK_CONSTRAINT,
-            constraint as *mut c_void,
-        );
+        _addToUpdateCache(internal, SP_UPDATE_IK_CONSTRAINT, constraint as *mut c_void);
         _sortReset((*parent).children, (*parent).childrenCount);
     } else {
-        let mut child: *mut spBone = *constrained
-            .offset(((*constraint).bonesCount - 1 as c_int) as isize);
+        let mut child: *mut spBone =
+            *constrained.offset(((*constraint).bonesCount - 1 as c_int) as isize);
         _sortBone(internal, child);
-        _addToUpdateCache(
-            internal,
-            SP_UPDATE_IK_CONSTRAINT,
-            constraint as *mut c_void,
-        );
+        _addToUpdateCache(internal, SP_UPDATE_IK_CONSTRAINT, constraint as *mut c_void);
         _sortReset((*parent).children, (*parent).childrenCount);
         (*child).sorted = 1 as c_int;
     };
@@ -16896,8 +15803,7 @@ unsafe extern "C" fn _sortPathConstraint(
     let mut attachment: *mut spAttachment = 0 as *mut spAttachment;
     let mut constrained: *mut *mut spBone = 0 as *mut *mut spBone;
     let mut skeleton: *mut spSkeleton = internal as *mut spSkeleton;
-    (*constraint)
-        .active = ((*(*(*constraint).target).bone).active != 0
+    (*constraint).active = ((*(*(*constraint).target).bone).active != 0
         && ((*(*constraint).data).skinRequired == 0
             || !((*internal).super_0.skin).is_null()
                 && spPathConstraintDataArray_contains(
@@ -16933,8 +15839,7 @@ unsafe extern "C" fn _sortPathConstraint(
     }
     attachment = (*slot).attachment;
     if !attachment.is_null()
-        && (*attachment).type_0 as c_uint
-            == SP_ATTACHMENT_PATH as c_int as c_uint
+        && (*attachment).type_0 as c_uint == SP_ATTACHMENT_PATH as c_int as c_uint
     {
         _sortPathConstraintAttachmentBones(internal, attachment, slotBone);
     }
@@ -16972,8 +15877,7 @@ unsafe extern "C" fn _sortTransformConstraint(
     let mut boneCount: c_int = 0;
     let mut constrained: *mut *mut spBone = 0 as *mut *mut spBone;
     let mut child: *mut spBone = 0 as *mut spBone;
-    (*constraint)
-        .active = ((*(*constraint).target).active != 0
+    (*constraint).active = ((*(*constraint).target).active != 0
         && ((*(*constraint).data).skinRequired == 0
             || !((*internal).super_0.skin).is_null()
                 && spTransformConstraintDataArray_contains(
@@ -17025,8 +15929,7 @@ unsafe extern "C" fn _sortPhysicsConstraint(
     mut constraint: *mut spPhysicsConstraint,
 ) {
     let mut bone: *mut spBone = (*constraint).bone;
-    (*constraint)
-        .active = ((*(*constraint).bone).active != 0
+    (*constraint).active = ((*(*constraint).bone).active != 0
         && ((*(*constraint).data).skinRequired == 0
             || !((*internal).super_0.skin).is_null()
                 && spPhysicsConstraintDataArray_contains(
@@ -17051,25 +15954,23 @@ pub unsafe extern "C" fn spSkeleton_updateCache(mut self_0: *mut spSkeleton) {
     let mut ii: c_int = 0;
     let mut bones: *mut *mut spBone = 0 as *mut *mut spBone;
     let mut ikConstraints: *mut *mut spIkConstraint = 0 as *mut *mut spIkConstraint;
-    let mut pathConstraints: *mut *mut spPathConstraint = 0
-        as *mut *mut spPathConstraint;
-    let mut transformConstraints: *mut *mut spTransformConstraint = 0
-        as *mut *mut spTransformConstraint;
-    let mut physicsConstraints: *mut *mut spPhysicsConstraint = 0
-        as *mut *mut spPhysicsConstraint;
+    let mut pathConstraints: *mut *mut spPathConstraint = 0 as *mut *mut spPathConstraint;
+    let mut transformConstraints: *mut *mut spTransformConstraint =
+        0 as *mut *mut spTransformConstraint;
+    let mut physicsConstraints: *mut *mut spPhysicsConstraint = 0 as *mut *mut spPhysicsConstraint;
     let mut ikCount: c_int = 0;
     let mut transformCount: c_int = 0;
     let mut pathCount: c_int = 0;
     let mut physicsCount: c_int = 0;
     let mut constraintCount: c_int = 0;
     let mut internal: *mut _spSkeleton = self_0 as *mut _spSkeleton;
-    (*internal)
-        .updateCacheCapacity = (*self_0).bonesCount + (*self_0).ikConstraintsCount
-        + (*self_0).transformConstraintsCount + (*self_0).pathConstraintsCount
+    (*internal).updateCacheCapacity = (*self_0).bonesCount
+        + (*self_0).ikConstraintsCount
+        + (*self_0).transformConstraintsCount
+        + (*self_0).pathConstraintsCount
         + (*self_0).physicsConstraintsCount;
     _spFree((*internal).updateCache as *mut c_void);
-    (*internal)
-        .updateCache = _spMalloc(
+    (*internal).updateCache = _spMalloc(
         (::core::mem::size_of::<_spUpdate>() as c_ulong)
             .wrapping_mul((*internal).updateCacheCapacity as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -17114,8 +16015,7 @@ pub unsafe extern "C" fn spSkeleton_updateCache(mut self_0: *mut spSkeleton) {
     's_133: while i < constraintCount {
         ii = 0 as c_int;
         while ii < ikCount {
-            let mut ikConstraint: *mut spIkConstraint = *ikConstraints
-                .offset(ii as isize);
+            let mut ikConstraint: *mut spIkConstraint = *ikConstraints.offset(ii as isize);
             if (*(*ikConstraint).data).order == i {
                 _sortIkConstraint(internal, ikConstraint);
                 i += 1;
@@ -17126,8 +16026,8 @@ pub unsafe extern "C" fn spSkeleton_updateCache(mut self_0: *mut spSkeleton) {
         }
         ii = 0 as c_int;
         while ii < transformCount {
-            let mut transformConstraint: *mut spTransformConstraint = *transformConstraints
-                .offset(ii as isize);
+            let mut transformConstraint: *mut spTransformConstraint =
+                *transformConstraints.offset(ii as isize);
             if (*(*transformConstraint).data).order == i {
                 _sortTransformConstraint(internal, transformConstraint);
                 i += 1;
@@ -17138,8 +16038,7 @@ pub unsafe extern "C" fn spSkeleton_updateCache(mut self_0: *mut spSkeleton) {
         }
         ii = 0 as c_int;
         while ii < pathCount {
-            let mut pathConstraint: *mut spPathConstraint = *pathConstraints
-                .offset(ii as isize);
+            let mut pathConstraint: *mut spPathConstraint = *pathConstraints.offset(ii as isize);
             if (*(*pathConstraint).data).order == i {
                 _sortPathConstraint(internal, pathConstraint);
                 i += 1;
@@ -17150,8 +16049,8 @@ pub unsafe extern "C" fn spSkeleton_updateCache(mut self_0: *mut spSkeleton) {
         }
         ii = 0 as c_int;
         while ii < physicsCount {
-            let mut physicsConstraint: *mut spPhysicsConstraint = *physicsConstraints
-                .offset(ii as isize);
+            let mut physicsConstraint: *mut spPhysicsConstraint =
+                *physicsConstraints.offset(ii as isize);
             if (*(*physicsConstraint).data).order == i {
                 _sortPhysicsConstraint(internal, physicsConstraint);
                 i += 1;
@@ -17200,18 +16099,13 @@ pub unsafe extern "C" fn spSkeleton_updateWorldTransform(
                 spIkConstraint_update((*update).object as *mut spIkConstraint);
             }
             3 => {
-                spTransformConstraint_update(
-                    (*update).object as *mut spTransformConstraint,
-                );
+                spTransformConstraint_update((*update).object as *mut spTransformConstraint);
             }
             2 => {
                 spPathConstraint_update((*update).object as *mut spPathConstraint);
             }
             4 => {
-                spPhysicsConstraint_update(
-                    (*update).object as *mut spPhysicsConstraint,
-                    physics,
-                );
+                spPhysicsConstraint_update((*update).object as *mut spPhysicsConstraint, physics);
             }
             _ => {}
         }
@@ -17219,10 +16113,7 @@ pub unsafe extern "C" fn spSkeleton_updateWorldTransform(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spSkeleton_update(
-    mut self_0: *mut spSkeleton,
-    mut delta: c_float,
-) {
+pub unsafe extern "C" fn spSkeleton_update(mut self_0: *mut spSkeleton, mut delta: c_float) {
     (*self_0).time += delta;
 }
 #[no_mangle]
@@ -17245,22 +16136,19 @@ pub unsafe extern "C" fn spSkeleton_updateWorldTransformWith(
     let mut pd: c_float = (*parent).d;
     (*rootBone).worldX = pa * (*self_0).x + pb * (*self_0).y + (*parent).worldX;
     (*rootBone).worldY = pc * (*self_0).x + pd * (*self_0).y + (*parent).worldY;
-    rotationY = (*rootBone).rotation + 90 as c_int as c_float
-        + (*rootBone).shearY;
+    rotationY = (*rootBone).rotation + 90 as c_int as c_float + (*rootBone).shearY;
     la = spine_cosf(
         ((*rootBone).rotation + (*rootBone).shearX)
             * (3.1415926535897932385f32 / 180 as c_int as c_float),
     ) * (*rootBone).scaleX;
-    lb = spine_cosf(
-        rotationY * (3.1415926535897932385f32 / 180 as c_int as c_float),
-    ) * (*rootBone).scaleY;
-    lc = sinf(
+    lb = spine_cosf(rotationY * (3.1415926535897932385f32 / 180 as c_int as c_float))
+        * (*rootBone).scaleY;
+    lc = spine_sinf(
         ((*rootBone).rotation + (*rootBone).shearX)
             * (3.1415926535897932385f32 / 180 as c_int as c_float),
     ) * (*rootBone).scaleX;
-    ld = sinf(
-        rotationY * (3.1415926535897932385f32 / 180 as c_int as c_float),
-    ) * (*rootBone).scaleY;
+    ld = spine_sinf(rotationY * (3.1415926535897932385f32 / 180 as c_int as c_float))
+        * (*rootBone).scaleY;
     (*rootBone).a = (pa * la + pb * lc) * (*self_0).scaleX;
     (*rootBone).b = (pa * lb + pb * ld) * (*self_0).scaleX;
     (*rootBone).c = (pc * la + pd * lc) * (*self_0).scaleY;
@@ -17278,18 +16166,13 @@ pub unsafe extern "C" fn spSkeleton_updateWorldTransformWith(
                 spIkConstraint_update((*update).object as *mut spIkConstraint);
             }
             3 => {
-                spTransformConstraint_update(
-                    (*update).object as *mut spTransformConstraint,
-                );
+                spTransformConstraint_update((*update).object as *mut spTransformConstraint);
             }
             2 => {
                 spPathConstraint_update((*update).object as *mut spPathConstraint);
             }
             4 => {
-                spPhysicsConstraint_update(
-                    (*update).object as *mut spPhysicsConstraint,
-                    physics,
-                );
+                spPhysicsConstraint_update((*update).object as *mut spPhysicsConstraint, physics);
             }
             _ => {}
         }
@@ -17316,9 +16199,7 @@ pub unsafe extern "C" fn spSkeleton_setBonesToSetupPose(mut self_0: *const spSke
     }
     i = 0 as c_int;
     while i < (*self_0).transformConstraintsCount {
-        spTransformConstraint_setToSetupPose(
-            *((*self_0).transformConstraints).offset(i as isize),
-        );
+        spTransformConstraint_setToSetupPose(*((*self_0).transformConstraints).offset(i as isize));
         i += 1;
     }
     i = 0 as c_int;
@@ -17328,9 +16209,7 @@ pub unsafe extern "C" fn spSkeleton_setBonesToSetupPose(mut self_0: *const spSke
     }
     i = 0 as c_int;
     while i < (*self_0).physicsConstraintsCount {
-        spPhysicsConstraint_setToSetupPose(
-            *((*self_0).physicsConstraints).offset(i as isize),
-        );
+        spPhysicsConstraint_setToSetupPose(*((*self_0).physicsConstraints).offset(i as isize));
         i += 1;
     }
 }
@@ -17357,8 +16236,10 @@ pub unsafe extern "C" fn spSkeleton_findBone(
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < (*self_0).bonesCount {
-        if spine_strcmp((**((*(*self_0).data).bones).offset(i as isize)).name, boneName)
-            == 0 as c_int
+        if spine_strcmp(
+            (**((*(*self_0).data).bones).offset(i as isize)).name,
+            boneName,
+        ) == 0 as c_int
         {
             return *((*self_0).bones).offset(i as isize);
         }
@@ -17374,8 +16255,10 @@ pub unsafe extern "C" fn spSkeleton_findSlot(
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < (*self_0).slotsCount {
-        if spine_strcmp((**((*(*self_0).data).slots).offset(i as isize)).name, slotName)
-            == 0 as c_int
+        if spine_strcmp(
+            (**((*(*self_0).data).slots).offset(i as isize)).name,
+            slotName,
+        ) == 0 as c_int
         {
             return *((*self_0).slots).offset(i as isize);
         }
@@ -17401,10 +16284,7 @@ pub unsafe extern "C" fn spSkeleton_setSkinByName(
     return 1 as c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spSkeleton_setSkin(
-    mut self_0: *mut spSkeleton,
-    mut newSkin: *mut spSkin,
-) {
+pub unsafe extern "C" fn spSkeleton_setSkin(mut self_0: *mut spSkeleton, mut newSkin: *mut spSkin) {
     if (*self_0).skin == newSkin {
         return;
     }
@@ -17417,11 +16297,8 @@ pub unsafe extern "C" fn spSkeleton_setSkin(
             while i < (*self_0).slotsCount {
                 let mut slot: *mut spSlot = *((*self_0).slots).offset(i as isize);
                 if !((*(*slot).data).attachmentName).is_null() {
-                    let mut attachment: *mut spAttachment = spSkin_getAttachment(
-                        newSkin,
-                        i,
-                        (*(*slot).data).attachmentName,
-                    );
+                    let mut attachment: *mut spAttachment =
+                        spSkin_getAttachment(newSkin, i, (*(*slot).data).attachmentName);
                     if !attachment.is_null() {
                         spSlot_setAttachment(slot, attachment);
                     }
@@ -17439,8 +16316,7 @@ pub unsafe extern "C" fn spSkeleton_getAttachmentForSlotName(
     mut slotName: *const c_char,
     mut attachmentName: *const c_char,
 ) -> *mut spAttachment {
-    let mut slotIndex: c_int = (*spSkeletonData_findSlot((*self_0).data, slotName))
-        .index;
+    let mut slotIndex: c_int = (*spSkeletonData_findSlot((*self_0).data, slotName)).index;
     return spSkeleton_getAttachmentForSlotIndex(self_0, slotIndex, attachmentName);
 }
 #[no_mangle]
@@ -17453,21 +16329,15 @@ pub unsafe extern "C" fn spSkeleton_getAttachmentForSlotIndex(
         return 0 as *mut spAttachment;
     }
     if !((*self_0).skin).is_null() {
-        let mut attachment: *mut spAttachment = spSkin_getAttachment(
-            (*self_0).skin,
-            slotIndex,
-            attachmentName,
-        );
+        let mut attachment: *mut spAttachment =
+            spSkin_getAttachment((*self_0).skin, slotIndex, attachmentName);
         if !attachment.is_null() {
             return attachment;
         }
     }
     if !((*(*self_0).data).defaultSkin).is_null() {
-        let mut attachment_0: *mut spAttachment = spSkin_getAttachment(
-            (*(*self_0).data).defaultSkin,
-            slotIndex,
-            attachmentName,
-        );
+        let mut attachment_0: *mut spAttachment =
+            spSkin_getAttachment((*(*self_0).data).defaultSkin, slotIndex, attachmentName);
         if !attachment_0.is_null() {
             return attachment_0;
         }
@@ -17488,11 +16358,8 @@ pub unsafe extern "C" fn spSkeleton_setAttachment(
             if attachmentName.is_null() {
                 spSlot_setAttachment(slot, 0 as *mut spAttachment);
             } else {
-                let mut attachment: *mut spAttachment = spSkeleton_getAttachmentForSlotIndex(
-                    self_0,
-                    i,
-                    attachmentName,
-                );
+                let mut attachment: *mut spAttachment =
+                    spSkeleton_getAttachmentForSlotIndex(self_0, i, attachmentName);
                 if attachment.is_null() {
                     return 0 as c_int;
                 }
@@ -17588,11 +16455,7 @@ pub unsafe extern "C" fn spSkeleton_physicsTranslate(
 ) {
     let mut i: c_int = 0 as c_int;
     while i < (*self_0).physicsConstraintsCount {
-        spPhysicsConstraint_translate(
-            *((*self_0).physicsConstraints).offset(i as isize),
-            x,
-            y,
-        );
+        spPhysicsConstraint_translate(*((*self_0).physicsConstraints).offset(i as isize), x, y);
         i += 1;
     }
 }
@@ -17614,10 +16477,7 @@ pub unsafe extern "C" fn spSkeleton_physicsRotate(
         i += 1;
     }
 }
-unsafe extern "C" fn string_lastIndexOf(
-    mut str: *const c_char,
-    mut needle: c_char,
-) -> c_int {
+unsafe extern "C" fn string_lastIndexOf(mut str: *const c_char, mut needle: c_char) -> c_int {
     if str.is_null() {
         return -(1 as c_int);
     }
@@ -17641,15 +16501,14 @@ unsafe extern "C" fn string_substring(
     }
     let mut len: c_int = end - start;
     let mut substr: *mut c_char = _spMalloc(
-        (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul((len + 1 as c_int) as c_ulong),
+        (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul((len + 1 as c_int) as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         9047 as c_int,
     ) as *mut c_char;
     if substr.is_null() {
         return 0 as *mut c_char;
     }
-    strncpy(substr, str.offset(start as isize), len as c_ulong);
+    spine_strncpy(substr, str.offset(start as isize), len as size_t);
     *substr.offset(len as isize) = '\0' as i32 as c_char;
     return substr;
 }
@@ -17670,9 +16529,7 @@ unsafe extern "C" fn string_starts_with_binary(
     }
     i = 0 as c_int;
     while i < lenNeedle {
-        if *str.offset(i as isize) as c_int
-            != *needle.offset(i as isize) as c_int
-        {
+        if *str.offset(i as isize) as c_int != *needle.offset(i as isize) as c_int {
             return 0 as c_int;
         }
         i += 1;
@@ -17684,9 +16541,8 @@ unsafe extern "C" fn string_copy(mut str: *const c_char) -> *mut c_char {
         return 0 as *mut c_char;
     }
     let mut len: c_int = spine_strlen(str) as c_int;
-    let mut tmp: *mut c_char = spine_malloc((len + 1 as c_int) as size_t)
-        as *mut c_char;
-    strncpy(tmp, str, len as c_ulong);
+    let mut tmp: *mut c_char = spine_malloc((len + 1 as c_int) as size_t) as *mut c_char;
+    spine_strncpy(tmp, str, len as size_t);
     *tmp.offset(len as isize) = '\0' as i32 as c_char;
     return tmp;
 }
@@ -17695,12 +16551,7 @@ pub unsafe extern "C" fn spSkeletonBinary_createWithLoader(
     mut attachmentLoader: *mut spAttachmentLoader,
 ) -> *mut spSkeletonBinary {
     let mut self_0: *mut spSkeletonBinary = &mut (*((_spCalloc
-        as unsafe extern "C" fn(
-            size_t,
-            size_t,
-            *const c_char,
-            c_int,
-        ) -> *mut c_void)(
+        as unsafe extern "C" fn(size_t, size_t, *const c_char, c_int) -> *mut c_void)(
         1 as c_int as size_t,
         ::core::mem::size_of::<_spSkeletonBinary>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -17712,15 +16563,10 @@ pub unsafe extern "C" fn spSkeletonBinary_createWithLoader(
     return self_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spSkeletonBinary_create(
-    mut atlas: *mut spAtlas,
-) -> *mut spSkeletonBinary {
-    let mut attachmentLoader: *mut spAtlasAttachmentLoader = spAtlasAttachmentLoader_create(
-        atlas,
-    );
-    let mut self_0: *mut spSkeletonBinary = spSkeletonBinary_createWithLoader(
-        &mut (*attachmentLoader).super_0,
-    );
+pub unsafe extern "C" fn spSkeletonBinary_create(mut atlas: *mut spAtlas) -> *mut spSkeletonBinary {
+    let mut attachmentLoader: *mut spAtlasAttachmentLoader = spAtlasAttachmentLoader_create(atlas);
+    let mut self_0: *mut spSkeletonBinary =
+        spSkeletonBinary_createWithLoader(&mut (*attachmentLoader).super_0);
     (*(self_0 as *mut _spSkeletonBinary)).ownsLoader = 1 as c_int;
     return self_0;
 }
@@ -17752,13 +16598,9 @@ pub unsafe extern "C" fn _spSkeletonBinary_setError(
             (255 as c_int - length) as size_t,
         );
     }
-    (*self_0)
-        .error = _spMalloc(
+    (*self_0).error = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(message.as_mut_ptr()))
-                    .wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(message.as_mut_ptr())).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         9109 as c_int,
     ) as *mut c_char;
@@ -17785,10 +16627,7 @@ unsafe extern "C" fn readInt(mut input: *mut _dataInput) -> c_int {
     result |= readByte(input) as c_uint;
     return result as c_int;
 }
-unsafe extern "C" fn readVarint(
-    mut input: *mut _dataInput,
-    mut optimizePositive: c_int,
-) -> c_int {
+unsafe extern "C" fn readVarint(mut input: *mut _dataInput, mut optimizePositive: c_int) -> c_int {
     let mut b: c_uchar = readByte(input);
     let mut value: int32_t = b as c_int & 0x7f as c_int;
     if b as c_int & 0x80 as c_int != 0 {
@@ -17801,16 +16640,13 @@ unsafe extern "C" fn readVarint(
                 b = readByte(input);
                 value |= (b as c_int & 0x7f as c_int) << 21 as c_int;
                 if b as c_int & 0x80 as c_int != 0 {
-                    value
-                        |= (readByte(input) as c_int & 0x7f as c_int)
-                            << 28 as c_int;
+                    value |= (readByte(input) as c_int & 0x7f as c_int) << 28 as c_int;
                 }
             }
         }
     }
     if optimizePositive == 0 {
-        value = (value as c_uint >> 1 as c_int
-            ^ -(value & 1 as c_int) as c_uint) as int32_t;
+        value = (value as c_uint >> 1 as c_int ^ -(value & 1 as c_int) as c_uint) as int32_t;
     }
     return value;
 }
@@ -17828,8 +16664,7 @@ pub unsafe extern "C" fn readString(mut input: *mut _dataInput) -> *mut c_char {
         return 0 as *mut c_char;
     }
     string = _spMalloc(
-        (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(length as c_ulong),
+        (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(length as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         9168 as c_int,
     ) as *mut c_char;
@@ -17866,9 +16701,7 @@ unsafe extern "C" fn readColor(
     *a = readByte(input) as c_int as c_float / 255.0f32;
 }
 unsafe extern "C" fn readSequenceBinary(mut input: *mut _dataInput) -> *mut spSequence {
-    let mut sequence: *mut spSequence = spSequence_create(
-        readVarint(input, -(1 as c_int)),
-    );
+    let mut sequence: *mut spSequence = spSequence_create(readVarint(input, -(1 as c_int)));
     (*sequence).start = readVarint(input, -(1 as c_int));
     (*sequence).digits = readVarint(input, -(1 as c_int));
     (*sequence).setupIndex = readVarint(input, -(1 as c_int));
@@ -18085,7 +16918,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
     let mut eventCount: c_int = 0;
     let mut animation: *mut spAnimation = 0 as *mut spAnimation;
     let mut scale: c_float = (*self_0).scale;
-    let mut numTimelines: c_int = readVarint(input, 1 as c_int);
+    let mut _numTimelines: c_int = readVarint(input, 1 as c_int);
     i = 0 as c_int;
     n = readVarint(input, 1 as c_int);
     while i < n {
@@ -18098,46 +16931,30 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
             let mut frameLast: c_int = frameCount - 1 as c_int;
             match timelineType as c_int {
                 0 => {
-                    let mut timeline: *mut spAttachmentTimeline = spAttachmentTimeline_create(
-                        frameCount,
-                        slotIndex,
-                    );
+                    let mut timeline: *mut spAttachmentTimeline =
+                        spAttachmentTimeline_create(frameCount, slotIndex);
                     frame = 0 as c_int;
                     while frame < frameCount {
                         let mut time: c_float = readFloat(input);
-                        let mut attachmentName: *const c_char = readStringRef(
-                            input,
-                            skeletonData,
-                        );
-                        spAttachmentTimeline_setFrame(
-                            timeline,
-                            frame,
-                            time,
-                            attachmentName,
-                        );
+                        let mut attachmentName: *const c_char = readStringRef(input, skeletonData);
+                        spAttachmentTimeline_setFrame(timeline, frame, time, attachmentName);
                         frame += 1;
                     }
                     spTimelineArray_add(timelines, &mut (*timeline).super_0);
                 }
                 1 => {
-                    let mut bezierCount: c_int = readVarint(
-                        input,
-                        1 as c_int,
-                    );
-                    let mut timeline_0: *mut spRGBATimeline = spRGBATimeline_create(
-                        frameCount,
-                        bezierCount,
-                        slotIndex,
-                    );
+                    let mut bezierCount: c_int = readVarint(input, 1 as c_int);
+                    let mut timeline_0: *mut spRGBATimeline =
+                        spRGBATimeline_create(frameCount, bezierCount, slotIndex);
                     let mut time_0: c_float = readFloat(input);
-                    let mut r: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut g: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut b: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut a: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
+                    let mut r: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut g: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut b: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut a: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
                     frame = 0 as c_int;
                     bezier = 0 as c_int;
                     loop {
@@ -18151,20 +16968,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                             break;
                         }
                         time2 = readFloat(input);
-                        r2 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        g2 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        b2 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        a2 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
+                        r2 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        g2 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        b2 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        a2 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
                         match readSByte(input) as c_int {
                             1 => {
-                                spCurveTimeline_setStepped(
-                                    &mut (*timeline_0).super_0,
-                                    frame,
-                                );
+                                spCurveTimeline_setStepped(&mut (*timeline_0).super_0, frame);
                             }
                             2 => {
                                 let fresh72 = bezier;
@@ -18236,22 +17046,16 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                     spTimelineArray_add(timelines, &mut (*timeline_0).super_0.super_0);
                 }
                 2 => {
-                    let mut bezierCount_0: c_int = readVarint(
-                        input,
-                        1 as c_int,
-                    );
-                    let mut timeline_1: *mut spRGBTimeline = spRGBTimeline_create(
-                        frameCount,
-                        bezierCount_0,
-                        slotIndex,
-                    );
+                    let mut bezierCount_0: c_int = readVarint(input, 1 as c_int);
+                    let mut timeline_1: *mut spRGBTimeline =
+                        spRGBTimeline_create(frameCount, bezierCount_0, slotIndex);
                     let mut time_1: c_float = readFloat(input);
-                    let mut r_0: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut g_0: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut b_0: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
+                    let mut r_0: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut g_0: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut b_0: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
                     frame = 0 as c_int;
                     bezier = 0 as c_int;
                     loop {
@@ -18264,18 +17068,12 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                             break;
                         }
                         time2_0 = readFloat(input);
-                        r2_0 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        g2_0 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        b2_0 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
+                        r2_0 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        g2_0 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        b2_0 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
                         match readSByte(input) as c_int {
                             1 => {
-                                spCurveTimeline_setStepped(
-                                    &mut (*timeline_1).super_0,
-                                    frame,
-                                );
+                                spCurveTimeline_setStepped(&mut (*timeline_1).super_0, frame);
                             }
                             2 => {
                                 let fresh76 = bezier;
@@ -18332,30 +17130,24 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                     spTimelineArray_add(timelines, &mut (*timeline_1).super_0.super_0);
                 }
                 3 => {
-                    let mut bezierCount_1: c_int = readVarint(
-                        input,
-                        1 as c_int,
-                    );
-                    let mut timeline_2: *mut spRGBA2Timeline = spRGBA2Timeline_create(
-                        frameCount,
-                        bezierCount_1,
-                        slotIndex,
-                    );
+                    let mut bezierCount_1: c_int = readVarint(input, 1 as c_int);
+                    let mut timeline_2: *mut spRGBA2Timeline =
+                        spRGBA2Timeline_create(frameCount, bezierCount_1, slotIndex);
                     let mut time_2: c_float = readFloat(input);
-                    let mut r_1: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut g_1: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut b_1: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut a_0: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut r2_1: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut g2_1: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut b2_1: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
+                    let mut r_1: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut g_1: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut b_1: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut a_0: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut r2_1: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut g2_1: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut b2_1: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
                     frame = 0 as c_int;
                     bezier = 0 as c_int;
                     loop {
@@ -18368,41 +17160,22 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                         let mut ng2: c_float = 0.;
                         let mut nb2: c_float = 0.;
                         spRGBA2Timeline_setFrame(
-                            timeline_2,
-                            frame,
-                            time_2,
-                            r_1,
-                            g_1,
-                            b_1,
-                            a_0,
-                            r2_1,
-                            g2_1,
-                            b2_1,
+                            timeline_2, frame, time_2, r_1, g_1, b_1, a_0, r2_1, g2_1, b2_1,
                         );
                         if frame == frameLast {
                             break;
                         }
                         time2_1 = readFloat(input);
-                        nr = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        ng = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        nb = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        na = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        nr2 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        ng2 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        nb2 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
+                        nr = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        ng = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        nb = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        na = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        nr2 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        ng2 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        nb2 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
                         match readSByte(input) as c_int {
                             1 => {
-                                spCurveTimeline_setStepped(
-                                    &mut (*timeline_2).super_0,
-                                    frame,
-                                );
+                                spCurveTimeline_setStepped(&mut (*timeline_2).super_0, frame);
                             }
                             2 => {
                                 let fresh79 = bezier;
@@ -18519,28 +17292,22 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                     spTimelineArray_add(timelines, &mut (*timeline_2).super_0.super_0);
                 }
                 4 => {
-                    let mut bezierCount_2: c_int = readVarint(
-                        input,
-                        1 as c_int,
-                    );
-                    let mut timeline_3: *mut spRGB2Timeline = spRGB2Timeline_create(
-                        frameCount,
-                        bezierCount_2,
-                        slotIndex,
-                    );
+                    let mut bezierCount_2: c_int = readVarint(input, 1 as c_int);
+                    let mut timeline_3: *mut spRGB2Timeline =
+                        spRGB2Timeline_create(frameCount, bezierCount_2, slotIndex);
                     let mut time_3: c_float = readFloat(input);
-                    let mut r_2: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut g_2: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut b_2: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut r2_2: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut g2_2: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
-                    let mut b2_2: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
+                    let mut r_2: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut g_2: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut b_2: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut r2_2: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut g2_2: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                    let mut b2_2: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
                     frame = 0 as c_int;
                     bezier = 0 as c_int;
                     loop {
@@ -18552,38 +17319,21 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                         let mut ng2_0: c_float = 0.;
                         let mut nb2_0: c_float = 0.;
                         spRGB2Timeline_setFrame(
-                            timeline_3,
-                            frame,
-                            time_3,
-                            r_2,
-                            g_2,
-                            b_2,
-                            r2_2,
-                            g2_2,
-                            b2_2,
+                            timeline_3, frame, time_3, r_2, g_2, b_2, r2_2, g2_2, b2_2,
                         );
                         if frame == frameLast {
                             break;
                         }
                         time2_2 = readFloat(input);
-                        nr_0 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        ng_0 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        nb_0 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        nr2_0 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        ng2_0 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
-                        nb2_0 = (readByte(input) as c_int as c_double
-                            / 255.0f64) as c_float;
+                        nr_0 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        ng_0 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        nb_0 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        nr2_0 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        ng2_0 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
+                        nb2_0 = (readByte(input) as c_int as c_double / 255.0f64) as c_float;
                         match readSByte(input) as c_int {
                             1 => {
-                                spCurveTimeline_setStepped(
-                                    &mut (*timeline_3).super_0,
-                                    frame,
-                                );
+                                spCurveTimeline_setStepped(&mut (*timeline_3).super_0, frame);
                             }
                             2 => {
                                 let fresh86 = bezier;
@@ -18685,18 +17435,12 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                     spTimelineArray_add(timelines, &mut (*timeline_3).super_0.super_0);
                 }
                 5 => {
-                    let mut bezierCount_3: c_int = readVarint(
-                        input,
-                        1 as c_int,
-                    );
-                    let mut timeline_4: *mut spAlphaTimeline = spAlphaTimeline_create(
-                        frameCount,
-                        bezierCount_3,
-                        slotIndex,
-                    );
+                    let mut bezierCount_3: c_int = readVarint(input, 1 as c_int);
+                    let mut timeline_4: *mut spAlphaTimeline =
+                        spAlphaTimeline_create(frameCount, bezierCount_3, slotIndex);
                     let mut time_4: c_float = readFloat(input);
-                    let mut a_1: c_float = (readByte(input) as c_int
-                        as c_double / 255.0f64) as c_float;
+                    let mut a_1: c_float =
+                        (readByte(input) as c_int as c_double / 255.0f64) as c_float;
                     frame = 0 as c_int;
                     bezier = 0 as c_int;
                     loop {
@@ -18707,14 +17451,10 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                             break;
                         }
                         time2_3 = readFloat(input);
-                        a2_0 = (readByte(input) as c_int / 255 as c_int)
-                            as c_float;
+                        a2_0 = (readByte(input) as c_int / 255 as c_int) as c_float;
                         match readSByte(input) as c_int {
                             1 => {
-                                spCurveTimeline_setStepped(
-                                    &mut (*timeline_4).super_0,
-                                    frame,
-                                );
+                                spCurveTimeline_setStepped(&mut (*timeline_4).super_0, frame);
                             }
                             2 => {
                                 let fresh92 = bezier;
@@ -18756,10 +17496,8 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
             let mut timelineType_0: c_uchar = readByte(input);
             let mut frameCount_0: c_int = readVarint(input, 1 as c_int);
             if timelineType_0 as c_int == 10 as c_int {
-                let mut timeline_5: *mut spInheritTimeline = spInheritTimeline_create(
-                    frameCount_0,
-                    boneIndex,
-                );
+                let mut timeline_5: *mut spInheritTimeline =
+                    spInheritTimeline_create(frameCount_0, boneIndex);
                 frame = 0 as c_int;
                 while frame < frameCount_0 {
                     let mut time_5: c_float = readFloat(input);
@@ -18780,12 +17518,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     c_int,
-                                ) -> *mut spRotateTimeline)(
+                                )
+                                    -> *mut spRotateTimeline)(
                                 frameCount_0,
                                 bezierCount_4,
                                 boneIndex,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -18798,12 +17537,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     c_int,
-                                ) -> *mut spTranslateTimeline)(
+                                )
+                                    -> *mut spTranslateTimeline)(
                                 frameCount_0,
                                 bezierCount_4,
                                 boneIndex,
                             ))
-                                .super_0,
+                            .super_0,
                             scale,
                         );
                     }
@@ -18816,12 +17556,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     c_int,
-                                ) -> *mut spTranslateXTimeline)(
+                                )
+                                    -> *mut spTranslateXTimeline)(
                                 frameCount_0,
                                 bezierCount_4,
                                 boneIndex,
                             ))
-                                .super_0,
+                            .super_0,
                             scale,
                         );
                     }
@@ -18834,12 +17575,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     c_int,
-                                ) -> *mut spTranslateYTimeline)(
+                                )
+                                    -> *mut spTranslateYTimeline)(
                                 frameCount_0,
                                 bezierCount_4,
                                 boneIndex,
                             ))
-                                .super_0,
+                            .super_0,
                             scale,
                         );
                     }
@@ -18852,12 +17594,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     c_int,
-                                ) -> *mut spScaleTimeline)(
+                                )
+                                    -> *mut spScaleTimeline)(
                                 frameCount_0,
                                 bezierCount_4,
                                 boneIndex,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -18870,12 +17613,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     c_int,
-                                ) -> *mut spScaleXTimeline)(
+                                )
+                                    -> *mut spScaleXTimeline)(
                                 frameCount_0,
                                 bezierCount_4,
                                 boneIndex,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -18888,12 +17632,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     c_int,
-                                ) -> *mut spScaleYTimeline)(
+                                )
+                                    -> *mut spScaleYTimeline)(
                                 frameCount_0,
                                 bezierCount_4,
                                 boneIndex,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -18906,12 +17651,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     c_int,
-                                ) -> *mut spShearTimeline)(
+                                )
+                                    -> *mut spShearTimeline)(
                                 frameCount_0,
                                 bezierCount_4,
                                 boneIndex,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -18924,12 +17670,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     c_int,
-                                ) -> *mut spShearXTimeline)(
+                                )
+                                    -> *mut spShearXTimeline)(
                                 frameCount_0,
                                 bezierCount_4,
                                 boneIndex,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -18942,28 +17689,26 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     c_int,
-                                ) -> *mut spShearYTimeline)(
+                                )
+                                    -> *mut spShearYTimeline)(
                                 frameCount_0,
                                 bezierCount_4,
                                 boneIndex,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
                     _ => {
                         iii = 0 as c_int;
                         while iii < (*timelines).size {
-                            spTimeline_dispose(
-                                *((*timelines).items).offset(iii as isize),
-                            );
+                            spTimeline_dispose(*((*timelines).items).offset(iii as isize));
                             iii += 1;
                         }
                         spTimelineArray_dispose(timelines);
                         _spSkeletonBinary_setError(
                             self_0,
-                            b"Invalid timeline type for a bone: \0" as *const u8
-                                as *const c_char,
+                            b"Invalid timeline type for a bone: \0" as *const u8 as *const c_char,
                             (**((*skeletonData).bones).offset(boneIndex as isize)).name,
                         );
                         return 0 as *mut spAnimation;
@@ -18981,11 +17726,8 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
         let mut frameCount_1: c_int = readVarint(input, 1 as c_int);
         let mut frameLast_0: c_int = frameCount_1 - 1 as c_int;
         let mut bezierCount_5: c_int = readVarint(input, 1 as c_int);
-        let mut timeline_6: *mut spIkConstraintTimeline = spIkConstraintTimeline_create(
-            frameCount_1,
-            bezierCount_5,
-            index,
-        );
+        let mut timeline_6: *mut spIkConstraintTimeline =
+            spIkConstraintTimeline_create(frameCount_1, bezierCount_5, index);
         let mut flags: c_int = readByte(input) as c_int;
         let mut time_6: c_float = readFloat(input);
         let mut mix: c_float = if flags & 1 as c_int != 0 as c_int {
@@ -18997,8 +17739,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
         } else {
             0 as c_int as c_float
         };
-        let mut softness: c_float = if flags & 4 as c_int != 0 as c_int
-        {
+        let mut softness: c_float = if flags & 4 as c_int != 0 as c_int {
             readFloat(input) * scale
         } else {
             0 as c_int as c_float
@@ -19025,8 +17766,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
             }
             flags = readByte(input) as c_int;
             let mut time2_4: c_float = readFloat(input);
-            let mut mix2: c_float = if flags & 1 as c_int != 0 as c_int
-            {
+            let mut mix2: c_float = if flags & 1 as c_int != 0 as c_int {
                 if flags & 2 as c_int != 0 as c_int {
                     readFloat(input)
                 } else {
@@ -19035,9 +17775,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
             } else {
                 0 as c_int as c_float
             };
-            let mut softness2: c_float = if flags & 4 as c_int
-                != 0 as c_int
-            {
+            let mut softness2: c_float = if flags & 4 as c_int != 0 as c_int {
                 readFloat(input) * scale
             } else {
                 0 as c_int as c_float
@@ -19089,11 +17827,8 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
         let mut frameCount_2: c_int = readVarint(input, 1 as c_int);
         let mut frameLast_1: c_int = frameCount_2 - 1 as c_int;
         let mut bezierCount_6: c_int = readVarint(input, 1 as c_int);
-        let mut timeline_7: *mut spTransformConstraintTimeline = spTransformConstraintTimeline_create(
-            frameCount_2,
-            bezierCount_6,
-            index_0,
-        );
+        let mut timeline_7: *mut spTransformConstraintTimeline =
+            spTransformConstraintTimeline_create(frameCount_2, bezierCount_6, index_0);
         let mut time_7: c_float = readFloat(input);
         let mut mixRotate: c_float = readFloat(input);
         let mut mixX: c_float = readFloat(input);
@@ -19112,15 +17847,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
             let mut mixScaleY2: c_float = 0.;
             let mut mixShearY2: c_float = 0.;
             spTransformConstraintTimeline_setFrame(
-                timeline_7,
-                frame,
-                time_7,
-                mixRotate,
-                mixX,
-                mixY,
-                mixScaleX,
-                mixScaleY,
-                mixShearY,
+                timeline_7, frame, time_7, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY,
             );
             if frame == frameLast_1 {
                 break;
@@ -19240,8 +17967,8 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
     n = readVarint(input, 1 as c_int);
     while i < n {
         let mut index_1: c_int = readVarint(input, 1 as c_int);
-        let mut data: *mut spPathConstraintData = *((*skeletonData).pathConstraints)
-            .offset(index_1 as isize);
+        let mut data: *mut spPathConstraintData =
+            *((*skeletonData).pathConstraints).offset(index_1 as isize);
         ii = 0 as c_int;
         nn = readVarint(input, 1 as c_int);
         while ii < nn {
@@ -19258,12 +17985,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                 c_int,
                                 c_int,
                                 c_int,
-                            ) -> *mut spPathConstraintPositionTimeline)(
+                            )
+                                -> *mut spPathConstraintPositionTimeline)(
                             frameCount_3,
                             bezierCount_7,
                             index_1,
                         ))
-                            .super_0,
+                        .super_0,
                         if (*data).positionMode as c_uint
                             == SP_POSITION_MODE_FIXED as c_int as c_uint
                         {
@@ -19282,12 +18010,13 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                 c_int,
                                 c_int,
                                 c_int,
-                            ) -> *mut spPathConstraintSpacingTimeline)(
+                            )
+                                -> *mut spPathConstraintSpacingTimeline)(
                             frameCount_3,
                             bezierCount_7,
                             index_1,
                         ))
-                            .super_0,
+                        .super_0,
                         if (*data).spacingMode as c_uint
                             == SP_SPACING_MODE_LENGTH as c_int as c_uint
                             || (*data).spacingMode as c_uint
@@ -19305,19 +18034,15 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                     let mut mixX_0: c_float = 0.;
                     let mut mixY_0: c_float = 0.;
                     let mut frameLast_2: c_int = 0;
-                    let mut timeline_8: *mut spPathConstraintMixTimeline = spPathConstraintMixTimeline_create(
-                        frameCount_3,
-                        bezierCount_7,
-                        index_1,
-                    );
+                    let mut timeline_8: *mut spPathConstraintMixTimeline =
+                        spPathConstraintMixTimeline_create(frameCount_3, bezierCount_7, index_1);
                     time_8 = readFloat(input);
                     mixRotate_0 = readFloat(input);
                     mixX_0 = readFloat(input);
                     mixY_0 = readFloat(input);
                     frame = 0 as c_int;
                     bezier = 0 as c_int;
-                    frameLast_2 = (*timeline_8).super_0.super_0.frameCount
-                        - 1 as c_int;
+                    frameLast_2 = (*timeline_8).super_0.super_0.frameCount - 1 as c_int;
                     loop {
                         let mut time2_6: c_float = 0.;
                         let mut mixRotate2_0: c_float = 0.;
@@ -19340,10 +18065,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                         mixY2_0 = readFloat(input);
                         match readSByte(input) as c_int {
                             1 => {
-                                spCurveTimeline_setStepped(
-                                    &mut (*timeline_8).super_0,
-                                    frame,
-                                );
+                                spCurveTimeline_setStepped(&mut (*timeline_8).super_0, frame);
                             }
                             2 => {
                                 let fresh101 = bezier;
@@ -19408,25 +18130,18 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
     i = 0 as c_int;
     n = readVarint(input, 1 as c_int);
     while i < n {
-        let mut index_2: c_int = readVarint(input, 1 as c_int)
-            - 1 as c_int;
+        let mut index_2: c_int = readVarint(input, 1 as c_int) - 1 as c_int;
         ii = 0 as c_int;
         nn = readVarint(input, 1 as c_int);
         while ii < nn {
             let mut type_1: c_int = readByte(input) as c_int;
             let mut frameCount_4: c_int = readVarint(input, 1 as c_int);
             if type_1 == 8 as c_int {
-                let mut timeline_9: *mut spPhysicsConstraintResetTimeline = spPhysicsConstraintResetTimeline_create(
-                    frameCount_4,
-                    index_2,
-                );
+                let mut timeline_9: *mut spPhysicsConstraintResetTimeline =
+                    spPhysicsConstraintResetTimeline_create(frameCount_4, index_2);
                 frame = 0 as c_int;
                 while frame < frameCount_4 {
-                    spPhysicsConstraintResetTimeline_setFrame(
-                        timeline_9,
-                        frame,
-                        readFloat(input),
-                    );
+                    spPhysicsConstraintResetTimeline_setFrame(timeline_9, frame, readFloat(input));
                     frame += 1;
                 }
                 spTimelineArray_add(timelines, &mut (*timeline_9).super_0);
@@ -19443,13 +18158,14 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     spTimelineType,
-                                ) -> *mut spPhysicsConstraintTimeline)(
+                                )
+                                    -> *mut spPhysicsConstraintTimeline)(
                                 frameCount_4,
                                 bezierCount_8,
                                 index_2,
                                 SP_TIMELINE_PHYSICSCONSTRAINT_INERTIA,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -19463,13 +18179,14 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     spTimelineType,
-                                ) -> *mut spPhysicsConstraintTimeline)(
+                                )
+                                    -> *mut spPhysicsConstraintTimeline)(
                                 frameCount_4,
                                 bezierCount_8,
                                 index_2,
                                 SP_TIMELINE_PHYSICSCONSTRAINT_STRENGTH,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -19483,13 +18200,14 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     spTimelineType,
-                                ) -> *mut spPhysicsConstraintTimeline)(
+                                )
+                                    -> *mut spPhysicsConstraintTimeline)(
                                 frameCount_4,
                                 bezierCount_8,
                                 index_2,
                                 SP_TIMELINE_PHYSICSCONSTRAINT_DAMPING,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -19503,13 +18221,14 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     spTimelineType,
-                                ) -> *mut spPhysicsConstraintTimeline)(
+                                )
+                                    -> *mut spPhysicsConstraintTimeline)(
                                 frameCount_4,
                                 bezierCount_8,
                                 index_2,
                                 SP_TIMELINE_PHYSICSCONSTRAINT_MASS,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -19523,13 +18242,14 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     spTimelineType,
-                                ) -> *mut spPhysicsConstraintTimeline)(
+                                )
+                                    -> *mut spPhysicsConstraintTimeline)(
                                 frameCount_4,
                                 bezierCount_8,
                                 index_2,
                                 SP_TIMELINE_PHYSICSCONSTRAINT_WIND,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -19543,13 +18263,14 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     spTimelineType,
-                                ) -> *mut spPhysicsConstraintTimeline)(
+                                )
+                                    -> *mut spPhysicsConstraintTimeline)(
                                 frameCount_4,
                                 bezierCount_8,
                                 index_2,
                                 SP_TIMELINE_PHYSICSCONSTRAINT_GRAVITY,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -19563,13 +18284,14 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     c_int,
                                     c_int,
                                     spTimelineType,
-                                ) -> *mut spPhysicsConstraintTimeline)(
+                                )
+                                    -> *mut spPhysicsConstraintTimeline)(
                                 frameCount_4,
                                 bezierCount_8,
                                 index_2,
                                 SP_TIMELINE_PHYSICSCONSTRAINT_MIX,
                             ))
-                                .super_0,
+                            .super_0,
                             1 as c_int as c_float,
                         );
                     }
@@ -19583,8 +18305,8 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
     i = 0 as c_int;
     n = readVarint(input, 1 as c_int);
     while i < n {
-        let mut skin: *mut spSkin = *((*skeletonData).skins)
-            .offset(readVarint(input, 1 as c_int) as isize);
+        let mut skin: *mut spSkin =
+            *((*skeletonData).skins).offset(readVarint(input, 1 as c_int) as isize);
         ii = 0 as c_int;
         nn = readVarint(input, 1 as c_int);
         while ii < nn {
@@ -19598,15 +18320,10 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                 let mut time_9: c_float = 0.;
                 let mut time2_7: c_float = 0.;
                 let mut timelineType_1: c_uint = 0;
-                let mut attachmentName_0: *const c_char = readStringRef(
-                    input,
-                    skeletonData,
-                );
-                let mut attachment: *mut spVertexAttachment = spSkin_getAttachment(
-                    skin,
-                    slotIndex_0,
-                    attachmentName_0,
-                ) as *mut spVertexAttachment;
+                let mut attachmentName_0: *const c_char = readStringRef(input, skeletonData);
+                let mut attachment: *mut spVertexAttachment =
+                    spSkin_getAttachment(skin, slotIndex_0, attachmentName_0)
+                        as *mut spVertexAttachment;
                 if attachment.is_null() {
                     i = 0 as c_int;
                     while i < (*timelines).size {
@@ -19629,13 +18346,10 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                         let mut tempDeform: *mut c_float = 0 as *mut c_float;
                         let mut weighted: c_int = 0;
                         let mut deformLength: c_int = 0;
-                        let mut timeline_10: *mut spDeformTimeline = 0
-                            as *mut spDeformTimeline;
-                        weighted = ((*attachment).bones != 0 as *mut c_int)
-                            as c_int;
+                        let mut timeline_10: *mut spDeformTimeline = 0 as *mut spDeformTimeline;
+                        weighted = ((*attachment).bones != 0 as *mut c_int) as c_int;
                         deformLength = if weighted != 0 {
-                            (*attachment).verticesCount / 3 as c_int
-                                * 2 as c_int
+                            (*attachment).verticesCount / 3 as c_int * 2 as c_int
                         } else {
                             (*attachment).verticesCount
                         };
@@ -19658,10 +18372,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                         bezier = 0 as c_int;
                         loop {
                             let mut deform: *mut c_float = 0 as *mut c_float;
-                            let mut end: c_int = readVarint(
-                                input,
-                                1 as c_int,
-                            );
+                            let mut end: c_int = readVarint(input, 1 as c_int);
                             if end == 0 {
                                 if weighted != 0 {
                                     deform = tempDeform;
@@ -19676,10 +18387,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                 }
                             } else {
                                 let mut v: c_int = 0;
-                                let mut start: c_int = readVarint(
-                                    input,
-                                    1 as c_int,
-                                );
+                                let mut start: c_int = readVarint(input, 1 as c_int);
                                 deform = tempDeform;
                                 spine_memset(
                                     deform as *mut c_void,
@@ -19697,8 +18405,8 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                 } else {
                                     v = start;
                                     while v < end {
-                                        *deform
-                                            .offset(v as isize) = readFloat(input) * (*self_0).scale;
+                                        *deform.offset(v as isize) =
+                                            readFloat(input) * (*self_0).scale;
                                         v += 1;
                                     }
                                 }
@@ -19709,8 +18417,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                         .wrapping_mul((deformLength - v) as c_ulong),
                                 );
                                 if weighted == 0 {
-                                    let mut vertices: *mut c_float = (*attachment)
-                                        .vertices;
+                                    let mut vertices: *mut c_float = (*attachment).vertices;
                                     v = 0 as c_int;
                                     while v < deformLength {
                                         *deform.offset(v as isize) += *vertices.offset(v as isize);
@@ -19718,22 +18425,14 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                                     }
                                 }
                             }
-                            spDeformTimeline_setFrame(
-                                timeline_10,
-                                frame,
-                                time_9,
-                                deform,
-                            );
+                            spDeformTimeline_setFrame(timeline_10, frame, time_9, deform);
                             if frame == frameLast_3 {
                                 break;
                             }
                             time2_7 = readFloat(input);
                             match readSByte(input) as c_int {
                                 1 => {
-                                    spCurveTimeline_setStepped(
-                                        &mut (*timeline_10).super_0,
-                                        frame,
-                                    );
+                                    spCurveTimeline_setStepped(&mut (*timeline_10).super_0, frame);
                                 }
                                 2 => {
                                     let fresh104 = bezier;
@@ -19794,10 +18493,8 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
     }
     drawOrderCount = readVarint(input, 1 as c_int);
     if drawOrderCount != 0 {
-        let mut timeline_12: *mut spDrawOrderTimeline = spDrawOrderTimeline_create(
-            drawOrderCount,
-            (*skeletonData).slotsCount,
-        );
+        let mut timeline_12: *mut spDrawOrderTimeline =
+            spDrawOrderTimeline_create(drawOrderCount, (*skeletonData).slotsCount);
         i = 0 as c_int;
         while i < drawOrderCount {
             let mut time_10: c_float = readFloat(input);
@@ -19810,9 +18507,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
             ) as *mut c_int;
             let mut unchanged: *mut c_int = _spMalloc(
                 (::core::mem::size_of::<c_int>() as c_ulong)
-                    .wrapping_mul(
-                        ((*skeletonData).slotsCount - offsetCount) as c_ulong,
-                    ),
+                    .wrapping_mul(((*skeletonData).slotsCount - offsetCount) as c_ulong),
                 b"spine.c\0" as *const u8 as *const c_char,
                 9942 as c_int,
             ) as *mut c_int;
@@ -19834,10 +18529,8 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
                     unchangedIndex = unchangedIndex + 1;
                     *unchanged.offset(fresh106 as isize) = fresh105;
                 }
-                *drawOrder
-                    .offset(
-                        (originalIndex + readVarint(input, 1 as c_int)) as isize,
-                    ) = originalIndex;
+                *drawOrder.offset((originalIndex + readVarint(input, 1 as c_int)) as isize) =
+                    originalIndex;
                 originalIndex += 1;
                 ii += 1;
             }
@@ -19852,10 +18545,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
             while ii >= 0 as c_int {
                 if *drawOrder.offset(ii as isize) == -(1 as c_int) {
                     unchangedIndex -= 1;
-                    *drawOrder
-                        .offset(
-                            ii as isize,
-                        ) = *unchanged.offset(unchangedIndex as isize);
+                    *drawOrder.offset(ii as isize) = *unchanged.offset(unchangedIndex as isize);
                 }
                 ii -= 1;
             }
@@ -19872,8 +18562,8 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
         i = 0 as c_int;
         while i < eventCount {
             let mut time_11: c_float = readFloat(input);
-            let mut eventData: *mut spEventData = *((*skeletonData).events)
-                .offset(readVarint(input, 1 as c_int) as isize);
+            let mut eventData: *mut spEventData =
+                *((*skeletonData).events).offset(readVarint(input, 1 as c_int) as isize);
             let mut event: *mut spEvent = spEvent_create(time_11, eventData);
             (*event).intValue = readVarint(input, 0 as c_int);
             (*event).floatValue = readFloat(input);
@@ -19897,9 +18587,7 @@ unsafe extern "C" fn _spSkeletonBinary_readAnimation(
     i = 0 as c_int;
     n = (*timelines).size;
     while i < n {
-        duration = if duration
-            > spTimeline_getDuration(*((*timelines).items).offset(i as isize))
-        {
+        duration = if duration > spTimeline_getDuration(*((*timelines).items).offset(i as isize)) {
             duration
         } else {
             spTimeline_getDuration(*((*timelines).items).offset(i as isize))
@@ -19915,8 +18603,7 @@ unsafe extern "C" fn _readFloatArray(
     mut scale: c_float,
 ) -> *mut c_float {
     let mut array: *mut c_float = _spMalloc(
-        (::core::mem::size_of::<c_float>() as c_ulong)
-            .wrapping_mul(n as c_ulong),
+        (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(n as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         9999 as c_int,
     ) as *mut c_float;
@@ -19936,21 +18623,16 @@ unsafe extern "C" fn _readFloatArray(
     }
     return array;
 }
-unsafe extern "C" fn _readShortArray(
-    mut input: *mut _dataInput,
-    mut n: c_int,
-) -> *mut c_ushort {
+unsafe extern "C" fn _readShortArray(mut input: *mut _dataInput, mut n: c_int) -> *mut c_ushort {
     let mut array: *mut c_ushort = _spMalloc(
-        (::core::mem::size_of::<c_ushort>() as c_ulong)
-            .wrapping_mul(n as c_ulong),
+        (::core::mem::size_of::<c_ushort>() as c_ulong).wrapping_mul(n as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         10011 as c_int,
     ) as *mut c_ushort;
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < n {
-        *array
-            .offset(i as isize) = readVarint(input, 1 as c_int) as c_ushort;
+        *array.offset(i as isize) = readVarint(input, 1 as c_int) as c_ushort;
         i += 1;
     }
     return array;
@@ -19974,9 +18656,7 @@ unsafe extern "C" fn _readVerticesBinary(
     }
     let mut v: *mut c_float = _spMalloc(
         (::core::mem::size_of::<c_float>() as c_ulong)
-            .wrapping_mul(
-                (*verticesLength * 3 as c_int * 3 as c_int) as c_ulong,
-            ),
+            .wrapping_mul((*verticesLength * 3 as c_int * 3 as c_int) as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         10029 as c_int,
     ) as *mut c_float;
@@ -20037,9 +18717,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
     let mut type_0: spAttachmentType = (flags & 0x7 as c_int) as spAttachmentType;
     match type_0 as c_uint {
         0 => {
-            let mut path: *mut c_char = if flags & 16 as c_int
-                != 0 as c_int
-            {
+            let mut path: *mut c_char = if flags & 16 as c_int != 0 as c_int {
                 readStringRef(input, skeletonData)
             } else {
                 name as *mut c_char
@@ -20059,18 +18737,20 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
                 1 as c_int as c_float,
             );
             if flags & 32 as c_int != 0 as c_int {
-                readColor(input, &mut color.r, &mut color.g, &mut color.b, &mut color.a);
+                readColor(
+                    input,
+                    &mut color.r,
+                    &mut color.g,
+                    &mut color.b,
+                    &mut color.a,
+                );
             }
-            let mut sequence: *mut spSequence = if flags & 64 as c_int
-                != 0 as c_int
-            {
+            let mut sequence: *mut spSequence = if flags & 64 as c_int != 0 as c_int {
                 readSequenceBinary(input)
             } else {
                 0 as *mut spSequence
             };
-            let mut rotation: c_float = if flags & 128 as c_int
-                != 0 as c_int
-            {
+            let mut rotation: c_float = if flags & 128 as c_int != 0 as c_int {
                 readFloat(input)
             } else {
                 0 as c_int as c_float
@@ -20116,7 +18796,8 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
                 name,
                 0 as *const c_char,
                 0 as *mut spSequence,
-            ) as *mut spBoundingBoxAttachment;
+            )
+                as *mut spBoundingBoxAttachment;
             if box_0.is_null() {
                 return 0 as *mut spAttachment;
             }
@@ -20159,9 +18840,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
             let mut height_0: c_float = 0 as c_int as c_float;
             let mut edges: *mut c_ushort = 0 as *mut c_ushort;
             let mut edgesCount: c_int = 0 as c_int;
-            let mut path_0: *mut c_char = if flags & 16 as c_int
-                != 0 as c_int
-            {
+            let mut path_0: *mut c_char = if flags & 16 as c_int != 0 as c_int {
                 readStringRef(input, skeletonData)
             } else {
                 name as *mut c_char
@@ -20189,9 +18868,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
                     &mut color_0.a,
                 );
             }
-            let mut sequence_0: *mut spSequence = if flags & 64 as c_int
-                != 0 as c_int
-            {
+            let mut sequence_0: *mut spSequence = if flags & 64 as c_int != 0 as c_int {
                 readSequenceBinary(input)
             } else {
                 0 as *mut spSequence
@@ -20208,8 +18885,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
             );
             uvsCount = verticesLength;
             uvs = _readFloatArray(input, uvsCount, 1 as c_int as c_float);
-            trianglesCount = (verticesLength - hullLength - 2 as c_int)
-                * 3 as c_int;
+            trianglesCount = (verticesLength - hullLength - 2 as c_int) * 3 as c_int;
             triangles = _readShortArray(input, trianglesCount);
             if nonessential != 0 {
                 edgesCount = readVarint(input, 1 as c_int);
@@ -20248,16 +18924,11 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
             if sequence_0.is_null() {
                 spMeshAttachment_updateRegion(mesh);
             }
-            spAttachmentLoader_configureAttachment(
-                (*self_0).attachmentLoader,
-                attachment,
-            );
+            spAttachmentLoader_configureAttachment((*self_0).attachmentLoader, attachment);
             return attachment;
         }
         3 => {
-            let mut path_1: *mut c_char = if flags & 16 as c_int
-                != 0 as c_int
-            {
+            let mut path_1: *mut c_char = if flags & 16 as c_int != 0 as c_int {
                 readStringRef(input, skeletonData)
             } else {
                 name as *mut c_char
@@ -20285,15 +18956,12 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
                     &mut color_1.a,
                 );
             }
-            let mut sequence_1: *mut spSequence = if flags & 64 as c_int
-                != 0 as c_int
-            {
+            let mut sequence_1: *mut spSequence = if flags & 64 as c_int != 0 as c_int {
                 readSequenceBinary(input)
             } else {
                 0 as *mut spSequence
             };
-            let mut inheritTimelines: c_int = (flags & 128 as c_int
-                != 0 as c_int) as c_int;
+            let mut inheritTimelines: c_int = (flags & 128 as c_int != 0 as c_int) as c_int;
             let mut skinIndex: c_int = readVarint(input, 1 as c_int);
             let mut parent: *mut c_char = readStringRef(input, skeletonData);
             let mut width_1: c_float = 0 as c_int as c_float;
@@ -20319,11 +18987,9 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
             if !((*mesh_0).path).is_null() {
                 let mut tmp: *mut c_char = 0 as *mut c_char;
                 tmp = _spMalloc(
-                    (::core::mem::size_of::<c_char>() as c_ulong)
-                        .wrapping_mul(
-                            (spine_strlen((*mesh_0).path))
-                                .wrapping_add(1 as c_int as c_ulong),
-                        ),
+                    (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
+                        (spine_strlen((*mesh_0).path)).wrapping_add(1 as c_int as c_ulong),
+                    ),
                     b"spine.c\0" as *const u8 as *const c_char,
                     10182 as c_int,
                 ) as *mut c_char;
@@ -20358,11 +19024,8 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
                 return 0 as *mut spAttachment;
             }
             path_2 = attachment_1 as *mut spPathAttachment;
-            (*path_2)
-                .closed = (flags & 16 as c_int != 0 as c_int) as c_int;
-            (*path_2)
-                .constantSpeed = (flags & 32 as c_int != 0 as c_int)
-                as c_int;
+            (*path_2).closed = (flags & 16 as c_int != 0 as c_int) as c_int;
+            (*path_2).constantSpeed = (flags & 32 as c_int != 0 as c_int) as c_int;
             let mut verticesLength_0: c_int = _readVerticesBinary(
                 input,
                 &mut (*path_2).super_0.vertices,
@@ -20374,8 +19037,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
             );
             (*path_2).super_0.worldVerticesLength = verticesLength_0;
             (*path_2).lengthsLength = verticesLength_0 / 6 as c_int;
-            (*path_2)
-                .lengths = _spMalloc(
+            (*path_2).lengths = _spMalloc(
                 (::core::mem::size_of::<c_float>() as c_ulong)
                     .wrapping_mul((*path_2).lengthsLength as c_ulong),
                 b"spine.c\0" as *const u8 as *const c_char,
@@ -20383,8 +19045,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
             ) as *mut c_float;
             let mut i: c_int = 0 as c_int;
             while i < (*path_2).lengthsLength {
-                *((*path_2).lengths)
-                    .offset(i as isize) = readFloat(input) * (*self_0).scale;
+                *((*path_2).lengths).offset(i as isize) = readFloat(input) * (*self_0).scale;
                 i += 1;
             }
             if nonessential != 0 {
@@ -20396,10 +19057,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
                     &mut (*path_2).color.a,
                 );
             }
-            spAttachmentLoader_configureAttachment(
-                (*self_0).attachmentLoader,
-                attachment_1,
-            );
+            spAttachmentLoader_configureAttachment((*self_0).attachmentLoader, attachment_1);
             return attachment_1;
         }
         5 => {
@@ -20428,10 +19086,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
                     &mut (*point).color.a,
                 );
             }
-            spAttachmentLoader_configureAttachment(
-                (*self_0).attachmentLoader,
-                attachment_2,
-            );
+            spAttachmentLoader_configureAttachment((*self_0).attachmentLoader, attachment_2);
             return attachment_2;
         }
         6 => {
@@ -20469,10 +19124,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readAttachment(
                 );
             }
             (*clip).endSlot = *((*skeletonData).slots).offset(endSlotIndex as isize);
-            spAttachmentLoader_configureAttachment(
-                (*self_0).attachmentLoader,
-                attachment_3,
-            );
+            spAttachmentLoader_configureAttachment((*self_0).attachmentLoader, attachment_3);
             return attachment_3;
         }
         _ => {}
@@ -20517,8 +19169,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkin(
         while i < n {
             spBoneDataArray_add(
                 (*skin).bones,
-                *((*skeletonData).bones)
-                    .offset(readVarint(input, 1 as c_int) as isize),
+                *((*skeletonData).bones).offset(readVarint(input, 1 as c_int) as isize),
             );
             i += 1;
         }
@@ -20527,8 +19178,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkin(
         while i < n {
             spIkConstraintDataArray_add(
                 (*skin).ikConstraints,
-                *((*skeletonData).ikConstraints)
-                    .offset(readVarint(input, 1 as c_int) as isize),
+                *((*skeletonData).ikConstraints).offset(readVarint(input, 1 as c_int) as isize),
             );
             i += 1;
         }
@@ -20547,8 +19197,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkin(
         while i < n {
             spPathConstraintDataArray_add(
                 (*skin).pathConstraints,
-                *((*skeletonData).pathConstraints)
-                    .offset(readVarint(input, 1 as c_int) as isize),
+                *((*skeletonData).pathConstraints).offset(readVarint(input, 1 as c_int) as isize),
             );
             i += 1;
         }
@@ -20606,11 +19255,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonDataFile(
         );
         return 0 as *mut spSkeletonData;
     }
-    skeletonData = spSkeletonBinary_readSkeletonData(
-        self_0,
-        binary as *mut c_uchar,
-        length,
-    );
+    skeletonData = spSkeletonBinary_readSkeletonData(self_0, binary as *mut c_uchar, length);
     _spFree(binary as *mut c_void);
     return skeletonData;
 }
@@ -20643,21 +19288,17 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
     skeletonData = spSkeletonData_create();
     lowHash = readInt(input);
     highHash = readInt(input);
-    snprintf(
+    spine_snprintf!(
         buffer.as_mut_ptr(),
-        32 as c_int as c_ulong,
+        32 as c_int as size_t,
         b"%x%x\0" as *const u8 as *const c_char,
         highHash,
         lowHash,
     );
     buffer[31 as c_int as usize] = 0 as c_int as c_char;
-    (*skeletonData)
-        .hash = _spMalloc(
+    (*skeletonData).hash = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(buffer.as_mut_ptr()))
-                    .wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(buffer.as_mut_ptr())).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         10334 as c_int,
     ) as *mut c_char;
@@ -20672,19 +19313,15 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
     ) == 0
     {
         let mut errorMsg: [c_char; 255] = [0; 255];
-        snprintf(
+        spine_snprintf!(
             errorMsg.as_mut_ptr(),
-            255 as c_int as c_ulong,
+            255 as c_int as size_t,
             b"Skeleton version %s does not match runtime version %s\0" as *const u8
                 as *const c_char,
             (*skeletonData).version,
             b"4.2\0" as *const u8 as *const c_char,
         );
-        _spSkeletonBinary_setError(
-            self_0,
-            errorMsg.as_mut_ptr(),
-            0 as *const c_char,
-        );
+        _spSkeletonBinary_setError(self_0, errorMsg.as_mut_ptr(), 0 as *const c_char);
         return 0 as *mut spSkeletonData;
     }
     (*skeletonData).x = readFloat(input);
@@ -20708,8 +19345,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
     }
     n = readVarint(input, 1 as c_int);
     (*skeletonData).stringsCount = n;
-    (*skeletonData)
-        .strings = _spMalloc(
+    (*skeletonData).strings = _spMalloc(
         (::core::mem::size_of::<*mut c_char>() as c_ulong)
             .wrapping_mul((*skeletonData).stringsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -20722,8 +19358,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         i += 1;
     }
     (*skeletonData).bonesCount = readVarint(input, 1 as c_int);
-    (*skeletonData)
-        .bones = _spMalloc(
+    (*skeletonData).bones = _spMalloc(
         (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
             .wrapping_mul((*skeletonData).bonesCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -20765,8 +19400,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         i += 1;
     }
     (*skeletonData).slotsCount = readVarint(input, 1 as c_int);
-    (*skeletonData)
-        .slots = _spMalloc(
+    (*skeletonData).slots = _spMalloc(
         (::core::mem::size_of::<*mut spSlotData>() as c_ulong)
             .wrapping_mul((*skeletonData).slotsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -20777,10 +19411,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         let mut slotName: *mut c_char = readString(input);
         let mut pathName: *mut c_char = 0 as *mut c_char;
         if nonessential != 0 {
-            let mut slash: c_int = string_lastIndexOf(
-                slotName,
-                '/' as i32 as c_char,
-            );
+            let mut slash: c_int = string_lastIndexOf(slotName, '/' as i32 as c_char);
             if slash != -(1 as c_int) {
                 pathName = string_substring(slotName, 0 as c_int, slash);
                 slotName = string_substring(
@@ -20790,8 +19421,8 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
                 );
             }
         }
-        let mut boneData: *mut spBoneData = *((*skeletonData).bones)
-            .offset(readVarint(input, 1 as c_int) as isize);
+        let mut boneData: *mut spBoneData =
+            *((*skeletonData).bones).offset(readVarint(input, 1 as c_int) as isize);
         let mut slotData: *mut spSlotData = spSlotData_create(i, slotName, boneData);
         _spFree(slotName as *mut c_void);
         readColor(
@@ -20805,9 +19436,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         let mut r: c_int = readByte(input) as c_int;
         let mut g: c_int = readByte(input) as c_int;
         let mut b: c_int = readByte(input) as c_int;
-        if !(r == 0xff as c_int && g == 0xff as c_int
-            && b == 0xff as c_int && a == 0xff as c_int)
-        {
+        if !(r == 0xff as c_int && g == 0xff as c_int && b == 0xff as c_int && a == 0xff as c_int) {
             (*slotData).darkColor = spColor_create();
             spColor_setFromFloats(
                 (*slotData).darkColor,
@@ -20819,13 +19448,10 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         }
         let mut attachmentName: *mut c_char = readStringRef(input, skeletonData);
         if !attachmentName.is_null() {
-            (*slotData)
-                .attachmentName = _spMalloc(
-                (::core::mem::size_of::<c_char>() as c_ulong)
-                    .wrapping_mul(
-                        (spine_strlen(attachmentName))
-                            .wrapping_add(1 as c_int as c_ulong),
-                    ),
+            (*slotData).attachmentName = _spMalloc(
+                (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
+                    (spine_strlen(attachmentName)).wrapping_add(1 as c_int as c_ulong),
+                ),
                 b"spine.c\0" as *const u8 as *const c_char,
                 10429 as c_int,
             ) as *mut c_char;
@@ -20843,8 +19469,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         i += 1;
     }
     (*skeletonData).ikConstraintsCount = readVarint(input, 1 as c_int);
-    (*skeletonData)
-        .ikConstraints = _spMalloc(
+    (*skeletonData).ikConstraints = _spMalloc(
         (::core::mem::size_of::<*mut spIkConstraintData>() as c_ulong)
             .wrapping_mul((*skeletonData).ikConstraintsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -20857,8 +19482,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         _spFree(name_0 as *mut c_void);
         (*data_0).order = readVarint(input, 1 as c_int);
         (*data_0).bonesCount = readVarint(input, 1 as c_int);
-        (*data_0)
-            .bones = _spMalloc(
+        (*data_0).bones = _spMalloc(
             (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
                 .wrapping_mul((*data_0).bonesCount as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -20867,32 +19491,22 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         ii = 0 as c_int;
         while ii < (*data_0).bonesCount {
             let ref mut fresh117 = *((*data_0).bones).offset(ii as isize);
-            *fresh117 = *((*skeletonData).bones)
-                .offset(readVarint(input, 1 as c_int) as isize);
+            *fresh117 = *((*skeletonData).bones).offset(readVarint(input, 1 as c_int) as isize);
             ii += 1;
         }
-        (*data_0)
-            .target = *((*skeletonData).bones)
-            .offset(readVarint(input, 1 as c_int) as isize);
+        (*data_0).target = *((*skeletonData).bones).offset(readVarint(input, 1 as c_int) as isize);
         let mut flags: c_int = readByte(input) as c_int;
-        (*data_0)
-            .skinRequired = (flags & 1 as c_int != 0 as c_int)
-            as c_int;
-        (*data_0)
-            .bendDirection = if flags & 2 as c_int != 0 as c_int {
+        (*data_0).skinRequired = (flags & 1 as c_int != 0 as c_int) as c_int;
+        (*data_0).bendDirection = if flags & 2 as c_int != 0 as c_int {
             1 as c_int
         } else {
             -(1 as c_int)
         };
-        (*data_0)
-            .compress = (flags & 4 as c_int != 0 as c_int) as c_int;
-        (*data_0)
-            .stretch = (flags & 8 as c_int != 0 as c_int) as c_int;
-        (*data_0)
-            .uniform = (flags & 16 as c_int != 0 as c_int) as c_int;
+        (*data_0).compress = (flags & 4 as c_int != 0 as c_int) as c_int;
+        (*data_0).stretch = (flags & 8 as c_int != 0 as c_int) as c_int;
+        (*data_0).uniform = (flags & 16 as c_int != 0 as c_int) as c_int;
         if flags & 32 as c_int != 0 as c_int {
-            (*data_0)
-                .mix = if flags & 64 as c_int != 0 as c_int {
+            (*data_0).mix = if flags & 64 as c_int != 0 as c_int {
                 readFloat(input)
             } else {
                 1 as c_int as c_float
@@ -20906,8 +19520,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         i += 1;
     }
     (*skeletonData).transformConstraintsCount = readVarint(input, 1 as c_int);
-    (*skeletonData)
-        .transformConstraints = _spMalloc(
+    (*skeletonData).transformConstraints = _spMalloc(
         (::core::mem::size_of::<*mut spTransformConstraintData>() as c_ulong)
             .wrapping_mul((*skeletonData).transformConstraintsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -20916,14 +19529,11 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
     i = 0 as c_int;
     while i < (*skeletonData).transformConstraintsCount {
         let mut name_1: *const c_char = readString(input);
-        let mut data_1: *mut spTransformConstraintData = spTransformConstraintData_create(
-            name_1,
-        );
+        let mut data_1: *mut spTransformConstraintData = spTransformConstraintData_create(name_1);
         _spFree(name_1 as *mut c_void);
         (*data_1).order = readVarint(input, 1 as c_int);
         (*data_1).bonesCount = readVarint(input, 1 as c_int);
-        (*data_1)
-            .bones = _spMalloc(
+        (*data_1).bones = _spMalloc(
             (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
                 .wrapping_mul((*data_1).bonesCount as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -20932,21 +19542,14 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         ii = 0 as c_int;
         while ii < (*data_1).bonesCount {
             let ref mut fresh119 = *((*data_1).bones).offset(ii as isize);
-            *fresh119 = *((*skeletonData).bones)
-                .offset(readVarint(input, 1 as c_int) as isize);
+            *fresh119 = *((*skeletonData).bones).offset(readVarint(input, 1 as c_int) as isize);
             ii += 1;
         }
-        (*data_1)
-            .target = *((*skeletonData).bones)
-            .offset(readVarint(input, 1 as c_int) as isize);
+        (*data_1).target = *((*skeletonData).bones).offset(readVarint(input, 1 as c_int) as isize);
         let mut flags_0: c_int = readByte(input) as c_int;
-        (*data_1)
-            .skinRequired = (flags_0 & 1 as c_int != 0 as c_int)
-            as c_int;
-        (*data_1)
-            .local = (flags_0 & 2 as c_int != 0 as c_int) as c_int;
-        (*data_1)
-            .relative = (flags_0 & 4 as c_int != 0 as c_int) as c_int;
+        (*data_1).skinRequired = (flags_0 & 1 as c_int != 0 as c_int) as c_int;
+        (*data_1).local = (flags_0 & 2 as c_int != 0 as c_int) as c_int;
+        (*data_1).relative = (flags_0 & 4 as c_int != 0 as c_int) as c_int;
         if flags_0 & 8 as c_int != 0 as c_int {
             (*data_1).offsetRotation = readFloat(input);
         }
@@ -20984,14 +19587,12 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         if flags_0 & 64 as c_int != 0 as c_int {
             (*data_1).mixShearY = readFloat(input);
         }
-        let ref mut fresh120 = *((*skeletonData).transformConstraints)
-            .offset(i as isize);
+        let ref mut fresh120 = *((*skeletonData).transformConstraints).offset(i as isize);
         *fresh120 = data_1;
         i += 1;
     }
     (*skeletonData).pathConstraintsCount = readVarint(input, 1 as c_int);
-    (*skeletonData)
-        .pathConstraints = _spMalloc(
+    (*skeletonData).pathConstraints = _spMalloc(
         (::core::mem::size_of::<*mut spPathConstraintData>() as c_ulong)
             .wrapping_mul((*skeletonData).pathConstraintsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -21005,8 +19606,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         (*data_2).order = readVarint(input, 1 as c_int);
         (*data_2).skinRequired = readBoolean(input);
         (*data_2).bonesCount = readVarint(input, 1 as c_int);
-        (*data_2)
-            .bones = _spMalloc(
+        (*data_2).bones = _spMalloc(
             (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
                 .wrapping_mul((*data_2).bonesCount as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -21015,35 +19615,24 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         ii = 0 as c_int;
         while ii < (*data_2).bonesCount {
             let ref mut fresh121 = *((*data_2).bones).offset(ii as isize);
-            *fresh121 = *((*skeletonData).bones)
-                .offset(readVarint(input, 1 as c_int) as isize);
+            *fresh121 = *((*skeletonData).bones).offset(readVarint(input, 1 as c_int) as isize);
             ii += 1;
         }
-        (*data_2)
-            .target = *((*skeletonData).slots)
-            .offset(readVarint(input, 1 as c_int) as isize);
+        (*data_2).target = *((*skeletonData).slots).offset(readVarint(input, 1 as c_int) as isize);
         let mut flags_1: c_int = readByte(input) as c_int;
         (*data_2).positionMode = (flags_1 & 1 as c_int) as spPositionMode;
-        (*data_2)
-            .spacingMode = (flags_1 >> 1 as c_int & 3 as c_int)
-            as spSpacingMode;
-        (*data_2)
-            .rotateMode = (flags_1 >> 3 as c_int & 3 as c_int)
-            as spRotateMode;
+        (*data_2).spacingMode = (flags_1 >> 1 as c_int & 3 as c_int) as spSpacingMode;
+        (*data_2).rotateMode = (flags_1 >> 3 as c_int & 3 as c_int) as spRotateMode;
         if flags_1 & 128 as c_int != 0 as c_int {
             (*data_2).offsetRotation = readFloat(input);
         }
         (*data_2).position = readFloat(input);
-        if (*data_2).positionMode as c_uint
-            == SP_POSITION_MODE_FIXED as c_int as c_uint
-        {
+        if (*data_2).positionMode as c_uint == SP_POSITION_MODE_FIXED as c_int as c_uint {
             (*data_2).position *= (*self_0).scale;
         }
         (*data_2).spacing = readFloat(input);
-        if (*data_2).spacingMode as c_uint
-            == SP_SPACING_MODE_LENGTH as c_int as c_uint
-            || (*data_2).spacingMode as c_uint
-                == SP_SPACING_MODE_FIXED as c_int as c_uint
+        if (*data_2).spacingMode as c_uint == SP_SPACING_MODE_LENGTH as c_int as c_uint
+            || (*data_2).spacingMode as c_uint == SP_SPACING_MODE_FIXED as c_int as c_uint
         {
             (*data_2).spacing *= (*self_0).scale;
         }
@@ -21055,8 +19644,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         i += 1;
     }
     (*skeletonData).physicsConstraintsCount = readVarint(input, 1 as c_int);
-    (*skeletonData)
-        .physicsConstraints = _spMalloc(
+    (*skeletonData).physicsConstraints = _spMalloc(
         (::core::mem::size_of::<*mut spPhysicsConstraintData>() as c_ulong)
             .wrapping_mul((*skeletonData).physicsConstraintsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -21065,18 +19653,12 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
     i = 0 as c_int;
     while i < (*skeletonData).physicsConstraintsCount {
         let mut name_3: *const c_char = readString(input);
-        let mut data_3: *mut spPhysicsConstraintData = spPhysicsConstraintData_create(
-            name_3,
-        );
+        let mut data_3: *mut spPhysicsConstraintData = spPhysicsConstraintData_create(name_3);
         _spFree(name_3 as *mut c_void);
         (*data_3).order = readVarint(input, 1 as c_int);
-        (*data_3)
-            .bone = *((*skeletonData).bones)
-            .offset(readVarint(input, 1 as c_int) as isize);
+        (*data_3).bone = *((*skeletonData).bones).offset(readVarint(input, 1 as c_int) as isize);
         let mut flags_2: c_int = readByte(input) as c_int;
-        (*data_3)
-            .skinRequired = (flags_2 & 1 as c_int != 0 as c_int)
-            as c_int;
+        (*data_3).skinRequired = (flags_2 & 1 as c_int != 0 as c_int) as c_int;
         if flags_2 & 2 as c_int != 0 as c_int {
             (*data_3).x = readFloat(input);
         }
@@ -21092,8 +19674,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         if flags_2 & 32 as c_int != 0 as c_int {
             (*data_3).shearX = readFloat(input);
         }
-        (*data_3)
-            .limit = (if flags_2 & 64 as c_int != 0 as c_int {
+        (*data_3).limit = (if flags_2 & 64 as c_int != 0 as c_int {
             readFloat(input)
         } else {
             5000 as c_int as c_float
@@ -21102,8 +19683,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         (*data_3).inertia = readFloat(input);
         (*data_3).strength = readFloat(input);
         (*data_3).damping = readFloat(input);
-        (*data_3)
-            .massInverse = if flags_2 & 128 as c_int != 0 as c_int {
+        (*data_3).massInverse = if flags_2 & 128 as c_int != 0 as c_int {
             readFloat(input)
         } else {
             1 as c_int as c_float
@@ -21132,8 +19712,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         if flags_2 & 64 as c_int != 0 as c_int {
             (*data_3).mixGlobal = -(1 as c_int);
         }
-        (*data_3)
-            .mix = if flags_2 & 128 as c_int != 0 as c_int {
+        (*data_3).mix = if flags_2 & 128 as c_int != 0 as c_int {
             readFloat(input)
         } else {
             1 as c_int as c_float
@@ -21142,14 +19721,8 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         *fresh123 = data_3;
         i += 1;
     }
-    (*skeletonData)
-        .defaultSkin = spSkeletonBinary_readSkin(
-        self_0,
-        input,
-        -(1 as c_int),
-        skeletonData,
-        nonessential,
-    );
+    (*skeletonData).defaultSkin =
+        spSkeletonBinary_readSkin(self_0, input, -(1 as c_int), skeletonData, nonessential);
     if !((*(*self_0).attachmentLoader).error1).is_null() {
         spSkeletonData_dispose(skeletonData);
         _spSkeletonBinary_setError(
@@ -21163,16 +19736,14 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
     if !((*skeletonData).defaultSkin).is_null() {
         (*skeletonData).skinsCount += 1;
     }
-    (*skeletonData)
-        .skins = _spMalloc(
+    (*skeletonData).skins = _spMalloc(
         (::core::mem::size_of::<*mut spSkin>() as c_ulong)
             .wrapping_mul((*skeletonData).skinsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         10578 as c_int,
     ) as *mut *mut spSkin;
     if !((*skeletonData).defaultSkin).is_null() {
-        let ref mut fresh124 = *((*skeletonData).skins)
-            .offset(0 as c_int as isize);
+        let ref mut fresh124 = *((*skeletonData).skins).offset(0 as c_int as isize);
         *fresh124 = (*skeletonData).defaultSkin;
     }
     i = if !((*skeletonData).defaultSkin).is_null() {
@@ -21181,13 +19752,8 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         0 as c_int
     };
     while i < (*skeletonData).skinsCount {
-        let mut skin: *mut spSkin = spSkeletonBinary_readSkin(
-            self_0,
-            input,
-            0 as c_int,
-            skeletonData,
-            nonessential,
-        );
+        let mut skin: *mut spSkin =
+            spSkeletonBinary_readSkin(self_0, input, 0 as c_int, skeletonData, nonessential);
         if !((*(*self_0).attachmentLoader).error1).is_null() {
             spSkeletonData_dispose(skeletonData);
             _spSkeletonBinary_setError(
@@ -21203,10 +19769,10 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
     }
     i = 0 as c_int;
     while i < (*internal).linkedMeshCount {
-        let mut linkedMesh: *mut _spLinkedMeshBinary = ((*internal).linkedMeshes)
-            .offset(i as isize);
-        let mut skin_0: *mut spSkin = *((*skeletonData).skins)
-            .offset((*linkedMesh).skinIndex as isize);
+        let mut linkedMesh: *mut _spLinkedMeshBinary =
+            ((*internal).linkedMeshes).offset(i as isize);
+        let mut skin_0: *mut spSkin =
+            *((*skeletonData).skins).offset((*linkedMesh).skinIndex as isize);
         if skin_0.is_null() {
             _spFree(input as *mut c_void);
             spSkeletonData_dispose(skeletonData);
@@ -21217,11 +19783,8 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
             );
             return 0 as *mut spSkeletonData;
         }
-        let mut parent_0: *mut spAttachment = spSkin_getAttachment(
-            skin_0,
-            (*linkedMesh).slotIndex,
-            (*linkedMesh).parent,
-        );
+        let mut parent_0: *mut spAttachment =
+            spSkin_getAttachment(skin_0, (*linkedMesh).slotIndex, (*linkedMesh).parent);
         if parent_0.is_null() {
             _spFree(input as *mut c_void);
             spSkeletonData_dispose(skeletonData);
@@ -21232,17 +19795,12 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
             );
             return 0 as *mut spSkeletonData;
         }
-        (*(*linkedMesh).mesh)
-            .super_0
-            .timelineAttachment = if (*linkedMesh).inheritTimeline != 0 {
+        (*(*linkedMesh).mesh).super_0.timelineAttachment = if (*linkedMesh).inheritTimeline != 0 {
             parent_0
         } else {
             &mut (*(*linkedMesh).mesh).super_0.super_0
         };
-        spMeshAttachment_setParentMesh(
-            (*linkedMesh).mesh,
-            parent_0 as *mut spMeshAttachment,
-        );
+        spMeshAttachment_setParentMesh((*linkedMesh).mesh, parent_0 as *mut spMeshAttachment);
         if !((*(*linkedMesh).mesh).region).is_null() {
             spMeshAttachment_updateRegion((*linkedMesh).mesh);
         }
@@ -21253,8 +19811,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         i += 1;
     }
     (*skeletonData).eventsCount = readVarint(input, 1 as c_int);
-    (*skeletonData)
-        .events = _spMalloc(
+    (*skeletonData).events = _spMalloc(
         (::core::mem::size_of::<*mut spEventData>() as c_ulong)
             .wrapping_mul((*skeletonData).eventsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -21278,8 +19835,7 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
         i += 1;
     }
     (*skeletonData).animationsCount = readVarint(input, 1 as c_int);
-    (*skeletonData)
-        .animations = _spMalloc(
+    (*skeletonData).animations = _spMalloc(
         (::core::mem::size_of::<*mut spAnimation>() as c_ulong)
             .wrapping_mul((*skeletonData).animationsCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -21288,12 +19844,8 @@ pub unsafe extern "C" fn spSkeletonBinary_readSkeletonData(
     i = 0 as c_int;
     while i < (*skeletonData).animationsCount {
         let mut name_5: *const c_char = readString(input);
-        let mut animation: *mut spAnimation = _spSkeletonBinary_readAnimation(
-            self_0,
-            name_5,
-            input,
-            skeletonData,
-        );
+        let mut animation: *mut spAnimation =
+            _spSkeletonBinary_readAnimation(self_0, name_5, input, skeletonData);
         _spFree(name_5 as *mut c_void);
         if animation.is_null() {
             _spFree(input as *mut c_void);
@@ -21321,10 +19873,8 @@ pub unsafe extern "C" fn spPolygon_create(mut capacity: c_int) -> *mut spPolygon
         10689 as c_int,
     ) as *mut spPolygon;
     (*self_0).capacity = capacity;
-    (*self_0)
-        .vertices = _spMalloc(
-        (::core::mem::size_of::<c_float>() as c_ulong)
-            .wrapping_mul(capacity as c_ulong),
+    (*self_0).vertices = _spMalloc(
+        (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(capacity as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         10691 as c_int,
     ) as *mut c_float;
@@ -21346,15 +19896,14 @@ pub unsafe extern "C" fn spPolygon_containsPoint(
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < (*self_0).count {
-        let mut vertexY: c_float = *((*self_0).vertices)
-            .offset((i + 1 as c_int) as isize);
-        let mut prevY: c_float = *((*self_0).vertices)
-            .offset((prevIndex + 1 as c_int) as isize);
+        let mut vertexY: c_float = *((*self_0).vertices).offset((i + 1 as c_int) as isize);
+        let mut prevY: c_float = *((*self_0).vertices).offset((prevIndex + 1 as c_int) as isize);
         if vertexY < y && prevY >= y || prevY < y && vertexY >= y {
             let mut vertexX: c_float = *((*self_0).vertices).offset(i as isize);
             if vertexX
                 + (y - vertexY) / (prevY - vertexY)
-                    * (*((*self_0).vertices).offset(prevIndex as isize) - vertexX) < x
+                    * (*((*self_0).vertices).offset(prevIndex as isize) - vertexX)
+                < x
             {
                 inside = (inside == 0) as c_int;
             }
@@ -21375,23 +19924,19 @@ pub unsafe extern "C" fn spPolygon_intersectsSegment(
     let mut width12: c_float = x1 - x2;
     let mut height12: c_float = y1 - y2;
     let mut det1: c_float = x1 * y2 - y1 * x2;
-    let mut x3: c_float = *((*self_0).vertices)
-        .offset(((*self_0).count - 2 as c_int) as isize);
-    let mut y3: c_float = *((*self_0).vertices)
-        .offset(((*self_0).count - 1 as c_int) as isize);
+    let mut x3: c_float = *((*self_0).vertices).offset(((*self_0).count - 2 as c_int) as isize);
+    let mut y3: c_float = *((*self_0).vertices).offset(((*self_0).count - 1 as c_int) as isize);
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < (*self_0).count {
         let mut x4: c_float = *((*self_0).vertices).offset(i as isize);
-        let mut y4: c_float = *((*self_0).vertices)
-            .offset((i + 1 as c_int) as isize);
+        let mut y4: c_float = *((*self_0).vertices).offset((i + 1 as c_int) as isize);
         let mut det2: c_float = x3 * y4 - y3 * x4;
         let mut width34: c_float = x3 - x4;
         let mut height34: c_float = y3 - y4;
         let mut det3: c_float = width12 * height34 - height12 * width34;
         let mut x: c_float = (det1 * width34 - width12 * det2) / det3;
-        if (x >= x3 && x <= x4 || x >= x4 && x <= x3)
-            && (x >= x1 && x <= x2 || x >= x2 && x <= x1)
+        if (x >= x3 && x <= x4 || x >= x4 && x <= x3) && (x >= x1 && x <= x2 || x >= x2 && x <= x1)
         {
             let mut y: c_float = (det1 * height34 - height12 * det2) / det3;
             if (y >= y3 && y <= y4 || y >= y4 && y <= y3)
@@ -21409,12 +19954,7 @@ pub unsafe extern "C" fn spPolygon_intersectsSegment(
 #[no_mangle]
 pub unsafe extern "C" fn spSkeletonBounds_create() -> *mut spSkeletonBounds {
     return &mut (*((_spCalloc
-        as unsafe extern "C" fn(
-            size_t,
-            size_t,
-            *const c_char,
-            c_int,
-        ) -> *mut c_void)(
+        as unsafe extern "C" fn(size_t, size_t, *const c_char, c_int) -> *mut c_void)(
         1 as c_int as size_t,
         ::core::mem::size_of::<_spSkeletonBounds>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -21447,8 +19987,7 @@ pub unsafe extern "C" fn spSkeletonBounds_update(
     if (*internal).capacity < (*skeleton).slotsCount {
         let mut newPolygons: *mut *mut spPolygon = 0 as *mut *mut spPolygon;
         _spFree((*self_0).boundingBoxes as *mut c_void);
-        (*self_0)
-            .boundingBoxes = _spMalloc(
+        (*self_0).boundingBoxes = _spMalloc(
             (::core::mem::size_of::<*mut spBoundingBoxAttachment>() as c_ulong)
                 .wrapping_mul((*skeleton).slotsCount as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -21478,19 +20017,16 @@ pub unsafe extern "C" fn spSkeletonBounds_update(
     i = 0 as c_int;
     while i < (*skeleton).slotsCount {
         let mut polygon: *mut spPolygon = 0 as *mut spPolygon;
-        let mut boundingBox: *mut spBoundingBoxAttachment = 0
-            as *mut spBoundingBoxAttachment;
+        let mut boundingBox: *mut spBoundingBoxAttachment = 0 as *mut spBoundingBoxAttachment;
         let mut attachment: *mut spAttachment = 0 as *mut spAttachment;
         let mut slot: *mut spSlot = *((*skeleton).slots).offset(i as isize);
         if !((*(*slot).bone).active == 0) {
             attachment = (*slot).attachment;
             if !(attachment.is_null()
-                || (*attachment).type_0 as c_uint
-                    != SP_ATTACHMENT_BOUNDING_BOX as c_int as c_uint)
+                || (*attachment).type_0 as c_uint != SP_ATTACHMENT_BOUNDING_BOX as c_int as c_uint)
             {
                 boundingBox = attachment as *mut spBoundingBoxAttachment;
-                let ref mut fresh128 = *((*self_0).boundingBoxes)
-                    .offset((*self_0).count as isize);
+                let ref mut fresh128 = *((*self_0).boundingBoxes).offset((*self_0).count as isize);
                 *fresh128 = boundingBox;
                 polygon = *((*self_0).polygons).offset((*self_0).count as isize);
                 if polygon.is_null()
@@ -21499,11 +20035,8 @@ pub unsafe extern "C" fn spSkeletonBounds_update(
                     if !polygon.is_null() {
                         spPolygon_dispose(polygon);
                     }
-                    polygon = spPolygon_create(
-                        (*boundingBox).super_0.worldVerticesLength,
-                    );
-                    let ref mut fresh129 = *((*self_0).polygons)
-                        .offset((*self_0).count as isize);
+                    polygon = spPolygon_create((*boundingBox).super_0.worldVerticesLength);
+                    let ref mut fresh129 = *((*self_0).polygons).offset((*self_0).count as isize);
                     *fresh129 = polygon;
                 }
                 (*polygon).count = (*boundingBox).super_0.worldVerticesLength;
@@ -21519,10 +20052,9 @@ pub unsafe extern "C" fn spSkeletonBounds_update(
                 if updateAabb != 0 {
                     let mut ii: c_int = 0 as c_int;
                     while ii < (*polygon).count {
-                        let mut x: c_float = *((*polygon).vertices)
-                            .offset(ii as isize);
-                        let mut y: c_float = *((*polygon).vertices)
-                            .offset((ii + 1 as c_int) as isize);
+                        let mut x: c_float = *((*polygon).vertices).offset(ii as isize);
+                        let mut y: c_float =
+                            *((*polygon).vertices).offset((ii + 1 as c_int) as isize);
                         if x < (*self_0).minX {
                             (*self_0).minX = x;
                         }
@@ -21550,7 +20082,9 @@ pub unsafe extern "C" fn spSkeletonBounds_aabbContainsPoint(
     mut x: c_float,
     mut y: c_float,
 ) -> c_int {
-    return (x >= (*self_0).minX && x <= (*self_0).maxX && y >= (*self_0).minY
+    return (x >= (*self_0).minX
+        && x <= (*self_0).maxX
+        && y >= (*self_0).minY
         && y <= (*self_0).maxY) as c_int;
 }
 #[no_mangle]
@@ -21595,9 +20129,10 @@ pub unsafe extern "C" fn spSkeletonBounds_aabbIntersectsSkeleton(
     mut self_0: *mut spSkeletonBounds,
     mut bounds: *mut spSkeletonBounds,
 ) -> c_int {
-    return ((*self_0).minX < (*bounds).maxX && (*self_0).maxX > (*bounds).minX
-        && (*self_0).minY < (*bounds).maxY && (*self_0).maxY > (*bounds).minY)
-        as c_int;
+    return ((*self_0).minX < (*bounds).maxX
+        && (*self_0).maxX > (*bounds).minX
+        && (*self_0).minY < (*bounds).maxY
+        && (*self_0).maxY > (*bounds).minY) as c_int;
 }
 #[no_mangle]
 pub unsafe extern "C" fn spSkeletonBounds_containsPoint(
@@ -21626,13 +20161,8 @@ pub unsafe extern "C" fn spSkeletonBounds_intersectsSegment(
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < (*self_0).count {
-        if spPolygon_intersectsSegment(
-            *((*self_0).polygons).offset(i as isize),
-            x1,
-            y1,
-            x2,
-            y2,
-        ) != 0
+        if spPolygon_intersectsSegment(*((*self_0).polygons).offset(i as isize), x1, y1, x2, y2)
+            != 0
         {
             return *((*self_0).boundingBoxes).offset(i as isize);
         }
@@ -21673,9 +20203,7 @@ pub unsafe extern "C" fn spSkeletonClipping_create() -> *mut spSkeletonClipping 
     return clipping;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spSkeletonClipping_dispose(
-    mut self_0: *mut spSkeletonClipping,
-) {
+pub unsafe extern "C" fn spSkeletonClipping_dispose(mut self_0: *mut spSkeletonClipping) {
     spTriangulator_dispose((*self_0).triangulator);
     spFloatArray_dispose((*self_0).clippingPolygon);
     spFloatArray_dispose((*self_0).clipOutput);
@@ -21691,8 +20219,7 @@ unsafe extern "C" fn _makeClockwise(mut polygon: *mut spFloatArray) {
     let mut lastX: c_int = 0;
     let mut vertices: *mut c_float = (*polygon).items;
     let mut verticeslength: c_int = (*polygon).size;
-    let mut area: c_float = *vertices
-        .offset((verticeslength - 2 as c_int) as isize)
+    let mut area: c_float = *vertices.offset((verticeslength - 2 as c_int) as isize)
         * *vertices.offset(1 as c_int as isize)
         - *vertices.offset(0 as c_int as isize)
             * *vertices.offset((verticeslength - 1 as c_int) as isize);
@@ -21721,10 +20248,8 @@ unsafe extern "C" fn _makeClockwise(mut polygon: *mut spFloatArray) {
         let mut y: c_float = *vertices.offset((i + 1 as c_int) as isize);
         let mut other: c_int = lastX - i;
         *vertices.offset(i as isize) = *vertices.offset(other as isize);
-        *vertices
-            .offset(
-                (i + 1 as c_int) as isize,
-            ) = *vertices.offset((other + 1 as c_int) as isize);
+        *vertices.offset((i + 1 as c_int) as isize) =
+            *vertices.offset((other + 1 as c_int) as isize);
         *vertices.offset(other as isize) = x;
         *vertices.offset((other + 1 as c_int) as isize) = y;
         i += 2 as c_int;
@@ -21755,8 +20280,7 @@ pub unsafe extern "C" fn spSkeletonClipping_clipStart(
         2 as c_int,
     );
     _makeClockwise((*self_0).clippingPolygon);
-    (*self_0)
-        .clippingPolygons = spTriangulator_decompose(
+    (*self_0).clippingPolygons = spTriangulator_decompose(
         (*self_0).triangulator,
         (*self_0).clippingPolygon,
         spTriangulator_triangulate((*self_0).triangulator, (*self_0).clippingPolygon),
@@ -21764,8 +20288,8 @@ pub unsafe extern "C" fn spSkeletonClipping_clipStart(
     i = 0 as c_int;
     n = (*(*self_0).clippingPolygons).size;
     while i < n {
-        let mut polygon: *mut spFloatArray = *((*(*self_0).clippingPolygons).items)
-            .offset(i as isize);
+        let mut polygon: *mut spFloatArray =
+            *((*(*self_0).clippingPolygons).items).offset(i as isize);
         _makeClockwise(polygon);
         spFloatArray_add(polygon, *((*polygon).items).offset(0 as c_int as isize));
         spFloatArray_add(polygon, *((*polygon).items).offset(1 as c_int as isize));
@@ -21778,16 +20302,13 @@ pub unsafe extern "C" fn spSkeletonClipping_clipEnd(
     mut self_0: *mut spSkeletonClipping,
     mut slot: *mut spSlot,
 ) {
-    if !((*self_0).clipAttachment).is_null()
-        && (*(*self_0).clipAttachment).endSlot == (*slot).data
+    if !((*self_0).clipAttachment).is_null() && (*(*self_0).clipAttachment).endSlot == (*slot).data
     {
         spSkeletonClipping_clipEnd2(self_0);
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spSkeletonClipping_clipEnd2(
-    mut self_0: *mut spSkeletonClipping,
-) {
+pub unsafe extern "C" fn spSkeletonClipping_clipEnd2(mut self_0: *mut spSkeletonClipping) {
     if ((*self_0).clipAttachment).is_null() {
         return;
     }
@@ -21845,12 +20366,9 @@ pub unsafe extern "C" fn _clip(
         let mut ii: c_int = 0;
         let mut temp: *mut spFloatArray = 0 as *mut spFloatArray;
         let mut edgeX: c_float = *clippingVertices.offset(i as isize);
-        let mut edgeY: c_float = *clippingVertices
-            .offset((i + 1 as c_int) as isize);
-        let mut edgeX2: c_float = *clippingVertices
-            .offset((i + 2 as c_int) as isize);
-        let mut edgeY2: c_float = *clippingVertices
-            .offset((i + 3 as c_int) as isize);
+        let mut edgeY: c_float = *clippingVertices.offset((i + 1 as c_int) as isize);
+        let mut edgeX2: c_float = *clippingVertices.offset((i + 2 as c_int) as isize);
+        let mut edgeY2: c_float = *clippingVertices.offset((i + 3 as c_int) as isize);
         let mut deltaX: c_float = edgeX - edgeX2;
         let mut deltaY: c_float = edgeY - edgeY2;
         let mut inputVertices: *mut c_float = (*input).items;
@@ -21860,18 +20378,12 @@ pub unsafe extern "C" fn _clip(
         ii = 0 as c_int;
         while ii < inputVerticesLength {
             let mut inputX: c_float = *inputVertices.offset(ii as isize);
-            let mut inputY: c_float = *inputVertices
-                .offset((ii + 1 as c_int) as isize);
-            let mut inputX2: c_float = *inputVertices
-                .offset((ii + 2 as c_int) as isize);
-            let mut inputY2: c_float = *inputVertices
-                .offset((ii + 3 as c_int) as isize);
-            let mut side2: c_int = (deltaX * (inputY2 - edgeY2)
-                - deltaY * (inputX2 - edgeX2) > 0 as c_int as c_float)
-                as c_int;
-            if deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2)
-                > 0 as c_int as c_float
-            {
+            let mut inputY: c_float = *inputVertices.offset((ii + 1 as c_int) as isize);
+            let mut inputX2: c_float = *inputVertices.offset((ii + 2 as c_int) as isize);
+            let mut inputY2: c_float = *inputVertices.offset((ii + 3 as c_int) as isize);
+            let mut side2: c_int = (deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2)
+                > 0 as c_int as c_float) as c_int;
+            if deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0 as c_int as c_float {
                 let mut c0: c_float = 0.;
                 let mut c2: c_float = 0.;
                 let mut s: c_float = 0.;
@@ -21884,9 +20396,7 @@ pub unsafe extern "C" fn _clip(
                     c0 = inputY2 - inputY;
                     c2 = inputX2 - inputX;
                     s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
-                    if (if s < 0 as c_int as c_float { -s } else { s })
-                        > 0.000001f32
-                    {
+                    if (if s < 0 as c_int as c_float { -s } else { s }) > 0.000001f32 {
                         ua = (c2 * (edgeY - inputY) - c0 * (edgeX - inputX)) / s;
                         spFloatArray_add(output, edgeX + (edgeX2 - edgeX) * ua);
                         spFloatArray_add(output, edgeY + (edgeY2 - edgeY) * ua);
@@ -21900,13 +20410,15 @@ pub unsafe extern "C" fn _clip(
                 if side2 != 0 {
                     let mut c0_0: c_float = inputY2 - inputY;
                     let mut c2_0: c_float = inputX2 - inputX;
-                    let mut s_0: c_float = c0_0 * (edgeX2 - edgeX)
-                        - c2_0 * (edgeY2 - edgeY);
-                    if (if s_0 < 0 as c_int as c_float { -s_0 } else { s_0 })
-                        > 0.000001f32
+                    let mut s_0: c_float = c0_0 * (edgeX2 - edgeX) - c2_0 * (edgeY2 - edgeY);
+                    if (if s_0 < 0 as c_int as c_float {
+                        -s_0
+                    } else {
+                        s_0
+                    }) > 0.000001f32
                     {
-                        let mut ua_0: c_float = (c2_0 * (edgeY - inputY)
-                            - c0_0 * (edgeX - inputX)) / s_0;
+                        let mut ua_0: c_float =
+                            (c2_0 * (edgeY - inputY) - c0_0 * (edgeX - inputX)) / s_0;
                         spFloatArray_add(output, edgeX + (edgeX2 - edgeX) * ua_0);
                         spFloatArray_add(output, edgeY + (edgeY2 - edgeY) * ua_0);
                     } else {
@@ -21958,7 +20470,7 @@ pub unsafe extern "C" fn _clip(
 pub unsafe extern "C" fn spSkeletonClipping_clipTriangles(
     mut self_0: *mut spSkeletonClipping,
     mut vertices: *mut c_float,
-    mut verticesLength: c_int,
+    mut _verticesLength: c_int,
     mut triangles: *mut c_ushort,
     mut trianglesLength: c_int,
     mut uvs: *mut c_float,
@@ -21978,8 +20490,7 @@ pub unsafe extern "C" fn spSkeletonClipping_clipTriangles(
     i = 0 as c_int;
     's_30: while i < trianglesLength {
         let mut p: c_int = 0;
-        let mut vertexOffset: c_int = *triangles.offset(i as isize) as c_int
-            * stride;
+        let mut vertexOffset: c_int = *triangles.offset(i as isize) as c_int * stride;
         let mut x2: c_float = 0.;
         let mut y2: c_float = 0.;
         let mut u2: c_float = 0.;
@@ -21989,19 +20500,15 @@ pub unsafe extern "C" fn spSkeletonClipping_clipTriangles(
         let mut u3: c_float = 0.;
         let mut v3: c_float = 0.;
         let mut x1: c_float = *vertices.offset(vertexOffset as isize);
-        let mut y1: c_float = *vertices
-            .offset((vertexOffset + 1 as c_int) as isize);
+        let mut y1: c_float = *vertices.offset((vertexOffset + 1 as c_int) as isize);
         let mut u1: c_float = *uvs.offset(vertexOffset as isize);
-        let mut v1: c_float = *uvs
-            .offset((vertexOffset + 1 as c_int) as isize);
-        vertexOffset = *triangles.offset((i + 1 as c_int) as isize) as c_int
-            * stride;
+        let mut v1: c_float = *uvs.offset((vertexOffset + 1 as c_int) as isize);
+        vertexOffset = *triangles.offset((i + 1 as c_int) as isize) as c_int * stride;
         x2 = *vertices.offset(vertexOffset as isize);
         y2 = *vertices.offset((vertexOffset + 1 as c_int) as isize);
         u2 = *uvs.offset(vertexOffset as isize);
         v2 = *uvs.offset((vertexOffset + 1 as c_int) as isize);
-        vertexOffset = *triangles.offset((i + 2 as c_int) as isize) as c_int
-            * stride;
+        vertexOffset = *triangles.offset((i + 2 as c_int) as isize) as c_int * stride;
         x3 = *vertices.offset(vertexOffset as isize);
         y3 = *vertices.offset((vertexOffset + 1 as c_int) as isize);
         u3 = *uvs.offset(vertexOffset as isize);
@@ -22027,12 +20534,10 @@ pub unsafe extern "C" fn spSkeletonClipping_clipTriangles(
                 let mut d2: c_float = 0.;
                 let mut d4: c_float = 0.;
                 let mut d: c_float = 0.;
-                let mut clippedTrianglesItems: *mut c_ushort = 0
-                    as *mut c_ushort;
+                let mut clippedTrianglesItems: *mut c_ushort = 0 as *mut c_ushort;
                 let mut clipOutputCount: c_int = 0;
                 let mut clipOutputItems: *mut c_float = 0 as *mut c_float;
-                let mut clippedVerticesItems: *mut c_float = 0
-                    as *mut c_float;
+                let mut clippedVerticesItems: *mut c_float = 0 as *mut c_float;
                 let mut clippedUVsItems: *mut c_float = 0 as *mut c_float;
                 let mut clipOutputLength: c_int = (*clipOutput).size;
                 if !(clipOutputLength == 0 as c_int) {
@@ -22047,12 +20552,10 @@ pub unsafe extern "C" fn spSkeletonClipping_clipTriangles(
                         clippedVertices,
                         s + (clipOutputCount << 1 as c_int),
                     ))
-                        .items;
-                    clippedUVsItems = (*spFloatArray_setSize(
-                        clippedUVs,
-                        s + (clipOutputCount << 1 as c_int),
-                    ))
-                        .items;
+                    .items;
+                    clippedUVsItems =
+                        (*spFloatArray_setSize(clippedUVs, s + (clipOutputCount << 1 as c_int)))
+                            .items;
                     ii = 0 as c_int;
                     while ii < clipOutputLength {
                         let mut c0: c_float = 0.;
@@ -22061,21 +20564,17 @@ pub unsafe extern "C" fn spSkeletonClipping_clipTriangles(
                         let mut b: c_float = 0.;
                         let mut c: c_float = 0.;
                         let mut x: c_float = *clipOutputItems.offset(ii as isize);
-                        let mut y: c_float = *clipOutputItems
-                            .offset((ii + 1 as c_int) as isize);
+                        let mut y: c_float = *clipOutputItems.offset((ii + 1 as c_int) as isize);
                         *clippedVerticesItems.offset(s as isize) = x;
-                        *clippedVerticesItems
-                            .offset((s + 1 as c_int) as isize) = y;
+                        *clippedVerticesItems.offset((s + 1 as c_int) as isize) = y;
                         c0 = x - x3;
                         c1 = y - y3;
                         a = (d0 * c0 + d1 * c1) * d;
                         b = (d4 * c0 + d2 * c1) * d;
                         c = 1 as c_int as c_float - a - b;
                         *clippedUVsItems.offset(s as isize) = u1 * a + u2 * b + u3 * c;
-                        *clippedUVsItems
-                            .offset(
-                                (s + 1 as c_int) as isize,
-                            ) = v1 * a + v2 * b + v3 * c;
+                        *clippedUVsItems.offset((s + 1 as c_int) as isize) =
+                            v1 * a + v2 * b + v3 * c;
                         s += 2 as c_int;
                         ii += 2 as c_int;
                     }
@@ -22084,41 +20583,28 @@ pub unsafe extern "C" fn spSkeletonClipping_clipTriangles(
                         clippedTriangles,
                         s + 3 as c_int * (clipOutputCount - 2 as c_int),
                     ))
-                        .items;
+                    .items;
                     clipOutputCount -= 1;
                     ii = 1 as c_int;
                     while ii < clipOutputCount {
-                        *clippedTrianglesItems
-                            .offset(s as isize) = index as c_ushort;
-                        *clippedTrianglesItems
-                            .offset(
-                                (s + 1 as c_int) as isize,
-                            ) = (index as c_int + ii) as c_ushort;
-                        *clippedTrianglesItems
-                            .offset(
-                                (s + 2 as c_int) as isize,
-                            ) = (index as c_int + ii + 1 as c_int)
-                            as c_ushort;
+                        *clippedTrianglesItems.offset(s as isize) = index as c_ushort;
+                        *clippedTrianglesItems.offset((s + 1 as c_int) as isize) =
+                            (index as c_int + ii) as c_ushort;
+                        *clippedTrianglesItems.offset((s + 2 as c_int) as isize) =
+                            (index as c_int + ii + 1 as c_int) as c_ushort;
                         s += 3 as c_int;
                         ii += 1;
                     }
-                    index = (index as c_int + (clipOutputCount + 1 as c_int))
-                        as c_short;
+                    index = (index as c_int + (clipOutputCount + 1 as c_int)) as c_short;
                 }
                 p += 1;
             } else {
-                let mut clippedTrianglesItems_0: *mut c_ushort = 0
-                    as *mut c_ushort;
-                let mut clippedVerticesItems_0: *mut c_float = (*spFloatArray_setSize(
-                    clippedVertices,
-                    s + ((3 as c_int) << 1 as c_int),
-                ))
-                    .items;
-                let mut clippedUVsItems_0: *mut c_float = (*spFloatArray_setSize(
-                    clippedUVs,
-                    s + ((3 as c_int) << 1 as c_int),
-                ))
-                    .items;
+                let mut clippedTrianglesItems_0: *mut c_ushort = 0 as *mut c_ushort;
+                let mut clippedVerticesItems_0: *mut c_float =
+                    (*spFloatArray_setSize(clippedVertices, s + ((3 as c_int) << 1 as c_int)))
+                        .items;
+                let mut clippedUVsItems_0: *mut c_float =
+                    (*spFloatArray_setSize(clippedUVs, s + ((3 as c_int) << 1 as c_int))).items;
                 *clippedVerticesItems_0.offset(s as isize) = x1;
                 *clippedVerticesItems_0.offset((s + 1 as c_int) as isize) = y1;
                 *clippedVerticesItems_0.offset((s + 2 as c_int) as isize) = x2;
@@ -22132,20 +20618,13 @@ pub unsafe extern "C" fn spSkeletonClipping_clipTriangles(
                 *clippedUVsItems_0.offset((s + 4 as c_int) as isize) = u3;
                 *clippedUVsItems_0.offset((s + 5 as c_int) as isize) = v3;
                 s = (*clippedTriangles).size;
-                clippedTrianglesItems_0 = (*spUnsignedShortArray_setSize(
-                    clippedTriangles,
-                    s + 3 as c_int,
-                ))
-                    .items;
+                clippedTrianglesItems_0 =
+                    (*spUnsignedShortArray_setSize(clippedTriangles, s + 3 as c_int)).items;
                 *clippedTrianglesItems_0.offset(s as isize) = index as c_ushort;
-                *clippedTrianglesItems_0
-                    .offset(
-                        (s + 1 as c_int) as isize,
-                    ) = (index as c_int + 1 as c_int) as c_ushort;
-                *clippedTrianglesItems_0
-                    .offset(
-                        (s + 2 as c_int) as isize,
-                    ) = (index as c_int + 2 as c_int) as c_ushort;
+                *clippedTrianglesItems_0.offset((s + 1 as c_int) as isize) =
+                    (index as c_int + 1 as c_int) as c_ushort;
+                *clippedTrianglesItems_0.offset((s + 2 as c_int) as isize) =
+                    (index as c_int + 2 as c_int) as c_ushort;
                 index = (index as c_int + 3 as c_int) as c_short;
                 i += 3 as c_int;
                 continue 's_30;
@@ -22210,9 +20689,7 @@ pub unsafe extern "C" fn spSkeletonData_dispose(mut self_0: *mut spSkeletonData)
     _spFree((*self_0).ikConstraints as *mut c_void);
     i = 0 as c_int;
     while i < (*self_0).transformConstraintsCount {
-        spTransformConstraintData_dispose(
-            *((*self_0).transformConstraints).offset(i as isize),
-        );
+        spTransformConstraintData_dispose(*((*self_0).transformConstraints).offset(i as isize));
         i += 1;
     }
     _spFree((*self_0).transformConstraints as *mut c_void);
@@ -22224,9 +20701,7 @@ pub unsafe extern "C" fn spSkeletonData_dispose(mut self_0: *mut spSkeletonData)
     _spFree((*self_0).pathConstraints as *mut c_void);
     i = 0 as c_int;
     while i < (*self_0).physicsConstraintsCount {
-        spPhysicsConstraintData_dispose(
-            *((*self_0).physicsConstraints).offset(i as isize),
-        );
+        spPhysicsConstraintData_dispose(*((*self_0).physicsConstraints).offset(i as isize));
         i += 1;
     }
     _spFree((*self_0).physicsConstraints as *mut c_void);
@@ -22244,9 +20719,7 @@ pub unsafe extern "C" fn spSkeletonData_findBone(
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < (*self_0).bonesCount {
-        if spine_strcmp((**((*self_0).bones).offset(i as isize)).name, boneName)
-            == 0 as c_int
-        {
+        if spine_strcmp((**((*self_0).bones).offset(i as isize)).name, boneName) == 0 as c_int {
             return *((*self_0).bones).offset(i as isize);
         }
         i += 1;
@@ -22261,9 +20734,7 @@ pub unsafe extern "C" fn spSkeletonData_findSlot(
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < (*self_0).slotsCount {
-        if spine_strcmp((**((*self_0).slots).offset(i as isize)).name, slotName)
-            == 0 as c_int
-        {
+        if spine_strcmp((**((*self_0).slots).offset(i as isize)).name, slotName) == 0 as c_int {
             return *((*self_0).slots).offset(i as isize);
         }
         i += 1;
@@ -22278,9 +20749,7 @@ pub unsafe extern "C" fn spSkeletonData_findSkin(
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < (*self_0).skinsCount {
-        if spine_strcmp((**((*self_0).skins).offset(i as isize)).name, skinName)
-            == 0 as c_int
-        {
+        if spine_strcmp((**((*self_0).skins).offset(i as isize)).name, skinName) == 0 as c_int {
             return *((*self_0).skins).offset(i as isize);
         }
         i += 1;
@@ -22295,9 +20764,7 @@ pub unsafe extern "C" fn spSkeletonData_findEvent(
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < (*self_0).eventsCount {
-        if spine_strcmp((**((*self_0).events).offset(i as isize)).name, eventName)
-            == 0 as c_int
-        {
+        if spine_strcmp((**((*self_0).events).offset(i as isize)).name, eventName) == 0 as c_int {
             return *((*self_0).events).offset(i as isize);
         }
         i += 1;
@@ -22404,12 +20871,7 @@ pub unsafe extern "C" fn spSkeletonJson_createWithLoader(
     mut attachmentLoader: *mut spAttachmentLoader,
 ) -> *mut spSkeletonJson {
     let mut self_0: *mut spSkeletonJson = &mut (*((_spCalloc
-        as unsafe extern "C" fn(
-            size_t,
-            size_t,
-            *const c_char,
-            c_int,
-        ) -> *mut c_void)(
+        as unsafe extern "C" fn(size_t, size_t, *const c_char, c_int) -> *mut c_void)(
         1 as c_int as size_t,
         ::core::mem::size_of::<_spSkeletonJson>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -22421,15 +20883,10 @@ pub unsafe extern "C" fn spSkeletonJson_createWithLoader(
     return self_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spSkeletonJson_create(
-    mut atlas: *mut spAtlas,
-) -> *mut spSkeletonJson {
-    let mut attachmentLoader: *mut spAtlasAttachmentLoader = spAtlasAttachmentLoader_create(
-        atlas,
-    );
-    let mut self_0: *mut spSkeletonJson = spSkeletonJson_createWithLoader(
-        &mut (*attachmentLoader).super_0,
-    );
+pub unsafe extern "C" fn spSkeletonJson_create(mut atlas: *mut spAtlas) -> *mut spSkeletonJson {
+    let mut attachmentLoader: *mut spAtlasAttachmentLoader = spAtlasAttachmentLoader_create(atlas);
+    let mut self_0: *mut spSkeletonJson =
+        spSkeletonJson_createWithLoader(&mut (*attachmentLoader).super_0);
     (*(self_0 as *mut _spSkeletonJson)).ownsLoader = 1 as c_int;
     return self_0;
 }
@@ -22462,13 +20919,9 @@ pub unsafe extern "C" fn _spSkeletonJson_setError(
             (255 as c_int - length) as size_t,
         );
     }
-    (*self_0)
-        .error = _spMalloc(
+    (*self_0).error = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(message.as_mut_ptr()))
-                    .wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(message.as_mut_ptr())).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         11441 as c_int,
     ) as *mut c_char;
@@ -22477,24 +20930,18 @@ pub unsafe extern "C" fn _spSkeletonJson_setError(
         Json_dispose(root);
     }
 }
-unsafe extern "C" fn toColor(
-    mut value: *const c_char,
-    mut index: c_int,
-) -> c_float {
+unsafe extern "C" fn toColor(mut value: *const c_char, mut index: c_int) -> c_float {
     let mut digits: [c_char; 3] = [0; 3];
     let mut error: *mut c_char = 0 as *mut c_char;
     let mut color: c_int = 0;
-    if index as size_t
-        >= (spine_strlen(value)).wrapping_div(2 as c_int as c_ulong)
-    {
+    if index as size_t >= (spine_strlen(value)).wrapping_div(2 as c_int as c_ulong) {
         return -(1 as c_int) as c_float;
     }
     value = value.offset((index * 2 as c_int) as isize);
     digits[0 as c_int as usize] = *value;
     digits[1 as c_int as usize] = *value.offset(1 as c_int as isize);
     digits[2 as c_int as usize] = '\0' as i32 as c_char;
-    color = spine_strtoul(digits.as_mut_ptr(), &mut error, 16 as c_int)
-        as c_int;
+    color = spine_strtoul(digits.as_mut_ptr(), &mut error, 16 as c_int) as c_int;
     if *error as c_int != 0 as c_int {
         return -(1 as c_int) as c_float;
     }
@@ -22577,18 +21024,7 @@ unsafe extern "C" fn readCurve(
     curve = (*curve).next;
     cy2 = (*curve).valueFloat * scale;
     setBezierJson(
-        timeline,
-        frame,
-        value,
-        bezier,
-        time1,
-        value1,
-        cx1,
-        cy1,
-        cx2,
-        cy2,
-        time2,
-        value2,
+        timeline, frame, value, bezier, time1, value1, cx1, cy1, cx2, cy2, time2, value2,
     );
     return bezier + 1 as c_int;
 }
@@ -22634,16 +21070,7 @@ unsafe extern "C" fn readTimelineJson(
         curve = Json_getItem(keyMap, b"curve\0" as *const u8 as *const c_char);
         if !curve.is_null() {
             bezier = readCurve(
-                curve,
-                timeline,
-                bezier,
-                frame,
-                0 as c_int,
-                time,
-                time2,
-                value,
-                value2,
-                scale,
+                curve, timeline, bezier, frame, 0 as c_int, time, time2, value, value2, scale,
             );
         }
         time = time2;
@@ -22692,28 +21119,10 @@ unsafe extern "C" fn readTimeline2Json(
         curve = Json_getItem(keyMap, b"curve\0" as *const u8 as *const c_char);
         if !curve.is_null() {
             bezier = readCurve(
-                curve,
-                timeline,
-                bezier,
-                frame,
-                0 as c_int,
-                time,
-                time2,
-                value1,
-                nvalue1,
-                scale,
+                curve, timeline, bezier, frame, 0 as c_int, time, time2, value1, nvalue1, scale,
             );
             bezier = readCurve(
-                curve,
-                timeline,
-                bezier,
-                frame,
-                1 as c_int,
-                time,
-                time2,
-                value2,
-                nvalue2,
-                scale,
+                curve, timeline, bezier, frame, 1 as c_int, time, time2, value2, nvalue2, scale,
             );
         }
         time = time2;
@@ -22729,27 +21138,14 @@ unsafe extern "C" fn readSequenceJson(mut item: *mut Json) -> *mut spSequence {
     if item.is_null() {
         return 0 as *mut spSequence;
     }
-    sequence = spSequence_create(
-        Json_getInt(
-            item,
-            b"count\0" as *const u8 as *const c_char,
-            0 as c_int,
-        ),
-    );
-    (*sequence)
-        .start = Json_getInt(
+    sequence = spSequence_create(Json_getInt(
         item,
-        b"start\0" as *const u8 as *const c_char,
-        1 as c_int,
-    );
-    (*sequence)
-        .digits = Json_getInt(
-        item,
-        b"digits\0" as *const u8 as *const c_char,
+        b"count\0" as *const u8 as *const c_char,
         0 as c_int,
-    );
-    (*sequence)
-        .setupIndex = Json_getInt(
+    ));
+    (*sequence).start = Json_getInt(item, b"start\0" as *const u8 as *const c_char, 1 as c_int);
+    (*sequence).digits = Json_getInt(item, b"digits\0" as *const u8 as *const c_char, 0 as c_int);
+    (*sequence).setupIndex = Json_getInt(
         item,
         b"setupIndex\0" as *const u8 as *const c_char,
         0 as c_int,
@@ -22946,42 +21342,17 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
     let mut timelines: *mut spTimelineArray = spTimelineArray_create(8 as c_int);
     let mut scale: c_float = (*self_0).scale;
     let mut duration: c_float = 0.;
-    let mut bones: *mut Json = Json_getItem(
-        root,
-        b"bones\0" as *const u8 as *const c_char,
-    );
-    let mut slots: *mut Json = Json_getItem(
-        root,
-        b"slots\0" as *const u8 as *const c_char,
-    );
-    let mut ik: *mut Json = Json_getItem(
-        root,
-        b"ik\0" as *const u8 as *const c_char,
-    );
-    let mut transform: *mut Json = Json_getItem(
-        root,
-        b"transform\0" as *const u8 as *const c_char,
-    );
-    let mut paths: *mut Json = Json_getItem(
-        root,
-        b"path\0" as *const u8 as *const c_char,
-    );
-    let mut physics: *mut Json = Json_getItem(
-        root,
-        b"physics\0" as *const u8 as *const c_char,
-    );
-    let mut attachmentsJson: *mut Json = Json_getItem(
-        root,
-        b"attachments\0" as *const u8 as *const c_char,
-    );
-    let mut drawOrderJson: *mut Json = Json_getItem(
-        root,
-        b"drawOrder\0" as *const u8 as *const c_char,
-    );
-    let mut events: *mut Json = Json_getItem(
-        root,
-        b"events\0" as *const u8 as *const c_char,
-    );
+    let mut bones: *mut Json = Json_getItem(root, b"bones\0" as *const u8 as *const c_char);
+    let mut slots: *mut Json = Json_getItem(root, b"slots\0" as *const u8 as *const c_char);
+    let mut ik: *mut Json = Json_getItem(root, b"ik\0" as *const u8 as *const c_char);
+    let mut transform: *mut Json = Json_getItem(root, b"transform\0" as *const u8 as *const c_char);
+    let mut paths: *mut Json = Json_getItem(root, b"path\0" as *const u8 as *const c_char);
+    let mut physics: *mut Json = Json_getItem(root, b"physics\0" as *const u8 as *const c_char);
+    let mut attachmentsJson: *mut Json =
+        Json_getItem(root, b"attachments\0" as *const u8 as *const c_char);
+    let mut drawOrderJson: *mut Json =
+        Json_getItem(root, b"drawOrder\0" as *const u8 as *const c_char);
+    let mut events: *mut Json = Json_getItem(root, b"events\0" as *const u8 as *const c_char);
     let mut boneMap: *mut Json = 0 as *mut Json;
     let mut slotMap: *mut Json = 0 as *mut Json;
     let mut keyMap: *mut Json = 0 as *mut Json;
@@ -23018,14 +21389,13 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
         b: 0.,
         a: 0.,
     };
-    slotMap = if !slots.is_null() { (*slots).child } else { 0 as *mut Json };
+    slotMap = if !slots.is_null() {
+        (*slots).child
+    } else {
+        0 as *mut Json
+    };
     while !slotMap.is_null() {
-        let mut slotIndex: c_int = findSlotIndex(
-            self_0,
-            skeletonData,
-            (*slotMap).name,
-            timelines,
-        );
+        let mut slotIndex: c_int = findSlotIndex(self_0, skeletonData, (*slotMap).name, timelines);
         if slotIndex == -(1 as c_int) {
             return 0 as *mut spAnimation;
         }
@@ -23037,10 +21407,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                 b"attachment\0" as *const u8 as *const c_char,
             ) == 0 as c_int
             {
-                let mut timeline: *mut spAttachmentTimeline = spAttachmentTimeline_create(
-                    frames,
-                    slotIndex,
-                );
+                let mut timeline: *mut spAttachmentTimeline =
+                    spAttachmentTimeline_create(frames, slotIndex);
                 keyMap = (*timelineMap).child;
                 frame = 0 as c_int;
                 while !keyMap.is_null() {
@@ -23052,16 +21420,10 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                             b"time\0" as *const u8 as *const c_char,
                             0 as c_int as c_float,
                         ),
-                        if !(Json_getItem(
-                            keyMap,
-                            b"name\0" as *const u8 as *const c_char,
-                        ))
+                        if !(Json_getItem(keyMap, b"name\0" as *const u8 as *const c_char))
                             .is_null()
                         {
-                            (*Json_getItem(
-                                keyMap,
-                                b"name\0" as *const u8 as *const c_char,
-                            ))
+                            (*Json_getItem(keyMap, b"name\0" as *const u8 as *const c_char))
                                 .valueString
                         } else {
                             0 as *const c_char
@@ -23071,17 +21433,12 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     frame += 1;
                 }
                 spTimelineArray_add(timelines, &mut (*timeline).super_0);
-            } else if spine_strcmp(
-                (*timelineMap).name,
-                b"rgba\0" as *const u8 as *const c_char,
-            ) == 0 as c_int
+            } else if spine_strcmp((*timelineMap).name, b"rgba\0" as *const u8 as *const c_char)
+                == 0 as c_int
             {
                 let mut time: c_float = 0.;
-                let mut timeline_0: *mut spRGBATimeline = spRGBATimeline_create(
-                    frames,
-                    frames << 2 as c_int,
-                    slotIndex,
-                );
+                let mut timeline_0: *mut spRGBATimeline =
+                    spRGBATimeline_create(frames, frames << 2 as c_int, slotIndex);
                 keyMap = (*timelineMap).child;
                 time = Json_getFloat(
                     keyMap,
@@ -23102,13 +21459,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                 loop {
                     let mut time2: c_float = 0.;
                     spRGBATimeline_setFrame(
-                        timeline_0,
-                        frame,
-                        time,
-                        color.r,
-                        color.g,
-                        color.b,
-                        color.a,
+                        timeline_0, frame, time, color.r, color.g, color.b, color.a,
                     );
                     nextMap = (*keyMap).next;
                     if nextMap.is_null() {
@@ -23128,10 +21479,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                         ),
                         1 as c_int,
                     );
-                    curve = Json_getItem(
-                        keyMap,
-                        b"curve\0" as *const u8 as *const c_char,
-                    );
+                    curve = Json_getItem(keyMap, b"curve\0" as *const u8 as *const c_char);
                     if !curve.is_null() {
                         bezier = readCurve(
                             curve,
@@ -23188,17 +21536,12 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     frame += 1;
                 }
                 spTimelineArray_add(timelines, &mut (*timeline_0).super_0.super_0);
-            } else if spine_strcmp(
-                (*timelineMap).name,
-                b"rgb\0" as *const u8 as *const c_char,
-            ) == 0 as c_int
+            } else if spine_strcmp((*timelineMap).name, b"rgb\0" as *const u8 as *const c_char)
+                == 0 as c_int
             {
                 let mut time_0: c_float = 0.;
-                let mut timeline_1: *mut spRGBTimeline = spRGBTimeline_create(
-                    frames,
-                    frames * 3 as c_int,
-                    slotIndex,
-                );
+                let mut timeline_1: *mut spRGBTimeline =
+                    spRGBTimeline_create(frames, frames * 3 as c_int, slotIndex);
                 keyMap = (*timelineMap).child;
                 time_0 = Json_getFloat(
                     keyMap,
@@ -23218,14 +21561,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                 bezier = 0 as c_int;
                 loop {
                     let mut time2_0: c_float = 0.;
-                    spRGBTimeline_setFrame(
-                        timeline_1,
-                        frame,
-                        time_0,
-                        color.r,
-                        color.g,
-                        color.b,
-                    );
+                    spRGBTimeline_setFrame(timeline_1, frame, time_0, color.r, color.g, color.b);
                     nextMap = (*keyMap).next;
                     if nextMap.is_null() {
                         break;
@@ -23244,10 +21580,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                         ),
                         1 as c_int,
                     );
-                    curve = Json_getItem(
-                        keyMap,
-                        b"curve\0" as *const u8 as *const c_char,
-                    );
+                    curve = Json_getItem(keyMap, b"curve\0" as *const u8 as *const c_char);
                     if !curve.is_null() {
                         bezier = readCurve(
                             curve,
@@ -23302,12 +21635,10 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     readTimelineJson(
                         (*timelineMap).child,
                         &mut (*(spAlphaTimeline_create
-                            as unsafe extern "C" fn(
-                                c_int,
-                                c_int,
-                                c_int,
-                            ) -> *mut spAlphaTimeline)(frames, frames, slotIndex))
-                            .super_0,
+                            as unsafe extern "C" fn(c_int, c_int, c_int) -> *mut spAlphaTimeline)(
+                            frames, frames, slotIndex,
+                        ))
+                        .super_0,
                         0 as c_int as c_float,
                         1 as c_int as c_float,
                     ),
@@ -23318,11 +21649,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
             ) == 0 as c_int
             {
                 let mut time_1: c_float = 0.;
-                let mut timeline_2: *mut spRGBA2Timeline = spRGBA2Timeline_create(
-                    frames,
-                    frames * 7 as c_int,
-                    slotIndex,
-                );
+                let mut timeline_2: *mut spRGBA2Timeline =
+                    spRGBA2Timeline_create(frames, frames * 7 as c_int, slotIndex);
                 keyMap = (*timelineMap).child;
                 time_1 = Json_getFloat(
                     keyMap,
@@ -23352,16 +21680,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                 loop {
                     let mut time2_1: c_float = 0.;
                     spRGBA2Timeline_setFrame(
-                        timeline_2,
-                        frame,
-                        time_1,
-                        color.r,
-                        color.g,
-                        color.b,
-                        color.a,
-                        color2.g,
-                        color2.g,
-                        color2.b,
+                        timeline_2, frame, time_1, color.r, color.g, color.b, color.a, color2.g,
+                        color2.g, color2.b,
                     );
                     nextMap = (*keyMap).next;
                     if nextMap.is_null() {
@@ -23390,10 +21710,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                         ),
                         0 as c_int,
                     );
-                    curve = Json_getItem(
-                        keyMap,
-                        b"curve\0" as *const u8 as *const c_char,
-                    );
+                    curve = Json_getItem(keyMap, b"curve\0" as *const u8 as *const c_char);
                     if !curve.is_null() {
                         bezier = readCurve(
                             curve,
@@ -23487,17 +21804,12 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     frame += 1;
                 }
                 spTimelineArray_add(timelines, &mut (*timeline_2).super_0.super_0);
-            } else if spine_strcmp(
-                (*timelineMap).name,
-                b"rgb2\0" as *const u8 as *const c_char,
-            ) == 0 as c_int
+            } else if spine_strcmp((*timelineMap).name, b"rgb2\0" as *const u8 as *const c_char)
+                == 0 as c_int
             {
                 let mut time_2: c_float = 0.;
-                let mut timeline_3: *mut spRGBA2Timeline = spRGBA2Timeline_create(
-                    frames,
-                    frames * 6 as c_int,
-                    slotIndex,
-                );
+                let mut timeline_3: *mut spRGBA2Timeline =
+                    spRGBA2Timeline_create(frames, frames * 6 as c_int, slotIndex);
                 keyMap = (*timelineMap).child;
                 time_2 = Json_getFloat(
                     keyMap,
@@ -23527,16 +21839,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                 loop {
                     let mut time2_2: c_float = 0.;
                     spRGBA2Timeline_setFrame(
-                        timeline_3,
-                        frame,
-                        time_2,
-                        color.r,
-                        color.g,
-                        color.b,
-                        color.a,
-                        color2.r,
-                        color2.g,
-                        color2.b,
+                        timeline_3, frame, time_2, color.r, color.g, color.b, color.a, color2.r,
+                        color2.g, color2.b,
                     );
                     nextMap = (*keyMap).next;
                     if nextMap.is_null() {
@@ -23565,10 +21869,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                         ),
                         0 as c_int,
                     );
-                    curve = Json_getItem(
-                        keyMap,
-                        b"curve\0" as *const u8 as *const c_char,
-                    );
+                    curve = Json_getItem(keyMap, b"curve\0" as *const u8 as *const c_char);
                     if !curve.is_null() {
                         bezier = readCurve(
                             curve,
@@ -23655,8 +21956,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                 _spSkeletonJson_setError(
                     self_0,
                     0 as *mut Json,
-                    b"Invalid timeline type for a slot: \0" as *const u8
-                        as *const c_char,
+                    b"Invalid timeline type for a slot: \0" as *const u8 as *const c_char,
                     (*timelineMap).name,
                 );
                 return 0 as *mut spAnimation;
@@ -23665,7 +21965,11 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
         }
         slotMap = (*slotMap).next;
     }
-    boneMap = if !bones.is_null() { (*bones).child } else { 0 as *mut Json };
+    boneMap = if !bones.is_null() {
+        (*bones).child
+    } else {
+        0 as *mut Json
+    };
     while !boneMap.is_null() {
         let mut boneIndex: c_int = -(1 as c_int);
         i = 0 as c_int;
@@ -23709,8 +22013,11 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                                     c_int,
                                     c_int,
                                     c_int,
-                                ) -> *mut spRotateTimeline)(frames_0, frames_0, boneIndex))
-                                .super_0,
+                                )
+                                    -> *mut spRotateTimeline)(
+                                frames_0, frames_0, boneIndex
+                            ))
+                            .super_0,
                             0 as c_int as c_float,
                             1 as c_int as c_float,
                         ),
@@ -23720,11 +22027,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"translate\0" as *const u8 as *const c_char,
                 ) == 0 as c_int
                 {
-                    let mut timeline_4: *mut spTranslateTimeline = spTranslateTimeline_create(
-                        frames_0,
-                        frames_0 << 1 as c_int,
-                        boneIndex,
-                    );
+                    let mut timeline_4: *mut spTranslateTimeline =
+                        spTranslateTimeline_create(frames_0, frames_0 << 1 as c_int, boneIndex);
                     spTimelineArray_add(
                         timelines,
                         readTimeline2Json(
@@ -23741,11 +22045,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"translatex\0" as *const u8 as *const c_char,
                 ) == 0 as c_int
                 {
-                    let mut timeline_5: *mut spTranslateXTimeline = spTranslateXTimeline_create(
-                        frames_0,
-                        frames_0,
-                        boneIndex,
-                    );
+                    let mut timeline_5: *mut spTranslateXTimeline =
+                        spTranslateXTimeline_create(frames_0, frames_0, boneIndex);
                     spTimelineArray_add(
                         timelines,
                         readTimelineJson(
@@ -23760,11 +22061,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"translatey\0" as *const u8 as *const c_char,
                 ) == 0 as c_int
                 {
-                    let mut timeline_6: *mut spTranslateYTimeline = spTranslateYTimeline_create(
-                        frames_0,
-                        frames_0,
-                        boneIndex,
-                    );
+                    let mut timeline_6: *mut spTranslateYTimeline =
+                        spTranslateYTimeline_create(frames_0, frames_0, boneIndex);
                     spTimelineArray_add(
                         timelines,
                         readTimelineJson(
@@ -23779,11 +22077,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"scale\0" as *const u8 as *const c_char,
                 ) == 0 as c_int
                 {
-                    let mut timeline_7: *mut spScaleTimeline = spScaleTimeline_create(
-                        frames_0,
-                        frames_0 << 1 as c_int,
-                        boneIndex,
-                    );
+                    let mut timeline_7: *mut spScaleTimeline =
+                        spScaleTimeline_create(frames_0, frames_0 << 1 as c_int, boneIndex);
                     spTimelineArray_add(
                         timelines,
                         readTimeline2Json(
@@ -23800,11 +22095,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"scalex\0" as *const u8 as *const c_char,
                 ) == 0 as c_int
                 {
-                    let mut timeline_8: *mut spScaleXTimeline = spScaleXTimeline_create(
-                        frames_0,
-                        frames_0,
-                        boneIndex,
-                    );
+                    let mut timeline_8: *mut spScaleXTimeline =
+                        spScaleXTimeline_create(frames_0, frames_0, boneIndex);
                     spTimelineArray_add(
                         timelines,
                         readTimelineJson(
@@ -23819,11 +22111,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"scaley\0" as *const u8 as *const c_char,
                 ) == 0 as c_int
                 {
-                    let mut timeline_9: *mut spScaleYTimeline = spScaleYTimeline_create(
-                        frames_0,
-                        frames_0,
-                        boneIndex,
-                    );
+                    let mut timeline_9: *mut spScaleYTimeline =
+                        spScaleYTimeline_create(frames_0, frames_0, boneIndex);
                     spTimelineArray_add(
                         timelines,
                         readTimelineJson(
@@ -23838,11 +22127,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"shear\0" as *const u8 as *const c_char,
                 ) == 0 as c_int
                 {
-                    let mut timeline_10: *mut spShearTimeline = spShearTimeline_create(
-                        frames_0,
-                        frames_0 << 1 as c_int,
-                        boneIndex,
-                    );
+                    let mut timeline_10: *mut spShearTimeline =
+                        spShearTimeline_create(frames_0, frames_0 << 1 as c_int, boneIndex);
                     spTimelineArray_add(
                         timelines,
                         readTimeline2Json(
@@ -23859,11 +22145,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"shearx\0" as *const u8 as *const c_char,
                 ) == 0 as c_int
                 {
-                    let mut timeline_11: *mut spShearXTimeline = spShearXTimeline_create(
-                        frames_0,
-                        frames_0,
-                        boneIndex,
-                    );
+                    let mut timeline_11: *mut spShearXTimeline =
+                        spShearXTimeline_create(frames_0, frames_0, boneIndex);
                     spTimelineArray_add(
                         timelines,
                         readTimelineJson(
@@ -23878,11 +22161,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"sheary\0" as *const u8 as *const c_char,
                 ) == 0 as c_int
                 {
-                    let mut timeline_12: *mut spShearYTimeline = spShearYTimeline_create(
-                        frames_0,
-                        frames_0,
-                        boneIndex,
-                    );
+                    let mut timeline_12: *mut spShearYTimeline =
+                        spShearYTimeline_create(frames_0, frames_0, boneIndex);
                     spTimelineArray_add(
                         timelines,
                         readTimelineJson(
@@ -23897,10 +22177,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"inherit\0" as *const u8 as *const c_char,
                 ) == 0 as c_int
                 {
-                    let mut timeline_13: *mut spInheritTimeline = spInheritTimeline_create(
-                        frames_0,
-                        boneIndex,
-                    );
+                    let mut timeline_13: *mut spInheritTimeline =
+                        spInheritTimeline_create(frames_0, boneIndex);
                     keyMap = (*timelineMap).child;
                     frame = 0 as c_int;
                     loop {
@@ -23915,10 +22193,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                             b"normal\0" as *const u8 as *const c_char,
                         );
                         let mut inherit: spInherit = SP_INHERIT_NORMAL;
-                        if spine_strcmp(
-                            value,
-                            b"normal\0" as *const u8 as *const c_char,
-                        ) == 0 as c_int
+                        if spine_strcmp(value, b"normal\0" as *const u8 as *const c_char)
+                            == 0 as c_int
                         {
                             inherit = SP_INHERIT_NORMAL;
                         } else if spine_strcmp(
@@ -23929,15 +22205,12 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                             inherit = SP_INHERIT_ONLYTRANSLATION;
                         } else if spine_strcmp(
                             value,
-                            b"noRotationOrReflection\0" as *const u8
-                                as *const c_char,
+                            b"noRotationOrReflection\0" as *const u8 as *const c_char,
                         ) == 0 as c_int
                         {
                             inherit = SP_INHERIT_NOROTATIONORREFLECTION;
-                        } else if spine_strcmp(
-                            value,
-                            b"noScale\0" as *const u8 as *const c_char,
-                        ) == 0 as c_int
+                        } else if spine_strcmp(value, b"noScale\0" as *const u8 as *const c_char)
+                            == 0 as c_int
                         {
                             inherit = SP_INHERIT_NOSCALE;
                         } else if spine_strcmp(
@@ -23960,8 +22233,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     _spSkeletonJson_setError(
                         self_0,
                         0 as *mut Json,
-                        b"Invalid timeline type for a bone: \0" as *const u8
-                            as *const c_char,
+                        b"Invalid timeline type for a bone: \0" as *const u8 as *const c_char,
                         (*timelineMap).name,
                     );
                     return 0 as *mut spAnimation;
@@ -23971,27 +22243,22 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
         }
         boneMap = (*boneMap).next;
     }
-    constraintMap = if !ik.is_null() { (*ik).child } else { 0 as *mut Json };
+    constraintMap = if !ik.is_null() {
+        (*ik).child
+    } else {
+        0 as *mut Json
+    };
     while !constraintMap.is_null() {
         let mut constraint: *mut spIkConstraintData = 0 as *mut spIkConstraintData;
-        let mut timeline_14: *mut spIkConstraintTimeline = 0
-            as *mut spIkConstraintTimeline;
+        let mut timeline_14: *mut spIkConstraintTimeline = 0 as *mut spIkConstraintTimeline;
         let mut constraintIndex: c_int = 0;
         let mut time_4: c_float = 0.;
         let mut mix: c_float = 0.;
         let mut softness: c_float = 0.;
         keyMap = (*constraintMap).child;
         if !keyMap.is_null() {
-            constraint = spSkeletonData_findIkConstraint(
-                skeletonData,
-                (*constraintMap).name,
-            );
-            constraintIndex = findIkConstraintIndex(
-                self_0,
-                skeletonData,
-                constraint,
-                timelines,
-            );
+            constraint = spSkeletonData_findIkConstraint(skeletonData, (*constraintMap).name);
+            constraintIndex = findIkConstraintIndex(self_0, skeletonData, constraint, timelines);
             if constraintIndex == -(1 as c_int) {
                 return 0 as *mut spAnimation;
             }
@@ -24078,10 +22345,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"softness\0" as *const u8 as *const c_char,
                     0 as c_int as c_float,
                 ) * scale;
-                curve = Json_getItem(
-                    keyMap,
-                    b"curve\0" as *const u8 as *const c_char,
-                );
+                curve = Json_getItem(keyMap, b"curve\0" as *const u8 as *const c_char);
                 if !curve.is_null() {
                     bezier = readCurve(
                         curve,
@@ -24124,10 +22388,9 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
         0 as *mut Json
     };
     while !constraintMap.is_null() {
-        let mut constraint_0: *mut spTransformConstraintData = 0
-            as *mut spTransformConstraintData;
-        let mut timeline_15: *mut spTransformConstraintTimeline = 0
-            as *mut spTransformConstraintTimeline;
+        let mut constraint_0: *mut spTransformConstraintData = 0 as *mut spTransformConstraintData;
+        let mut timeline_15: *mut spTransformConstraintTimeline =
+            0 as *mut spTransformConstraintTimeline;
         let mut constraintIndex_0: c_int = 0;
         let mut time_5: c_float = 0.;
         let mut mixRotate: c_float = 0.;
@@ -24138,16 +22401,10 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
         let mut mixScaleY: c_float = 0.;
         keyMap = (*constraintMap).child;
         if !keyMap.is_null() {
-            constraint_0 = spSkeletonData_findTransformConstraint(
-                skeletonData,
-                (*constraintMap).name,
-            );
-            constraintIndex_0 = findTransformConstraintIndex(
-                self_0,
-                skeletonData,
-                constraint_0,
-                timelines,
-            );
+            constraint_0 =
+                spSkeletonData_findTransformConstraint(skeletonData, (*constraintMap).name);
+            constraintIndex_0 =
+                findTransformConstraintIndex(self_0, skeletonData, constraint_0, timelines);
             if constraintIndex_0 == -(1 as c_int) {
                 return 0 as *mut spAnimation;
             }
@@ -24176,11 +22433,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                 b"mixX\0" as *const u8 as *const c_char,
                 1 as c_int as c_float,
             );
-            mixY = Json_getFloat(
-                keyMap,
-                b"mixY\0" as *const u8 as *const c_char,
-                mixX,
-            );
+            mixY = Json_getFloat(keyMap, b"mixY\0" as *const u8 as *const c_char, mixX);
             mixScaleX = Json_getFloat(
                 keyMap,
                 b"mixScaleX\0" as *const u8 as *const c_char,
@@ -24236,11 +22489,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"mixX\0" as *const u8 as *const c_char,
                     1 as c_int as c_float,
                 );
-                mixY2 = Json_getFloat(
-                    nextMap,
-                    b"mixY\0" as *const u8 as *const c_char,
-                    mixX2,
-                );
+                mixY2 = Json_getFloat(nextMap, b"mixY\0" as *const u8 as *const c_char, mixX2);
                 mixScaleX2 = Json_getFloat(
                     nextMap,
                     b"mixScaleX\0" as *const u8 as *const c_char,
@@ -24251,10 +22500,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     b"mixScaleY\0" as *const u8 as *const c_char,
                     mixScaleX2,
                 );
-                curve = Json_getItem(
-                    keyMap,
-                    b"curve\0" as *const u8 as *const c_char,
-                );
+                curve = Json_getItem(keyMap, b"curve\0" as *const u8 as *const c_char);
                 if !curve.is_null() {
                     bezier = readCurve(
                         curve,
@@ -24343,18 +22589,16 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
         }
         constraintMap = (*constraintMap).next;
     }
-    constraintMap = if !paths.is_null() { (*paths).child } else { 0 as *mut Json };
+    constraintMap = if !paths.is_null() {
+        (*paths).child
+    } else {
+        0 as *mut Json
+    };
     while !constraintMap.is_null() {
-        let mut constraint_1: *mut spPathConstraintData = spSkeletonData_findPathConstraint(
-            skeletonData,
-            (*constraintMap).name,
-        );
-        let mut constraintIndex_1: c_int = findPathConstraintIndex(
-            self_0,
-            skeletonData,
-            constraint_1,
-            timelines,
-        );
+        let mut constraint_1: *mut spPathConstraintData =
+            spSkeletonData_findPathConstraint(skeletonData, (*constraintMap).name);
+        let mut constraintIndex_1: c_int =
+            findPathConstraintIndex(self_0, skeletonData, constraint_1, timelines);
         if constraintIndex_1 == -(1 as c_int) {
             return 0 as *mut spAnimation;
         }
@@ -24366,16 +22610,15 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
             if !keyMap.is_null() {
                 frames_1 = (*timelineMap).size;
                 timelineName = (*timelineMap).name;
-                if spine_strcmp(
-                    timelineName,
-                    b"position\0" as *const u8 as *const c_char,
-                ) == 0 as c_int
+                if spine_strcmp(timelineName, b"position\0" as *const u8 as *const c_char)
+                    == 0 as c_int
                 {
-                    let mut timeline_16: *mut spPathConstraintPositionTimeline = spPathConstraintPositionTimeline_create(
-                        frames_1,
-                        frames_1,
-                        constraintIndex_1,
-                    );
+                    let mut timeline_16: *mut spPathConstraintPositionTimeline =
+                        spPathConstraintPositionTimeline_create(
+                            frames_1,
+                            frames_1,
+                            constraintIndex_1,
+                        );
                     spTimelineArray_add(
                         timelines,
                         readTimelineJson(
@@ -24391,21 +22634,21 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                             },
                         ),
                     );
-                } else if spine_strcmp(
-                    timelineName,
-                    b"spacing\0" as *const u8 as *const c_char,
-                ) == 0 as c_int
+                } else if spine_strcmp(timelineName, b"spacing\0" as *const u8 as *const c_char)
+                    == 0 as c_int
                 {
-                    let mut timeline_17: *mut spCurveTimeline1 = &mut (*(spPathConstraintSpacingTimeline_create
-                        as unsafe extern "C" fn(
-                            c_int,
-                            c_int,
-                            c_int,
-                        ) -> *mut spPathConstraintSpacingTimeline)(
-                        frames_1,
-                        frames_1,
-                        constraintIndex_1,
-                    ))
+                    let mut timeline_17: *mut spCurveTimeline1 =
+                        &mut (*(spPathConstraintSpacingTimeline_create
+                            as unsafe extern "C" fn(
+                                c_int,
+                                c_int,
+                                c_int,
+                            )
+                                -> *mut spPathConstraintSpacingTimeline)(
+                            frames_1,
+                            frames_1,
+                            constraintIndex_1,
+                        ))
                         .super_0;
                     spTimelineArray_add(
                         timelines,
@@ -24424,16 +22667,15 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                             },
                         ),
                     );
-                } else if spine_strcmp(
-                    timelineName,
-                    b"mix\0" as *const u8 as *const c_char,
-                ) == 0 as c_int
+                } else if spine_strcmp(timelineName, b"mix\0" as *const u8 as *const c_char)
+                    == 0 as c_int
                 {
-                    let mut timeline_18: *mut spPathConstraintMixTimeline = spPathConstraintMixTimeline_create(
-                        frames_1,
-                        frames_1 * 3 as c_int,
-                        constraintIndex_1,
-                    );
+                    let mut timeline_18: *mut spPathConstraintMixTimeline =
+                        spPathConstraintMixTimeline_create(
+                            frames_1,
+                            frames_1 * 3 as c_int,
+                            constraintIndex_1,
+                        );
                     let mut time_6: c_float = Json_getFloat(
                         keyMap,
                         b"time\0" as *const u8 as *const c_char,
@@ -24449,11 +22691,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                         b"mixX\0" as *const u8 as *const c_char,
                         1 as c_int as c_float,
                     );
-                    let mut mixY_0: c_float = Json_getFloat(
-                        keyMap,
-                        b"mixY\0" as *const u8 as *const c_char,
-                        mixX_0,
-                    );
+                    let mut mixY_0: c_float =
+                        Json_getFloat(keyMap, b"mixY\0" as *const u8 as *const c_char, mixX_0);
                     frame = 0 as c_int;
                     bezier = 0 as c_int;
                     loop {
@@ -24493,10 +22732,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                             b"mixY\0" as *const u8 as *const c_char,
                             mixX2_0,
                         );
-                        curve = Json_getItem(
-                            keyMap,
-                            b"curve\0" as *const u8 as *const c_char,
-                        );
+                        curve = Json_getItem(keyMap, b"curve\0" as *const u8 as *const c_char);
                         if !curve.is_null() {
                             bezier = readCurve(
                                 curve,
@@ -24549,22 +22785,19 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
         }
         constraintMap = (*constraintMap).next;
     }
-    constraintMap = if !physics.is_null() { (*physics).child } else { 0 as *mut Json };
+    constraintMap = if !physics.is_null() {
+        (*physics).child
+    } else {
+        0 as *mut Json
+    };
     while !constraintMap.is_null() {
         let mut index: c_int = -(1 as c_int);
         if !((*constraintMap).name).is_null()
             && spine_strlen((*constraintMap).name) > 0 as c_int as c_ulong
         {
-            let mut constraint_2: *mut spPhysicsConstraintData = spSkeletonData_findPhysicsConstraint(
-                skeletonData,
-                (*constraintMap).name,
-            );
-            index = findPhysicsConstraintIndex(
-                self_0,
-                skeletonData,
-                constraint_2,
-                timelines,
-            );
+            let mut constraint_2: *mut spPhysicsConstraintData =
+                spSkeletonData_findPhysicsConstraint(skeletonData, (*constraintMap).name);
+            index = findPhysicsConstraintIndex(self_0, skeletonData, constraint_2, timelines);
             if index == -(1 as c_int) {
                 return 0 as *mut spAnimation;
             }
@@ -24576,15 +22809,11 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
             if !keyMap.is_null() {
                 let mut timelineName_0: *const c_char = (*timelineMap).name;
                 let mut frames_2: c_int = (*timelineMap).size;
-                if spine_strcmp(
-                    timelineName_0,
-                    b"reset\0" as *const u8 as *const c_char,
-                ) == 0 as c_int
+                if spine_strcmp(timelineName_0, b"reset\0" as *const u8 as *const c_char)
+                    == 0 as c_int
                 {
-                    let mut timeline_19: *mut spPhysicsConstraintResetTimeline = spPhysicsConstraintResetTimeline_create(
-                        frames_2,
-                        index,
-                    );
+                    let mut timeline_19: *mut spPhysicsConstraintResetTimeline =
+                        spPhysicsConstraintResetTimeline_create(frames_2, index);
                     frame = 0 as c_int;
                     while !keyMap.is_null() {
                         spPhysicsConstraintResetTimeline_setFrame(
@@ -24601,12 +22830,10 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                     }
                     spTimelineArray_add(timelines, &mut (*timeline_19).super_0);
                 } else {
-                    let mut timeline_20: *mut spPhysicsConstraintTimeline = 0
-                        as *mut spPhysicsConstraintTimeline;
-                    if spine_strcmp(
-                        timelineName_0,
-                        b"inertia\0" as *const u8 as *const c_char,
-                    ) == 0 as c_int
+                    let mut timeline_20: *mut spPhysicsConstraintTimeline =
+                        0 as *mut spPhysicsConstraintTimeline;
+                    if spine_strcmp(timelineName_0, b"inertia\0" as *const u8 as *const c_char)
+                        == 0 as c_int
                     {
                         timeline_20 = spPhysicsConstraintTimeline_create(
                             frames_2,
@@ -24639,10 +22866,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                             SP_TIMELINE_PHYSICSCONSTRAINT_DAMPING,
                         );
                         current_block_322 = 2197125908392311113;
-                    } else if spine_strcmp(
-                        timelineName_0,
-                        b"mass\0" as *const u8 as *const c_char,
-                    ) == 0 as c_int
+                    } else if spine_strcmp(timelineName_0, b"mass\0" as *const u8 as *const c_char)
+                        == 0 as c_int
                     {
                         timeline_20 = spPhysicsConstraintTimeline_create(
                             frames_2,
@@ -24651,10 +22876,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                             SP_TIMELINE_PHYSICSCONSTRAINT_MASS,
                         );
                         current_block_322 = 2197125908392311113;
-                    } else if spine_strcmp(
-                        timelineName_0,
-                        b"wind\0" as *const u8 as *const c_char,
-                    ) == 0 as c_int
+                    } else if spine_strcmp(timelineName_0, b"wind\0" as *const u8 as *const c_char)
+                        == 0 as c_int
                     {
                         timeline_20 = spPhysicsConstraintTimeline_create(
                             frames_2,
@@ -24675,10 +22898,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                             SP_TIMELINE_PHYSICSCONSTRAINT_GRAVITY,
                         );
                         current_block_322 = 2197125908392311113;
-                    } else if spine_strcmp(
-                        timelineName_0,
-                        b"mix\0" as *const u8 as *const c_char,
-                    ) == 0 as c_int
+                    } else if spine_strcmp(timelineName_0, b"mix\0" as *const u8 as *const c_char)
+                        == 0 as c_int
                     {
                         timeline_20 = spPhysicsConstraintTimeline_create(
                             frames_2,
@@ -24716,29 +22937,19 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
         0 as *mut Json
     };
     while !attachmentsMap.is_null() {
-        let mut skin: *mut spSkin = spSkeletonData_findSkin(
-            skeletonData,
-            (*attachmentsMap).name,
-        );
+        let mut skin: *mut spSkin = spSkeletonData_findSkin(skeletonData, (*attachmentsMap).name);
         slotMap = (*attachmentsMap).child;
         while !slotMap.is_null() {
             let mut attachmentMap: *mut Json = 0 as *mut Json;
-            let mut slotIndex_0: c_int = findSlotIndex(
-                self_0,
-                skeletonData,
-                (*slotMap).name,
-                timelines,
-            );
+            let mut slotIndex_0: c_int =
+                findSlotIndex(self_0, skeletonData, (*slotMap).name, timelines);
             if slotIndex_0 == -(1 as c_int) {
                 return 0 as *mut spAnimation;
             }
             attachmentMap = (*slotMap).child;
             while !attachmentMap.is_null() {
-                let mut baseAttachment: *mut spAttachment = spSkin_getAttachment(
-                    skin,
-                    slotIndex_0,
-                    (*attachmentMap).name,
-                );
+                let mut baseAttachment: *mut spAttachment =
+                    spSkin_getAttachment(skin, slotIndex_0, (*attachmentMap).name);
                 if baseAttachment.is_null() {
                     cleanUpTimelines(timelines);
                     _spSkeletonJson_setError(
@@ -24752,32 +22963,25 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                 timelineMap = (*attachmentMap).child;
                 while !timelineMap.is_null() {
                     let mut frames_3: c_int = 0;
-                    let mut timelineName_1: *const c_char = 0
-                        as *const c_char;
+                    let mut timelineName_1: *const c_char = 0 as *const c_char;
                     keyMap = (*timelineMap).child;
                     if !keyMap.is_null() {
                         frames_3 = (*timelineMap).size;
                         timelineName_1 = (*timelineMap).name;
-                        if spine_strcmp(
-                            b"deform\0" as *const u8 as *const c_char,
-                            timelineName_1,
-                        ) == 0
+                        if spine_strcmp(b"deform\0" as *const u8 as *const c_char, timelineName_1)
+                            == 0
                         {
-                            let mut tempDeform: *mut c_float = 0
-                                as *mut c_float;
-                            let mut vertexAttachment: *mut spVertexAttachment = 0
-                                as *mut spVertexAttachment;
+                            let mut tempDeform: *mut c_float = 0 as *mut c_float;
+                            let mut vertexAttachment: *mut spVertexAttachment =
+                                0 as *mut spVertexAttachment;
                             let mut weighted: c_int = 0;
                             let mut deformLength: c_int = 0;
-                            let mut timeline_21: *mut spDeformTimeline = 0
-                                as *mut spDeformTimeline;
+                            let mut timeline_21: *mut spDeformTimeline = 0 as *mut spDeformTimeline;
                             let mut time_7: c_float = 0.;
                             vertexAttachment = baseAttachment as *mut spVertexAttachment;
-                            weighted = ((*vertexAttachment).bones
-                                != 0 as *mut c_int) as c_int;
+                            weighted = ((*vertexAttachment).bones != 0 as *mut c_int) as c_int;
                             deformLength = if weighted != 0 {
-                                (*vertexAttachment).verticesCount / 3 as c_int
-                                    * 2 as c_int
+                                (*vertexAttachment).verticesCount / 3 as c_int * 2 as c_int
                             } else {
                                 (*vertexAttachment).verticesCount
                             };
@@ -24806,8 +23010,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                                     keyMap,
                                     b"vertices\0" as *const u8 as *const c_char,
                                 );
-                                let mut deform: *mut c_float = 0
-                                    as *mut c_float;
+                                let mut deform: *mut c_float = 0 as *mut c_float;
                                 let mut time2_6: c_float = 0.;
                                 if vertices.is_null() {
                                     if weighted != 0 {
@@ -24848,10 +23051,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                                         vertex = (*vertices).child;
                                         v = start;
                                         while !vertex.is_null() {
-                                            *deform
-                                                .offset(
-                                                    v as isize,
-                                                ) = (*vertex).valueFloat * (*self_0).scale;
+                                            *deform.offset(v as isize) =
+                                                (*vertex).valueFloat * (*self_0).scale;
                                             vertex = (*vertex).next;
                                             v += 1;
                                         }
@@ -24863,22 +23064,17 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                                             .wrapping_mul((deformLength - v) as c_ulong),
                                     );
                                     if weighted == 0 {
-                                        let mut verticesValues: *mut c_float = (*vertexAttachment)
-                                            .vertices;
+                                        let mut verticesValues: *mut c_float =
+                                            (*vertexAttachment).vertices;
                                         v = 0 as c_int;
                                         while v < deformLength {
-                                            *deform.offset(v as isize)
-                                                += *verticesValues.offset(v as isize);
+                                            *deform.offset(v as isize) +=
+                                                *verticesValues.offset(v as isize);
                                             v += 1;
                                         }
                                     }
                                 }
-                                spDeformTimeline_setFrame(
-                                    timeline_21,
-                                    frame,
-                                    time_7,
-                                    deform,
-                                );
+                                spDeformTimeline_setFrame(timeline_21, frame, time_7, deform);
                                 nextMap = (*keyMap).next;
                                 if nextMap.is_null() {
                                     break;
@@ -24888,10 +23084,8 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                                     b"time\0" as *const u8 as *const c_char,
                                     0 as c_int as c_float,
                                 );
-                                curve = Json_getItem(
-                                    keyMap,
-                                    b"curve\0" as *const u8 as *const c_char,
-                                );
+                                curve =
+                                    Json_getItem(keyMap, b"curve\0" as *const u8 as *const c_char);
                                 if !curve.is_null() {
                                     bezier = readCurve(
                                         curve,
@@ -24911,22 +23105,15 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                                 frame += 1;
                             }
                             _spFree(tempDeform as *mut c_void);
-                            spTimelineArray_add(
-                                timelines,
-                                &mut (*timeline_21).super_0.super_0,
-                            );
+                            spTimelineArray_add(timelines, &mut (*timeline_21).super_0.super_0);
                         } else if spine_strcmp(
                             timelineName_1,
                             b"sequence\0" as *const u8 as *const c_char,
                         ) == 0
                         {
-                            let mut timeline_22: *mut spSequenceTimeline = spSequenceTimeline_create(
-                                frames_3,
-                                slotIndex_0,
-                                baseAttachment,
-                            );
-                            let mut lastDelay: c_float = 0 as c_int
-                                as c_float;
+                            let mut timeline_22: *mut spSequenceTimeline =
+                                spSequenceTimeline_create(frames_3, slotIndex_0, baseAttachment);
+                            let mut lastDelay: c_float = 0 as c_int as c_float;
                             frame = 0 as c_int;
                             while !keyMap.is_null() {
                                 let mut delay: c_float = Json_getFloat(
@@ -24950,17 +23137,13 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                                     0 as c_int,
                                 );
                                 let mut mode: c_int = 0 as c_int;
-                                if spine_strcmp(
-                                    modeString,
-                                    b"once\0" as *const u8 as *const c_char,
-                                ) == 0
+                                if spine_strcmp(modeString, b"once\0" as *const u8 as *const c_char)
+                                    == 0
                                 {
                                     mode = 1 as c_int;
                                 }
-                                if spine_strcmp(
-                                    modeString,
-                                    b"loop\0" as *const u8 as *const c_char,
-                                ) == 0
+                                if spine_strcmp(modeString, b"loop\0" as *const u8 as *const c_char)
+                                    == 0
                                 {
                                     mode = 2 as c_int;
                                 }
@@ -25016,27 +23199,20 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
         attachmentsMap = (*attachmentsMap).next;
     }
     if !drawOrderJson.is_null() {
-        let mut timeline_23: *mut spDrawOrderTimeline = spDrawOrderTimeline_create(
-            (*drawOrderJson).size,
-            (*skeletonData).slotsCount,
-        );
+        let mut timeline_23: *mut spDrawOrderTimeline =
+            spDrawOrderTimeline_create((*drawOrderJson).size, (*skeletonData).slotsCount);
         keyMap = (*drawOrderJson).child;
         frame = 0 as c_int;
         while !keyMap.is_null() {
             let mut ii: c_int = 0;
             let mut drawOrder: *mut c_int = 0 as *mut c_int;
-            let mut offsets: *mut Json = Json_getItem(
-                keyMap,
-                b"offsets\0" as *const u8 as *const c_char,
-            );
+            let mut offsets: *mut Json =
+                Json_getItem(keyMap, b"offsets\0" as *const u8 as *const c_char);
             if !offsets.is_null() {
                 let mut offsetMap: *mut Json = 0 as *mut Json;
                 let mut unchanged: *mut c_int = _spMalloc(
                     (::core::mem::size_of::<c_int>() as c_ulong)
-                        .wrapping_mul(
-                            ((*skeletonData).slotsCount - (*offsets).size)
-                                as c_ulong,
-                        ),
+                        .wrapping_mul(((*skeletonData).slotsCount - (*offsets).size) as c_ulong),
                     b"spine.c\0" as *const u8 as *const c_char,
                     12259 as c_int,
                 ) as *mut c_int;
@@ -25075,15 +23251,14 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                         unchangedIndex = unchangedIndex + 1;
                         *unchanged.offset(fresh132 as isize) = fresh131;
                     }
-                    *drawOrder
-                        .offset(
-                            (originalIndex
-                                + Json_getInt(
-                                    offsetMap,
-                                    b"offset\0" as *const u8 as *const c_char,
-                                    0 as c_int,
-                                )) as isize,
-                        ) = originalIndex;
+                    *drawOrder.offset(
+                        (originalIndex
+                            + Json_getInt(
+                                offsetMap,
+                                b"offset\0" as *const u8 as *const c_char,
+                                0 as c_int,
+                            )) as isize,
+                    ) = originalIndex;
                     originalIndex += 1;
                     offsetMap = (*offsetMap).next;
                 }
@@ -25098,10 +23273,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                 while ii >= 0 as c_int {
                     if *drawOrder.offset(ii as isize) == -(1 as c_int) {
                         unchangedIndex -= 1;
-                        *drawOrder
-                            .offset(
-                                ii as isize,
-                            ) = *unchanged.offset(unchangedIndex as isize);
+                        *drawOrder.offset(ii as isize) = *unchanged.offset(unchangedIndex as isize);
                     }
                     ii -= 1;
                 }
@@ -25124,9 +23296,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
         spTimelineArray_add(timelines, &mut (*timeline_23).super_0);
     }
     if !events.is_null() {
-        let mut timeline_24: *mut spEventTimeline = spEventTimeline_create(
-            (*events).size,
-        );
+        let mut timeline_24: *mut spEventTimeline = spEventTimeline_create((*events).size);
         keyMap = (*events).child;
         frame = 0 as c_int;
         while !keyMap.is_null() {
@@ -25162,14 +23332,12 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                 ),
                 eventData,
             );
-            (*event)
-                .intValue = Json_getInt(
+            (*event).intValue = Json_getInt(
                 keyMap,
                 b"int\0" as *const u8 as *const c_char,
                 (*eventData).intValue,
             );
-            (*event)
-                .floatValue = Json_getFloat(
+            (*event).floatValue = Json_getFloat(
                 keyMap,
                 b"float\0" as *const u8 as *const c_char,
                 (*eventData).floatValue,
@@ -25180,27 +23348,22 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
                 (*eventData).stringValue,
             );
             if !stringValue.is_null() {
-                (*event)
-                    .stringValue = _spMalloc(
-                    (::core::mem::size_of::<c_char>() as c_ulong)
-                        .wrapping_mul(
-                            (spine_strlen(stringValue))
-                                .wrapping_add(1 as c_int as c_ulong),
-                        ),
+                (*event).stringValue = _spMalloc(
+                    (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
+                        (spine_strlen(stringValue)).wrapping_add(1 as c_int as c_ulong),
+                    ),
                     b"spine.c\0" as *const u8 as *const c_char,
                     12308 as c_int,
                 ) as *mut c_char;
                 spine_strcpy((*event).stringValue, stringValue);
             }
             if !((*eventData).audioPath).is_null() {
-                (*event)
-                    .volume = Json_getFloat(
+                (*event).volume = Json_getFloat(
                     keyMap,
                     b"volume\0" as *const u8 as *const c_char,
                     1 as c_int as c_float,
                 );
-                (*event)
-                    .balance = Json_getFloat(
+                (*event).balance = Json_getFloat(
                     keyMap,
                     b"volume\0" as *const u8 as *const c_char,
                     0 as c_int as c_float,
@@ -25216,9 +23379,7 @@ unsafe extern "C" fn _spSkeletonJson_readAnimation(
     i = 0 as c_int;
     n = (*timelines).size;
     while i < n {
-        duration = if duration
-            > spTimeline_getDuration(*((*timelines).items).offset(i as isize))
-        {
+        duration = if duration > spTimeline_getDuration(*((*timelines).items).offset(i as isize)) {
             duration
         } else {
             spTimeline_getDuration(*((*timelines).items).offset(i as isize))
@@ -25242,14 +23403,10 @@ unsafe extern "C" fn _readVerticesJson(
     let mut weights: *mut spFloatArray = 0 as *mut spFloatArray;
     let mut bones: *mut spIntArray = 0 as *mut spIntArray;
     (*attachment).worldVerticesLength = verticesLength;
-    entry = Json_getItem(
-        attachmentMap,
-        b"vertices\0" as *const u8 as *const c_char,
-    );
+    entry = Json_getItem(attachmentMap, b"vertices\0" as *const u8 as *const c_char);
     entrySize = (*entry).size;
     vertices = _spMalloc(
-        (::core::mem::size_of::<c_float>() as c_ulong)
-            .wrapping_mul(entrySize as c_ulong),
+        (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(entrySize as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         12336 as c_int,
     ) as *mut c_float;
@@ -25281,8 +23438,7 @@ unsafe extern "C" fn _readVerticesJson(
     while i < n {
         let fresh135 = i;
         i = i + 1;
-        let mut boneCount: c_int = *vertices.offset(fresh135 as isize)
-            as c_int;
+        let mut boneCount: c_int = *vertices.offset(fresh135 as isize) as c_int;
         spIntArray_add(bones, boneCount);
         nn = i + boneCount * 4 as c_int;
         while i < nn {
@@ -25345,9 +23501,7 @@ unsafe extern "C" fn string_starts_with_json(
     }
     i = 0 as c_int;
     while i < lenNeedle {
-        if *str.offset(i as isize) as c_int
-            != *needle.offset(i as isize) as c_int
-        {
+        if *str.offset(i as isize) as c_int != *needle.offset(i as isize) as c_int {
             return 0 as c_int;
         }
         i += 1;
@@ -25391,19 +23545,15 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
     skeletonData = spSkeletonData_create();
     skeleton = Json_getItem(root, b"skeleton\0" as *const u8 as *const c_char);
     if !skeleton.is_null() {
-        (*skeletonData)
-            .hash = _spMalloc(
-            (::core::mem::size_of::<c_char>() as c_ulong)
-                .wrapping_mul(
-                    (spine_strlen(
-                        Json_getString(
-                            skeleton,
-                            b"hash\0" as *const u8 as *const c_char,
-                            b"0\0" as *const u8 as *const c_char,
-                        ),
-                    ))
-                        .wrapping_add(1 as c_int as c_ulong),
-                ),
+        (*skeletonData).hash = _spMalloc(
+            (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
+                (spine_strlen(Json_getString(
+                    skeleton,
+                    b"hash\0" as *const u8 as *const c_char,
+                    b"0\0" as *const u8 as *const c_char,
+                )))
+                .wrapping_add(1 as c_int as c_ulong),
+            ),
             b"spine.c\0" as *const u8 as *const c_char,
             12449 as c_int,
         ) as *mut c_char;
@@ -25415,19 +23565,15 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                 b"0\0" as *const u8 as *const c_char,
             ),
         );
-        (*skeletonData)
-            .version = _spMalloc(
-            (::core::mem::size_of::<c_char>() as c_ulong)
-                .wrapping_mul(
-                    (spine_strlen(
-                        Json_getString(
-                            skeleton,
-                            b"spine\0" as *const u8 as *const c_char,
-                            b"0\0" as *const u8 as *const c_char,
-                        ),
-                    ))
-                        .wrapping_add(1 as c_int as c_ulong),
-                ),
+        (*skeletonData).version = _spMalloc(
+            (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
+                (spine_strlen(Json_getString(
+                    skeleton,
+                    b"spine\0" as *const u8 as *const c_char,
+                    b"0\0" as *const u8 as *const c_char,
+                )))
+                .wrapping_add(1 as c_int as c_ulong),
+            ),
             b"spine.c\0" as *const u8 as *const c_char,
             12450 as c_int,
         ) as *mut c_char;
@@ -25445,9 +23591,9 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         ) == 0
         {
             let mut errorMsg: [c_char; 255] = [0; 255];
-            snprintf(
+            spine_snprintf!(
                 errorMsg.as_mut_ptr(),
-                255 as c_int as c_ulong,
+                255 as c_int as size_t,
                 b"Skeleton version %s does not match runtime version %s\0" as *const u8
                     as *const c_char,
                 (*skeletonData).version,
@@ -25461,44 +23607,37 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             );
             return 0 as *mut spSkeletonData;
         }
-        (*skeletonData)
-            .x = Json_getFloat(
+        (*skeletonData).x = Json_getFloat(
             skeleton,
             b"x\0" as *const u8 as *const c_char,
             0 as c_int as c_float,
         );
-        (*skeletonData)
-            .y = Json_getFloat(
+        (*skeletonData).y = Json_getFloat(
             skeleton,
             b"y\0" as *const u8 as *const c_char,
             0 as c_int as c_float,
         );
-        (*skeletonData)
-            .width = Json_getFloat(
+        (*skeletonData).width = Json_getFloat(
             skeleton,
             b"width\0" as *const u8 as *const c_char,
             0 as c_int as c_float,
         );
-        (*skeletonData)
-            .height = Json_getFloat(
+        (*skeletonData).height = Json_getFloat(
             skeleton,
             b"height\0" as *const u8 as *const c_char,
             0 as c_int as c_float,
         );
-        (*skeletonData)
-            .referenceScale = Json_getFloat(
+        (*skeletonData).referenceScale = Json_getFloat(
             skeleton,
             b"referenceScale\0" as *const u8 as *const c_char,
             100 as c_int as c_float,
         ) * (*self_0).scale;
-        (*skeletonData)
-            .fps = Json_getFloat(
+        (*skeletonData).fps = Json_getFloat(
             skeleton,
             b"fps\0" as *const u8 as *const c_char,
             30 as c_int as c_float,
         );
-        (*skeletonData)
-            .imagesPath = Json_getString(
+        (*skeletonData).imagesPath = Json_getString(
             skeleton,
             b"images\0" as *const u8 as *const c_char,
             0 as *const c_char,
@@ -25506,19 +23645,16 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         if !((*skeletonData).imagesPath).is_null() {
             let mut tmp: *mut c_char = 0 as *mut c_char;
             tmp = _spMalloc(
-                (::core::mem::size_of::<c_char>() as c_ulong)
-                    .wrapping_mul(
-                        (spine_strlen((*skeletonData).imagesPath))
-                            .wrapping_add(1 as c_int as c_ulong),
-                    ),
+                (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
+                    (spine_strlen((*skeletonData).imagesPath)).wrapping_add(1 as c_int as c_ulong),
+                ),
                 b"spine.c\0" as *const u8 as *const c_char,
                 12466 as c_int,
             ) as *mut c_char;
             spine_strcpy(tmp, (*skeletonData).imagesPath);
             (*skeletonData).imagesPath = tmp;
         }
-        (*skeletonData)
-            .audioPath = Json_getString(
+        (*skeletonData).audioPath = Json_getString(
             skeleton,
             b"audio\0" as *const u8 as *const c_char,
             0 as *const c_char,
@@ -25526,11 +23662,9 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         if !((*skeletonData).audioPath).is_null() {
             let mut tmp_0: *mut c_char = 0 as *mut c_char;
             tmp_0 = _spMalloc(
-                (::core::mem::size_of::<c_char>() as c_ulong)
-                    .wrapping_mul(
-                        (spine_strlen((*skeletonData).audioPath))
-                            .wrapping_add(1 as c_int as c_ulong),
-                    ),
+                (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
+                    (spine_strlen((*skeletonData).audioPath)).wrapping_add(1 as c_int as c_ulong),
+                ),
                 b"spine.c\0" as *const u8 as *const c_char,
                 12472 as c_int,
             ) as *mut c_char;
@@ -25539,8 +23673,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         }
     }
     bones = Json_getItem(root, b"bones\0" as *const u8 as *const c_char);
-    (*skeletonData)
-        .bones = _spMalloc(
+    (*skeletonData).bones = _spMalloc(
         (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
             .wrapping_mul((*bones).size as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -25580,50 +23713,42 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             ),
             parent,
         );
-        (*data)
-            .length = Json_getFloat(
+        (*data).length = Json_getFloat(
             boneMap,
             b"length\0" as *const u8 as *const c_char,
             0 as c_int as c_float,
         ) * (*self_0).scale;
-        (*data)
-            .x = Json_getFloat(
+        (*data).x = Json_getFloat(
             boneMap,
             b"x\0" as *const u8 as *const c_char,
             0 as c_int as c_float,
         ) * (*self_0).scale;
-        (*data)
-            .y = Json_getFloat(
+        (*data).y = Json_getFloat(
             boneMap,
             b"y\0" as *const u8 as *const c_char,
             0 as c_int as c_float,
         ) * (*self_0).scale;
-        (*data)
-            .rotation = Json_getFloat(
+        (*data).rotation = Json_getFloat(
             boneMap,
             b"rotation\0" as *const u8 as *const c_char,
             0 as c_int as c_float,
         );
-        (*data)
-            .scaleX = Json_getFloat(
+        (*data).scaleX = Json_getFloat(
             boneMap,
             b"scaleX\0" as *const u8 as *const c_char,
             1 as c_int as c_float,
         );
-        (*data)
-            .scaleY = Json_getFloat(
+        (*data).scaleY = Json_getFloat(
             boneMap,
             b"scaleY\0" as *const u8 as *const c_char,
             1 as c_int as c_float,
         );
-        (*data)
-            .shearX = Json_getFloat(
+        (*data).shearX = Json_getFloat(
             boneMap,
             b"shearX\0" as *const u8 as *const c_char,
             0 as c_int as c_float,
         );
-        (*data)
-            .shearY = Json_getFloat(
+        (*data).shearY = Json_getFloat(
             boneMap,
             b"shearY\0" as *const u8 as *const c_char,
             0 as c_int as c_float,
@@ -25634,14 +23759,10 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             b"normal\0" as *const u8 as *const c_char,
         );
         (*data).inherit = SP_INHERIT_NORMAL;
-        if spine_strcmp(inherit, b"normal\0" as *const u8 as *const c_char)
-            == 0 as c_int
-        {
+        if spine_strcmp(inherit, b"normal\0" as *const u8 as *const c_char) == 0 as c_int {
             (*data).inherit = SP_INHERIT_NORMAL;
-        } else if spine_strcmp(
-            inherit,
-            b"onlyTranslation\0" as *const u8 as *const c_char,
-        ) == 0 as c_int
+        } else if spine_strcmp(inherit, b"onlyTranslation\0" as *const u8 as *const c_char)
+            == 0 as c_int
         {
             (*data).inherit = SP_INHERIT_ONLYTRANSLATION;
         } else if spine_strcmp(
@@ -25650,9 +23771,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         ) == 0 as c_int
         {
             (*data).inherit = SP_INHERIT_NOROTATIONORREFLECTION;
-        } else if spine_strcmp(inherit, b"noScale\0" as *const u8 as *const c_char)
-            == 0 as c_int
-        {
+        } else if spine_strcmp(inherit, b"noScale\0" as *const u8 as *const c_char) == 0 as c_int {
             (*data).inherit = SP_INHERIT_NOSCALE;
         } else if spine_strcmp(
             inherit,
@@ -25661,17 +23780,12 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         {
             (*data).inherit = SP_INHERIT_NOSCALEORREFLECTION;
         }
-        (*data)
-            .skinRequired = if Json_getInt(
-            boneMap,
-            b"skin\0" as *const u8 as *const c_char,
-            0 as c_int,
-        ) != 0
-        {
-            1 as c_int
-        } else {
-            0 as c_int
-        };
+        (*data).skinRequired =
+            if Json_getInt(boneMap, b"skin\0" as *const u8 as *const c_char, 0 as c_int) != 0 {
+                1 as c_int
+            } else {
+                0 as c_int
+            };
         color = Json_getString(
             boneMap,
             b"color\0" as *const u8 as *const c_char,
@@ -25680,8 +23794,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         if !color.is_null() {
             toColor2(&mut (*data).color, color, -(1 as c_int));
         }
-        (*data)
-            .icon = Json_getString(
+        (*data).icon = Json_getString(
             boneMap,
             b"icon\0" as *const u8 as *const c_char,
             b"\0" as *const u8 as *const c_char,
@@ -25690,18 +23803,14 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             let mut tmp_1: *mut c_char = 0 as *mut c_char;
             tmp_1 = _spMalloc(
                 (::core::mem::size_of::<c_char>() as c_ulong)
-                    .wrapping_mul(
-                        (spine_strlen((*data).icon))
-                            .wrapping_add(1 as c_int as c_ulong),
-                    ),
+                    .wrapping_mul((spine_strlen((*data).icon)).wrapping_add(1 as c_int as c_ulong)),
                 b"spine.c\0" as *const u8 as *const c_char,
                 12524 as c_int,
             ) as *mut c_char;
             spine_strcpy(tmp_1, (*data).icon);
             (*data).icon = tmp_1;
         }
-        (*data)
-            .visible = if Json_getInt(
+        (*data).visible = if Json_getInt(
             boneMap,
             b"visible\0" as *const u8 as *const c_char,
             -(1 as c_int),
@@ -25721,8 +23830,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
     if !slots.is_null() {
         let mut slotMap: *mut Json = 0 as *mut Json;
         (*skeletonData).slotsCount = (*slots).size;
-        (*skeletonData)
-            .slots = _spMalloc(
+        (*skeletonData).slots = _spMalloc(
             (::core::mem::size_of::<*mut spSlotData>() as c_ulong)
                 .wrapping_mul((*slots).size as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -25740,10 +23848,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                 b"bone\0" as *const u8 as *const c_char,
                 0 as *const c_char,
             );
-            let mut boneData: *mut spBoneData = spSkeletonData_findBone(
-                skeletonData,
-                boneName,
-            );
+            let mut boneData: *mut spBoneData = spSkeletonData_findBone(skeletonData, boneName);
             if boneData.is_null() {
                 spSkeletonData_dispose(skeletonData);
                 _spSkeletonJson_setError(
@@ -25760,16 +23865,15 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                 b"name\0" as *const u8 as *const c_char,
                 0 as *const c_char,
             ) as *mut c_char;
-
             let slash: c_int = string_lastIndexOf(slotName, '/' as i32 as c_char);
-			if slash != -1 {
+            if slash != -1 {
                 pathName = string_substring(slotName, 0 as c_int, slash);
                 slotName = string_substring(
                     slotName,
                     slash + 1 as c_int,
                     spine_strlen(slotName) as c_int,
                 );
-			}
+            }
             data_0 = spSlotData_create(i, slotName, boneData);
             color_0 = Json_getString(
                 slotMap,
@@ -25800,10 +23904,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                     1.0f32,
                 );
             }
-            item = Json_getItem(
-                slotMap,
-                b"attachment\0" as *const u8 as *const c_char,
-            );
+            item = Json_getItem(slotMap, b"attachment\0" as *const u8 as *const c_char);
             if !item.is_null() {
                 spSlotData_setAttachmentName(data_0, (*item).valueString);
             }
@@ -25829,8 +23930,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                     (*data_0).blendMode = SP_BLEND_MODE_SCREEN;
                 }
             }
-            (*data_0)
-                .visible = Json_getInt(
+            (*data_0).visible = Json_getInt(
                 slotMap,
                 b"visible\0" as *const u8 as *const c_char,
                 -(1 as c_int),
@@ -25846,8 +23946,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
     if !ik.is_null() {
         let mut constraintMap: *mut Json = 0 as *mut Json;
         (*skeletonData).ikConstraintsCount = (*ik).size;
-        (*skeletonData)
-            .ikConstraints = _spMalloc(
+        (*skeletonData).ikConstraints = _spMalloc(
             (::core::mem::size_of::<*mut spIkConstraintData>() as c_ulong)
                 .wrapping_mul((*ik).size as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -25857,21 +23956,17 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         i = 0 as c_int;
         while !constraintMap.is_null() {
             let mut targetName: *const c_char = 0 as *const c_char;
-            let mut data_1: *mut spIkConstraintData = spIkConstraintData_create(
-                Json_getString(
-                    constraintMap,
-                    b"name\0" as *const u8 as *const c_char,
-                    0 as *const c_char,
-                ),
-            );
-            (*data_1)
-                .order = Json_getInt(
+            let mut data_1: *mut spIkConstraintData = spIkConstraintData_create(Json_getString(
+                constraintMap,
+                b"name\0" as *const u8 as *const c_char,
+                0 as *const c_char,
+            ));
+            (*data_1).order = Json_getInt(
                 constraintMap,
                 b"order\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_1)
-                .skinRequired = if Json_getInt(
+            (*data_1).skinRequired = if Json_getInt(
                 constraintMap,
                 b"skin\0" as *const u8 as *const c_char,
                 0 as c_int,
@@ -25881,13 +23976,9 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             } else {
                 0 as c_int
             };
-            boneMap = Json_getItem(
-                constraintMap,
-                b"bones\0" as *const u8 as *const c_char,
-            );
+            boneMap = Json_getItem(constraintMap, b"bones\0" as *const u8 as *const c_char);
             (*data_1).bonesCount = (*boneMap).size;
-            (*data_1)
-                .bones = _spMalloc(
+            (*data_1).bones = _spMalloc(
                 (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
                     .wrapping_mul((*boneMap).size as c_ulong),
                 b"spine.c\0" as *const u8 as *const c_char,
@@ -25897,10 +23988,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             ii = 0 as c_int;
             while !boneMap.is_null() {
                 let ref mut fresh138 = *((*data_1).bones).offset(ii as isize);
-                *fresh138 = spSkeletonData_findBone(
-                    skeletonData,
-                    (*boneMap).valueString,
-                );
+                *fresh138 = spSkeletonData_findBone(skeletonData, (*boneMap).valueString);
                 if (*((*data_1).bones).offset(ii as isize)).is_null() {
                     spSkeletonData_dispose(skeletonData);
                     _spSkeletonJson_setError(
@@ -25930,8 +24018,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                 );
                 return 0 as *mut spSkeletonData;
             }
-            (*data_1)
-                .bendDirection = if Json_getInt(
+            (*data_1).bendDirection = if Json_getInt(
                 constraintMap,
                 b"bendPositive\0" as *const u8 as *const c_char,
                 1 as c_int,
@@ -25941,8 +24028,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             } else {
                 -(1 as c_int)
             };
-            (*data_1)
-                .compress = if Json_getInt(
+            (*data_1).compress = if Json_getInt(
                 constraintMap,
                 b"compress\0" as *const u8 as *const c_char,
                 0 as c_int,
@@ -25952,8 +24038,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             } else {
                 0 as c_int
             };
-            (*data_1)
-                .stretch = if Json_getInt(
+            (*data_1).stretch = if Json_getInt(
                 constraintMap,
                 b"stretch\0" as *const u8 as *const c_char,
                 0 as c_int,
@@ -25963,8 +24048,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             } else {
                 0 as c_int
             };
-            (*data_1)
-                .uniform = if Json_getInt(
+            (*data_1).uniform = if Json_getInt(
                 constraintMap,
                 b"uniform\0" as *const u8 as *const c_char,
                 0 as c_int,
@@ -25974,14 +24058,12 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             } else {
                 0 as c_int
             };
-            (*data_1)
-                .mix = Json_getFloat(
+            (*data_1).mix = Json_getFloat(
                 constraintMap,
                 b"mix\0" as *const u8 as *const c_char,
                 1 as c_int as c_float,
             );
-            (*data_1)
-                .softness = Json_getFloat(
+            (*data_1).softness = Json_getFloat(
                 constraintMap,
                 b"softness\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
@@ -25996,8 +24078,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
     if !transform.is_null() {
         let mut constraintMap_0: *mut Json = 0 as *mut Json;
         (*skeletonData).transformConstraintsCount = (*transform).size;
-        (*skeletonData)
-            .transformConstraints = _spMalloc(
+        (*skeletonData).transformConstraints = _spMalloc(
             (::core::mem::size_of::<*mut spTransformConstraintData>() as c_ulong)
                 .wrapping_mul((*transform).size as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -26007,21 +24088,18 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         i = 0 as c_int;
         while !constraintMap_0.is_null() {
             let mut name: *const c_char = 0 as *const c_char;
-            let mut data_2: *mut spTransformConstraintData = spTransformConstraintData_create(
-                Json_getString(
+            let mut data_2: *mut spTransformConstraintData =
+                spTransformConstraintData_create(Json_getString(
                     constraintMap_0,
                     b"name\0" as *const u8 as *const c_char,
                     0 as *const c_char,
-                ),
-            );
-            (*data_2)
-                .order = Json_getInt(
+                ));
+            (*data_2).order = Json_getInt(
                 constraintMap_0,
                 b"order\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_2)
-                .skinRequired = if Json_getInt(
+            (*data_2).skinRequired = if Json_getInt(
                 constraintMap_0,
                 b"skin\0" as *const u8 as *const c_char,
                 0 as c_int,
@@ -26031,13 +24109,9 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             } else {
                 0 as c_int
             };
-            boneMap = Json_getItem(
-                constraintMap_0,
-                b"bones\0" as *const u8 as *const c_char,
-            );
+            boneMap = Json_getItem(constraintMap_0, b"bones\0" as *const u8 as *const c_char);
             (*data_2).bonesCount = (*boneMap).size;
-            (*data_2)
-                .bones = _spMalloc(
+            (*data_2).bones = _spMalloc(
                 (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
                     .wrapping_mul((*boneMap).size as c_ulong),
                 b"spine.c\0" as *const u8 as *const c_char,
@@ -26047,17 +24121,13 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             ii = 0 as c_int;
             while !boneMap.is_null() {
                 let ref mut fresh140 = *((*data_2).bones).offset(ii as isize);
-                *fresh140 = spSkeletonData_findBone(
-                    skeletonData,
-                    (*boneMap).valueString,
-                );
+                *fresh140 = spSkeletonData_findBone(skeletonData, (*boneMap).valueString);
                 if (*((*data_2).bones).offset(ii as isize)).is_null() {
                     spSkeletonData_dispose(skeletonData);
                     _spSkeletonJson_setError(
                         self_0,
                         root,
-                        b"Transform bone not found: \0" as *const u8
-                            as *const c_char,
+                        b"Transform bone not found: \0" as *const u8 as *const c_char,
                         (*boneMap).valueString,
                     );
                     return 0 as *mut spSkeletonData;
@@ -26081,92 +24151,77 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                 );
                 return 0 as *mut spSkeletonData;
             }
-            (*data_2)
-                .local = Json_getInt(
+            (*data_2).local = Json_getInt(
                 constraintMap_0,
                 b"local\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_2)
-                .relative = Json_getInt(
+            (*data_2).relative = Json_getInt(
                 constraintMap_0,
                 b"relative\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_2)
-                .offsetRotation = Json_getFloat(
+            (*data_2).offsetRotation = Json_getFloat(
                 constraintMap_0,
                 b"rotation\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_2)
-                .offsetX = Json_getFloat(
+            (*data_2).offsetX = Json_getFloat(
                 constraintMap_0,
                 b"x\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             ) * (*self_0).scale;
-            (*data_2)
-                .offsetY = Json_getFloat(
+            (*data_2).offsetY = Json_getFloat(
                 constraintMap_0,
                 b"y\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             ) * (*self_0).scale;
-            (*data_2)
-                .offsetScaleX = Json_getFloat(
+            (*data_2).offsetScaleX = Json_getFloat(
                 constraintMap_0,
                 b"scaleX\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_2)
-                .offsetScaleY = Json_getFloat(
+            (*data_2).offsetScaleY = Json_getFloat(
                 constraintMap_0,
                 b"scaleY\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_2)
-                .offsetShearY = Json_getFloat(
+            (*data_2).offsetShearY = Json_getFloat(
                 constraintMap_0,
                 b"shearY\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_2)
-                .mixRotate = Json_getFloat(
+            (*data_2).mixRotate = Json_getFloat(
                 constraintMap_0,
                 b"mixRotate\0" as *const u8 as *const c_char,
                 1 as c_int as c_float,
             );
-            (*data_2)
-                .mixX = Json_getFloat(
+            (*data_2).mixX = Json_getFloat(
                 constraintMap_0,
                 b"mixX\0" as *const u8 as *const c_char,
                 1 as c_int as c_float,
             );
-            (*data_2)
-                .mixY = Json_getFloat(
+            (*data_2).mixY = Json_getFloat(
                 constraintMap_0,
                 b"mixY\0" as *const u8 as *const c_char,
                 (*data_2).mixX,
             );
-            (*data_2)
-                .mixScaleX = Json_getFloat(
+            (*data_2).mixScaleX = Json_getFloat(
                 constraintMap_0,
                 b"mixScaleX\0" as *const u8 as *const c_char,
                 1 as c_int as c_float,
             );
-            (*data_2)
-                .mixScaleY = Json_getFloat(
+            (*data_2).mixScaleY = Json_getFloat(
                 constraintMap_0,
                 b"mixScaleY\0" as *const u8 as *const c_char,
                 (*data_2).mixScaleX,
             );
-            (*data_2)
-                .mixShearY = Json_getFloat(
+            (*data_2).mixShearY = Json_getFloat(
                 constraintMap_0,
                 b"mixShearY\0" as *const u8 as *const c_char,
                 1 as c_int as c_float,
             );
-            let ref mut fresh141 = *((*skeletonData).transformConstraints)
-                .offset(i as isize);
+            let ref mut fresh141 = *((*skeletonData).transformConstraints).offset(i as isize);
             *fresh141 = data_2;
             constraintMap_0 = (*constraintMap_0).next;
             i += 1;
@@ -26176,8 +24231,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
     if !pathJson.is_null() {
         let mut constraintMap_1: *mut Json = 0 as *mut Json;
         (*skeletonData).pathConstraintsCount = (*pathJson).size;
-        (*skeletonData)
-            .pathConstraints = _spMalloc(
+        (*skeletonData).pathConstraints = _spMalloc(
             (::core::mem::size_of::<*mut spPathConstraintData>() as c_ulong)
                 .wrapping_mul((*pathJson).size as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -26188,21 +24242,18 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         while !constraintMap_1.is_null() {
             let mut name_0: *const c_char = 0 as *const c_char;
             let mut item_0: *const c_char = 0 as *const c_char;
-            let mut data_3: *mut spPathConstraintData = spPathConstraintData_create(
-                Json_getString(
+            let mut data_3: *mut spPathConstraintData =
+                spPathConstraintData_create(Json_getString(
                     constraintMap_1,
                     b"name\0" as *const u8 as *const c_char,
                     0 as *const c_char,
-                ),
-            );
-            (*data_3)
-                .order = Json_getInt(
+                ));
+            (*data_3).order = Json_getInt(
                 constraintMap_1,
                 b"order\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_3)
-                .skinRequired = if Json_getInt(
+            (*data_3).skinRequired = if Json_getInt(
                 constraintMap_1,
                 b"skin\0" as *const u8 as *const c_char,
                 0 as c_int,
@@ -26212,13 +24263,9 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             } else {
                 0 as c_int
             };
-            boneMap = Json_getItem(
-                constraintMap_1,
-                b"bones\0" as *const u8 as *const c_char,
-            );
+            boneMap = Json_getItem(constraintMap_1, b"bones\0" as *const u8 as *const c_char);
             (*data_3).bonesCount = (*boneMap).size;
-            (*data_3)
-                .bones = _spMalloc(
+            (*data_3).bones = _spMalloc(
                 (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
                     .wrapping_mul((*boneMap).size as c_ulong),
                 b"spine.c\0" as *const u8 as *const c_char,
@@ -26228,10 +24275,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             ii = 0 as c_int;
             while !boneMap.is_null() {
                 let ref mut fresh142 = *((*data_3).bones).offset(ii as isize);
-                *fresh142 = spSkeletonData_findBone(
-                    skeletonData,
-                    (*boneMap).valueString,
-                );
+                *fresh142 = spSkeletonData_findBone(skeletonData, (*boneMap).valueString);
                 if (*((*data_3).bones).offset(ii as isize)).is_null() {
                     spSkeletonData_dispose(skeletonData);
                     _spSkeletonJson_setError(
@@ -26266,14 +24310,9 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                 b"positionMode\0" as *const u8 as *const c_char,
                 b"percent\0" as *const u8 as *const c_char,
             );
-            if spine_strcmp(item_0, b"fixed\0" as *const u8 as *const c_char)
-                == 0 as c_int
-            {
+            if spine_strcmp(item_0, b"fixed\0" as *const u8 as *const c_char) == 0 as c_int {
                 (*data_3).positionMode = SP_POSITION_MODE_FIXED;
-            } else if spine_strcmp(
-                item_0,
-                b"percent\0" as *const u8 as *const c_char,
-            ) == 0 as c_int
+            } else if spine_strcmp(item_0, b"percent\0" as *const u8 as *const c_char) == 0 as c_int
             {
                 (*data_3).positionMode = SP_POSITION_MODE_PERCENT;
             }
@@ -26282,20 +24321,11 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                 b"spacingMode\0" as *const u8 as *const c_char,
                 b"length\0" as *const u8 as *const c_char,
             );
-            if spine_strcmp(item_0, b"length\0" as *const u8 as *const c_char)
-                == 0 as c_int
-            {
+            if spine_strcmp(item_0, b"length\0" as *const u8 as *const c_char) == 0 as c_int {
                 (*data_3).spacingMode = SP_SPACING_MODE_LENGTH;
-            } else if spine_strcmp(
-                item_0,
-                b"fixed\0" as *const u8 as *const c_char,
-            ) == 0 as c_int
-            {
+            } else if spine_strcmp(item_0, b"fixed\0" as *const u8 as *const c_char) == 0 as c_int {
                 (*data_3).spacingMode = SP_SPACING_MODE_FIXED;
-            } else if spine_strcmp(
-                item_0,
-                b"percent\0" as *const u8 as *const c_char,
-            ) == 0 as c_int
+            } else if spine_strcmp(item_0, b"percent\0" as *const u8 as *const c_char) == 0 as c_int
             {
                 (*data_3).spacingMode = SP_SPACING_MODE_PERCENT;
             } else {
@@ -26306,67 +24336,49 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                 b"rotateMode\0" as *const u8 as *const c_char,
                 b"tangent\0" as *const u8 as *const c_char,
             );
-            if spine_strcmp(item_0, b"tangent\0" as *const u8 as *const c_char)
-                == 0 as c_int
-            {
+            if spine_strcmp(item_0, b"tangent\0" as *const u8 as *const c_char) == 0 as c_int {
                 (*data_3).rotateMode = SP_ROTATE_MODE_TANGENT;
-            } else if spine_strcmp(
-                item_0,
-                b"chain\0" as *const u8 as *const c_char,
-            ) == 0 as c_int
-            {
+            } else if spine_strcmp(item_0, b"chain\0" as *const u8 as *const c_char) == 0 as c_int {
                 (*data_3).rotateMode = SP_ROTATE_MODE_CHAIN;
-            } else if spine_strcmp(
-                item_0,
-                b"chainScale\0" as *const u8 as *const c_char,
-            ) == 0 as c_int
+            } else if spine_strcmp(item_0, b"chainScale\0" as *const u8 as *const c_char)
+                == 0 as c_int
             {
                 (*data_3).rotateMode = SP_ROTATE_MODE_CHAIN_SCALE;
             }
-            (*data_3)
-                .offsetRotation = Json_getFloat(
+            (*data_3).offsetRotation = Json_getFloat(
                 constraintMap_1,
                 b"rotation\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_3)
-                .position = Json_getFloat(
+            (*data_3).position = Json_getFloat(
                 constraintMap_1,
                 b"position\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            if (*data_3).positionMode as c_uint
-                == SP_POSITION_MODE_FIXED as c_int as c_uint
-            {
+            if (*data_3).positionMode as c_uint == SP_POSITION_MODE_FIXED as c_int as c_uint {
                 (*data_3).position *= (*self_0).scale;
             }
-            (*data_3)
-                .spacing = Json_getFloat(
+            (*data_3).spacing = Json_getFloat(
                 constraintMap_1,
                 b"spacing\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            if (*data_3).spacingMode as c_uint
-                == SP_SPACING_MODE_LENGTH as c_int as c_uint
-                || (*data_3).spacingMode as c_uint
-                    == SP_SPACING_MODE_FIXED as c_int as c_uint
+            if (*data_3).spacingMode as c_uint == SP_SPACING_MODE_LENGTH as c_int as c_uint
+                || (*data_3).spacingMode as c_uint == SP_SPACING_MODE_FIXED as c_int as c_uint
             {
                 (*data_3).spacing *= (*self_0).scale;
             }
-            (*data_3)
-                .mixRotate = Json_getFloat(
+            (*data_3).mixRotate = Json_getFloat(
                 constraintMap_1,
                 b"mixRotate\0" as *const u8 as *const c_char,
                 1 as c_int as c_float,
             );
-            (*data_3)
-                .mixX = Json_getFloat(
+            (*data_3).mixX = Json_getFloat(
                 constraintMap_1,
                 b"mixX\0" as *const u8 as *const c_char,
                 1 as c_int as c_float,
             );
-            (*data_3)
-                .mixY = Json_getFloat(
+            (*data_3).mixY = Json_getFloat(
                 constraintMap_1,
                 b"mixY\0" as *const u8 as *const c_char,
                 (*data_3).mixX,
@@ -26381,8 +24393,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
     if !physics.is_null() {
         let mut constraintMap_2: *mut Json = 0 as *mut Json;
         (*skeletonData).physicsConstraintsCount = (*physics).size;
-        (*skeletonData)
-            .physicsConstraints = _spMalloc(
+        (*skeletonData).physicsConstraints = _spMalloc(
             (::core::mem::size_of::<*mut spPhysicsConstraintData>() as c_ulong)
                 .wrapping_mul((*physics).size as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -26392,21 +24403,18 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         i = 0 as c_int;
         while !constraintMap_2.is_null() {
             let mut name_1: *const c_char = 0 as *const c_char;
-            let mut data_4: *mut spPhysicsConstraintData = spPhysicsConstraintData_create(
-                Json_getString(
+            let mut data_4: *mut spPhysicsConstraintData =
+                spPhysicsConstraintData_create(Json_getString(
                     constraintMap_2,
                     b"name\0" as *const u8 as *const c_char,
                     0 as *const c_char,
-                ),
-            );
-            (*data_4)
-                .order = Json_getInt(
+                ));
+            (*data_4).order = Json_getInt(
                 constraintMap_2,
                 b"order\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_4)
-                .skinRequired = Json_getInt(
+            (*data_4).skinRequired = Json_getInt(
                 constraintMap_2,
                 b"skin\0" as *const u8 as *const c_char,
                 0 as c_int,
@@ -26427,136 +24435,114 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                 );
                 return 0 as *mut spSkeletonData;
             }
-            (*data_4)
-                .x = Json_getFloat(
+            (*data_4).x = Json_getFloat(
                 constraintMap_2,
                 b"x\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_4)
-                .y = Json_getFloat(
+            (*data_4).y = Json_getFloat(
                 constraintMap_2,
                 b"y\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_4)
-                .rotate = Json_getFloat(
+            (*data_4).rotate = Json_getFloat(
                 constraintMap_2,
                 b"rotate\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_4)
-                .scaleX = Json_getFloat(
+            (*data_4).scaleX = Json_getFloat(
                 constraintMap_2,
                 b"scaleX\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_4)
-                .shearX = Json_getFloat(
+            (*data_4).shearX = Json_getFloat(
                 constraintMap_2,
                 b"shearX\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_4)
-                .limit = Json_getFloat(
+            (*data_4).limit = Json_getFloat(
                 constraintMap_2,
                 b"limit\0" as *const u8 as *const c_char,
                 5000 as c_int as c_float,
             ) * (*self_0).scale;
-            (*data_4)
-                .step = 1.0f32
+            (*data_4).step = 1.0f32
                 / Json_getInt(
                     constraintMap_2,
                     b"fps\0" as *const u8 as *const c_char,
                     60 as c_int,
                 ) as c_float;
-            (*data_4)
-                .inertia = Json_getFloat(
+            (*data_4).inertia = Json_getFloat(
                 constraintMap_2,
                 b"inertia\0" as *const u8 as *const c_char,
                 1 as c_int as c_float,
             );
-            (*data_4)
-                .strength = Json_getFloat(
+            (*data_4).strength = Json_getFloat(
                 constraintMap_2,
                 b"strength\0" as *const u8 as *const c_char,
                 100 as c_int as c_float,
             );
-            (*data_4)
-                .damping = Json_getFloat(
+            (*data_4).damping = Json_getFloat(
                 constraintMap_2,
                 b"damping\0" as *const u8 as *const c_char,
                 1 as c_int as c_float,
             );
-            (*data_4)
-                .massInverse = 1.0f32
+            (*data_4).massInverse = 1.0f32
                 / Json_getFloat(
                     constraintMap_2,
                     b"mass\0" as *const u8 as *const c_char,
                     1 as c_int as c_float,
                 );
-            (*data_4)
-                .wind = Json_getFloat(
+            (*data_4).wind = Json_getFloat(
                 constraintMap_2,
                 b"wind\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_4)
-                .gravity = Json_getFloat(
+            (*data_4).gravity = Json_getFloat(
                 constraintMap_2,
                 b"gravity\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
             );
-            (*data_4)
-                .mix = Json_getFloat(
+            (*data_4).mix = Json_getFloat(
                 constraintMap_2,
                 b"mix\0" as *const u8 as *const c_char,
                 1 as c_int as c_float,
             );
-            (*data_4)
-                .inertiaGlobal = Json_getInt(
+            (*data_4).inertiaGlobal = Json_getInt(
                 constraintMap_2,
                 b"inertiaGlobal\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_4)
-                .strengthGlobal = Json_getInt(
+            (*data_4).strengthGlobal = Json_getInt(
                 constraintMap_2,
                 b"strengthGlobal\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_4)
-                .dampingGlobal = Json_getInt(
+            (*data_4).dampingGlobal = Json_getInt(
                 constraintMap_2,
                 b"dampingGlobal\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_4)
-                .massGlobal = Json_getInt(
+            (*data_4).massGlobal = Json_getInt(
                 constraintMap_2,
                 b"massGlobal\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_4)
-                .windGlobal = Json_getInt(
+            (*data_4).windGlobal = Json_getInt(
                 constraintMap_2,
                 b"windGlobal\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_4)
-                .gravityGlobal = Json_getInt(
+            (*data_4).gravityGlobal = Json_getInt(
                 constraintMap_2,
                 b"gravityGlobal\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            (*data_4)
-                .mixGlobal = Json_getInt(
+            (*data_4).mixGlobal = Json_getInt(
                 constraintMap_2,
                 b"mixGlobal\0" as *const u8 as *const c_char,
                 0 as c_int,
             );
-            let ref mut fresh144 = *((*skeletonData).physicsConstraints)
-                .offset(i as isize);
+            let ref mut fresh144 = *((*skeletonData).physicsConstraints).offset(i as isize);
             *fresh144 = data_4;
             constraintMap_2 = (*constraintMap_2).next;
             i += 1;
@@ -26565,8 +24551,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
     skins = Json_getItem(root, b"skins\0" as *const u8 as *const c_char);
     if !skins.is_null() {
         let mut skinMap: *mut Json = 0 as *mut Json;
-        (*skeletonData)
-            .skins = _spMalloc(
+        (*skeletonData).skins = _spMalloc(
             (::core::mem::size_of::<*mut spSkin>() as c_ulong)
                 .wrapping_mul((*skins).size as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -26578,31 +24563,23 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             let mut attachmentsMap: *mut Json = 0 as *mut Json;
             let mut curves: *mut Json = 0 as *mut Json;
             let mut skinPart: *mut Json = 0 as *mut Json;
-            let mut skin: *mut spSkin = spSkin_create(
-                Json_getString(
-                    skinMap,
-                    b"name\0" as *const u8 as *const c_char,
-                    b"\0" as *const u8 as *const c_char,
-                ),
-            );
-            skinPart = Json_getItem(
+            let mut skin: *mut spSkin = spSkin_create(Json_getString(
                 skinMap,
-                b"bones\0" as *const u8 as *const c_char,
-            );
+                b"name\0" as *const u8 as *const c_char,
+                b"\0" as *const u8 as *const c_char,
+            ));
+            skinPart = Json_getItem(skinMap, b"bones\0" as *const u8 as *const c_char);
             if !skinPart.is_null() {
                 skinPart = (*skinPart).child;
                 while !skinPart.is_null() {
-                    let mut bone: *mut spBoneData = spSkeletonData_findBone(
-                        skeletonData,
-                        (*skinPart).valueString,
-                    );
+                    let mut bone: *mut spBoneData =
+                        spSkeletonData_findBone(skeletonData, (*skinPart).valueString);
                     if bone.is_null() {
                         spSkeletonData_dispose(skeletonData);
                         _spSkeletonJson_setError(
                             self_0,
                             root,
-                            b"Skin bone constraint not found: \0" as *const u8
-                                as *const c_char,
+                            b"Skin bone constraint not found: \0" as *const u8 as *const c_char,
                             (*skinPart).valueString,
                         );
                         return 0 as *mut spSkeletonData;
@@ -26611,24 +24588,18 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                     skinPart = (*skinPart).next;
                 }
             }
-            skinPart = Json_getItem(
-                skinMap,
-                b"ik\0" as *const u8 as *const c_char,
-            );
+            skinPart = Json_getItem(skinMap, b"ik\0" as *const u8 as *const c_char);
             if !skinPart.is_null() {
                 skinPart = (*skinPart).child;
                 while !skinPart.is_null() {
-                    let mut constraint: *mut spIkConstraintData = spSkeletonData_findIkConstraint(
-                        skeletonData,
-                        (*skinPart).valueString,
-                    );
+                    let mut constraint: *mut spIkConstraintData =
+                        spSkeletonData_findIkConstraint(skeletonData, (*skinPart).valueString);
                     if constraint.is_null() {
                         spSkeletonData_dispose(skeletonData);
                         _spSkeletonJson_setError(
                             self_0,
                             root,
-                            b"Skin IK constraint not found: \0" as *const u8
-                                as *const c_char,
+                            b"Skin IK constraint not found: \0" as *const u8 as *const c_char,
                             (*skinPart).valueString,
                         );
                         return 0 as *mut spSkeletonData;
@@ -26637,24 +24608,18 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                     skinPart = (*skinPart).next;
                 }
             }
-            skinPart = Json_getItem(
-                skinMap,
-                b"path\0" as *const u8 as *const c_char,
-            );
+            skinPart = Json_getItem(skinMap, b"path\0" as *const u8 as *const c_char);
             if !skinPart.is_null() {
                 skinPart = (*skinPart).child;
                 while !skinPart.is_null() {
-                    let mut constraint_0: *mut spPathConstraintData = spSkeletonData_findPathConstraint(
-                        skeletonData,
-                        (*skinPart).valueString,
-                    );
+                    let mut constraint_0: *mut spPathConstraintData =
+                        spSkeletonData_findPathConstraint(skeletonData, (*skinPart).valueString);
                     if constraint_0.is_null() {
                         spSkeletonData_dispose(skeletonData);
                         _spSkeletonJson_setError(
                             self_0,
                             root,
-                            b"Skin path constraint not found: \0" as *const u8
-                                as *const c_char,
+                            b"Skin path constraint not found: \0" as *const u8 as *const c_char,
                             (*skinPart).valueString,
                         );
                         return 0 as *mut spSkeletonData;
@@ -26663,17 +24628,15 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                     skinPart = (*skinPart).next;
                 }
             }
-            skinPart = Json_getItem(
-                skinMap,
-                b"transform\0" as *const u8 as *const c_char,
-            );
+            skinPart = Json_getItem(skinMap, b"transform\0" as *const u8 as *const c_char);
             if !skinPart.is_null() {
                 skinPart = (*skinPart).child;
                 while !skinPart.is_null() {
-                    let mut constraint_1: *mut spTransformConstraintData = spSkeletonData_findTransformConstraint(
-                        skeletonData,
-                        (*skinPart).valueString,
-                    );
+                    let mut constraint_1: *mut spTransformConstraintData =
+                        spSkeletonData_findTransformConstraint(
+                            skeletonData,
+                            (*skinPart).valueString,
+                        );
                     if constraint_1.is_null() {
                         spSkeletonData_dispose(skeletonData);
                         _spSkeletonJson_setError(
@@ -26685,39 +24648,27 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                         );
                         return 0 as *mut spSkeletonData;
                     }
-                    spTransformConstraintDataArray_add(
-                        (*skin).transformConstraints,
-                        constraint_1,
-                    );
+                    spTransformConstraintDataArray_add((*skin).transformConstraints, constraint_1);
                     skinPart = (*skinPart).next;
                 }
             }
-            skinPart = Json_getItem(
-                skinMap,
-                b"physics\0" as *const u8 as *const c_char,
-            );
+            skinPart = Json_getItem(skinMap, b"physics\0" as *const u8 as *const c_char);
             if !skinPart.is_null() {
                 skinPart = (*skinPart).child;
                 while !skinPart.is_null() {
-                    let mut constraint_2: *mut spPhysicsConstraintData = spSkeletonData_findPhysicsConstraint(
-                        skeletonData,
-                        (*skinPart).valueString,
-                    );
+                    let mut constraint_2: *mut spPhysicsConstraintData =
+                        spSkeletonData_findPhysicsConstraint(skeletonData, (*skinPart).valueString);
                     if constraint_2.is_null() {
                         spSkeletonData_dispose(skeletonData);
                         _spSkeletonJson_setError(
                             self_0,
                             root,
-                            b"Skin physics constraint not found: \0" as *const u8
-                                as *const c_char,
+                            b"Skin physics constraint not found: \0" as *const u8 as *const c_char,
                             (*skinPart).valueString,
                         );
                         return 0 as *mut spSkeletonData;
                     }
-                    spPhysicsConstraintDataArray_add(
-                        (*skin).physicsConstraints,
-                        constraint_2,
-                    );
+                    spPhysicsConstraintDataArray_add((*skin).physicsConstraints, constraint_2);
                     skinPart = (*skinPart).next;
                 }
             }
@@ -26725,30 +24676,21 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             (*skeletonData).skinsCount = (*skeletonData).skinsCount + 1;
             let ref mut fresh146 = *((*skeletonData).skins).offset(fresh145 as isize);
             *fresh146 = skin;
-            if spine_strcmp(
-                (*skin).name,
-                b"default\0" as *const u8 as *const c_char,
-            ) == 0 as c_int
+            if spine_strcmp((*skin).name, b"default\0" as *const u8 as *const c_char) == 0 as c_int
             {
                 (*skeletonData).defaultSkin = skin;
             }
-            skinPart = Json_getItem(
-                skinMap,
-                b"attachments\0" as *const u8 as *const c_char,
-            );
+            skinPart = Json_getItem(skinMap, b"attachments\0" as *const u8 as *const c_char);
             if !skinPart.is_null() {
                 attachmentsMap = (*skinPart).child;
                 while !attachmentsMap.is_null() {
-                    let mut slot: *mut spSlotData = spSkeletonData_findSlot(
-                        skeletonData,
-                        (*attachmentsMap).name,
-                    );
+                    let mut slot: *mut spSlotData =
+                        spSkeletonData_findSlot(skeletonData, (*attachmentsMap).name);
                     let mut attachmentMap: *mut Json = 0 as *mut Json;
                     attachmentMap = (*attachmentsMap).child;
                     while !attachmentMap.is_null() {
                         let mut attachment: *mut spAttachment = 0 as *mut spAttachment;
-                        let mut skinAttachmentName: *const c_char = (*attachmentMap)
-                            .name;
+                        let mut skinAttachmentName: *const c_char = (*attachmentMap).name;
                         let mut attachmentName: *const c_char = Json_getString(
                             attachmentMap,
                             b"name\0" as *const u8 as *const c_char,
@@ -26768,16 +24710,12 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                             b"region\0" as *const u8 as *const c_char,
                         );
                         let mut type_0: spAttachmentType = SP_ATTACHMENT_REGION;
-                        if spine_strcmp(
-                            typeString,
-                            b"region\0" as *const u8 as *const c_char,
-                        ) == 0 as c_int
+                        if spine_strcmp(typeString, b"region\0" as *const u8 as *const c_char)
+                            == 0 as c_int
                         {
                             type_0 = SP_ATTACHMENT_REGION;
-                        } else if spine_strcmp(
-                            typeString,
-                            b"mesh\0" as *const u8 as *const c_char,
-                        ) == 0 as c_int
+                        } else if spine_strcmp(typeString, b"mesh\0" as *const u8 as *const c_char)
+                            == 0 as c_int
                         {
                             type_0 = SP_ATTACHMENT_MESH;
                         } else if spine_strcmp(
@@ -26792,10 +24730,8 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                         ) == 0 as c_int
                         {
                             type_0 = SP_ATTACHMENT_BOUNDING_BOX;
-                        } else if spine_strcmp(
-                            typeString,
-                            b"path\0" as *const u8 as *const c_char,
-                        ) == 0 as c_int
+                        } else if spine_strcmp(typeString, b"path\0" as *const u8 as *const c_char)
+                            == 0 as c_int
                         {
                             type_0 = SP_ATTACHMENT_PATH;
                         } else if spine_strcmp(
@@ -26804,10 +24740,8 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                         ) == 0 as c_int
                         {
                             type_0 = SP_ATTACHMENT_CLIPPING;
-                        } else if spine_strcmp(
-                            typeString,
-                            b"point\0" as *const u8 as *const c_char,
-                        ) == 0 as c_int
+                        } else if spine_strcmp(typeString, b"point\0" as *const u8 as *const c_char)
+                            == 0 as c_int
                         {
                             type_0 = SP_ATTACHMENT_POINT;
                         } else {
@@ -26815,18 +24749,15 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                             _spSkeletonJson_setError(
                                 self_0,
                                 root,
-                                b"Unknown attachment type: \0" as *const u8
-                                    as *const c_char,
+                                b"Unknown attachment type: \0" as *const u8 as *const c_char,
                                 typeString,
                             );
                             return 0 as *mut spSkeletonData;
                         }
-                        sequence = readSequenceJson(
-                            Json_getItem(
-                                attachmentMap,
-                                b"sequence\0" as *const u8 as *const c_char,
-                            ),
-                        );
+                        sequence = readSequenceJson(Json_getItem(
+                            attachmentMap,
+                            b"sequence\0" as *const u8 as *const c_char,
+                        ));
                         attachment = spAttachmentLoader_createAttachment(
                             (*self_0).attachmentLoader,
                             skin,
@@ -26849,11 +24780,10 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                         } else {
                             match (*attachment).type_0 as c_uint {
                                 0 => {
-                                    let mut region: *mut spRegionAttachment = attachment
-                                        as *mut spRegionAttachment;
+                                    let mut region: *mut spRegionAttachment =
+                                        attachment as *mut spRegionAttachment;
                                     if !path.is_null() {
-                                        (*region)
-                                            .path = _spMalloc(
+                                        (*region).path = _spMalloc(
                                             (::core::mem::size_of::<c_char>() as c_ulong)
                                                 .wrapping_mul(
                                                     (spine_strlen(path))
@@ -26861,47 +24791,41 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                                 ),
                                             b"spine.c\0" as *const u8 as *const c_char,
                                             12952 as c_int,
-                                        ) as *mut c_char;
+                                        )
+                                            as *mut c_char;
                                         spine_strcpy((*region).path, path);
                                     }
-                                    (*region)
-                                        .x = Json_getFloat(
+                                    (*region).x = Json_getFloat(
                                         attachmentMap,
                                         b"x\0" as *const u8 as *const c_char,
                                         0 as c_int as c_float,
                                     ) * (*self_0).scale;
-                                    (*region)
-                                        .y = Json_getFloat(
+                                    (*region).y = Json_getFloat(
                                         attachmentMap,
                                         b"y\0" as *const u8 as *const c_char,
                                         0 as c_int as c_float,
                                     ) * (*self_0).scale;
-                                    (*region)
-                                        .scaleX = Json_getFloat(
+                                    (*region).scaleX = Json_getFloat(
                                         attachmentMap,
                                         b"scaleX\0" as *const u8 as *const c_char,
                                         1 as c_int as c_float,
                                     );
-                                    (*region)
-                                        .scaleY = Json_getFloat(
+                                    (*region).scaleY = Json_getFloat(
                                         attachmentMap,
                                         b"scaleY\0" as *const u8 as *const c_char,
                                         1 as c_int as c_float,
                                     );
-                                    (*region)
-                                        .rotation = Json_getFloat(
+                                    (*region).rotation = Json_getFloat(
                                         attachmentMap,
                                         b"rotation\0" as *const u8 as *const c_char,
                                         0 as c_int as c_float,
                                     );
-                                    (*region)
-                                        .width = Json_getFloat(
+                                    (*region).width = Json_getFloat(
                                         attachmentMap,
                                         b"width\0" as *const u8 as *const c_char,
                                         32 as c_int as c_float,
                                     ) * (*self_0).scale;
-                                    (*region)
-                                        .height = Json_getFloat(
+                                    (*region).height = Json_getFloat(
                                         attachmentMap,
                                         b"height\0" as *const u8 as *const c_char,
                                         32 as c_int as c_float,
@@ -26930,18 +24854,17 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                     );
                                 }
                                 2 | 3 => {
-                                    let mut mesh: *mut spMeshAttachment = attachment
-                                        as *mut spMeshAttachment;
-                                    (*mesh)
-                                        .path = _spMalloc(
-                                        (::core::mem::size_of::<c_char>() as c_ulong)
-                                            .wrapping_mul(
-                                                (spine_strlen(path))
-                                                    .wrapping_add(1 as c_int as c_ulong),
-                                            ),
+                                    let mut mesh: *mut spMeshAttachment =
+                                        attachment as *mut spMeshAttachment;
+                                    (*mesh).path = _spMalloc(
+                                        (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
+                                            (spine_strlen(path))
+                                                .wrapping_add(1 as c_int as c_ulong),
+                                        ),
                                         b"spine.c\0" as *const u8 as *const c_char,
                                         12980 as c_int,
-                                    ) as *mut c_char;
+                                    )
+                                        as *mut c_char;
                                     spine_strcpy((*mesh).path, path);
                                     color_1 = Json_getString(
                                         attachmentMap,
@@ -26957,14 +24880,12 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                             toColor(color_1, 3 as c_int),
                                         );
                                     }
-                                    (*mesh)
-                                        .width = Json_getFloat(
+                                    (*mesh).width = Json_getFloat(
                                         attachmentMap,
                                         b"width\0" as *const u8 as *const c_char,
                                         32 as c_int as c_float,
                                     ) * (*self_0).scale;
-                                    (*mesh)
-                                        .height = Json_getFloat(
+                                    (*mesh).height = Json_getFloat(
                                         attachmentMap,
                                         b"height\0" as *const u8 as *const c_char,
                                         32 as c_int as c_float,
@@ -26981,18 +24902,18 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                             b"triangles\0" as *const u8 as *const c_char,
                                         );
                                         (*mesh).trianglesCount = (*entry).size;
-                                        (*mesh)
-                                            .triangles = _spMalloc(
+                                        (*mesh).triangles = _spMalloc(
                                             (::core::mem::size_of::<c_ushort>() as c_ulong)
                                                 .wrapping_mul((*entry).size as c_ulong),
                                             b"spine.c\0" as *const u8 as *const c_char,
                                             13000 as c_int,
-                                        ) as *mut c_ushort;
+                                        )
+                                            as *mut c_ushort;
                                         entry = (*entry).child;
                                         ii = 0 as c_int;
                                         while !entry.is_null() {
-                                            *((*mesh).triangles)
-                                                .offset(ii as isize) = (*entry).valueInt as c_ushort;
+                                            *((*mesh).triangles).offset(ii as isize) =
+                                                (*entry).valueInt as c_ushort;
                                             entry = (*entry).next;
                                             ii += 1;
                                         }
@@ -27001,18 +24922,18 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                             b"uvs\0" as *const u8 as *const c_char,
                                         );
                                         verticesLength = (*entry).size;
-                                        (*mesh)
-                                            .regionUVs = _spMalloc(
+                                        (*mesh).regionUVs = _spMalloc(
                                             (::core::mem::size_of::<c_float>() as c_ulong)
                                                 .wrapping_mul(verticesLength as c_ulong),
                                             b"spine.c\0" as *const u8 as *const c_char,
                                             13006 as c_int,
-                                        ) as *mut c_float;
+                                        )
+                                            as *mut c_float;
                                         entry = (*entry).child;
                                         ii = 0 as c_int;
                                         while !entry.is_null() {
-                                            *((*mesh).regionUVs)
-                                                .offset(ii as isize) = (*entry).valueFloat;
+                                            *((*mesh).regionUVs).offset(ii as isize) =
+                                                (*entry).valueFloat;
                                             entry = (*entry).next;
                                             ii += 1;
                                         }
@@ -27025,8 +24946,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                         if !((*mesh).region).is_null() {
                                             spMeshAttachment_updateRegion(mesh);
                                         }
-                                        (*mesh)
-                                            .hullLength = Json_getInt(
+                                        (*mesh).hullLength = Json_getInt(
                                             attachmentMap,
                                             b"hull\0" as *const u8 as *const c_char,
                                             0 as c_int,
@@ -27037,18 +24957,18 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                         );
                                         if !entry.is_null() {
                                             (*mesh).edgesCount = (*entry).size;
-                                            (*mesh)
-                                                .edges = _spMalloc(
+                                            (*mesh).edges = _spMalloc(
                                                 (::core::mem::size_of::<c_ushort>() as c_ulong)
                                                     .wrapping_mul((*entry).size as c_ulong),
                                                 b"spine.c\0" as *const u8 as *const c_char,
                                                 13019 as c_int,
-                                            ) as *mut c_ushort;
+                                            )
+                                                as *mut c_ushort;
                                             entry = (*entry).child;
                                             ii = 0 as c_int;
                                             while !entry.is_null() {
-                                                *((*mesh).edges)
-                                                    .offset(ii as isize) = (*entry).valueInt as c_ushort;
+                                                *((*mesh).edges).offset(ii as isize) =
+                                                    (*entry).valueInt as c_ushort;
                                                 entry = (*entry).next;
                                                 ii += 1;
                                             }
@@ -27078,8 +24998,8 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                     }
                                 }
                                 1 => {
-                                    let mut box_0: *mut spBoundingBoxAttachment = attachment
-                                        as *mut spBoundingBoxAttachment;
+                                    let mut box_0: *mut spBoundingBoxAttachment =
+                                        attachment as *mut spBoundingBoxAttachment;
                                     let mut vertexCount: c_int = Json_getInt(
                                         attachmentMap,
                                         b"vertexCount\0" as *const u8 as *const c_char,
@@ -27112,17 +25032,15 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                     );
                                 }
                                 4 => {
-                                    let mut pathAttachment: *mut spPathAttachment = attachment
-                                        as *mut spPathAttachment;
+                                    let mut pathAttachment: *mut spPathAttachment =
+                                        attachment as *mut spPathAttachment;
                                     let mut vertexCount_0: c_int = 0 as c_int;
-                                    (*pathAttachment)
-                                        .closed = Json_getInt(
+                                    (*pathAttachment).closed = Json_getInt(
                                         attachmentMap,
                                         b"closed\0" as *const u8 as *const c_char,
                                         0 as c_int,
                                     );
-                                    (*pathAttachment)
-                                        .constantSpeed = Json_getInt(
+                                    (*pathAttachment).constantSpeed = Json_getInt(
                                         attachmentMap,
                                         b"constantSpeed\0" as *const u8 as *const c_char,
                                         1 as c_int,
@@ -27138,17 +25056,16 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                         &mut (*pathAttachment).super_0,
                                         vertexCount_0 << 1 as c_int,
                                     );
-                                    (*pathAttachment)
-                                        .lengthsLength = vertexCount_0 / 3 as c_int;
-                                    (*pathAttachment)
-                                        .lengths = _spMalloc(
+                                    (*pathAttachment).lengthsLength = vertexCount_0 / 3 as c_int;
+                                    (*pathAttachment).lengths = _spMalloc(
                                         (::core::mem::size_of::<c_float>() as c_ulong)
                                             .wrapping_mul(
                                                 (*pathAttachment).lengthsLength as c_ulong,
                                             ),
                                         b"spine.c\0" as *const u8 as *const c_char,
                                         13058 as c_int,
-                                    ) as *mut c_float;
+                                    )
+                                        as *mut c_float;
                                     curves = Json_getItem(
                                         attachmentMap,
                                         b"lengths\0" as *const u8 as *const c_char,
@@ -27156,10 +25073,8 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                     curves = (*curves).child;
                                     ii = 0 as c_int;
                                     while !curves.is_null() {
-                                        *((*pathAttachment).lengths)
-                                            .offset(
-                                                ii as isize,
-                                            ) = (*curves).valueFloat * (*self_0).scale;
+                                        *((*pathAttachment).lengths).offset(ii as isize) =
+                                            (*curves).valueFloat * (*self_0).scale;
                                         curves = (*curves).next;
                                         ii += 1;
                                     }
@@ -27179,22 +25094,19 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                     }
                                 }
                                 5 => {
-                                    let mut point: *mut spPointAttachment = attachment
-                                        as *mut spPointAttachment;
-                                    (*point)
-                                        .x = Json_getFloat(
+                                    let mut point: *mut spPointAttachment =
+                                        attachment as *mut spPointAttachment;
+                                    (*point).x = Json_getFloat(
                                         attachmentMap,
                                         b"x\0" as *const u8 as *const c_char,
                                         0 as c_int as c_float,
                                     ) * (*self_0).scale;
-                                    (*point)
-                                        .y = Json_getFloat(
+                                    (*point).y = Json_getFloat(
                                         attachmentMap,
                                         b"y\0" as *const u8 as *const c_char,
                                         0 as c_int as c_float,
                                     ) * (*self_0).scale;
-                                    (*point)
-                                        .rotation = Json_getFloat(
+                                    (*point).rotation = Json_getFloat(
                                         attachmentMap,
                                         b"rotation\0" as *const u8 as *const c_char,
                                         0 as c_int as c_float,
@@ -27215,8 +25127,8 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                     }
                                 }
                                 6 => {
-                                    let mut clip: *mut spClippingAttachment = attachment
-                                        as *mut spClippingAttachment;
+                                    let mut clip: *mut spClippingAttachment =
+                                        attachment as *mut spClippingAttachment;
                                     let mut vertexCount_1: c_int = 0 as c_int;
                                     let mut end: *const c_char = Json_getString(
                                         attachmentMap,
@@ -27224,10 +25136,8 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                                         0 as *const c_char,
                                     );
                                     if !end.is_null() {
-                                        let mut endSlot: *mut spSlotData = spSkeletonData_findSlot(
-                                            skeletonData,
-                                            end,
-                                        );
+                                        let mut endSlot: *mut spSlotData =
+                                            spSkeletonData_findSlot(skeletonData, end);
                                         (*clip).endSlot = endSlot;
                                     }
                                     vertexCount_1 = Json_getInt(
@@ -27281,8 +25191,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
     i = 0 as c_int;
     while i < (*internal).linkedMeshCount {
         let mut parent_0: *mut spAttachment = 0 as *mut spAttachment;
-        let mut linkedMesh: *mut _spLinkedMeshJson = ((*internal).linkedMeshes)
-            .offset(i as isize);
+        let mut linkedMesh: *mut _spLinkedMeshJson = ((*internal).linkedMeshes).offset(i as isize);
         let mut skin_0: *mut spSkin = if ((*linkedMesh).skin).is_null() {
             (*skeletonData).defaultSkin
         } else {
@@ -27298,11 +25207,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             );
             return 0 as *mut spSkeletonData;
         }
-        parent_0 = spSkin_getAttachment(
-            skin_0,
-            (*linkedMesh).slotIndex,
-            (*linkedMesh).parent,
-        );
+        parent_0 = spSkin_getAttachment(skin_0, (*linkedMesh).slotIndex, (*linkedMesh).parent);
         if parent_0.is_null() {
             spSkeletonData_dispose(skeletonData);
             _spSkeletonJson_setError(
@@ -27313,17 +25218,12 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
             );
             return 0 as *mut spSkeletonData;
         }
-        (*(*linkedMesh).mesh)
-            .super_0
-            .timelineAttachment = if (*linkedMesh).inheritTimeline != 0 {
+        (*(*linkedMesh).mesh).super_0.timelineAttachment = if (*linkedMesh).inheritTimeline != 0 {
             parent_0
         } else {
             &mut (*(*linkedMesh).mesh).super_0.super_0
         };
-        spMeshAttachment_setParentMesh(
-            (*linkedMesh).mesh,
-            parent_0 as *mut spMeshAttachment,
-        );
+        spMeshAttachment_setParentMesh((*linkedMesh).mesh, parent_0 as *mut spMeshAttachment);
         if !((*(*linkedMesh).mesh).region).is_null() {
             spMeshAttachment_updateRegion((*linkedMesh).mesh);
         }
@@ -27339,8 +25239,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         let mut stringValue: *const c_char = 0 as *const c_char;
         let mut audioPath: *const c_char = 0 as *const c_char;
         (*skeletonData).eventsCount = (*events).size;
-        (*skeletonData)
-            .events = _spMalloc(
+        (*skeletonData).events = _spMalloc(
             (::core::mem::size_of::<*mut spEventData>() as c_ulong)
                 .wrapping_mul((*events).size as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -27350,14 +25249,9 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         i = 0 as c_int;
         while !eventMap.is_null() {
             let mut eventData: *mut spEventData = spEventData_create((*eventMap).name);
-            (*eventData)
-                .intValue = Json_getInt(
-                eventMap,
-                b"int\0" as *const u8 as *const c_char,
-                0 as c_int,
-            );
-            (*eventData)
-                .floatValue = Json_getFloat(
+            (*eventData).intValue =
+                Json_getInt(eventMap, b"int\0" as *const u8 as *const c_char, 0 as c_int);
+            (*eventData).floatValue = Json_getFloat(
                 eventMap,
                 b"float\0" as *const u8 as *const c_char,
                 0 as c_int as c_float,
@@ -27368,13 +25262,10 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                 0 as *const c_char,
             );
             if !stringValue.is_null() {
-                (*eventData)
-                    .stringValue = _spMalloc(
-                    (::core::mem::size_of::<c_char>() as c_ulong)
-                        .wrapping_mul(
-                            (spine_strlen(stringValue))
-                                .wrapping_add(1 as c_int as c_ulong),
-                        ),
+                (*eventData).stringValue = _spMalloc(
+                    (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
+                        (spine_strlen(stringValue)).wrapping_add(1 as c_int as c_ulong),
+                    ),
                     b"spine.c\0" as *const u8 as *const c_char,
                     13155 as c_int,
                 ) as *mut c_char;
@@ -27386,25 +25277,20 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
                 0 as *const c_char,
             );
             if !audioPath.is_null() {
-                (*eventData)
-                    .audioPath = _spMalloc(
-                    (::core::mem::size_of::<c_char>() as c_ulong)
-                        .wrapping_mul(
-                            (spine_strlen(audioPath))
-                                .wrapping_add(1 as c_int as c_ulong),
-                        ),
+                (*eventData).audioPath = _spMalloc(
+                    (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(
+                        (spine_strlen(audioPath)).wrapping_add(1 as c_int as c_ulong),
+                    ),
                     b"spine.c\0" as *const u8 as *const c_char,
                     13158 as c_int,
                 ) as *mut c_char;
                 spine_strcpy((*eventData).audioPath, audioPath);
-                (*eventData)
-                    .volume = Json_getFloat(
+                (*eventData).volume = Json_getFloat(
                     eventMap,
                     b"volume\0" as *const u8 as *const c_char,
                     1 as c_int as c_float,
                 );
-                (*eventData)
-                    .balance = Json_getFloat(
+                (*eventData).balance = Json_getFloat(
                     eventMap,
                     b"balance\0" as *const u8 as *const c_char,
                     0 as c_int as c_float,
@@ -27419,8 +25305,7 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
     animations = Json_getItem(root, b"animations\0" as *const u8 as *const c_char);
     if !animations.is_null() {
         let mut animationMap: *mut Json = 0 as *mut Json;
-        (*skeletonData)
-            .animations = _spMalloc(
+        (*skeletonData).animations = _spMalloc(
             (::core::mem::size_of::<*mut spAnimation>() as c_ulong)
                 .wrapping_mul((*animations).size as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -27428,19 +25313,15 @@ pub unsafe extern "C" fn spSkeletonJson_readSkeletonData(
         ) as *mut *mut spAnimation;
         animationMap = (*animations).child;
         while !animationMap.is_null() {
-            let mut animation: *mut spAnimation = _spSkeletonJson_readAnimation(
-                self_0,
-                animationMap,
-                skeletonData,
-            );
+            let mut animation: *mut spAnimation =
+                _spSkeletonJson_readAnimation(self_0, animationMap, skeletonData);
             if animation.is_null() {
                 spSkeletonData_dispose(skeletonData);
                 return 0 as *mut spSkeletonData;
             }
             let fresh148 = (*skeletonData).animationsCount;
             (*skeletonData).animationsCount = (*skeletonData).animationsCount + 1;
-            let ref mut fresh149 = *((*skeletonData).animations)
-                .offset(fresh148 as isize);
+            let ref mut fresh149 = *((*skeletonData).animations).offset(fresh148 as isize);
             *fresh149 = animation;
             animationMap = (*animationMap).next;
         }
@@ -27460,8 +25341,7 @@ pub unsafe extern "C" fn spBoneDataArray_create(
     ) as *mut spBoneDataArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spBoneData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -27485,16 +25365,12 @@ pub unsafe extern "C" fn spBoneDataArray_setSize(
 ) -> *mut spBoneDataArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -27511,8 +25387,7 @@ pub unsafe extern "C" fn spBoneDataArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -27524,16 +25399,12 @@ pub unsafe extern "C" fn spBoneDataArray_add(
     mut value: *mut spBoneData,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -27577,8 +25448,9 @@ pub unsafe extern "C" fn spBoneDataArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<*mut spBoneData>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -27602,17 +25474,13 @@ pub unsafe extern "C" fn spBoneDataArray_contains(
     return 0 as c_int;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spBoneDataArray_pop(
-    mut self_0: *mut spBoneDataArray,
-) -> *mut spBoneData {
+pub unsafe extern "C" fn spBoneDataArray_pop(mut self_0: *mut spBoneDataArray) -> *mut spBoneData {
     (*self_0).size -= 1;
     let mut item: *mut spBoneData = *((*self_0).items).offset((*self_0).size as isize);
     return item;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spBoneDataArray_peek(
-    mut self_0: *mut spBoneDataArray,
-) -> *mut spBoneData {
+pub unsafe extern "C" fn spBoneDataArray_peek(mut self_0: *mut spBoneDataArray) -> *mut spBoneData {
     return *((*self_0).items).offset(((*self_0).size - 1 as c_int) as isize);
 }
 #[no_mangle]
@@ -27627,8 +25495,7 @@ pub unsafe extern "C" fn spIkConstraintDataArray_create(
     ) as *mut spIkConstraintDataArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spIkConstraintData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -27637,16 +25504,12 @@ pub unsafe extern "C" fn spIkConstraintDataArray_create(
     return array;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spIkConstraintDataArray_dispose(
-    mut self_0: *mut spIkConstraintDataArray,
-) {
+pub unsafe extern "C" fn spIkConstraintDataArray_dispose(mut self_0: *mut spIkConstraintDataArray) {
     _spFree((*self_0).items as *mut c_void);
     _spFree(self_0 as *mut c_void);
 }
 #[no_mangle]
-pub unsafe extern "C" fn spIkConstraintDataArray_clear(
-    mut self_0: *mut spIkConstraintDataArray,
-) {
+pub unsafe extern "C" fn spIkConstraintDataArray_clear(mut self_0: *mut spIkConstraintDataArray) {
     (*self_0).size = 0 as c_int;
 }
 #[no_mangle]
@@ -27656,16 +25519,12 @@ pub unsafe extern "C" fn spIkConstraintDataArray_setSize(
 ) -> *mut spIkConstraintDataArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spIkConstraintData>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -27682,8 +25541,7 @@ pub unsafe extern "C" fn spIkConstraintDataArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<*mut spIkConstraintData>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -27695,16 +25553,12 @@ pub unsafe extern "C" fn spIkConstraintDataArray_add(
     mut value: *mut spIkConstraintData,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spIkConstraintData>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -27748,8 +25602,9 @@ pub unsafe extern "C" fn spIkConstraintDataArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<*mut spIkConstraintData>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -27777,8 +25632,7 @@ pub unsafe extern "C" fn spIkConstraintDataArray_pop(
     mut self_0: *mut spIkConstraintDataArray,
 ) -> *mut spIkConstraintData {
     (*self_0).size -= 1;
-    let mut item: *mut spIkConstraintData = *((*self_0).items)
-        .offset((*self_0).size as isize);
+    let mut item: *mut spIkConstraintData = *((*self_0).items).offset((*self_0).size as isize);
     return item;
 }
 #[no_mangle]
@@ -27796,11 +25650,11 @@ pub unsafe extern "C" fn spTransformConstraintDataArray_create(
         ::core::mem::size_of::<spTransformConstraintDataArray>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
         13221 as c_int,
-    ) as *mut spTransformConstraintDataArray;
+    )
+        as *mut spTransformConstraintDataArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spTransformConstraintData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -27828,16 +25682,12 @@ pub unsafe extern "C" fn spTransformConstraintDataArray_setSize(
 ) -> *mut spTransformConstraintDataArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spTransformConstraintData>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -27854,8 +25704,7 @@ pub unsafe extern "C" fn spTransformConstraintDataArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<*mut spTransformConstraintData>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -27867,16 +25716,12 @@ pub unsafe extern "C" fn spTransformConstraintDataArray_add(
     mut value: *mut spTransformConstraintData,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spTransformConstraintData>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -27920,8 +25765,9 @@ pub unsafe extern "C" fn spTransformConstraintDataArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<*mut spTransformConstraintData>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -27949,8 +25795,8 @@ pub unsafe extern "C" fn spTransformConstraintDataArray_pop(
     mut self_0: *mut spTransformConstraintDataArray,
 ) -> *mut spTransformConstraintData {
     (*self_0).size -= 1;
-    let mut item: *mut spTransformConstraintData = *((*self_0).items)
-        .offset((*self_0).size as isize);
+    let mut item: *mut spTransformConstraintData =
+        *((*self_0).items).offset((*self_0).size as isize);
     return item;
 }
 #[no_mangle]
@@ -27971,8 +25817,7 @@ pub unsafe extern "C" fn spPathConstraintDataArray_create(
     ) as *mut spPathConstraintDataArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spPathConstraintData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -28000,16 +25845,12 @@ pub unsafe extern "C" fn spPathConstraintDataArray_setSize(
 ) -> *mut spPathConstraintDataArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spPathConstraintData>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -28026,8 +25867,7 @@ pub unsafe extern "C" fn spPathConstraintDataArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<*mut spPathConstraintData>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -28039,16 +25879,12 @@ pub unsafe extern "C" fn spPathConstraintDataArray_add(
     mut value: *mut spPathConstraintData,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spPathConstraintData>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -28092,8 +25928,9 @@ pub unsafe extern "C" fn spPathConstraintDataArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<*mut spPathConstraintData>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -28121,8 +25958,7 @@ pub unsafe extern "C" fn spPathConstraintDataArray_pop(
     mut self_0: *mut spPathConstraintDataArray,
 ) -> *mut spPathConstraintData {
     (*self_0).size -= 1;
-    let mut item: *mut spPathConstraintData = *((*self_0).items)
-        .offset((*self_0).size as isize);
+    let mut item: *mut spPathConstraintData = *((*self_0).items).offset((*self_0).size as isize);
     return item;
 }
 #[no_mangle]
@@ -28143,8 +25979,7 @@ pub unsafe extern "C" fn spPhysicsConstraintDataArray_create(
     ) as *mut spPhysicsConstraintDataArray;
     (*array).size = 0 as c_int;
     (*array).capacity = initialCapacity;
-    (*array)
-        .items = _spCalloc(
+    (*array).items = _spCalloc(
         initialCapacity as size_t,
         ::core::mem::size_of::<*mut spPhysicsConstraintData>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
@@ -28172,16 +26007,12 @@ pub unsafe extern "C" fn spPhysicsConstraintDataArray_setSize(
 ) -> *mut spPhysicsConstraintDataArray {
     (*self_0).size = newSize;
     if (*self_0).capacity < newSize {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spPhysicsConstraintData>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -28198,8 +26029,7 @@ pub unsafe extern "C" fn spPhysicsConstraintDataArray_ensureCapacity(
         return;
     }
     (*self_0).capacity = newCapacity;
-    (*self_0)
-        .items = _spRealloc(
+    (*self_0).items = _spRealloc(
         (*self_0).items as *mut c_void,
         (::core::mem::size_of::<*mut spPhysicsConstraintData>() as c_ulong)
             .wrapping_mul((*self_0).capacity as c_ulong),
@@ -28211,16 +26041,12 @@ pub unsafe extern "C" fn spPhysicsConstraintDataArray_add(
     mut value: *mut spPhysicsConstraintData,
 ) {
     if (*self_0).size == (*self_0).capacity {
-        (*self_0)
-            .capacity = if 8 as c_int
-            > ((*self_0).size as c_float * 1.75f32) as c_int
-        {
+        (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
             8 as c_int
         } else {
             ((*self_0).size as c_float * 1.75f32) as c_int
         };
-        (*self_0)
-            .items = _spRealloc(
+        (*self_0).items = _spRealloc(
             (*self_0).items as *mut c_void,
             (::core::mem::size_of::<*mut spPhysicsConstraintData>() as c_ulong)
                 .wrapping_mul((*self_0).capacity as c_ulong),
@@ -28264,8 +26090,9 @@ pub unsafe extern "C" fn spPhysicsConstraintDataArray_removeAt(
     (*self_0).size -= 1;
     spine_memmove(
         ((*self_0).items).offset(index as isize) as *mut c_void,
-        ((*self_0).items).offset(index as isize).offset(1 as c_int as isize)
-            as *const c_void,
+        ((*self_0).items)
+            .offset(index as isize)
+            .offset(1 as c_int as isize) as *const c_void,
         (::core::mem::size_of::<*mut spPhysicsConstraintData>() as c_ulong)
             .wrapping_mul(((*self_0).size - index) as c_ulong),
     );
@@ -28293,8 +26120,7 @@ pub unsafe extern "C" fn spPhysicsConstraintDataArray_pop(
     mut self_0: *mut spPhysicsConstraintDataArray,
 ) -> *mut spPhysicsConstraintData {
     (*self_0).size -= 1;
-    let mut item: *mut spPhysicsConstraintData = *((*self_0).items)
-        .offset((*self_0).size as isize);
+    let mut item: *mut spPhysicsConstraintData = *((*self_0).items).offset((*self_0).size as isize);
     return item;
 }
 #[no_mangle]
@@ -28316,13 +26142,9 @@ pub unsafe extern "C" fn _Entry_create(
         13228 as c_int,
     ) as *mut _Entry;
     (*self_0).slotIndex = slotIndex;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name as *mut c_char))
-                    .wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name as *mut c_char)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         13230 as c_int,
     ) as *mut c_char;
@@ -28354,33 +26176,23 @@ unsafe extern "C" fn _SkinHashTableEntry_dispose(mut self_0: *mut _SkinHashTable
 #[no_mangle]
 pub unsafe extern "C" fn spSkin_create(mut name: *const c_char) -> *mut spSkin {
     let mut self_0: *mut spSkin = &mut (*((_spCalloc
-        as unsafe extern "C" fn(
-            size_t,
-            size_t,
-            *const c_char,
-            c_int,
-        ) -> *mut c_void)(
+        as unsafe extern "C" fn(size_t, size_t, *const c_char, c_int) -> *mut c_void)(
         1 as c_int as size_t,
         ::core::mem::size_of::<_spSkin>() as c_ulong,
         b"spine.c\0" as *const u8 as *const c_char,
         13254 as c_int,
     ) as *mut _spSkin))
         .super_0;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name as *mut c_char))
-                    .wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name as *mut c_char)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         13255 as c_int,
     ) as *mut c_char;
     spine_strcpy((*self_0).name, name as *mut c_char);
     (*self_0).bones = spBoneDataArray_create(4 as c_int);
     (*self_0).ikConstraints = spIkConstraintDataArray_create(4 as c_int);
-    (*self_0)
-        .transformConstraints = spTransformConstraintDataArray_create(4 as c_int);
+    (*self_0).transformConstraints = spTransformConstraintDataArray_create(4 as c_int);
     (*self_0).pathConstraints = spPathConstraintDataArray_create(4 as c_int);
     (*self_0).physicsConstraints = spPhysicsConstraintDataArray_create(4 as c_int);
     spColor_setFromFloats(
@@ -28400,10 +26212,8 @@ pub unsafe extern "C" fn spSkin_dispose(mut self_0: *mut spSkin) {
         _Entry_dispose(entry);
         entry = nextEntry;
     }
-    let mut currentHashtableEntry: *mut *mut _SkinHashTableEntry = ((*(self_0
-        as *mut _spSkin))
-        .entriesHashTable)
-        .as_mut_ptr();
+    let mut currentHashtableEntry: *mut *mut _SkinHashTableEntry =
+        ((*(self_0 as *mut _spSkin)).entriesHashTable).as_mut_ptr();
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < 100 as c_int {
@@ -28432,9 +26242,8 @@ pub unsafe extern "C" fn spSkin_setAttachment(
     mut attachment: *mut spAttachment,
 ) {
     let mut existingEntry: *mut _SkinHashTableEntry = 0 as *mut _SkinHashTableEntry;
-    let mut hashEntry: *mut _SkinHashTableEntry = (*(self_0 as *mut _spSkin))
-        .entriesHashTable[(slotIndex as c_uint)
-        .wrapping_rem(100 as c_int as c_uint) as usize];
+    let mut hashEntry: *mut _SkinHashTableEntry = (*(self_0 as *mut _spSkin)).entriesHashTable
+        [(slotIndex as c_uint).wrapping_rem(100 as c_int as c_uint) as usize];
     while !hashEntry.is_null() {
         if (*(*hashEntry).entry).slotIndex == slotIndex
             && spine_strcmp((*(*hashEntry).entry).name, name) == 0 as c_int
@@ -28458,17 +26267,13 @@ pub unsafe extern "C" fn spSkin_setAttachment(
         (*newEntry).next = (*(self_0 as *mut _spSkin)).entries;
         let ref mut fresh160 = (*(self_0 as *mut _spSkin)).entries;
         *fresh160 = newEntry;
-        let mut hashTableIndex: c_uint = (slotIndex as c_uint)
-            .wrapping_rem(100 as c_int as c_uint);
-        let mut hashTable: *mut *mut _SkinHashTableEntry = ((*(self_0 as *mut _spSkin))
-            .entriesHashTable)
-            .as_mut_ptr();
-        let mut newHashEntry: *mut _SkinHashTableEntry = _SkinHashTableEntry_create(
-            newEntry,
-        );
+        let mut hashTableIndex: c_uint = (slotIndex as c_uint).wrapping_rem(100 as c_int as c_uint);
+        let mut hashTable: *mut *mut _SkinHashTableEntry =
+            ((*(self_0 as *mut _spSkin)).entriesHashTable).as_mut_ptr();
+        let mut newHashEntry: *mut _SkinHashTableEntry = _SkinHashTableEntry_create(newEntry);
         (*newHashEntry).next = *hashTable.offset(hashTableIndex as isize);
-        let ref mut fresh161 = (*(self_0 as *mut _spSkin))
-            .entriesHashTable[hashTableIndex as usize];
+        let ref mut fresh161 =
+            (*(self_0 as *mut _spSkin)).entriesHashTable[hashTableIndex as usize];
         *fresh161 = newHashEntry;
     };
 }
@@ -28478,9 +26283,8 @@ pub unsafe extern "C" fn spSkin_getAttachment(
     mut slotIndex: c_int,
     mut name: *const c_char,
 ) -> *mut spAttachment {
-    let mut hashEntry: *const _SkinHashTableEntry = (*(self_0 as *mut _spSkin))
-        .entriesHashTable[(slotIndex as c_uint)
-        .wrapping_rem(100 as c_int as c_uint) as usize];
+    let mut hashEntry: *const _SkinHashTableEntry = (*(self_0 as *mut _spSkin)).entriesHashTable
+        [(slotIndex as c_uint).wrapping_rem(100 as c_int as c_uint) as usize];
     while !hashEntry.is_null() {
         if (*(*hashEntry).entry).slotIndex == slotIndex
             && spine_strcmp((*(*hashEntry).entry).name, name) == 0 as c_int
@@ -28518,14 +26322,10 @@ pub unsafe extern "C" fn spSkin_attachAll(
 ) {
     let mut entry: *const _Entry = (*(oldSkin as *mut _spSkin)).entries;
     while !entry.is_null() {
-        let mut slot: *mut spSlot = *((*skeleton).slots)
-            .offset((*entry).slotIndex as isize);
+        let mut slot: *mut spSlot = *((*skeleton).slots).offset((*entry).slotIndex as isize);
         if (*slot).attachment == (*entry).attachment {
-            let mut attachment: *mut spAttachment = spSkin_getAttachment(
-                self_0,
-                (*entry).slotIndex,
-                (*entry).name,
-            );
+            let mut attachment: *mut spAttachment =
+                spSkin_getAttachment(self_0, (*entry).slotIndex, (*entry).name);
             if !attachment.is_null() {
                 spSlot_setAttachment(slot, attachment);
             }
@@ -28534,10 +26334,7 @@ pub unsafe extern "C" fn spSkin_attachAll(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spSkin_addSkin(
-    mut self_0: *mut spSkin,
-    mut other: *const spSkin,
-) {
+pub unsafe extern "C" fn spSkin_addSkin(mut self_0: *mut spSkin, mut other: *const spSkin) {
     let mut i: c_int = 0 as c_int;
     let mut entry: *mut spSkinEntry = 0 as *mut spSkinEntry;
     i = 0 as c_int;
@@ -28622,10 +26419,7 @@ pub unsafe extern "C" fn spSkin_addSkin(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spSkin_copySkin(
-    mut self_0: *mut spSkin,
-    mut other: *const spSkin,
-) {
+pub unsafe extern "C" fn spSkin_copySkin(mut self_0: *mut spSkin, mut other: *const spSkin) {
     let mut i: c_int = 0 as c_int;
     let mut entry: *mut spSkinEntry = 0 as *mut spSkinEntry;
     i = 0 as c_int;
@@ -28700,12 +26494,9 @@ pub unsafe extern "C" fn spSkin_copySkin(
     }
     entry = spSkin_getAttachments(other);
     while !entry.is_null() {
-        if (*(*entry).attachment).type_0 as c_uint
-            == SP_ATTACHMENT_MESH as c_int as c_uint
-        {
-            let mut attachment: *mut spMeshAttachment = spMeshAttachment_newLinkedMesh(
-                (*entry).attachment as *mut spMeshAttachment,
-            );
+        if (*(*entry).attachment).type_0 as c_uint == SP_ATTACHMENT_MESH as c_int as c_uint {
+            let mut attachment: *mut spMeshAttachment =
+                spMeshAttachment_newLinkedMesh((*entry).attachment as *mut spMeshAttachment);
             spSkin_setAttachment(
                 self_0,
                 (*entry).slotIndex,
@@ -28713,26 +26504,18 @@ pub unsafe extern "C" fn spSkin_copySkin(
                 &mut (*attachment).super_0.super_0,
             );
         } else {
-            let mut attachment_0: *mut spAttachment = if !((*entry).attachment).is_null()
-            {
+            let mut attachment_0: *mut spAttachment = if !((*entry).attachment).is_null() {
                 spAttachment_copy((*entry).attachment)
             } else {
                 0 as *mut spAttachment
             };
-            spSkin_setAttachment(
-                self_0,
-                (*entry).slotIndex,
-                (*entry).name,
-                attachment_0,
-            );
+            spSkin_setAttachment(self_0, (*entry).slotIndex, (*entry).name, attachment_0);
         }
         entry = (*entry).next;
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spSkin_getAttachments(
-    mut self_0: *const spSkin,
-) -> *mut spSkinEntry {
+pub unsafe extern "C" fn spSkin_getAttachments(mut self_0: *const spSkin) -> *mut spSkinEntry {
     return (*(self_0 as *mut _spSkin)).entries;
 }
 #[no_mangle]
@@ -28745,10 +26528,8 @@ pub unsafe extern "C" fn spSkin_clear(mut self_0: *mut spSkin) {
     }
     let ref mut fresh162 = (*(self_0 as *mut _spSkin)).entries;
     *fresh162 = 0 as *mut _Entry;
-    let mut currentHashtableEntry: *mut *mut _SkinHashTableEntry = ((*(self_0
-        as *mut _spSkin))
-        .entriesHashTable)
-        .as_mut_ptr();
+    let mut currentHashtableEntry: *mut *mut _SkinHashTableEntry =
+        ((*(self_0 as *mut _spSkin)).entriesHashTable).as_mut_ptr();
     let mut i: c_int = 0;
     i = 0 as c_int;
     while i < 100 as c_int {
@@ -28789,8 +26570,7 @@ pub unsafe extern "C" fn spSlot_create(
         1 as c_int as c_float,
         1 as c_int as c_float,
     );
-    (*self_0)
-        .darkColor = if ((*data).darkColor).is_null() {
+    (*self_0).darkColor = if ((*data).darkColor).is_null() {
         0 as *mut spColor
     } else {
         spColor_create()
@@ -28804,9 +26584,7 @@ pub unsafe extern "C" fn spSlot_dispose(mut self_0: *mut spSlot) {
     _spFree((*self_0).darkColor as *mut c_void);
     _spFree(self_0 as *mut c_void);
 }
-unsafe extern "C" fn isVertexAttachment(
-    mut attachment: *mut spAttachment,
-) -> c_int {
+unsafe extern "C" fn isVertexAttachment(mut attachment: *mut spAttachment) -> c_int {
     if attachment.is_null() {
         return 0 as c_int;
     }
@@ -28864,12 +26642,9 @@ pub unsafe extern "C" fn spSlotData_create(
         13600 as c_int,
     ) as *mut spSlotData;
     (*self_0).index = index;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         13602 as c_int,
     ) as *mut c_char;
@@ -28899,13 +26674,9 @@ pub unsafe extern "C" fn spSlotData_setAttachmentName(
 ) {
     _spFree((*self_0).attachmentName as *mut c_void);
     if !attachmentName.is_null() {
-        (*self_0)
-            .attachmentName = _spMalloc(
+        (*self_0).attachmentName = _spMalloc(
             (::core::mem::size_of::<c_char>() as c_ulong)
-                .wrapping_mul(
-                    (spine_strlen(attachmentName))
-                        .wrapping_add(1 as c_int as c_ulong),
-                ),
+                .wrapping_mul((spine_strlen(attachmentName)).wrapping_add(1 as c_int as c_ulong)),
             b"spine.c\0" as *const u8 as *const c_char,
             13619 as c_int,
         ) as *mut c_char;
@@ -28934,8 +26705,7 @@ pub unsafe extern "C" fn spTransformConstraint_create(
     (*self_0).mixScaleY = (*data).mixScaleY;
     (*self_0).mixShearY = (*data).mixShearY;
     (*self_0).bonesCount = (*data).bonesCount;
-    (*self_0)
-        .bones = _spMalloc(
+    (*self_0).bones = _spMalloc(
         (::core::mem::size_of::<*mut spBone>() as c_ulong)
             .wrapping_mul((*self_0).bonesCount as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
@@ -28954,9 +26724,7 @@ pub unsafe extern "C" fn spTransformConstraint_create(
     return self_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn spTransformConstraint_dispose(
-    mut self_0: *mut spTransformConstraint,
-) {
+pub unsafe extern "C" fn spTransformConstraint_dispose(mut self_0: *mut spTransformConstraint) {
     _spFree((*self_0).bones as *mut c_void);
     _spFree(self_0 as *mut c_void);
 }
@@ -28970,22 +26738,19 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteWorld(
     let mut mixScaleX: c_float = (*self_0).mixScaleX;
     let mut mixScaleY: c_float = (*self_0).mixScaleY;
     let mut mixShearY: c_float = (*self_0).mixShearY;
-    let mut translate: c_int = (mixX != 0 as c_int as c_float
-        || mixY != 0 as c_int as c_float) as c_int;
+    let mut translate: c_int =
+        (mixX != 0 as c_int as c_float || mixY != 0 as c_int as c_float) as c_int;
     let mut target: *mut spBone = (*self_0).target;
     let mut ta: c_float = (*target).a;
     let mut tb: c_float = (*target).b;
     let mut tc: c_float = (*target).c;
     let mut td: c_float = (*target).d;
-    let mut degRadReflect: c_float = if ta * td - tb * tc
-        > 0 as c_int as c_float
-    {
+    let mut degRadReflect: c_float = if ta * td - tb * tc > 0 as c_int as c_float {
         3.1415926535897932385f32 / 180 as c_int as c_float
     } else {
         -(3.1415926535897932385f32 / 180 as c_int as c_float)
     };
-    let mut offsetRotation: c_float = (*(*self_0).data).offsetRotation
-        * degRadReflect;
+    let mut offsetRotation: c_float = (*(*self_0).data).offsetRotation * degRadReflect;
     let mut offsetShearY: c_float = (*(*self_0).data).offsetShearY * degRadReflect;
     let mut i: c_int = 0;
     let mut a: c_float = 0.;
@@ -29015,7 +26780,7 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteWorld(
             }
             r *= mixRotate;
             cosine = spine_cosf(r);
-            sine = sinf(r);
+            sine = spine_sinf(r);
             (*bone).a = cosine * a - sine * c;
             (*bone).b = cosine * b - sine * d;
             (*bone).c = sine * a + cosine * c;
@@ -29036,8 +26801,9 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteWorld(
             s = spine_sqrtf((*bone).a * (*bone).a + (*bone).c * (*bone).c);
             if s != 0 as c_int as c_float {
                 s = (s
-                    + (spine_sqrtf(ta * ta + tc * tc) - s
-                        + (*(*self_0).data).offsetScaleX) * mixScaleX) / s;
+                    + (spine_sqrtf(ta * ta + tc * tc) - s + (*(*self_0).data).offsetScaleX)
+                        * mixScaleX)
+                    / s;
             }
             (*bone).a *= s;
             (*bone).c *= s;
@@ -29046,8 +26812,9 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteWorld(
             s = spine_sqrtf((*bone).b * (*bone).b + (*bone).d * (*bone).d);
             if s != 0 as c_int as c_float {
                 s = (s
-                    + (spine_sqrtf(tb * tb + td * td) - s
-                        + (*(*self_0).data).offsetScaleY) * mixScaleY) / s;
+                    + (spine_sqrtf(tb * tb + td * td) - s + (*(*self_0).data).offsetScaleY)
+                        * mixScaleY)
+                    / s;
             }
             (*bone).b *= s;
             (*bone).d *= s;
@@ -29056,7 +26823,8 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteWorld(
             b = (*bone).b;
             d = (*bone).d;
             by = spine_atan2f(d, b);
-            r = spine_atan2f(td, tb) - spine_atan2f(tc, ta)
+            r = spine_atan2f(td, tb)
+                - spine_atan2f(tc, ta)
                 - (by - spine_atan2f((*bone).c, (*bone).a));
             s = spine_sqrtf(b * b + d * d);
             if r > 3.1415926535897932385f32 {
@@ -29066,7 +26834,7 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteWorld(
             }
             r = by + (r + offsetShearY) * mixShearY;
             (*bone).b = spine_cosf(r) * s;
-            (*bone).d = sinf(r) * s;
+            (*bone).d = spine_sinf(r) * s;
         }
         spBone_updateAppliedTransform(bone);
         i += 1;
@@ -29082,22 +26850,19 @@ pub unsafe extern "C" fn _spTransformConstraint_applyRelativeWorld(
     let mut mixScaleX: c_float = (*self_0).mixScaleX;
     let mut mixScaleY: c_float = (*self_0).mixScaleY;
     let mut mixShearY: c_float = (*self_0).mixShearY;
-    let mut translate: c_int = (mixX != 0 as c_int as c_float
-        || mixY != 0 as c_int as c_float) as c_int;
+    let mut translate: c_int =
+        (mixX != 0 as c_int as c_float || mixY != 0 as c_int as c_float) as c_int;
     let mut target: *mut spBone = (*self_0).target;
     let mut ta: c_float = (*target).a;
     let mut tb: c_float = (*target).b;
     let mut tc: c_float = (*target).c;
     let mut td: c_float = (*target).d;
-    let mut degRadReflect: c_float = if ta * td - tb * tc
-        > 0 as c_int as c_float
-    {
+    let mut degRadReflect: c_float = if ta * td - tb * tc > 0 as c_int as c_float {
         3.1415926535897932385f32 / 180 as c_int as c_float
     } else {
         -(3.1415926535897932385f32 / 180 as c_int as c_float)
     };
-    let mut offsetRotation: c_float = (*(*self_0).data).offsetRotation
-        * degRadReflect;
+    let mut offsetRotation: c_float = (*(*self_0).data).offsetRotation * degRadReflect;
     let mut offsetShearY: c_float = (*(*self_0).data).offsetShearY * degRadReflect;
     let mut i: c_int = 0;
     let mut a: c_float = 0.;
@@ -29126,7 +26891,7 @@ pub unsafe extern "C" fn _spTransformConstraint_applyRelativeWorld(
             }
             r *= mixRotate;
             cosine = spine_cosf(r);
-            sine = sinf(r);
+            sine = spine_sinf(r);
             (*bone).a = cosine * a - sine * c;
             (*bone).b = cosine * b - sine * d;
             (*bone).c = sine * a + cosine * c;
@@ -29145,14 +26910,16 @@ pub unsafe extern "C" fn _spTransformConstraint_applyRelativeWorld(
         }
         if mixScaleX != 0 as c_int as c_float {
             s = (spine_sqrtf(ta * ta + tc * tc) - 1 as c_int as c_float
-                + (*(*self_0).data).offsetScaleX) * mixScaleX
+                + (*(*self_0).data).offsetScaleX)
+                * mixScaleX
                 + 1 as c_int as c_float;
             (*bone).a *= s;
             (*bone).c *= s;
         }
         if mixScaleY > 0 as c_int as c_float {
             s = (spine_sqrtf(tb * tb + td * td) - 1 as c_int as c_float
-                + (*(*self_0).data).offsetScaleY) * mixScaleY
+                + (*(*self_0).data).offsetScaleY)
+                * mixScaleY
                 + 1 as c_int as c_float;
             (*bone).b *= s;
             (*bone).d *= s;
@@ -29167,11 +26934,10 @@ pub unsafe extern "C" fn _spTransformConstraint_applyRelativeWorld(
             b = (*bone).b;
             d = (*bone).d;
             r = spine_atan2f(d, b)
-                + (r - 3.1415926535897932385f32 / 2 as c_int as c_float
-                    + offsetShearY) * mixShearY;
+                + (r - 3.1415926535897932385f32 / 2 as c_int as c_float + offsetShearY) * mixShearY;
             s = spine_sqrtf(b * b + d * d);
             (*bone).b = spine_cosf(r) * s;
-            (*bone).d = sinf(r) * s;
+            (*bone).d = spine_sinf(r) * s;
         }
         spBone_updateAppliedTransform(bone);
         i += 1;
@@ -29202,10 +26968,8 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteLocal(
         rotation = (*bone).arotation;
         if mixRotate != 0 as c_int as c_float {
             r = (*target).arotation - rotation + (*(*self_0).data).offsetRotation;
-            r
-                -= ceil(
-                    (r / 360 as c_int as c_float) as c_double - 0.5f64,
-                ) as c_float * 360 as c_int as c_float;
+            r -= spine_ceil((r / 360 as c_int as c_float) as c_double - 0.5f64) as c_float
+                * 360 as c_int as c_float;
             rotation += r * mixRotate;
         }
         x = (*bone).ax;
@@ -29214,27 +26978,21 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteLocal(
         y += ((*target).ay - y + (*(*self_0).data).offsetY) * mixY;
         scaleX = (*bone).ascaleX;
         scaleY = (*bone).ascaleY;
-        if mixScaleX != 0 as c_int as c_float
-            && scaleX != 0 as c_int as c_float
-        {
+        if mixScaleX != 0 as c_int as c_float && scaleX != 0 as c_int as c_float {
             scaleX = (scaleX
-                + ((*target).ascaleX - scaleX + (*(*self_0).data).offsetScaleX)
-                    * mixScaleX) / scaleX;
+                + ((*target).ascaleX - scaleX + (*(*self_0).data).offsetScaleX) * mixScaleX)
+                / scaleX;
         }
-        if mixScaleY != 0 as c_int as c_float
-            && scaleY != 0 as c_int as c_float
-        {
+        if mixScaleY != 0 as c_int as c_float && scaleY != 0 as c_int as c_float {
             scaleY = (scaleY
-                + ((*target).ascaleY - scaleY + (*(*self_0).data).offsetScaleY)
-                    * mixScaleY) / scaleY;
+                + ((*target).ascaleY - scaleY + (*(*self_0).data).offsetScaleY) * mixScaleY)
+                / scaleY;
         }
         shearY = (*bone).ashearY;
         if mixShearY != 0 as c_int as c_float {
             r = (*target).ashearY - shearY + (*(*self_0).data).offsetShearY;
-            r
-                -= ceil(
-                    (r / 360 as c_int as c_float) as c_double - 0.5f64,
-                ) as c_float * 360 as c_int as c_float;
+            r -= spine_ceil((r / 360 as c_int as c_float) as c_double - 0.5f64) as c_float
+                * 360 as c_int as c_float;
             shearY += r * mixShearY;
         }
         spBone_updateWorldTransformWith(
@@ -29276,15 +27034,14 @@ pub unsafe extern "C" fn _spTransformConstraint_applyRelativeLocal(
         x = (*bone).ax + ((*target).ax + (*(*self_0).data).offsetX) * mixX;
         y = (*bone).ay + ((*target).ay + (*(*self_0).data).offsetY) * mixY;
         scaleX = (*bone).ascaleX
-            * (((*target).ascaleX - 1 as c_int as c_float
-                + (*(*self_0).data).offsetScaleX) * mixScaleX
+            * (((*target).ascaleX - 1 as c_int as c_float + (*(*self_0).data).offsetScaleX)
+                * mixScaleX
                 + 1 as c_int as c_float);
         scaleY = (*bone).ascaleY
-            * (((*target).ascaleY - 1 as c_int as c_float
-                + (*(*self_0).data).offsetScaleY) * mixScaleY
+            * (((*target).ascaleY - 1 as c_int as c_float + (*(*self_0).data).offsetScaleY)
+                * mixScaleY
                 + 1 as c_int as c_float);
-        shearY = (*bone).ashearY
-            + ((*target).ashearY + (*(*self_0).data).offsetShearY) * mixShearY;
+        shearY = (*bone).ashearY + ((*target).ashearY + (*(*self_0).data).offsetShearY) * mixShearY;
         spBone_updateWorldTransformWith(
             bone,
             x,
@@ -29299,9 +27056,7 @@ pub unsafe extern "C" fn _spTransformConstraint_applyRelativeLocal(
     }
 }
 #[no_mangle]
-pub unsafe extern "C" fn spTransformConstraint_update(
-    mut self_0: *mut spTransformConstraint,
-) {
+pub unsafe extern "C" fn spTransformConstraint_update(mut self_0: *mut spTransformConstraint) {
     if (*self_0).mixRotate == 0 as c_int as c_float
         && (*self_0).mixX == 0 as c_int as c_float
         && (*self_0).mixY == 0 as c_int as c_float
@@ -29345,12 +27100,9 @@ pub unsafe extern "C" fn spTransformConstraintData_create(
         b"spine.c\0" as *const u8 as *const c_char,
         13925 as c_int,
     ) as *mut spTransformConstraintData;
-    (*self_0)
-        .name = _spMalloc(
+    (*self_0).name = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(
-                (spine_strlen(name)).wrapping_add(1 as c_int as c_ulong),
-            ),
+            .wrapping_mul((spine_strlen(name)).wrapping_add(1 as c_int as c_ulong)),
         b"spine.c\0" as *const u8 as *const c_char,
         13926 as c_int,
     ) as *mut c_char;
@@ -29393,9 +27145,7 @@ pub unsafe extern "C" fn spTriangulator_dispose(mut self_0: *mut spTriangulator)
     spArrayFloatArray_dispose((*self_0).convexPolygons);
     i = 0 as c_int;
     while i < (*(*self_0).convexPolygonsIndices).size {
-        spShortArray_dispose(
-            *((*(*self_0).convexPolygonsIndices).items).offset(i as isize),
-        );
+        spShortArray_dispose(*((*(*self_0).convexPolygonsIndices).items).offset(i as isize));
         i += 1;
     }
     spArrayShortArray_dispose((*self_0).convexPolygonsIndices);
@@ -29410,27 +27160,20 @@ pub unsafe extern "C" fn spTriangulator_dispose(mut self_0: *mut spTriangulator)
     spArrayFloatArray_dispose((*self_0).polygonPool);
     i = 0 as c_int;
     while i < (*(*self_0).polygonIndicesPool).size {
-        spShortArray_dispose(
-            *((*(*self_0).polygonIndicesPool).items).offset(i as isize),
-        );
+        spShortArray_dispose(*((*(*self_0).polygonIndicesPool).items).offset(i as isize));
         i += 1;
     }
     spArrayShortArray_dispose((*self_0).polygonIndicesPool);
     _spFree(self_0 as *mut c_void);
 }
-unsafe extern "C" fn _obtainPolygon(
-    mut self_0: *mut spTriangulator,
-) -> *mut spFloatArray {
+unsafe extern "C" fn _obtainPolygon(mut self_0: *mut spTriangulator) -> *mut spFloatArray {
     if (*(*self_0).polygonPool).size == 0 as c_int {
-        return spFloatArray_create(16 as c_int)
+        return spFloatArray_create(16 as c_int);
     } else {
-        return spArrayFloatArray_pop((*self_0).polygonPool)
+        return spArrayFloatArray_pop((*self_0).polygonPool);
     };
 }
-unsafe extern "C" fn _freePolygon(
-    mut self_0: *mut spTriangulator,
-    mut polygon: *mut spFloatArray,
-) {
+unsafe extern "C" fn _freePolygon(mut self_0: *mut spTriangulator, mut polygon: *mut spFloatArray) {
     spArrayFloatArray_add((*self_0).polygonPool, polygon);
 }
 unsafe extern "C" fn _freeAllPolygons(
@@ -29444,13 +27187,11 @@ unsafe extern "C" fn _freeAllPolygons(
         i += 1;
     }
 }
-unsafe extern "C" fn _obtainPolygonIndices(
-    mut self_0: *mut spTriangulator,
-) -> *mut spShortArray {
+unsafe extern "C" fn _obtainPolygonIndices(mut self_0: *mut spTriangulator) -> *mut spShortArray {
     if (*(*self_0).polygonIndicesPool).size == 0 as c_int {
-        return spShortArray_create(16 as c_int)
+        return spShortArray_create(16 as c_int);
     } else {
-        return spArrayShortArray_pop((*self_0).polygonIndicesPool)
+        return spArrayShortArray_pop((*self_0).polygonIndicesPool);
     };
 }
 unsafe extern "C" fn _freePolygonIndices(
@@ -29478,8 +27219,8 @@ unsafe extern "C" fn _positiveArea(
     mut p3x: c_float,
     mut p3y: c_float,
 ) -> c_int {
-    return (p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y)
-        >= 0 as c_int as c_float) as c_int;
+    return (p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0 as c_int as c_float)
+        as c_int;
 }
 unsafe extern "C" fn _isConcave(
     mut index: c_int,
@@ -29487,14 +27228,12 @@ unsafe extern "C" fn _isConcave(
     mut vertices: *mut c_float,
     mut indices: *mut c_short,
 ) -> c_int {
-    let mut previous: c_int = (*indices
-        .offset(((vertexCount + index - 1 as c_int) % vertexCount) as isize)
-        as c_int) << 1 as c_int;
-    let mut current: c_int = (*indices.offset(index as isize) as c_int)
-        << 1 as c_int;
-    let mut next: c_int = (*indices
-        .offset(((index + 1 as c_int) % vertexCount) as isize) as c_int)
-        << 1 as c_int;
+    let mut previous: c_int =
+        (*indices.offset(((vertexCount + index - 1 as c_int) % vertexCount) as isize) as c_int)
+            << 1 as c_int;
+    let mut current: c_int = (*indices.offset(index as isize) as c_int) << 1 as c_int;
+    let mut next: c_int =
+        (*indices.offset(((index + 1 as c_int) % vertexCount) as isize) as c_int) << 1 as c_int;
     return (_positiveArea(
         *vertices.offset(previous as isize),
         *vertices.offset((previous + 1 as c_int) as isize),
@@ -29514,9 +27253,7 @@ unsafe extern "C" fn _winding(
 ) -> c_int {
     let mut px: c_float = p2x - p1x;
     let mut py: c_float = p2y - p1y;
-    return if p3x * py - p3y * px + px * p1y - p1x * py
-        >= 0 as c_int as c_float
-    {
+    return if p3x * py - p3y * px + px * p1y - p1x * py >= 0 as c_int as c_float {
         1 as c_int
     } else {
         -(1 as c_int)
@@ -29570,21 +27307,15 @@ pub unsafe extern "C" fn spTriangulator_triangulate(
         i = 0 as c_int;
         's_80: loop {
             if *isConcave.offset(i as isize) == 0 {
-                let mut p1: c_int = (*indices.offset(previous as isize)
-                    as c_int) << 1 as c_int;
-                let mut p2: c_int = (*indices.offset(i as isize) as c_int)
-                    << 1 as c_int;
-                let mut p3: c_int = (*indices.offset(next as isize) as c_int)
-                    << 1 as c_int;
+                let mut p1: c_int = (*indices.offset(previous as isize) as c_int) << 1 as c_int;
+                let mut p2: c_int = (*indices.offset(i as isize) as c_int) << 1 as c_int;
+                let mut p3: c_int = (*indices.offset(next as isize) as c_int) << 1 as c_int;
                 let mut p1x: c_float = *vertices.offset(p1 as isize);
-                let mut p1y: c_float = *vertices
-                    .offset((p1 + 1 as c_int) as isize);
+                let mut p1y: c_float = *vertices.offset((p1 + 1 as c_int) as isize);
                 let mut p2x: c_float = *vertices.offset(p2 as isize);
-                let mut p2y: c_float = *vertices
-                    .offset((p2 + 1 as c_int) as isize);
+                let mut p2y: c_float = *vertices.offset((p2 + 1 as c_int) as isize);
                 let mut p3x: c_float = *vertices.offset(p3 as isize);
-                let mut p3y: c_float = *vertices
-                    .offset((p3 + 1 as c_int) as isize);
+                let mut p3y: c_float = *vertices.offset((p3 + 1 as c_int) as isize);
                 ii = (next + 1 as c_int) % vertexCount;
                 loop {
                     if !(ii != previous) {
@@ -29594,8 +27325,7 @@ pub unsafe extern "C" fn spTriangulator_triangulate(
                     let mut vx: c_float = 0.;
                     let mut vy: c_float = 0.;
                     if !(*isConcave.offset(ii as isize) == 0) {
-                        v = (*indices.offset(ii as isize) as c_int)
-                            << 1 as c_int;
+                        v = (*indices.offset(ii as isize) as c_int) << 1 as c_int;
                         vx = *vertices.offset(v as isize);
                         vy = *vertices.offset((v + 1 as c_int) as isize);
                         if _positiveArea(p3x, p3y, p1x, p1y, vx, vy) != 0 {
@@ -29625,8 +27355,7 @@ pub unsafe extern "C" fn spTriangulator_triangulate(
         }
         spShortArray_add(
             triangles,
-            *indices
-                .offset(((vertexCount + i - 1 as c_int) % vertexCount) as isize),
+            *indices.offset(((vertexCount + i - 1 as c_int) % vertexCount) as isize),
         );
         spShortArray_add(triangles, *indices.offset(i as isize));
         spShortArray_add(
@@ -29638,14 +27367,10 @@ pub unsafe extern "C" fn spTriangulator_triangulate(
         vertexCount -= 1;
         previousIndex = (vertexCount + i - 1 as c_int) % vertexCount;
         nextIndex = if i == vertexCount { 0 as c_int } else { i };
-        *isConcave
-            .offset(
-                previousIndex as isize,
-            ) = _isConcave(previousIndex, vertexCount, vertices, indices);
-        *isConcave
-            .offset(
-                nextIndex as isize,
-            ) = _isConcave(nextIndex, vertexCount, vertices, indices);
+        *isConcave.offset(previousIndex as isize) =
+            _isConcave(previousIndex, vertexCount, vertices, indices);
+        *isConcave.offset(nextIndex as isize) =
+            _isConcave(nextIndex, vertexCount, vertices, indices);
     }
     if vertexCount == 3 as c_int {
         spShortArray_add(triangles, *indices.offset(2 as c_int as isize));
@@ -29685,12 +27410,11 @@ pub unsafe extern "C" fn spTriangulator_decompose(
     i = 0 as c_int;
     n = (*triangles).size;
     while i < n {
-        let mut t1: c_int = (*trianglesItems.offset(i as isize) as c_int)
-            << 1 as c_int;
-        let mut t2: c_int = (*trianglesItems
-            .offset((i + 1 as c_int) as isize) as c_int) << 1 as c_int;
-        let mut t3: c_int = (*trianglesItems
-            .offset((i + 2 as c_int) as isize) as c_int) << 1 as c_int;
+        let mut t1: c_int = (*trianglesItems.offset(i as isize) as c_int) << 1 as c_int;
+        let mut t2: c_int =
+            (*trianglesItems.offset((i + 1 as c_int) as isize) as c_int) << 1 as c_int;
+        let mut t3: c_int =
+            (*trianglesItems.offset((i + 2 as c_int) as isize) as c_int) << 1 as c_int;
         let mut x1: c_float = *vertices.offset(t1 as isize);
         let mut y1: c_float = *vertices.offset((t1 + 1 as c_int) as isize);
         let mut x2: c_float = *vertices.offset(t2 as isize);
@@ -29773,8 +27497,7 @@ pub unsafe extern "C" fn spTriangulator_decompose(
         let mut ii: c_int = 0;
         polygonIndices = *((*convexPolygonsIndices).items).offset(i as isize);
         if !((*polygonIndices).size == 0 as c_int) {
-            firstIndex = *((*polygonIndices).items).offset(0 as c_int as isize)
-                as c_int;
+            firstIndex = *((*polygonIndices).items).offset(0 as c_int as isize) as c_int;
             lastIndex = *((*polygonIndices).items)
                 .offset(((*polygonIndices).size - 1 as c_int) as isize)
                 as c_int;
@@ -29804,45 +27527,26 @@ pub unsafe extern "C" fn spTriangulator_decompose(
                 if !(ii == i) {
                     otherIndices = *((*convexPolygonsIndices).items).offset(ii as isize);
                     if !((*otherIndices).size != 3 as c_int) {
-                        otherFirstIndex = *((*otherIndices).items)
-                            .offset(0 as c_int as isize) as c_int;
-                        otherSecondIndex = *((*otherIndices).items)
-                            .offset(1 as c_int as isize) as c_int;
-                        otherLastIndex = *((*otherIndices).items)
-                            .offset(2 as c_int as isize) as c_int;
+                        otherFirstIndex =
+                            *((*otherIndices).items).offset(0 as c_int as isize) as c_int;
+                        otherSecondIndex =
+                            *((*otherIndices).items).offset(1 as c_int as isize) as c_int;
+                        otherLastIndex =
+                            *((*otherIndices).items).offset(2 as c_int as isize) as c_int;
                         otherPoly = *((*convexPolygons).items).offset(ii as isize);
-                        x3_0 = *((*otherPoly).items)
-                            .offset(((*otherPoly).size - 2 as c_int) as isize);
-                        y3_0 = *((*otherPoly).items)
-                            .offset(((*otherPoly).size - 1 as c_int) as isize);
-                        if !(otherFirstIndex != firstIndex
-                            || otherSecondIndex != lastIndex)
-                        {
-                            winding1_0 = _winding(
-                                prevPrevX,
-                                prevPrevY,
-                                prevX,
-                                prevY,
-                                x3_0,
-                                y3_0,
-                            );
-                            winding2_0 = _winding(
-                                x3_0,
-                                y3_0,
-                                firstX,
-                                firstY,
-                                secondX,
-                                secondY,
-                            );
+                        x3_0 =
+                            *((*otherPoly).items).offset(((*otherPoly).size - 2 as c_int) as isize);
+                        y3_0 =
+                            *((*otherPoly).items).offset(((*otherPoly).size - 1 as c_int) as isize);
+                        if !(otherFirstIndex != firstIndex || otherSecondIndex != lastIndex) {
+                            winding1_0 = _winding(prevPrevX, prevPrevY, prevX, prevY, x3_0, y3_0);
+                            winding2_0 = _winding(x3_0, y3_0, firstX, firstY, secondX, secondY);
                             if winding1_0 == winding && winding2_0 == winding {
                                 spFloatArray_clear(otherPoly);
                                 spShortArray_clear(otherIndices);
                                 spFloatArray_add(polygon, x3_0);
                                 spFloatArray_add(polygon, y3_0);
-                                spShortArray_add(
-                                    polygonIndices,
-                                    otherLastIndex as c_short,
-                                );
+                                spShortArray_add(polygonIndices, otherLastIndex as c_short);
                                 prevPrevX = prevX;
                                 prevPrevY = prevY;
                                 prevX = x3_0;
@@ -29873,18 +27577,14 @@ pub unsafe extern "C" fn spTriangulator_decompose(
 }
 static mut nextID: c_int = 0 as c_int;
 #[no_mangle]
-pub unsafe extern "C" fn _spVertexAttachment_init(
-    mut attachment: *mut spVertexAttachment,
-) {
+pub unsafe extern "C" fn _spVertexAttachment_init(mut attachment: *mut spVertexAttachment) {
     let fresh165 = nextID;
     nextID = nextID + 1;
     (*attachment).id = fresh165;
     (*attachment).timelineAttachment = &mut (*attachment).super_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spVertexAttachment_deinit(
-    mut attachment: *mut spVertexAttachment,
-) {
+pub unsafe extern "C" fn _spVertexAttachment_deinit(mut attachment: *mut spVertexAttachment) {
     _spAttachment_deinit(&mut (*attachment).super_0);
     _spFree((*attachment).bones as *mut c_void);
     _spFree((*attachment).vertices as *mut c_void);
@@ -29904,10 +27604,8 @@ pub unsafe extern "C" fn spVertexAttachment_computeWorldVertices(
     let mut deformArray: *mut c_float = 0 as *mut c_float;
     let mut vertices: *mut c_float = 0 as *mut c_float;
     let mut bones: *mut c_int = 0 as *mut c_int;
-    if (*self_0).super_0.type_0 as c_uint
-        == SP_ATTACHMENT_MESH as c_int as c_uint
-        || (*self_0).super_0.type_0 as c_uint
-            == SP_ATTACHMENT_LINKED_MESH as c_int as c_uint
+    if (*self_0).super_0.type_0 as c_uint == SP_ATTACHMENT_MESH as c_int as c_uint
+        || (*self_0).super_0.type_0 as c_uint == SP_ATTACHMENT_LINKED_MESH as c_int as c_uint
     {
         let mut mesh: *mut spMeshAttachment = self_0 as *mut spMeshAttachment;
         if !((*mesh).sequence).is_null() {
@@ -29936,13 +27634,9 @@ pub unsafe extern "C" fn spVertexAttachment_computeWorldVertices(
         w = offset;
         while w < count {
             let mut vx: c_float = *vertices.offset(v as isize);
-            let mut vy: c_float = *vertices
-                .offset((v + 1 as c_int) as isize);
+            let mut vy: c_float = *vertices.offset((v + 1 as c_int) as isize);
             *worldVertices.offset(w as isize) = vx * (*bone).a + vy * (*bone).b + x;
-            *worldVertices
-                .offset(
-                    (w + 1 as c_int) as isize,
-                ) = vx * (*bone).c + vy * (*bone).d + y;
+            *worldVertices.offset((w + 1 as c_int) as isize) = vx * (*bone).c + vy * (*bone).d + y;
             v += 2 as c_int;
             w += stride;
         }
@@ -29972,19 +27666,13 @@ pub unsafe extern "C" fn spVertexAttachment_computeWorldVertices(
                 let mut n_0: c_int = *bones.offset(fresh166 as isize);
                 n_0 += v_0;
                 while v_0 < n_0 {
-                    let mut bone_0: *mut spBone = *skeletonBones
-                        .offset(*bones.offset(v_0 as isize) as isize);
+                    let mut bone_0: *mut spBone =
+                        *skeletonBones.offset(*bones.offset(v_0 as isize) as isize);
                     let mut vx_0: c_float = *vertices.offset(b as isize);
-                    let mut vy_0: c_float = *vertices
-                        .offset((b + 1 as c_int) as isize);
-                    let mut weight: c_float = *vertices
-                        .offset((b + 2 as c_int) as isize);
-                    wx
-                        += (vx_0 * (*bone_0).a + vy_0 * (*bone_0).b + (*bone_0).worldX)
-                            * weight;
-                    wy
-                        += (vx_0 * (*bone_0).c + vy_0 * (*bone_0).d + (*bone_0).worldY)
-                            * weight;
+                    let mut vy_0: c_float = *vertices.offset((b + 1 as c_int) as isize);
+                    let mut weight: c_float = *vertices.offset((b + 2 as c_int) as isize);
+                    wx += (vx_0 * (*bone_0).a + vy_0 * (*bone_0).b + (*bone_0).worldX) * weight;
+                    wy += (vx_0 * (*bone_0).c + vy_0 * (*bone_0).d + (*bone_0).worldY) * weight;
                     v_0 += 1;
                     b += 3 as c_int;
                 }
@@ -30007,21 +27695,15 @@ pub unsafe extern "C" fn spVertexAttachment_computeWorldVertices(
                 let mut n_1: c_int = *bones.offset(fresh167 as isize);
                 n_1 += v_0;
                 while v_0 < n_1 {
-                    let mut bone_1: *mut spBone = *skeletonBones
-                        .offset(*bones.offset(v_0 as isize) as isize);
-                    let mut vx_1: c_float = *vertices.offset(b_0 as isize)
-                        + *deformArray.offset(f as isize);
-                    let mut vy_1: c_float = *vertices
-                        .offset((b_0 + 1 as c_int) as isize)
+                    let mut bone_1: *mut spBone =
+                        *skeletonBones.offset(*bones.offset(v_0 as isize) as isize);
+                    let mut vx_1: c_float =
+                        *vertices.offset(b_0 as isize) + *deformArray.offset(f as isize);
+                    let mut vy_1: c_float = *vertices.offset((b_0 + 1 as c_int) as isize)
                         + *deformArray.offset((f + 1 as c_int) as isize);
-                    let mut weight_0: c_float = *vertices
-                        .offset((b_0 + 2 as c_int) as isize);
-                    wx_0
-                        += (vx_1 * (*bone_1).a + vy_1 * (*bone_1).b + (*bone_1).worldX)
-                            * weight_0;
-                    wy_0
-                        += (vx_1 * (*bone_1).c + vy_1 * (*bone_1).d + (*bone_1).worldY)
-                            * weight_0;
+                    let mut weight_0: c_float = *vertices.offset((b_0 + 2 as c_int) as isize);
+                    wx_0 += (vx_1 * (*bone_1).a + vy_1 * (*bone_1).b + (*bone_1).worldX) * weight_0;
+                    wy_0 += (vx_1 * (*bone_1).c + vy_1 * (*bone_1).d + (*bone_1).worldY) * weight_0;
                     v_0 += 1;
                     b_0 += 3 as c_int;
                     f += 2 as c_int;
@@ -30040,8 +27722,7 @@ pub unsafe extern "C" fn spVertexAttachment_copyTo(
 ) {
     if (*from).bonesCount != 0 {
         (*to).bonesCount = (*from).bonesCount;
-        (*to)
-            .bones = _spMalloc(
+        (*to).bones = _spMalloc(
             (::core::mem::size_of::<c_int>() as c_ulong)
                 .wrapping_mul((*from).bonesCount as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -30062,8 +27743,7 @@ pub unsafe extern "C" fn spVertexAttachment_copyTo(
     }
     if (*from).verticesCount != 0 {
         (*to).verticesCount = (*from).verticesCount;
-        (*to)
-            .vertices = _spMalloc(
+        (*to).vertices = _spMalloc(
             (::core::mem::size_of::<c_float>() as c_ulong)
                 .wrapping_mul((*from).verticesCount as c_ulong),
             b"spine.c\0" as *const u8 as *const c_char,
@@ -30088,26 +27768,17 @@ pub unsafe extern "C" fn spVertexAttachment_copyTo(
 pub unsafe extern "C" fn _spInternalRandom() -> c_float {
     return spine_rand() as c_float / 2147483647 as c_int as c_float;
 }
-static mut mallocFunc: Option::<unsafe extern "C" fn(size_t) -> *mut c_void> = unsafe {
-    Some(spine_malloc as unsafe extern "C" fn(size_t) -> *mut c_void)
-};
-static mut reallocFunc: Option::<
-    unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void,
-> = unsafe {
-    Some(
-        spine_realloc
-            as unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void,
-    )
-};
-static mut debugMallocFunc: Option::<
+static mut mallocFunc: Option<unsafe extern "C" fn(size_t) -> *mut c_void> =
+    Some(spine_malloc as unsafe extern "C" fn(size_t) -> *mut c_void);
+static mut reallocFunc: Option<unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void> =
+    Some(spine_realloc as unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void);
+static mut debugMallocFunc: Option<
     unsafe extern "C" fn(size_t, *const c_char, c_int) -> *mut c_void,
 > = None;
-static mut freeFunc: Option::<unsafe extern "C" fn(*mut c_void) -> ()> = unsafe {
-    Some(spine_free as unsafe extern "C" fn(*mut c_void) -> ())
-};
-static mut randomFunc: Option::<unsafe extern "C" fn() -> c_float> = unsafe {
-    Some(_spInternalRandom as unsafe extern "C" fn() -> c_float)
-};
+static mut freeFunc: Option<unsafe extern "C" fn(*mut c_void) -> ()> =
+    Some(spine_free as unsafe extern "C" fn(*mut c_void) -> ());
+static mut randomFunc: Option<unsafe extern "C" fn() -> c_float> =
+    Some(_spInternalRandom as unsafe extern "C" fn() -> c_float);
 #[no_mangle]
 pub unsafe extern "C" fn _spMalloc(
     mut size: size_t,
@@ -30133,10 +27804,7 @@ pub unsafe extern "C" fn _spCalloc(
     return ptr;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spRealloc(
-    mut ptr: *mut c_void,
-    mut size: size_t,
-) -> *mut c_void {
+pub unsafe extern "C" fn _spRealloc(mut ptr: *mut c_void, mut size: size_t) -> *mut c_void {
     return reallocFunc.expect("non-null function pointer")(ptr, size);
 }
 #[no_mangle]
@@ -30149,40 +27817,30 @@ pub unsafe extern "C" fn _spRandom() -> c_float {
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spSetDebugMalloc(
-    mut spine_malloc_0: Option::<
-        unsafe extern "C" fn(
-            size_t,
-            *const c_char,
-            c_int,
-        ) -> *mut c_void,
-    >,
+    mut spine_malloc_0: Option<unsafe extern "C" fn(size_t, *const c_char, c_int) -> *mut c_void>,
 ) {
     debugMallocFunc = spine_malloc_0;
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spSetMalloc(
-    mut spine_malloc_0: Option::<unsafe extern "C" fn(size_t) -> *mut c_void>,
+    mut spine_malloc_0: Option<unsafe extern "C" fn(size_t) -> *mut c_void>,
 ) {
     mallocFunc = spine_malloc_0;
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spSetRealloc(
-    mut spine_realloc_0: Option::<
-        unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void,
-    >,
+    mut spine_realloc_0: Option<unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void>,
 ) {
     reallocFunc = spine_realloc_0;
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spSetFree(
-    mut spine_free_0: Option::<unsafe extern "C" fn(*mut c_void) -> ()>,
+    mut spine_free_0: Option<unsafe extern "C" fn(*mut c_void) -> ()>,
 ) {
     freeFunc = spine_free_0;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spSetRandom(
-    mut random: Option::<unsafe extern "C" fn() -> c_float>,
-) {
+pub unsafe extern "C" fn _spSetRandom(mut random: Option<unsafe extern "C" fn() -> c_float>) {
     randomFunc = random;
 }
 #[no_mangle]
@@ -30191,11 +27849,7 @@ pub unsafe extern "C" fn _spReadFile(
     mut length: *mut c_int,
 ) -> *mut c_char {
     let mut data: *mut c_char = 0 as *mut c_char;
-    let mut result: size_t = 0;
-    let mut file: *mut FILE = spine_fopen(
-        path,
-        b"rb\0" as *const u8 as *const c_char,
-    );
+    let mut file: *mut FILE = spine_fopen(path, b"rb\0" as *const u8 as *const c_char);
     if file.is_null() {
         return 0 as *mut c_char;
     }
@@ -30203,12 +27857,11 @@ pub unsafe extern "C" fn _spReadFile(
     *length = spine_ftell(file) as c_int;
     spine_fseek(file, 0 as c_int as c_long, 0 as c_int);
     data = _spMalloc(
-        (::core::mem::size_of::<c_char>() as c_ulong)
-            .wrapping_mul(*length as c_ulong),
+        (::core::mem::size_of::<c_char>() as c_ulong).wrapping_mul(*length as c_ulong),
         b"spine.c\0" as *const u8 as *const c_char,
         14554 as c_int,
     ) as *mut c_char;
-    result = spine_fread(
+    spine_fread(
         data as *mut c_void,
         1 as c_int as size_t,
         *length as size_t,
@@ -30218,17 +27871,11 @@ pub unsafe extern "C" fn _spReadFile(
     return data;
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spMath_random(
-    mut min: c_float,
-    mut max: c_float,
-) -> c_float {
+pub unsafe extern "C" fn _spMath_random(mut min: c_float, mut max: c_float) -> c_float {
     return min + (max - min) * _spRandom();
 }
 #[no_mangle]
-pub unsafe extern "C" fn _spMath_randomTriangular(
-    mut min: c_float,
-    mut max: c_float,
-) -> c_float {
+pub unsafe extern "C" fn _spMath_randomTriangular(mut min: c_float, mut max: c_float) -> c_float {
     return _spMath_randomTriangularWith(min, max, (min + max) * 0.5f32);
 }
 #[no_mangle]
@@ -30246,7 +27893,7 @@ pub unsafe extern "C" fn _spMath_randomTriangularWith(
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spMath_interpolate(
-    mut apply: Option::<unsafe extern "C" fn(c_float) -> c_float>,
+    mut apply: Option<unsafe extern "C" fn(c_float) -> c_float>,
     mut start: c_float,
     mut end: c_float,
     mut a: c_float,
@@ -30262,24 +27909,21 @@ pub unsafe extern "C" fn _spMath_pow2_apply(mut a: c_float) -> c_float {
         ) / 2 as c_int as c_double) as c_float;
     }
     return (spine_pow(
-        ((a - 1 as c_int as c_float) * 2 as c_int as c_float)
-            as c_double,
+        ((a - 1 as c_int as c_float) * 2 as c_int as c_float) as c_double,
         2 as c_int as c_double,
-    ) / -(2 as c_int) as c_double + 1 as c_int as c_double)
-        as c_float;
+    ) / -(2 as c_int) as c_double
+        + 1 as c_int as c_double) as c_float;
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spMath_pow2out_apply(mut a: c_float) -> c_float {
     return (spine_pow(
         (a - 1 as c_int as c_float) as c_double,
         2 as c_int as c_double,
-    ) * -(1 as c_int) as c_double + 1 as c_int as c_double)
-        as c_float;
+    ) * -(1 as c_int) as c_double
+        + 1 as c_int as c_double) as c_float;
 }
-
 
 type _IO_wide_data = u8;
 type _IO_codecvt = u8;
 type _IO_marker = u8;
 pub use crate::c::environment::types::*;
-    

@@ -296,7 +296,7 @@ impl AnimationState {
     /// # #[path="./test.rs"]
     /// # mod test;
     /// # use rusty_spine::{AnimationState, AnimationEvent};
-    /// # let (_, mut animation_state) = test::TestAsset::spineboy().instance();
+    /// # let (_, mut animation_state) = test::TestAsset::spineboy().instance(true);
     /// animation_state.set_listener(|_, animation_event| match animation_event {
     ///     AnimationEvent::Start { track_entry } => {
     ///         println!("Animation {} started!", track_entry.track_index());
@@ -866,7 +866,7 @@ c_handle_indexed_decl!(
     /// # #[path="./test.rs"]
     /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, TrackEntryHandle};
-    /// # let (_, animation_state) = test::TestAsset::spineboy().instance();
+    /// # let (_, animation_state) = test::TestAsset::spineboy().instance(true);
     /// let track_entry_handles: Vec<TrackEntryHandle> = animation_state.tracks().map(|track| track.unwrap().handle()).collect();
     /// for track_entry_handle in track_entry_handles.iter() {
     ///     let track_entry = track_entry_handle.get(&animation_state).unwrap();
@@ -900,7 +900,7 @@ mod tests {
 
     #[test]
     fn track_entry_optional() {
-        let (_, mut animation_state) = TestAsset::spineboy().instance();
+        let (_, mut animation_state) = TestAsset::spineboy().instance(true);
         let _ = animation_state.set_animation_by_name(0, "idle", true);
         let _ = animation_state.set_animation_by_name(2, "run", true);
 
@@ -921,7 +921,7 @@ mod tests {
 
     #[test]
     fn track_entry_invalidate_clear() {
-        let (_, mut animation_state) = TestAsset::spineboy().instance();
+        let (_, mut animation_state) = TestAsset::spineboy().instance(true);
         let _ = animation_state.set_animation_by_name(0, "idle", true);
 
         let track_handle = animation_state.track_at_index(0).unwrap().handle();
@@ -933,7 +933,7 @@ mod tests {
 
     #[test]
     fn track_entry_invalidate_change() {
-        let (_, mut animation_state) = TestAsset::spineboy().instance();
+        let (_, mut animation_state) = TestAsset::spineboy().instance(true);
         let _ = animation_state.set_animation_by_name(0, "idle", true);
 
         let track_handle = animation_state.track_at_index(0).unwrap().handle();
