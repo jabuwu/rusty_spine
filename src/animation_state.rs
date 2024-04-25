@@ -674,30 +674,40 @@ impl TrackEntry {
         eventThreshold,
         f32
     );
-    /*c_accessor_mut!(
-        /// When the mix percentage ([`mix_time`](`Self::mix_time`) /
-        /// [`mix_duration`](`Self::mix_duration`)) is less than the `attachment_threshold`,
-        /// attachment timelines are applied while this animation is being mixed out. Defaults to 0,
-        /// so attachment timelines are not applied while this animation is being mixed out.
-        attachment_threshold,
-        /// Set the attachment threshold, see
-        /// [`attachment_threshold`](`Self::attachment_threshold`).
-        set_attachment_threshold,
-        attachmentThreshold,
+    c_accessor_mut!(
+        /// When [`alpha`](`Self::alpha`) is greater than this value, attachment timelines are
+        /// applied. Defaults to 0, so attachment timelines are always applied.
+        alpha_attachment_threshold,
+        /// Set the alpha attachment threshold, see
+        /// [`alpha_attachment_threshold`](`Self::alpha_attachment_threshold`).
+        set_alpha_attachment_threshold,
+        alphaAttachmentThreshold,
         f32
-    );*/
-    /*c_accessor_mut!(
+    );
+    c_accessor_mut!(
         /// When the mix percentage ([`mix_time`](`Self::mix_time`) /
-        /// [`mix_duration`](`Self::mix_duration`)) is less than the `draw_order_threshold`, draw
-        /// order timelines are applied while this animation is being mixed out. Defaults to 0, so
-        /// draw order timelines are not applied while this animation is being mixed out.
-        draw_order_threshold,
-        /// Set the draw order threshold, see
-        /// [`draw_order_threshold`](`Self::draw_order_threshold`).
-        set_draw_order_threshold,
-        drawOrderThreshold,
+        /// [`mix_duration`](`Self::mix_duration`)) is less than the this value, attachment
+        /// timelines are applied while this animation is being mixed out. Defaults to 0, so
+        /// attachment timelines are not applied while this animation is being mixed out.
+        mix_attachment_threshold,
+        /// Set the mix attachment threshold, see
+        /// [`mix_attachment_threshold`](`Self::mix_attachment_threshold`).
+        set_mix_attachment_threshold,
+        alphaAttachmentThreshold,
         f32
-    );*/
+    );
+    c_accessor_mut!(
+        /// When the mix percentage ([`mix_time`](`Self::mix_time`) /
+        /// [`mix_duration`](`Self::mix_duration`)) is less than this value, draw order timelines
+        /// are applied while this animation is being mixed out. Defaults to 0, so draw order
+        /// timelines are not applied while this animation is being mixed out.
+        mix_draw_order_threshold,
+        /// Set the mix draw order threshold, see
+        /// [`mix_draw_order_threshold`](`Self::mix_draw_order_threshold`).
+        set_mix_draw_order_threshold,
+        mixDrawOrderThreshold,
+        f32
+    );
     c_accessor_mut!(
         /// Seconds when this animation starts, both initially and after looping. Defaults to 0.
         ///
