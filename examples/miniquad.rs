@@ -453,7 +453,7 @@ impl Stage {
     fn new(ctx: &mut Context, texture_delete_queue: Arc<Mutex<Vec<Texture>>>) -> Stage {
         let spine_demos = vec![
             SpineDemo {
-                atlas_path: "assets/spineboy/export/spineboy-pma.atlas",
+                atlas_path: "assets/spineboy/export/spineboy.atlas",
                 skeleton_path: SpineSkeletonPath::Binary(
                     "assets/spineboy/export/spineboy-pro.skel",
                 ),
@@ -482,7 +482,7 @@ impl Stage {
                 backface_culling: true,
             },
             SpineDemo {
-                atlas_path: "assets/celestial-circus/export/celestial-circus.atlas",
+                atlas_path: "assets/celestial-circus/export/celestial-circus-pma.atlas",
                 skeleton_path: SpineSkeletonPath::Json(
                     "assets/celestial-circus/export/celestial-circus-pro.json",
                 ),
@@ -501,7 +501,7 @@ impl Stage {
                 skin: None,
                 backface_culling: true,
             },
-            /*SpineDemo {
+            SpineDemo {
                 atlas_path: "assets/dragon/export/dragon.atlas",
                 skeleton_path: SpineSkeletonPath::Json("assets/dragon/export/dragon-ess.json"),
                 animation: "flying",
@@ -509,7 +509,7 @@ impl Stage {
                 scale: 0.7,
                 skin: None,
                 backface_culling: true,
-            },*/
+            },
             SpineDemo {
                 atlas_path: "assets/goblins/export/goblins.atlas",
                 skeleton_path: SpineSkeletonPath::Json("assets/goblins/export/goblins-pro.json"),

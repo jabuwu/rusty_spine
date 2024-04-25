@@ -20,7 +20,7 @@ pub struct TestAsset {
 }
 
 impl TestAsset {
-    pub const fn all() -> &'static [Self; 8] {
+    pub const fn all() -> &'static [Self; 9] {
         &[
             Self {
                 atlas_file: "assets/spineboy/export/spineboy.atlas",
@@ -40,12 +40,12 @@ impl TestAsset {
                 json_data: include_bytes!("../assets/coin/export/coin-pro.json"),
                 binary_data: include_bytes!("../assets/coin/export/coin-pro.skel"),
             },
-            /*Self {
+            Self {
                 atlas_file: "assets/dragon/export/dragon.atlas",
                 atlas_data: include_bytes!("../assets/dragon/export/dragon.atlas"),
                 json_data: include_bytes!("../assets/dragon/export/dragon-ess.json"),
                 binary_data: include_bytes!("../assets/dragon/export/dragon-ess.skel"),
-            },*/
+            },
             Self {
                 atlas_file: "assets/goblins/export/goblins.atlas",
                 atlas_data: include_bytes!("../assets/goblins/export/goblins.atlas"),
