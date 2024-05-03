@@ -1,5 +1,6 @@
 # 0.8.0 (UNRELEASED)
 - Add `TrackEntry::set_track_time`
+- Fix `memcpy` crash in Rust 1.78 (when not using `libc` feature)
 
 # 0.7.1
 - Fix dark color applying incorrectly with premultiplied alpha (using draw functions)
