@@ -414,16 +414,18 @@ mod test {
     /// Ensure all the example assets draw without error.
     #[test]
     fn combined_drawer() {
-        for example_asset in TestAsset::all() {
-            let (mut skeleton, _) = example_asset.instance();
-            let drawer = CombinedDrawer {
-                cull_direction: CullDirection::Clockwise,
-                premultiplied_alpha: false,
-                color_space: ColorSpace::Linear,
-            };
-            let mut clipper = SkeletonClipping::new();
-            let renderables = drawer.draw(&mut skeleton, Some(&mut clipper));
-            assert!(!renderables.is_empty());
+        for json in [true, false] {
+            for example_asset in TestAsset::all() {
+                let (mut skeleton, _) = example_asset.instance(json);
+                let drawer = CombinedDrawer {
+                    cull_direction: CullDirection::Clockwise,
+                    premultiplied_alpha: false,
+                    color_space: ColorSpace::Linear,
+                };
+                let mut clipper = SkeletonClipping::new();
+                let renderables = drawer.draw(&mut skeleton, Some(&mut clipper));
+                assert!(!renderables.is_empty());
+            }
         }
     }
 }

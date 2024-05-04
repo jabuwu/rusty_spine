@@ -200,7 +200,7 @@ c_handle_decl!(
     /// # #[path="./test.rs"]
     /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, SlotHandle};
-    /// # let (skeleton, _) = test::TestAsset::spineboy().instance();
+    /// # let (skeleton, _) = test::TestAsset::spineboy().instance(true);
     /// let slot_handles: Vec<SlotHandle> = skeleton.slots().map(|slot| slot.handle()).collect();
     /// for slot_handle in slot_handles.iter() {
     ///     let slot = slot_handle.get(&skeleton).unwrap();

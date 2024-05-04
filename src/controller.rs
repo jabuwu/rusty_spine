@@ -18,7 +18,7 @@
 //!     SkeletonController::new(skeleton_data.clone(), animation_state_data);
 //!
 //! // Update for one frame
-//! skeleton_controller.update(0.016);
+//! skeleton_controller.update(0.016, Physics::Update);
 //!
 //! // Get renderable mesh data
 //! // Note: if slot_index is not important, use the much faster
@@ -66,7 +66,7 @@ use crate::{
     skeleton::Skeleton,
     skeleton_clipping::SkeletonClipping,
     skeleton_data::SkeletonData,
-    BlendMode,
+    BlendMode, Physics,
 };
 
 #[derive(Debug)]
@@ -137,7 +137,7 @@ impl SkeletonController {
     ) -> Self {
         let mut skeleton = Skeleton::new(skeleton_data);
         skeleton.set_to_setup_pose();
-        skeleton.update_world_transform();
+        skeleton.update_world_transform(Physics::Pose);
         Self {
             skeleton,
             animation_state: AnimationState::new(animation_state_data),
@@ -152,10 +152,11 @@ impl SkeletonController {
     }
 
     /// Updates the animation state, applies to the skeleton, and updates world transforms.
-    pub fn update(&mut self, delta_seconds: f32) {
+    pub fn update(&mut self, delta_seconds: f32, physics: Physics) {
         self.animation_state.update(delta_seconds);
         self.animation_state.apply(&mut self.skeleton);
-        self.skeleton.update_world_transform();
+        self.skeleton.update(delta_seconds);
+        self.skeleton.update_world_transform(physics);
     }
 
     /// Render the skeleton using the [`SimpleDrawer`] and returns renderable mesh information.

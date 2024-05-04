@@ -1,5 +1,19 @@
 # 0.8.0 (UNRELEASED)
-- Add `TrackEntry::set_track_time`
+- Upgrade runtime to Spine 4.2
+- Add `Physics` enum
+  - Add `physics` parameter to `Skeleton::update_world_transform` and `Skeleton::update_world_transform_with`
+  - Add `physics` parameter to `Controller::update`
+- Add methods:
+  - `TrackEntry::set_track_time`
+  - `TrackEntry::mix_attachment_threshold`
+  - `TrackEntry::set_mix_attachment_threshold`
+  - `TrackEntry::mix_draw_order_threshold`
+  - `TrackEntry::set_mix_draw_order_threshold`
+- Remove methods:
+  - `TrackEntry::attachment_threshold`
+  - `TrackEntry::set_attachment_threshold`
+  - `TrackEntry::draw_order_threshold`
+  - `TrackEntry::set_draw_order_threshold`
 
 # 0.7.1
 - Fix dark color applying incorrectly with premultiplied alpha (using draw functions)

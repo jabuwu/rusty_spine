@@ -84,7 +84,7 @@ impl Extension {
 /// # #[path="./test.rs"]
 /// # mod test;
 /// # use rusty_spine::{AnimationState, EventType, controller::SkeletonController};
-/// # let (mut skeleton_data, mut animation_state_data) = test::TestAsset::spineboy().instance_data();
+/// # let (mut skeleton_data, mut animation_state_data) = test::TestAsset::spineboy().instance_data(true);
 ///
 /// struct SpineTexture(pub String); // from example above
 ///

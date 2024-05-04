@@ -296,7 +296,7 @@ impl AnimationState {
     /// # #[path="./test.rs"]
     /// # mod test;
     /// # use rusty_spine::{AnimationState, AnimationEvent};
-    /// # let (_, mut animation_state) = test::TestAsset::spineboy().instance();
+    /// # let (_, mut animation_state) = test::TestAsset::spineboy().instance(true);
     /// animation_state.set_listener(|_, animation_event| match animation_event {
     ///     AnimationEvent::Start { track_entry } => {
     ///         println!("Animation {} started!", track_entry.track_index());
@@ -675,27 +675,37 @@ impl TrackEntry {
         f32
     );
     c_accessor_mut!(
-        /// When the mix percentage ([`mix_time`](`Self::mix_time`) /
-        /// [`mix_duration`](`Self::mix_duration`)) is less than the `attachment_threshold`,
-        /// attachment timelines are applied while this animation is being mixed out. Defaults to 0,
-        /// so attachment timelines are not applied while this animation is being mixed out.
-        attachment_threshold,
-        /// Set the attachment threshold, see
-        /// [`attachment_threshold`](`Self::attachment_threshold`).
-        set_attachment_threshold,
-        attachmentThreshold,
+        /// When [`alpha`](`Self::alpha`) is greater than this value, attachment timelines are
+        /// applied. Defaults to 0, so attachment timelines are always applied.
+        alpha_attachment_threshold,
+        /// Set the alpha attachment threshold, see
+        /// [`alpha_attachment_threshold`](`Self::alpha_attachment_threshold`).
+        set_alpha_attachment_threshold,
+        alphaAttachmentThreshold,
         f32
     );
     c_accessor_mut!(
         /// When the mix percentage ([`mix_time`](`Self::mix_time`) /
-        /// [`mix_duration`](`Self::mix_duration`)) is less than the `draw_order_threshold`, draw
-        /// order timelines are applied while this animation is being mixed out. Defaults to 0, so
-        /// draw order timelines are not applied while this animation is being mixed out.
-        draw_order_threshold,
-        /// Set the draw order threshold, see
-        /// [`draw_order_threshold`](`Self::draw_order_threshold`).
-        set_draw_order_threshold,
-        drawOrderThreshold,
+        /// [`mix_duration`](`Self::mix_duration`)) is less than the this value, attachment
+        /// timelines are applied while this animation is being mixed out. Defaults to 0, so
+        /// attachment timelines are not applied while this animation is being mixed out.
+        mix_attachment_threshold,
+        /// Set the mix attachment threshold, see
+        /// [`mix_attachment_threshold`](`Self::mix_attachment_threshold`).
+        set_mix_attachment_threshold,
+        alphaAttachmentThreshold,
+        f32
+    );
+    c_accessor_mut!(
+        /// When the mix percentage ([`mix_time`](`Self::mix_time`) /
+        /// [`mix_duration`](`Self::mix_duration`)) is less than this value, draw order timelines
+        /// are applied while this animation is being mixed out. Defaults to 0, so draw order
+        /// timelines are not applied while this animation is being mixed out.
+        mix_draw_order_threshold,
+        /// Set the mix draw order threshold, see
+        /// [`mix_draw_order_threshold`](`Self::mix_draw_order_threshold`).
+        set_mix_draw_order_threshold,
+        mixDrawOrderThreshold,
         f32
     );
     c_accessor_mut!(
@@ -868,7 +878,7 @@ c_handle_indexed_decl!(
     /// # #[path="./test.rs"]
     /// # mod test;
     /// # use rusty_spine::{AnimationState, EventType, TrackEntryHandle};
-    /// # let (_, animation_state) = test::TestAsset::spineboy().instance();
+    /// # let (_, animation_state) = test::TestAsset::spineboy().instance(true);
     /// let track_entry_handles: Vec<TrackEntryHandle> = animation_state.tracks().map(|track| track.unwrap().handle()).collect();
     /// for track_entry_handle in track_entry_handles.iter() {
     ///     let track_entry = track_entry_handle.get(&animation_state).unwrap();
@@ -902,7 +912,7 @@ mod tests {
 
     #[test]
     fn track_entry_optional() {
-        let (_, mut animation_state) = TestAsset::spineboy().instance();
+        let (_, mut animation_state) = TestAsset::spineboy().instance(true);
         let _ = animation_state.set_animation_by_name(0, "idle", true);
         let _ = animation_state.set_animation_by_name(2, "run", true);
 
@@ -923,7 +933,7 @@ mod tests {
 
     #[test]
     fn track_entry_invalidate_clear() {
-        let (_, mut animation_state) = TestAsset::spineboy().instance();
+        let (_, mut animation_state) = TestAsset::spineboy().instance(true);
         let _ = animation_state.set_animation_by_name(0, "idle", true);
 
         let track_handle = animation_state.track_at_index(0).unwrap().handle();
@@ -935,7 +945,7 @@ mod tests {
 
     #[test]
     fn track_entry_invalidate_change() {
-        let (_, mut animation_state) = TestAsset::spineboy().instance();
+        let (_, mut animation_state) = TestAsset::spineboy().instance(true);
         let _ = animation_state.set_animation_by_name(0, "idle", true);
 
         let track_handle = animation_state.track_at_index(0).unwrap().handle();

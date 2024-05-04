@@ -56,7 +56,8 @@ use rusty_spine::{
     atlas::{AtlasFilter, AtlasFormat, AtlasWrap},
     controller::{SkeletonController, SkeletonControllerSettings},
     draw::{ColorSpace, CullDirection},
-    AnimationEvent, AnimationStateData, Atlas, BlendMode, Color, SkeletonBinary, SkeletonJson,
+    AnimationEvent, AnimationStateData, Atlas, BlendMode, Color, Physics, SkeletonBinary,
+    SkeletonJson,
 };
 
 const MAX_MESH_VERTICES: usize = 10000;
@@ -452,7 +453,7 @@ impl Stage {
     fn new(ctx: &mut Context, texture_delete_queue: Arc<Mutex<Vec<Texture>>>) -> Stage {
         let spine_demos = vec![
             SpineDemo {
-                atlas_path: "assets/spineboy/export/spineboy-pma.atlas",
+                atlas_path: "assets/spineboy/export/spineboy.atlas",
                 skeleton_path: SpineSkeletonPath::Binary(
                     "assets/spineboy/export/spineboy-pro.skel",
                 ),
@@ -477,6 +478,26 @@ impl Stage {
                 animation: "death",
                 position: Vec2::new(0., -260.),
                 scale: 0.3,
+                skin: None,
+                backface_culling: true,
+            },
+            SpineDemo {
+                atlas_path: "assets/celestial-circus/export/celestial-circus-pma.atlas",
+                skeleton_path: SpineSkeletonPath::Json(
+                    "assets/celestial-circus/export/celestial-circus-pro.json",
+                ),
+                animation: "swing",
+                position: Vec2::new(0., -120.),
+                scale: 0.2,
+                skin: None,
+                backface_culling: true,
+            },
+            SpineDemo {
+                atlas_path: "assets/cloud-pot/export/cloud-pot.atlas",
+                skeleton_path: SpineSkeletonPath::Json("assets/cloud-pot/export/cloud-pot.json"),
+                animation: "playing-in-the-rain",
+                position: Vec2::new(0., -220.),
+                scale: 0.4,
                 skin: None,
                 backface_culling: true,
             },
@@ -545,7 +566,7 @@ impl EventHandler for Stage {
     fn update(&mut self, _ctx: &mut Context) {
         let now = date::now();
         let dt = ((now - self.last_frame_time) as f32).max(0.001);
-        self.spine.controller.update(dt);
+        self.spine.controller.update(dt, Physics::Update);
         self.last_frame_time = now;
     }
 

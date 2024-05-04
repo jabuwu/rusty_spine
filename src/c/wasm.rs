@@ -530,6 +530,36 @@ pub unsafe extern "C" fn spine_strcpy(mut to: *mut c_char, mut from: *const c_ch
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn spine_strncpy(
+    dst: *mut c_char,
+    src: *const c_char,
+    mut n: size_t,
+) -> *mut c_char {
+    if n != 0 {
+        let mut d = dst;
+        let mut s = src;
+        loop {
+            *d = *s;
+            if *s as c_int == '\0' as i32 {
+                while n != 0 {
+                    *d = 0;
+                    d = d.offset(1);
+                    n -= 1;
+                }
+                break;
+            }
+            s = s.offset(1);
+            d = d.offset(1);
+            n -= 1;
+            if n == 0 {
+                break;
+            }
+        }
+    }
+    dst
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn spine_strncat(
     dst: *mut c_char,
     src: *const c_char,
@@ -796,6 +826,11 @@ extern "C" fn spine_sqrtf(x: c_float) -> c_float {
 }
 
 #[no_mangle]
+extern "C" fn spine_ceil(x: c_double) -> c_double {
+    x.ceil()
+}
+
+#[no_mangle]
 extern "C" fn spine_acosf(x: c_float) -> c_float {
     x.acos()
 }
@@ -928,14 +963,15 @@ fn fmt(format: &str, args: &[Box<dyn Any>]) -> String {
                             panic!("Unsupported printf argument type");
                         }
                     }
-                    's' => arg.downcast_ref::<*const c_char>().map_or_else(
-                        || {
-                            panic!("Unsupported printf argument type");
-                        },
-                        |s| {
+                    's' => {
+                        if let Some(s) = arg.downcast_ref::<*const c_char>() {
                             new_str += unsafe { CStr::from_ptr(*s).to_str().unwrap() };
-                        },
-                    ),
+                        } else if let Some(s) = arg.downcast_ref::<*mut c_char>() {
+                            new_str += unsafe { CStr::from_ptr(*s).to_str().unwrap() };
+                        } else {
+                            panic!("Unsupported printf argument type");
+                        }
+                    }
                     'f' => {
                         if let Some(f) = arg.downcast_ref::<f32>() {
                             new_str += &format!("{:.6}", *f);
@@ -973,12 +1009,16 @@ pub(crate) fn printf(c_format: *const c_char, args: &[Box<dyn Any>]) {
     print!("{}", fmt(&format, args));
 }
 
-pub(crate) fn sprintf(c_str: *mut c_char, c_format: *const c_char, args: &[Box<dyn Any>]) {
+pub(crate) fn snprintf(
+    c_out: *mut c_char,
+    c_len: size_t,
+    c_format: *const c_char,
+    args: &[Box<dyn Any>],
+) {
     let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
-    let result = fmt(&format, args);
+    let c_formatted = CString::new(fmt(&format, args)).unwrap();
     unsafe {
-        let str = CString::new(result).unwrap();
-        spine_strcpy(c_str, str.as_ptr());
+        spine_strncpy(c_out, c_formatted.as_ptr(), c_len);
     }
 }
 
@@ -1002,12 +1042,12 @@ macro_rules! spine_printf {
     };
 }
 
-macro_rules! spine_sprintf {
-    ($str:expr, $format:expr) => {
-        crate::c::wasm::sprintf($str, $format, vec![]);
+macro_rules! spine_snprintf {
+    ($str:expr, $len:expr, $format:expr) => {
+        crate::c::wasm::snprintf($str, $len, $format, &[]);
     };
-    ($str:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
-        crate::c::wasm::sprintf($str, $format, &[
+    ($str:expr, $len:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
+        crate::c::wasm::snprintf($str, $len, $format, &[
             $(Box::new($arg)),+
         ]);
     };
@@ -1024,10 +1064,11 @@ macro_rules! spine_sscanf {
 
 #[cfg(test)]
 mod tests {
-    use std::ffi::CString;
+    use std::ffi::{CStr, CString};
 
     use crate::c::{
         c_uint,
+        environment::spine_strncpy,
         wasm::{spine_strtol, spine_strtoul},
     };
 
@@ -1064,6 +1105,55 @@ mod tests {
             assert_eq!(spine_strlen(empty.as_ptr()), 0);
             let hello_world = CString::new("hello world").unwrap();
             assert_eq!(spine_strlen(hello_world.as_ptr()), 11);
+        }
+    }
+
+    #[test]
+    fn strcpy() {
+        unsafe {
+            let mut dst: [super::c_char; 255] = [0; 255];
+            let src = CString::new("1234 hello world").unwrap();
+            spine_strncpy(dst.as_mut_ptr(), src.as_ptr(), 255);
+            let string = CStr::from_ptr(dst.as_ptr()).to_string_lossy().to_string();
+            assert_eq!(string.as_str(), "1234 hello world");
+
+            let mut dst: [super::c_char; 10] = [10; 10];
+            let src = CString::new("1234 hello world").unwrap();
+            spine_strncpy(dst.as_mut_ptr(), src.as_ptr(), 10);
+            let string = CStr::from_ptr(dst.as_ptr()).to_string_lossy().to_string();
+            assert_eq!(string.as_str(), "1234 hello"); //strcpy doesn't add null byte
+
+            let mut dst: [super::c_char; 10] = [10; 10];
+            let src = CString::new("1234").unwrap();
+            spine_strncpy(dst.as_mut_ptr(), src.as_ptr(), 10);
+            let string = CStr::from_ptr(dst.as_ptr()).to_string_lossy().to_string();
+            assert_eq!(string.as_str(), "1234");
+        }
+    }
+
+    #[test]
+    fn strncpy() {
+        unsafe {
+            let mut dst: [super::c_char; 255] = [0; 255];
+            let src = CString::new("1234 hello world").unwrap();
+            spine_strncpy(dst.as_mut_ptr(), src.as_ptr(), 255);
+            let string = CStr::from_ptr(dst.as_ptr()).to_string_lossy().to_string();
+            assert_eq!(string.as_str(), "1234 hello world");
+
+            let mut dst: [super::c_char; 10] = [10; 10];
+            let src = CString::new("1234 hello world").unwrap();
+            spine_strncpy(dst.as_mut_ptr(), src.as_ptr(), 10);
+            let string = CStr::from_ptr(dst.as_ptr()).to_string_lossy().to_string();
+            assert_eq!(string.as_str(), "1234 hello"); //strncpy doesn't add null byte
+
+            let mut dst: [super::c_char; 10] = [10; 10];
+            let src = CString::new("1234").unwrap();
+            spine_strncpy(dst.as_mut_ptr(), src.as_ptr(), 10);
+            for item in dst.iter().skip(4) {
+                assert_eq!(*item, 0 as super::c_char);
+            }
+            let string = CStr::from_ptr(dst.as_ptr()).to_string_lossy().to_string();
+            assert_eq!(string.as_str(), "1234");
         }
     }
 
@@ -1121,6 +1211,40 @@ mod tests {
             "string: (hello)"
         );
         assert_eq!(super::fmt("hex: (%x)", &[Box::new(200)]), "hex: (c8)");
+    }
+
+    #[test]
+    fn snprintf() {
+        let mut error_msg: [super::c_char; 255] = [0; 255];
+        spine_snprintf!(
+            error_msg.as_mut_ptr(),
+            255 as super::c_int as super::size_t,
+            (b"Skeleton version %s does not match runtime version %s\0" as *const u8)
+                .cast::<super::c_char>(),
+            (b"4.1\0" as *const u8).cast::<super::c_char>(),
+            (b"4.2\0" as *const u8).cast::<super::c_char>(),
+        );
+        let string = unsafe { CStr::from_ptr(error_msg.as_ptr()) }
+            .to_string_lossy()
+            .to_string();
+        assert_eq!(
+            string.as_str(),
+            "Skeleton version 4.1 does not match runtime version 4.2"
+        );
+
+        let mut error_msg: [super::c_char; 16] = [0; 16];
+        spine_snprintf!(
+            error_msg.as_mut_ptr(),
+            16 as super::c_int as super::size_t,
+            (b"Skeleton version %s does not match runtime version %s\0" as *const u8)
+                .cast::<super::c_char>(),
+            (b"4.1\0" as *const u8).cast::<super::c_char>(),
+            (b"4.2\0" as *const u8).cast::<super::c_char>(),
+        );
+        let string = unsafe { CStr::from_ptr(error_msg.as_ptr()) }
+            .to_string_lossy()
+            .to_string();
+        assert_eq!(&string[0..16], "Skeleton version");
     }
 
     #[test]
