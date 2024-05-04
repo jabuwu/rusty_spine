@@ -59,6 +59,15 @@ unsafe extern "C" fn spine_strcpy(dest: *mut c_char, src: *const c_char) -> *mut
 }
 
 #[no_mangle]
+unsafe extern "C" fn spine_strncpy(
+    dest: *mut c_char,
+    src: *const c_char,
+    num: size_t,
+) -> *mut c_char {
+    libc::strncpy(dest, src, num)
+}
+
+#[no_mangle]
 unsafe extern "C" fn spine_strncat(
     dest: *mut c_char,
     src: *const c_char,
@@ -98,6 +107,11 @@ unsafe extern "C" fn spine_rand() -> c_int {
 #[no_mangle]
 extern "C" fn spine_sqrtf(x: c_float) -> c_float {
     x.sqrt()
+}
+
+#[no_mangle]
+extern "C" fn spine_ceil(x: c_double) -> c_double {
+    x.ceil()
 }
 
 #[no_mangle]
@@ -173,12 +187,12 @@ macro_rules! spine_printf {
     };
 }
 
-macro_rules! spine_sprintf {
-    ($str:expr, $format:expr) => {
-        libc::sprintf($str, $format);
+macro_rules! spine_snprintf {
+    ($str:expr, $len:expr, $format:expr) => {
+        libc::snprintf($str, $len as usize, $format);
     };
-    ($str:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
-        libc::sprintf($str, $format, $($arg),+);
+    ($str:expr, $len:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
+        libc::snprintf($str, $len as usize, $format, $($arg),+);
     };
 }
 

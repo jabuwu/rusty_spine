@@ -11,7 +11,7 @@ fn main() {
     let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
     let mut skeleton_controller =
         SkeletonController::new(skeleton_data.clone(), animation_state_data);
-    skeleton_controller.update(0.016);
+    skeleton_controller.update(0.016, Physics::Update);
     let renderables = skeleton_controller.renderables();
     println!("Skeleton:");
     println!();
