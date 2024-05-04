@@ -1,4 +1,4 @@
-//! Spine runtime for Rust (and wasm!) transpiled from the official C Runtime. Supports Spine 4.1.
+//! Spine runtime for Rust (and wasm!) transpiled from the official C Runtime. Supports Spine 4.2.
 //!
 //! For a very quick working example, see [`controller`].
 //!
