@@ -1335,7 +1335,7 @@ mod tests {
             let src = CString::new("1234 hello world").unwrap();
             spine_strncpy(dst.as_mut_ptr(), src.as_ptr(), 10);
             let string = CStr::from_ptr(dst.as_ptr()).to_string_lossy().to_string();
-            assert_eq!(string.as_str(), "1234 hello"); //strncpy doesn't add null byte
+            assert!(string.starts_with("1234 hello")); //strncpy doesn't add null byte
 
             let mut dst: [super::c_char; 10] = [10; 10];
             let src = CString::new("1234").unwrap();
