@@ -9,6 +9,13 @@ rusty_spine = "0.7"
 
 [Online demo!](https://jabuwu.github.io/rusty_spine/)
 
+## Supported Versions
+
+| rusty_spine      | Spine |
+| ---------------- | ----- |
+| 0.8 (unreleased) | 4.2   |
+| 0.1 - 0.7        | 4.1   |
+
 ## Rust API
 
 A Rust API is provided on top of the C API, because working with C APIs directly in Rust is tedious and error prone. It's made to be as thin a wrapper as possible.
