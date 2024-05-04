@@ -1,6 +1,6 @@
 # rusty_spine
 
-Spine runtime for Rust (and wasm!) transpiled from the official C Runtime. Supports [Spine 4.2](http://esotericsoftware.com/).
+[Spine](http://esotericsoftware.com/) runtime for Rust (and wasm!) transpiled from the official C Runtime.
 
 ```
 [dependencies]
