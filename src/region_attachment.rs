@@ -149,7 +149,7 @@ impl RegionAttachment {
 #[cfg(feature = "mint")]
 impl RegionAttachment {
     #[must_use]
-    pub fn position(&self) -> Vector2<f32> {
+    pub fn translation(&self) -> Vector2<f32> {
         Vector2 {
             x: self.x(),
             y: self.y(),

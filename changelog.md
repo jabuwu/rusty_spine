@@ -1,6 +1,8 @@
 # 0.8.0 (UNRELEASED)
 - Upgrade runtime to Spine 4.2
 - Fix `memcpy` crash in Rust 1.78 (when not using `libc` feature)
+- Consistently use "translation" instead of "position" verbiage.
+  - Functions with `position` in their name renamed to use `translation` (except those referring to other types of positions).
 - Add `Physics` enum
   - Add `physics` parameter to `Skeleton::update_world_transform` and `Skeleton::update_world_transform_with`
   - Add `physics` parameter to `Controller::update`

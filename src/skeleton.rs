@@ -448,18 +448,18 @@ impl Skeleton {
         f32
     );
     c_accessor_mut!(
-        /// The skeleton X position, which is added to the root bone worldX position.
+        /// The skeleton X translation, which is added to the root bone worldX translation.
         x,
-        /// Sets the skeleton X position, which is added to the root bone worldX position.
+        /// Sets the skeleton X translation, which is added to the root bone worldX translation.
         /// Bones that do not inherit translation are still affected by this property.
         set_x,
         x,
         f32
     );
     c_accessor_mut!(
-        /// The skeleton Y position, which is added to the root bone worldY position.
+        /// The skeleton Y translation, which is added to the root bone worldY translation.
         y,
-        /// Sets the skeleton Y position, which is added to the root bone worldY position.
+        /// Sets the skeleton Y translation, which is added to the root bone worldY translation.
         /// Bones that do not inherit translation are still affected by this property.
         set_y,
         y,
@@ -562,17 +562,17 @@ impl Skeleton {
 #[cfg(feature = "mint")]
 impl Skeleton {
     #[must_use]
-    pub fn position(&self) -> Vector2<f32> {
+    pub fn translation(&self) -> Vector2<f32> {
         Vector2 {
             x: self.x(),
             y: self.y(),
         }
     }
 
-    pub fn set_position(&mut self, position: impl Into<Vector2<f32>>) {
-        let position: Vector2<f32> = position.into();
-        self.set_x(position.x);
-        self.set_y(position.y);
+    pub fn set_translation(&mut self, translation: impl Into<Vector2<f32>>) {
+        let translation: Vector2<f32> = translation.into();
+        self.set_x(translation.x);
+        self.set_y(translation.y);
     }
 
     #[must_use]

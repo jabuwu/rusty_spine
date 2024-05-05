@@ -333,18 +333,18 @@ impl Bone {
         f32
     );
     c_accessor_mut!(
-        /// Set the world X position.
+        /// Set the world X translation.
         world_x,
-        /// The world X position. If changed,
+        /// The world X translation. If changed,
         /// [`update_applied_transform`](`Self::update_applied_transform`) should be called.
         set_world_x,
         worldX,
         f32
     );
     c_accessor_mut!(
-        /// The world Y position.
+        /// The world Y translation.
         world_y,
-        /// Set the world Y position. If changed,
+        /// Set the world Y translation. If changed,
         /// [`update_applied_transform`](`Self::update_applied_transform`) should be called.
         set_world_y,
         worldY,
@@ -424,7 +424,7 @@ impl Bone {
 impl Bone {
     /// The local translation.
     #[must_use]
-    pub fn position(&self) -> Vector2<f32> {
+    pub fn translation(&self) -> Vector2<f32> {
         Vector2 {
             x: self.x(),
             y: self.y(),
@@ -432,15 +432,15 @@ impl Bone {
     }
 
     /// Set the local translation.
-    pub fn set_position(&mut self, position: impl Into<Vector2<f32>>) {
-        let position: Vector2<f32> = position.into();
-        self.set_x(position.x);
-        self.set_y(position.y);
+    pub fn set_translation(&mut self, translation: impl Into<Vector2<f32>>) {
+        let translation: Vector2<f32> = translation.into();
+        self.set_x(translation.x);
+        self.set_y(translation.y);
     }
 
     /// The world translation.
     #[must_use]
-    pub fn world_position(&self) -> Vector2<f32> {
+    pub fn world_translation(&self) -> Vector2<f32> {
         Vector2 {
             x: self.world_x(),
             y: self.world_y(),
@@ -448,15 +448,15 @@ impl Bone {
     }
 
     /// Set the world translation.
-    pub fn set_world_position(&mut self, position: impl Into<Vector2<f32>>) {
-        let position: Vector2<f32> = position.into();
-        self.set_world_x(position.x);
-        self.set_world_y(position.y);
+    pub fn set_world_translation(&mut self, translation: impl Into<Vector2<f32>>) {
+        let translation: Vector2<f32> = translation.into();
+        self.set_world_x(translation.x);
+        self.set_world_y(translation.y);
     }
 
     /// The applied translation.
     #[must_use]
-    pub fn applied_position(&self) -> Vector2<f32> {
+    pub fn applied_translation(&self) -> Vector2<f32> {
         Vector2 {
             x: self.world_x(),
             y: self.world_y(),
@@ -464,10 +464,10 @@ impl Bone {
     }
 
     /// Set the applied translation.
-    pub fn set_applied_position(&mut self, position: impl Into<Vector2<f32>>) {
-        let position: Vector2<f32> = position.into();
-        self.set_applied_x(position.x);
-        self.set_applied_y(position.y);
+    pub fn set_applied_translation(&mut self, translation: impl Into<Vector2<f32>>) {
+        let translation: Vector2<f32> = translation.into();
+        self.set_applied_x(translation.x);
+        self.set_applied_y(translation.y);
     }
 
     /// The local scale.
@@ -553,7 +553,7 @@ impl Bone {
 
     pub fn update_world_transform_with2(
         &mut self,
-        position: mint::Vector2<f32>,
+        translation: mint::Vector2<f32>,
         rotation: f32,
         scale: mint::Vector2<f32>,
         shear: mint::Vector2<f32>,
@@ -561,8 +561,8 @@ impl Bone {
         unsafe {
             spBone_updateWorldTransformWith(
                 self.c_ptr(),
-                position.x,
-                position.y,
+                translation.x,
+                translation.y,
                 rotation,
                 scale.x,
                 scale.y,
@@ -637,7 +637,7 @@ impl BoneData {
 #[cfg(feature = "mint")]
 impl BoneData {
     #[must_use]
-    pub fn position(&self) -> Vector2<f32> {
+    pub fn translation(&self) -> Vector2<f32> {
         Vector2 {
             x: self.x(),
             y: self.y(),

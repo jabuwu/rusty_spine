@@ -265,7 +265,7 @@ impl SkeletonData {
 impl SkeletonData {
     /// The translation of the skeleton's axis aligned bounding box in the setup pose.
     #[must_use]
-    pub fn position(&self) -> Vector2<f32> {
+    pub fn translation(&self) -> Vector2<f32> {
         Vector2 {
             x: self.x(),
             y: self.y(),

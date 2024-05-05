@@ -426,7 +426,7 @@ pub mod atlas {
     #[cfg(feature = "mint")]
     impl AtlasRegion {
         #[must_use]
-        pub fn position(&self) -> Vector2<i32> {
+        pub fn translation(&self) -> Vector2<i32> {
             Vector2 {
                 x: self.x(),
                 y: self.y(),
