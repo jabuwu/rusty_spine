@@ -4,13 +4,69 @@
 - Add `Physics` enum
   - Add `physics` parameter to `Skeleton::update_world_transform` and `Skeleton::update_world_transform_with`
   - Add `physics` parameter to `Controller::update`
-- Add methods:
+- Add constraint types:
+  - `IkConstraint`
+  - `IkConstraintData`
+  - `PathConstraint`
+  - `PathConstraintData`
+  - `PhysicsConstraint`
+  - `PhysicsConstraintData`
+  - `TransformConstraint`
+  - `TransformConstraintData`
+- Add IK constraint methods:
+  - `Skeleton::ik_constraints`
+  - `Skeleton::ik_constraints_mut`
+  - `Skeleton::ik_constraint_at_index`
+  - `Skeleton::ik_constraint_at_index_mut`
+  - `Skeleton::find_ik_constraint`
+  - `Skeleton::find_ik_constraint_mut`
+  - `SkeletonData::ik_constraints`
+  - `SkeletonData::ik_constraint_at_index`
+  - `SkeletonData::find_ik_constraint`
+- Add path constraint methods:
+  - `Skeleton::path_constraints`
+  - `Skeleton::path_constraints_mut`
+  - `Skeleton::path_constraint_at_index`
+  - `Skeleton::path_constraint_at_index_mut`
+  - `Skeleton::find_path_constraint`
+  - `Skeleton::find_path_constraint_mut`
+  - `SkeletonData::path_constraints`
+  - `SkeletonData::path_constraint_at_index`
+  - `SkeletonData::find_path_constraint`
+- Add physics constraint methods:
+  - `Skeleton::physics_constraints`
+  - `Skeleton::physics_constraints_mut`
+  - `Skeleton::physics_constraint_at_index`
+  - `Skeleton::physics_constraint_at_index_mut`
+  - `Skeleton::find_physics_constraint`
+  - `Skeleton::find_physics_constraint_mut`
+  - `Skeleton::physics_constraint_count`
+  - `SkeletonData::physics_constraints`
+  - `SkeletonData::physics_constraint_at_index`
+  - `SkeletonData::physics_constraint_count`
+  - `SkeletonData::find_physics_constraint`
+- Add transform constraint methods:
+  - `Skeleton::transform_constraints`
+  - `Skeleton::transform_constraints_mut`
+  - `Skeleton::transform_constraint_at_index`
+  - `Skeleton::transform_constraint_at_index_mut`
+  - `Skeleton::find_transform_constraint`
+  - `Skeleton::find_transform_constraint_mut`
+  - `SkeletonData::transform_constraints`
+  - `SkeletonData::transform_constraint_at_index`
+  - `SkeletonData::find_transform_constraint`
+- Add new enum types:
+  - `PositionMode`
+  - `SpacingMode`
+  - `RotateMode`
+- Add missing mutator:
   - `TrackEntry::set_track_time`
+- Add Spine 4.2 methods:
   - `TrackEntry::mix_attachment_threshold`
   - `TrackEntry::set_mix_attachment_threshold`
   - `TrackEntry::mix_draw_order_threshold`
   - `TrackEntry::set_mix_draw_order_threshold`
-- Remove methods:
+- Remove Spine 4.1 methods:
   - `TrackEntry::attachment_threshold`
   - `TrackEntry::set_attachment_threshold`
   - `TrackEntry::draw_order_threshold`

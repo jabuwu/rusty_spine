@@ -7,6 +7,8 @@ use crate::{
 #[cfg(feature = "mint")]
 use mint::Vector2;
 
+/// Stores the setup pose for a [`PhysicsConstraint`](`crate::PhysicsConstraint`).
+///
 /// [Spine API Reference](https://esotericsoftware.com/spine-api-reference#PhysicsConstraintData)
 #[derive(Debug)]
 pub struct PhysicsConstraintData {
@@ -22,9 +24,26 @@ impl NewFromPtr<spPhysicsConstraintData> for PhysicsConstraintData {
 }
 
 impl PhysicsConstraintData {
-    c_accessor_string!(name, name);
-    c_accessor!(order, order, i32);
-    c_accessor_bool!(skin_required, skinRequired);
+    c_accessor_string!(
+        /// The constraint's name, which is unique across all constraints in the skeleton of the
+        /// same type.
+        name,
+        name
+    );
+    c_accessor!(
+        /// The ordinal of this constraint for the order a skeleton's constraints will be applied by
+        /// [`Skeleton::update_world_transform`](`crate::Skeleton::update_world_transform`).
+        order,
+        order,
+        i32
+    );
+    c_accessor_bool!(
+        /// When true,
+        /// [`Skeleton::update_world_transform`](`crate::Skeleton::update_world_transform`) only
+        /// updates this constraint if the skin contains this constraint.
+        skin_required,
+        skinRequired
+    );
 
     c_accessor!(damping, damping, f32);
     c_accessor_bool!(damping_global, dampingGlobal);
@@ -35,7 +54,13 @@ impl PhysicsConstraintData {
     c_accessor!(limit, limit, f32);
     c_accessor_bool!(mass_global, massGlobal);
     c_accessor!(mass_inverse, massInverse, f32);
-    c_accessor!(mix, mix, f32);
+    c_accessor!(
+        /// A percentage (0-1) that controls the mix between the constrained and unconstrained
+        /// poses.
+        mix,
+        mix,
+        f32
+    );
     c_accessor_bool!(mix_global, mixGlobal);
     c_accessor!(rotate, rotate, f32);
     c_accessor!(scale_x, scaleX, f32);
@@ -48,7 +73,13 @@ impl PhysicsConstraintData {
     c_accessor!(x, x, f32);
     c_accessor!(y, y, f32);
 
-    c_accessor_tmp_ptr!(bone, bone, BoneData, spBoneData);
+    c_accessor_tmp_ptr!(
+        /// The bone constrained by this physics constraint.
+        bone,
+        bone,
+        BoneData,
+        spBoneData
+    );
 
     c_ptr!(c_physics_constraint_data, spPhysicsConstraintData);
 }

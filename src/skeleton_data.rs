@@ -3,11 +3,14 @@ use std::sync::Arc;
 use crate::{
     animation::Animation,
     bone::BoneData,
-    c::{spAnimation, spBoneData, spSkeletonData, spSkeletonData_dispose, spSkin, spSlotData},
+    c::{
+        spAnimation, spBoneData, spIkConstraintData, spPathConstraintData, spPhysicsConstraintData,
+        spSkeletonData, spSkeletonData_dispose, spSkin, spSlotData, spTransformConstraintData,
+    },
     c_interface::{CTmpRef, NewFromPtr, SyncPtr},
     skin::Skin,
     slot::SlotData,
-    Atlas,
+    Atlas, IkConstraintData, PathConstraintData, PhysicsConstraintData, TransformConstraintData,
 };
 
 #[cfg(feature = "mint")]
@@ -68,6 +71,42 @@ impl SkeletonData {
         self.animations().find(|animation| animation.name() == name)
     }
 
+    #[must_use]
+    pub fn find_ik_constraint(
+        &self,
+        name: &str,
+    ) -> Option<CTmpRef<SkeletonData, IkConstraintData>> {
+        self.ik_constraints()
+            .find(|ik_constraint| ik_constraint.name() == name)
+    }
+
+    #[must_use]
+    pub fn find_path_constraint(
+        &self,
+        name: &str,
+    ) -> Option<CTmpRef<SkeletonData, PathConstraintData>> {
+        self.path_constraints()
+            .find(|path_constraint| path_constraint.name() == name)
+    }
+
+    #[must_use]
+    pub fn find_physics_constraint(
+        &self,
+        name: &str,
+    ) -> Option<CTmpRef<SkeletonData, PhysicsConstraintData>> {
+        self.physics_constraints()
+            .find(|physics_constraint| physics_constraint.name() == name)
+    }
+
+    #[must_use]
+    pub fn find_transform_constraint(
+        &self,
+        name: &str,
+    ) -> Option<CTmpRef<SkeletonData, TransformConstraintData>> {
+        self.transform_constraints()
+            .find(|transform_constraint| transform_constraint.name() == name)
+    }
+
     c_accessor_string_optional!(
         /// The Spine version used to export the skeleton data, or [`None`].
         version,
@@ -119,13 +158,30 @@ impl SkeletonData {
     c_accessor!(skins_count, skinsCount, usize);
     c_accessor!(events_count, eventsCount, usize);
     c_accessor!(animations_count, animationsCount, usize);
-    c_accessor!(ik_constraints_count, ikConstraintsCount, usize);
     c_accessor!(
-        transform_constraints_count,
+        /// The number of IK constraints in this skeleton.
+        ik_contraints_count,
+        ikConstraintsCount,
+        usize
+    );
+    c_accessor!(
+        /// The number of path constraints in this skeleton.
+        path_contraints_count,
+        pathConstraintsCount,
+        usize
+    );
+    c_accessor!(
+        /// The number of physics constraints in this skeleton.
+        physics_contraints_count,
+        physicsConstraintsCount,
+        usize
+    );
+    c_accessor!(
+        /// The number of transform constraints in this skeleton.
+        transform_contraints_count,
         transformConstraintsCount,
         usize
     );
-    c_accessor!(path_constraints_count, pathConstraintsCount, usize);
     c_accessor_array!(
         bones,
         bone_at_index,
@@ -162,6 +218,42 @@ impl SkeletonData {
         spAnimation,
         animations,
         animations_count
+    );
+    c_accessor_array!(
+        ik_constraints,
+        ik_contraint_at_index,
+        SkeletonData,
+        IkConstraintData,
+        spIkConstraintData,
+        ikConstraints,
+        ik_contraints_count
+    );
+    c_accessor_array!(
+        path_constraints,
+        path_contraint_at_index,
+        SkeletonData,
+        PathConstraintData,
+        spPathConstraintData,
+        pathConstraints,
+        path_contraints_count
+    );
+    c_accessor_array!(
+        physics_constraints,
+        physics_contraint_at_index,
+        SkeletonData,
+        PhysicsConstraintData,
+        spPhysicsConstraintData,
+        physicsConstraints,
+        physics_contraints_count
+    );
+    c_accessor_array!(
+        transform_constraints,
+        transform_contraint_at_index,
+        SkeletonData,
+        TransformConstraintData,
+        spTransformConstraintData,
+        transformConstraints,
+        transform_contraints_count
     );
     c_ptr!(c_skeleton_data, spSkeletonData);
 

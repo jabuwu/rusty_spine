@@ -29,6 +29,7 @@ impl PhysicsConstraint {
         }
     }
 
+    /// Applies the constraint to the constrained bones.
     pub fn update(&self, physics: Physics) {
         unsafe {
             spPhysicsConstraint_update(self.c_physics_constraint.0, physics as spPhysics);
@@ -41,12 +42,16 @@ impl PhysicsConstraint {
         }
     }
 
+    /// Translates the physics constraint so next update forces are applied as if the bone moved an
+    /// additional amount in world space.
     pub fn translate(&mut self, x: f32, y: f32) {
         unsafe {
             spPhysicsConstraint_translate(self.c_physics_constraint.0, x, y);
         }
     }
 
+    /// Rotates the physics constraint so next update forces are applied as if the bone rotated
+    /// around the specified point in world space.
     pub fn rotate(&mut self, x: f32, y: f32, degrees: f32) {
         unsafe {
             spPhysicsConstraint_rotate(self.c_physics_constraint.0, x, y, degrees);
@@ -54,6 +59,7 @@ impl PhysicsConstraint {
     }
 
     c_accessor_tmp_ptr_mut!(
+        /// The physics constraint's setup pose data.
         data,
         data_mut,
         data,
@@ -66,11 +72,24 @@ impl PhysicsConstraint {
     c_accessor_mut!(gravity, set_gravity, gravity, f32);
     c_accessor_mut!(inertia, set_intertia, inertia, f32);
     c_accessor_mut!(mass_inverse, set_mass_inverse, massInverse, f32);
-    c_accessor_mut!(mix, set_mix, mix, f32);
+    c_accessor_mut!(
+        /// A percentage (0-1) that controls the mix between the constrained and unconstrained poses.
+        mix,
+        set_mix,
+        mix,
+        f32
+    );
     c_accessor_mut!(strength, set_strength, strength, f32);
     c_accessor_mut!(wind, set_wind, wind, f32);
 
-    c_accessor_tmp_ptr_mut!(bone, bone_mut, bone, Bone, spBone);
+    c_accessor_tmp_ptr_mut!(
+        /// The bone constrained by this physics constraint.
+        bone,
+        bone_mut,
+        bone,
+        Bone,
+        spBone
+    );
 
     c_ptr!(c_physics_constraint, spPhysicsConstraint);
 }

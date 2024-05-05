@@ -22,6 +22,7 @@ impl NewFromPtr<spPathConstraint> for PathConstraint {
 }
 
 impl PathConstraint {
+    /// Applies the constraint to the constrained bones.
     pub fn update(&self) {
         unsafe {
             spPathConstraint_update(self.c_path_constraint.0);
@@ -35,6 +36,7 @@ impl PathConstraint {
     }
 
     c_accessor_tmp_ptr_mut!(
+        /// The path constraint's setup pose data.
         data,
         data_mut,
         data,
@@ -43,14 +45,48 @@ impl PathConstraint {
     );
 
     c_accessor_bool!(active, active);
-    c_accessor_mut!(mix_rotate, set_mix_rotate, mixRotate, f32);
-    c_accessor_mut!(mix_x, set_mix_x, mixX, f32);
-    c_accessor_mut!(mix_y, set_mix_y, mixY, f32);
-    c_accessor_mut!(position, set_position, position, f32);
-    c_accessor_mut!(spacing, set_spacing, spacing, f32);
+    c_accessor_mut!(
+        /// A percentage (0-1) that controls the mix between the constrained and unconstrained
+        /// rotation.
+        mix_rotate,
+        set_mix_rotate,
+        mixRotate,
+        f32
+    );
+    c_accessor_mut!(
+        /// A percentage (0-1) that controls the mix between the constrained and unconstrained
+        /// translation X.
+        mix_x,
+        set_mix_x,
+        mixX,
+        f32
+    );
+    c_accessor_mut!(
+        /// A percentage (0-1) that controls the mix between the constrained and unconstrained
+        /// translation Y.
+        mix_y,
+        set_mix_y,
+        mixY,
+        f32
+    );
+    c_accessor_mut!(
+        /// The position along the path.
+        position,
+        set_position,
+        position,
+        f32
+    );
+    c_accessor_mut!(
+        /// The spacing between bones.
+        spacing,
+        set_spacing,
+        spacing,
+        f32
+    );
 
     c_accessor!(bones_count, bonesCount, usize);
     c_accessor_array!(
+        /// The bones that will be modified by this path constraint.
         bones,
         bone_at_index,
         PathConstraint,
@@ -59,7 +95,14 @@ impl PathConstraint {
         bones,
         bones_count
     );
-    c_accessor_tmp_ptr_mut!(target, target_mut, target, Slot, spSlot);
+    c_accessor_tmp_ptr_mut!(
+        /// The slot whose path attachment will be used to constrained the bones.
+        target,
+        target_mut,
+        target,
+        Slot,
+        spSlot
+    );
 
     c_ptr!(c_path_constraint, spPathConstraint);
 }

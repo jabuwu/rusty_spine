@@ -7,6 +7,8 @@ use crate::{
 #[cfg(feature = "mint")]
 use mint::Vector2;
 
+/// Stores the setup pose for a [`TransformConstraint`](`crate::TransformConstraint`).
+///
 /// [Spine API Reference](https://esotericsoftware.com/spine-api-reference#TransformConstraintData)
 #[derive(Debug)]
 pub struct TransformConstraintData {
@@ -22,23 +24,105 @@ impl NewFromPtr<spTransformConstraintData> for TransformConstraintData {
 }
 
 impl TransformConstraintData {
-    c_accessor_string!(name, name);
-    c_accessor!(order, order, i32);
-    c_accessor_bool!(skin_required, skinRequired);
+    c_accessor_string!(
+        /// The constraint's name, which is unique across all constraints in the skeleton of the
+        /// same type.
+        name,
+        name
+    );
+    c_accessor!(
+        /// The ordinal of this constraint for the order a skeleton's constraints will be applied by
+        /// [`Skeleton::update_world_transform`](`crate::Skeleton::update_world_transform`).
+        order,
+        order,
+        i32
+    );
+    c_accessor_bool!(
+        /// When true,
+        /// [`Skeleton::update_world_transform`](`crate::Skeleton::update_world_transform`) only
+        /// updates this constraint if the skin contains this constraint.
+        skin_required,
+        skinRequired
+    );
 
     c_accessor_bool!(local, local);
-    c_accessor!(mix_rotate, mixRotate, f32);
-    c_accessor!(mix_scale_x, mixScaleX, f32);
-    c_accessor!(mix_scale_y, mixScaleY, f32);
-    c_accessor!(mix_shear_y, mixShearY, f32);
-    c_accessor!(mix_x, mixX, f32);
-    c_accessor!(mix_y, mixY, f32);
-    c_accessor!(offset_rotation, offsetRotation, f32);
-    c_accessor!(offset_scale_x, offsetScaleX, f32);
-    c_accessor!(offset_scale_y, offsetScaleY, f32);
-    c_accessor!(offset_shear_y, offsetShearY, f32);
-    c_accessor!(offset_x, offsetX, f32);
-    c_accessor!(offset_y, offsetY, f32);
+    c_accessor!(
+        /// A percentage (0-1) that controls the mix between the constrained and unconstrained
+        /// rotation.
+        mix_rotate,
+        mixRotate,
+        f32
+    );
+    c_accessor!(
+        /// A percentage (0-1) that controls the mix between the constrained and unconstrained
+        /// scale X.
+        mix_scale_x,
+        mixScaleX, f32
+    );
+    c_accessor!(
+        /// A percentage (0-1) that controls the mix between the constrained and unconstrained
+        /// scale Y.
+        mix_scale_y,
+        mixScaleY,
+        f32
+    );
+    c_accessor!(
+        /// A percentage (0-1) that controls the mix between the constrained and unconstrained
+        /// shear Y.
+        mix_shear_y,
+        mixShearY,
+        f32
+    );
+    c_accessor!(
+        /// A percentage (0-1) that controls the mix between the constrained and unconstrained
+        /// translation X.
+        mix_x,
+        mixX,
+        f32
+    );
+    c_accessor!(
+        /// A percentage (0-1) that controls the mix between the constrained and unconstrained
+        /// translation Y.
+        mix_y,
+        mixY,
+        f32
+    );
+    c_accessor!(
+        /// An offset added to the constrained bone rotation.
+        offset_rotation,
+        offsetRotation,
+        f32
+    );
+    c_accessor!(
+        /// An offset added to the constrained bone scale X.
+        offset_scale_x,
+        offsetScaleX,
+        f32
+    );
+    c_accessor!(
+        /// An offset added to the constrained bone scale Y.
+        offset_scale_y,
+        offsetScaleY,
+        f32
+    );
+    c_accessor!(
+        ///An offset added to the constrained bone shear Y.
+        offset_shear_y,
+        offsetShearY,
+        f32
+    );
+    c_accessor!(
+        /// An offset added to the constrained bone X translation.
+        offset_x,
+        offsetX,
+        f32
+    );
+    c_accessor!(
+        /// An offset added to the constrained bone Y translation.
+        offset_y,
+        offsetY,
+        f32
+    );
     c_accessor_bool!(relative, relative);
 
     c_accessor!(bones_count, bonesCount, usize);
@@ -51,7 +135,13 @@ impl TransformConstraintData {
         bones,
         bones_count
     );
-    c_accessor_tmp_ptr!(target, target, BoneData, spBoneData);
+    c_accessor_tmp_ptr!(
+        /// The target bone whose world transform will be copied to the constrained bones.
+        target,
+        target,
+        BoneData,
+        spBoneData
+    );
 
     c_ptr!(c_transform_constraint_data, spTransformConstraintData);
 }
