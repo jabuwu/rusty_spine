@@ -1,4 +1,4 @@
-# 0.8.0 (UNRELEASED)
+# 0.8.0
 - Upgrade runtime to Spine 4.2
 - Fix `memcpy` crash in Rust 1.78 (when not using `libc` feature)
 - Consistently use "translation" instead of "position" verbiage.

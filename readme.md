@@ -4,17 +4,17 @@
 
 ```
 [dependencies]
-rusty_spine = "0.7"
+rusty_spine = "0.8"
 ```
 
 [Online demo!](https://jabuwu.github.io/rusty_spine/)
 
 ## Supported Versions
 
-| rusty_spine      | Spine |
-| ---------------- | ----- |
-| 0.8 (unreleased) | 4.2   |
-| 0.1 - 0.7        | 4.1   |
+| rusty_spine | Spine |
+| ----------- | ----- |
+| 0.8         | 4.2   |
+| 0.1 - 0.7   | 4.1   |
 
 ## Rust API
 
