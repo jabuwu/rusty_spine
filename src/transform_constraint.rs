@@ -131,7 +131,6 @@ impl TransformConstraint {
         }
     }
 
-    #[must_use]
     pub fn set_mix_scale(&mut self, mix_scale: impl Into<Vector2<f32>>) {
         let mix_scale: Vector2<f32> = mix_scale.into();
         self.set_mix_scale_x(mix_scale.x);
@@ -146,7 +145,6 @@ impl TransformConstraint {
         }
     }
 
-    #[must_use]
     pub fn set_mix(&mut self, mix: impl Into<Vector2<f32>>) {
         let mix: Vector2<f32> = mix.into();
         self.set_mix_x(mix.x);

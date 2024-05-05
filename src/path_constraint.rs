@@ -121,7 +121,6 @@ impl PathConstraint {
         }
     }
 
-    #[must_use]
     pub fn set_mix(&mut self, mix: impl Into<Vector2<f32>>) {
         let mix: Vector2<f32> = mix.into();
         self.set_mix_x(mix.x);
