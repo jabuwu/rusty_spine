@@ -3,19 +3,20 @@ use std::{borrow::Cow, sync::Arc};
 use crate::{
     bone::Bone,
     c::{
-        spBone, spPhysics, spSkeleton, spSkeletonData, spSkeleton_create, spSkeleton_dispose,
+        spBone, spIkConstraint, spPathConstraint, spPhysics, spPhysicsConstraint, spSkeleton,
+        spSkeletonData, spSkeleton_create, spSkeleton_dispose,
         spSkeleton_getAttachmentForSlotIndex, spSkeleton_getAttachmentForSlotName,
         spSkeleton_setAttachment, spSkeleton_setBonesToSetupPose, spSkeleton_setSkin,
         spSkeleton_setSkinByName, spSkeleton_setSlotsToSetupPose, spSkeleton_setToSetupPose,
         spSkeleton_update, spSkeleton_updateCache, spSkeleton_updateWorldTransform,
-        spSkeleton_updateWorldTransformWith, spSkin, spSlot,
+        spSkeleton_updateWorldTransformWith, spSkin, spSlot, spTransformConstraint,
     },
     c_interface::{to_c_str, CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::SpineError,
     skeleton_data::SkeletonData,
     skin::Skin,
     slot::Slot,
-    Attachment, Physics,
+    Attachment, IkConstraint, PathConstraint, Physics, PhysicsConstraint, TransformConstraint,
 };
 
 #[allow(unused_imports)]
@@ -248,6 +249,72 @@ impl Skeleton {
         self.slots_mut().find(|slot| slot.data().name() == name)
     }
 
+    #[must_use]
+    pub fn find_ik_constraint(&self, name: &str) -> Option<CTmpRef<Skeleton, IkConstraint>> {
+        self.ik_constraints()
+            .find(|ik_constraint| ik_constraint.data().name() == name)
+    }
+
+    #[must_use]
+    pub fn find_ik_constraint_mut(
+        &mut self,
+        name: &str,
+    ) -> Option<CTmpMut<Skeleton, IkConstraint>> {
+        self.ik_constraints_mut()
+            .find(|ik_constraint| ik_constraint.data().name() == name)
+    }
+
+    #[must_use]
+    pub fn find_path_constraint(&self, name: &str) -> Option<CTmpRef<Skeleton, PathConstraint>> {
+        self.path_constraints()
+            .find(|path_constraint| path_constraint.data().name() == name)
+    }
+
+    #[must_use]
+    pub fn find_path_constraint_mut(
+        &mut self,
+        name: &str,
+    ) -> Option<CTmpMut<Skeleton, PathConstraint>> {
+        self.path_constraints_mut()
+            .find(|path_constraint| path_constraint.data().name() == name)
+    }
+
+    #[must_use]
+    pub fn find_physics_constraint(
+        &self,
+        name: &str,
+    ) -> Option<CTmpRef<Skeleton, PhysicsConstraint>> {
+        self.physics_constraints()
+            .find(|physics_constraint| physics_constraint.data().name() == name)
+    }
+
+    #[must_use]
+    pub fn find_physics_constraint_mut(
+        &mut self,
+        name: &str,
+    ) -> Option<CTmpMut<Skeleton, PhysicsConstraint>> {
+        self.physics_constraints_mut()
+            .find(|physics_constraint| physics_constraint.data().name() == name)
+    }
+
+    #[must_use]
+    pub fn find_transform_constraint(
+        &self,
+        name: &str,
+    ) -> Option<CTmpRef<Skeleton, TransformConstraint>> {
+        self.transform_constraints()
+            .find(|transform_constraint| transform_constraint.data().name() == name)
+    }
+
+    #[must_use]
+    pub fn find_transform_constraint_mut(
+        &mut self,
+        name: &str,
+    ) -> Option<CTmpMut<Skeleton, TransformConstraint>> {
+        self.transform_constraints_mut()
+            .find(|transform_constraint| transform_constraint.data().name() == name)
+    }
+
     pub fn set_attachment(&mut self, slot_name: &str, attachment_name: Option<&str>) -> bool {
         let c_slot_name = to_c_str(slot_name);
         attachment_name.map_or_else(
@@ -345,15 +412,21 @@ impl Skeleton {
         usize
     );
     c_accessor!(
-        /// The number of transform constraints in this skeleton.
-        transform_contraints_count,
-        transformConstraintsCount,
-        usize
-    );
-    c_accessor!(
         /// The number of path constraints in this skeleton.
         path_contraints_count,
         pathConstraintsCount,
+        usize
+    );
+    c_accessor!(
+        /// The number of physics constraints in this skeleton.
+        physics_contraints_count,
+        physicsConstraintsCount,
+        usize
+    );
+    c_accessor!(
+        /// The number of transform constraints in this skeleton.
+        transform_contraints_count,
+        transformConstraintsCount,
         usize
     );
     c_accessor_mut!(
@@ -436,6 +509,50 @@ impl Skeleton {
         spSlot,
         drawOrder,
         slots_count
+    );
+    c_accessor_array_mut!(
+        ik_constraints,
+        ik_constraints_mut,
+        ik_contraint_at_index,
+        ik_constraint_at_index_mut,
+        Skeleton,
+        IkConstraint,
+        spIkConstraint,
+        ikConstraints,
+        ik_contraints_count
+    );
+    c_accessor_array_mut!(
+        path_constraints,
+        path_constraints_mut,
+        path_contraint_at_index,
+        path_constraint_at_index_mut,
+        Skeleton,
+        PathConstraint,
+        spPathConstraint,
+        pathConstraints,
+        path_contraints_count
+    );
+    c_accessor_array_mut!(
+        physics_constraints,
+        physics_constraints_mut,
+        physics_contraint_at_index,
+        physics_constraint_at_index_mut,
+        Skeleton,
+        PhysicsConstraint,
+        spPhysicsConstraint,
+        physicsConstraints,
+        physics_contraints_count
+    );
+    c_accessor_array_mut!(
+        transform_constraints,
+        transform_constraints_mut,
+        transform_contraint_at_index,
+        transform_constraint_at_index_mut,
+        Skeleton,
+        TransformConstraint,
+        spTransformConstraint,
+        transformConstraints,
+        transform_contraints_count
     );
     c_accessor_tmp_ptr_optional_mut!(skin, skin_mut, skin, Skin, spSkin);
     c_ptr!(c_skeleton, spSkeleton);
