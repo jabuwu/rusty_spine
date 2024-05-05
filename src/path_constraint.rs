@@ -7,6 +7,9 @@ use crate::{
     Bone, PathConstraintData, Slot,
 };
 
+#[cfg(feature = "mint")]
+use mint::Vector2;
+
 /// [Spine API Reference](https://esotericsoftware.com/spine-api-reference#PathConstraint)
 #[derive(Debug)]
 pub struct PathConstraint {
@@ -105,4 +108,23 @@ impl PathConstraint {
     );
 
     c_ptr!(c_path_constraint, spPathConstraint);
+}
+
+/// Functions available if using the `mint` feature.
+#[cfg(feature = "mint")]
+impl PathConstraint {
+    #[must_use]
+    pub fn mix(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.mix_x(),
+            y: self.mix_y(),
+        }
+    }
+
+    #[must_use]
+    pub fn set_mix(&mut self, mix: impl Into<Vector2<f32>>) {
+        let mix: Vector2<f32> = mix.into();
+        self.set_mix_x(mix.x);
+        self.set_mix_y(mix.y);
+    }
 }

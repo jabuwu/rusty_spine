@@ -7,6 +7,9 @@ use crate::{
     Bone, TransformConstraintData,
 };
 
+#[cfg(feature = "mint")]
+use mint::Vector2;
+
 /// [Spine API Reference](https://esotericsoftware.com/spine-api-reference#TransformConstraint)
 #[derive(Debug)]
 pub struct TransformConstraint {
@@ -57,7 +60,7 @@ impl TransformConstraint {
         /// A percentage (0-1) that controls the mix between the constrained and unconstrained
         /// scale X.
         mix_scale_x,
-        set_scale_x,
+        set_mix_scale_x,
         mixScaleX,
         f32
     );
@@ -65,7 +68,7 @@ impl TransformConstraint {
         /// A percentage (0-1) that controls the mix between the constrained and unconstrained
         /// scale X.
         mix_scale_y,
-        set_scale_y,
+        set_mix_scale_y,
         mixScaleY,
         f32
     );
@@ -115,4 +118,38 @@ impl TransformConstraint {
     );
 
     c_ptr!(c_transform_constraint, spTransformConstraint);
+}
+
+/// Functions available if using the `mint` feature.
+#[cfg(feature = "mint")]
+impl TransformConstraint {
+    #[must_use]
+    pub fn mix_scale(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.mix_scale_x(),
+            y: self.mix_scale_y(),
+        }
+    }
+
+    #[must_use]
+    pub fn set_mix_scale(&mut self, mix_scale: impl Into<Vector2<f32>>) {
+        let mix_scale: Vector2<f32> = mix_scale.into();
+        self.set_mix_scale_x(mix_scale.x);
+        self.set_mix_scale_y(mix_scale.y);
+    }
+
+    #[must_use]
+    pub fn mix(&self) -> Vector2<f32> {
+        Vector2 {
+            x: self.mix_x(),
+            y: self.mix_y(),
+        }
+    }
+
+    #[must_use]
+    pub fn set_mix(&mut self, mix: impl Into<Vector2<f32>>) {
+        let mix: Vector2<f32> = mix.into();
+        self.set_mix_x(mix.x);
+        self.set_mix_y(mix.y);
+    }
 }
