@@ -20,8 +20,6 @@ bitflags! {
 }
 
 fn main() -> anyhow::Result<()> {
-    std::env::set_var("RUSTFLAGS", "-D warnings");
-
     let arguments = [
         ("check", Check::CHECK),
         ("wasm-check", Check::WASM_CHECK),
@@ -81,13 +79,19 @@ fn check(sh: &Shell, target: Target, features: Features) -> anyhow::Result<()> {
     let target_flags = &target.flags();
     let feature_combination_flags = features.combination_flags();
     for feature_flags in feature_combination_flags.iter() {
-        cmd!(sh, "cargo check {target_flags...} {feature_flags...}").run()?;
+        cmd!(
+            sh,
+            "cargo rustc {target_flags...} {feature_flags...} -- -D warnings"
+        )
+        .run()?;
     }
     Ok(())
 }
 
 fn example_check(sh: &Shell) -> anyhow::Result<()> {
-    cmd!(sh, "cargo check --examples").run()?;
+    for example in ["c", "miniquad", "simple"] {
+        cmd!(sh, "cargo rustc --example {example} -- -D warnings").run()?;
+    }
     Ok(())
 }
 
@@ -124,6 +128,6 @@ fn doc_check(sh: &Shell) -> anyhow::Result<()> {
 }
 
 fn clippy(sh: &Shell) -> anyhow::Result<()> {
-    cmd!(sh, "cargo clippy --workspace --all-targets").run()?;
+    cmd!(sh, "cargo clippy --workspace --all-targets -- -D warnings").run()?;
     Ok(())
 }
