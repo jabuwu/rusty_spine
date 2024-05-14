@@ -26,6 +26,7 @@ impl NewFromPtr<spAttachmentLoader> for AttachmentLoader {
 impl AttachmentLoader {
     /// The spine runtime offers a default [`AttachmentLoader`](`crate::AttachmentLoader`) that
     /// loads attachments from an [`Atlas`](`crate::Atlas`).
+    #[must_use]
     pub fn new_atlas_loader(atlas: &Atlas) -> Self {
         unsafe {
             let atlas_attachment_loader = spAtlasAttachmentLoader_create(atlas.c_ptr());
