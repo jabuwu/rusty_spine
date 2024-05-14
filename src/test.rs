@@ -20,6 +20,7 @@ pub struct TestAsset {
 }
 
 impl TestAsset {
+    #[must_use]
     pub const fn all() -> &'static [Self; 9] {
         &[
             Self {
@@ -85,24 +86,29 @@ impl TestAsset {
         ]
     }
 
+    #[must_use]
     pub const fn spineboy() -> &'static Self {
         &Self::all()[0]
     }
 
     #[allow(clippy::missing_panics_doc)]
+    #[must_use]
     pub fn atlas(&self) -> Atlas {
         Atlas::new(self.atlas_data, "").unwrap()
     }
 
+    #[must_use]
     pub fn skeleton_json(&self) -> SkeletonJson {
         SkeletonJson::new(Arc::new(self.atlas()))
     }
 
+    #[must_use]
     pub fn skeleton_binary(&self) -> SkeletonBinary {
         SkeletonBinary::new(Arc::new(self.atlas()))
     }
 
     #[allow(clippy::missing_panics_doc)]
+    #[must_use]
     pub fn skeleton_data(&self, json: bool) -> SkeletonData {
         if json {
             self.skeleton_json()
@@ -115,16 +121,19 @@ impl TestAsset {
         }
     }
 
+    #[must_use]
     pub fn animation_state_data(&self, json: bool) -> AnimationStateData {
         AnimationStateData::new(Arc::new(self.skeleton_data(json)))
     }
 
+    #[must_use]
     pub fn instance_data(&self, json: bool) -> (Arc<SkeletonData>, Arc<AnimationStateData>) {
         let skeleton_data = Arc::new(self.skeleton_data(json));
         let animation_state_data = Arc::new(AnimationStateData::new(skeleton_data.clone()));
         (skeleton_data, animation_state_data)
     }
 
+    #[must_use]
     pub fn instance(&self, json: bool) -> (Skeleton, AnimationState) {
         let (skeleton_data, animation_state_data) = self.instance_data(json);
         let skeleton = Skeleton::new(skeleton_data);
