@@ -27,11 +27,15 @@ use crate::{
     c::{c_char, spAtlasPage},
 };
 
+type CreateTextureCb = Box<dyn Fn(&mut AtlasPage, &str)>;
+type DisposeTextureCb = Box<dyn Fn(&mut AtlasPage)>;
+type ReadFileCb = Box<dyn Fn(&str) -> Option<Vec<u8>>>;
+
 #[derive(Default)]
 pub(crate) struct Extension {
-    create_texture_cb: Option<Box<dyn Fn(&mut AtlasPage, &str)>>,
-    dispose_texture_cb: Option<Box<dyn Fn(&mut AtlasPage)>>,
-    read_file_cb: Option<Box<dyn Fn(&str) -> Option<Vec<u8>>>>,
+    create_texture_cb: Option<CreateTextureCb>,
+    dispose_texture_cb: Option<DisposeTextureCb>,
+    read_file_cb: Option<ReadFileCb>,
 }
 
 impl Extension {
@@ -52,19 +56,52 @@ impl Extension {
 ///
 /// The purpose of this callback is to allow loading textures in whichever engine is being used.
 /// The following example shows the intended usage by storing the texture on the renderer object
-/// of the AtlasPage which can be acquired later.
+/// of the [`AtlasPage`] which can be acquired later.
 /// ```
 /// struct SpineTexture(pub String);
 ///
-/// fn main() {
-///     rusty_spine::extension::set_create_texture_cb(|atlas_page, path| {
-///         atlas_page.renderer_object().set(SpineTexture(path.to_owned()));
-///     });
-///     rusty_spine::extension::set_dispose_texture_cb(|atlas_page| unsafe {
-///         atlas_page.renderer_object().dispose::<SpineTexture>();
-///     });
+/// rusty_spine::extension::set_create_texture_cb(|atlas_page, path| {
+///     atlas_page.renderer_object().set(SpineTexture(path.to_owned()));
+/// });
+/// rusty_spine::extension::set_dispose_texture_cb(|atlas_page| unsafe {
+///     atlas_page.renderer_object().dispose::<SpineTexture>();
+/// });
+/// ```
+///
+/// If using the [`SimpleDrawer`](`crate::draw::SimpleDrawer`) or
+/// [`CombinedDrawer`](`crate::draw::CombinedDrawer`), the texture can be acquired from
+/// [`SimpleRenderable::attachment_renderer_object`](`crate::draw::SimpleRenderable::attachment_renderer_object`)
+/// or
+/// [`CombinedRenderable::attachment_renderer_object`](`crate::draw::CombinedRenderable::attachment_renderer_object`)
+/// respectively.
+///
+/// If using the [`SkeletonController`](`crate::controller::SkeletonController`), see
+/// [`SkeletonRenderable::attachment_renderer_object`](`crate::controller::SkeletonRenderable::attachment_renderer_object`)
+/// or
+/// [`SkeletonCombinedRenderable::attachment_renderer_object`](`crate::controller::SkeletonCombinedRenderable::attachment_renderer_object`)
+///
+/// ```
+/// # #[path="./test.rs"]
+/// # mod test;
+/// # use rusty_spine::{AnimationState, EventType, controller::SkeletonController};
+/// # let (mut skeleton_data, mut animation_state_data) = test::TestAsset::spineboy().instance_data(true);
+///
+/// struct SpineTexture(pub String); // from example above
+///
+/// // ...
+///
+/// let mut skeleton_controller = SkeletonController::new(skeleton_data, animation_state_data);
+/// let renderables = skeleton_controller.renderables();
+/// for renderable in renderables.iter() {
+///     if let Some(attachment_renderer_object) = renderable.attachment_renderer_object {
+///         let texture = unsafe { &mut *(attachment_renderer_object as *mut SpineTexture) };
+///     }
 /// }
 /// ```
+///
+/// # Panics
+///
+/// Panics if the internal mutex is poisoned.
 pub fn set_create_texture_cb<F>(create_texture_cb: F)
 where
     F: Fn(&mut AtlasPage, &str) + 'static,
@@ -76,7 +113,11 @@ where
 
 /// Set `_spAtlasPage_disposeTexture`
 ///
-/// For an example, see [set_create_texture_cb](fn.set_create_texture_cb.html).
+/// For an example, see [`set_create_texture_cb`].
+///
+/// # Panics
+///
+/// Panics if the internal mutex is poisoned.
 pub fn set_dispose_texture_cb<F>(dispose_texture_cb: F)
 where
     F: Fn(&mut AtlasPage) + 'static,
@@ -94,12 +135,14 @@ where
 /// `std::fs::read` is provided if this callback remains unset.
 ///
 /// ```
-/// fn main() {
-///     rusty_spine::extension::set_read_file_cb(|path| {
-///         std::fs::read(path).ok()
-///     });
-/// }
+/// rusty_spine::extension::set_read_file_cb(|path| {
+///     std::fs::read(path).ok()
+/// });
 /// ```
+///
+/// # Panics
+///
+/// Panics if the internal mutex is poisoned.
 pub fn set_read_file_cb<F>(read_file_cb: F)
 where
     F: Fn(&str) -> Option<Vec<u8>> + 'static,
@@ -143,28 +186,28 @@ extern "C" {
 extern "C" fn _spUtil_readFile(c_path: *const c_char, c_length: *mut c_int) -> *mut c_char {
     let singleton = Extension::singleton();
     let extension = singleton.lock().unwrap();
-    if let Some(cb) = &extension.read_file_cb {
-        if let Some(data) = cb(unsafe { CStr::from_ptr(c_path).to_str().unwrap() }) {
-            unsafe {
-                *c_length = data.len() as c_int;
-                let c_data = spine_malloc(data.len() as size_t);
-                spine_memcpy(c_data, data.as_ptr() as *const c_void, data.len() as size_t);
-                c_data as *mut c_char
-            }
-        } else {
-            std::ptr::null_mut()
-        }
-    } else {
-        let str = unsafe { CStr::from_ptr(c_path).to_str().unwrap().to_owned() };
-        if let Ok(data) = read(str) {
-            let c_data = unsafe { spine_malloc(data.len() as size_t) };
-            unsafe {
-                spine_memcpy(c_data, data.as_ptr() as *const c_void, data.len() as size_t);
-                *c_length = data.len() as c_int;
-            }
-            c_data as *mut c_char
-        } else {
-            std::ptr::null_mut()
-        }
-    }
+    extension.read_file_cb.as_ref().map_or_else(
+        || {
+            let str = unsafe { CStr::from_ptr(c_path).to_str().unwrap().to_owned() };
+            read(str).map_or(std::ptr::null_mut(), |data| {
+                let c_data = unsafe { spine_malloc(data.len() as size_t) };
+                unsafe {
+                    spine_memcpy(c_data, data.as_ptr().cast::<c_void>(), data.len() as size_t);
+                    *c_length = data.len() as c_int;
+                }
+                c_data.cast::<c_char>()
+            })
+        },
+        |cb| {
+            cb(unsafe { CStr::from_ptr(c_path).to_str().unwrap() }).map_or(
+                std::ptr::null_mut(),
+                |data| unsafe {
+                    *c_length = data.len() as c_int;
+                    let c_data = spine_malloc(data.len() as size_t);
+                    spine_memcpy(c_data, data.as_ptr().cast::<c_void>(), data.len() as size_t);
+                    c_data.cast::<c_char>()
+                },
+            )
+        },
+    )
 }

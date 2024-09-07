@@ -1,4 +1,4 @@
-use std::{ffi::CString, sync::Arc};
+use std::sync::Arc;
 
 use crate::{
     animation::Animation,
@@ -7,11 +7,14 @@ use crate::{
         spAnimationStateData_getMix, spAnimationStateData_setMix,
         spAnimationStateData_setMixByName, spSkeletonData,
     },
-    c_interface::{NewFromPtr, SyncPtr},
+    c_interface::{to_c_str, NewFromPtr, SyncPtr},
     skeleton_data::SkeletonData,
 };
 
-/// Animation settings used to instantiate [AnimationState](struct.AnimationState.html).
+#[allow(unused_imports)]
+use crate::AnimationState;
+
+/// Animation settings used to instantiate [`AnimationState`].
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#AnimationStateData)
 ///
@@ -19,9 +22,9 @@ use crate::{
 /// smoothly mix between a `walk` and `run` animation for `0.2` seconds:
 ///
 /// ```
-/// # #[path="./doctests.rs"]
-/// # mod doctests;
-/// # let mut animation_state_data = doctests::test_spineboy_animation_state_data();
+/// # #[path="./test.rs"]
+/// # mod test;
+/// # let mut animation_state_data = test::TestAsset::spineboy().animation_state_data(true);
 /// animation_state_data.set_mix_by_name("walk", "run", 0.2);
 /// ```
 ///
@@ -29,9 +32,9 @@ use crate::{
 /// durations must be specified:
 ///
 /// ```
-/// # #[path="./doctests.rs"]
-/// # mod doctests;
-/// # let mut animation_state_data = doctests::test_spineboy_animation_state_data();
+/// # #[path="./test.rs"]
+/// # mod test;
+/// # let mut animation_state_data = test::TestAsset::spineboy().animation_state_data(true);
 /// animation_state_data.set_mix_by_name("walk", "run", 0.2);
 /// animation_state_data.set_mix_by_name("run", "walk", 0.2);
 /// ```
@@ -43,9 +46,9 @@ pub struct AnimationStateData {
 }
 
 impl NewFromPtr<spAnimationStateData> for AnimationStateData {
-    unsafe fn new_from_ptr(c_animation_state_data: *const spAnimationStateData) -> Self {
+    unsafe fn new_from_ptr(c_animation_state_data: *mut spAnimationStateData) -> Self {
         Self {
-            c_animation_state_data: SyncPtr(c_animation_state_data as *mut spAnimationStateData),
+            c_animation_state_data: SyncPtr(c_animation_state_data),
             owns_memory: false,
             _skeleton_data: None,
         }
@@ -53,6 +56,7 @@ impl NewFromPtr<spAnimationStateData> for AnimationStateData {
 }
 
 impl AnimationStateData {
+    #[must_use]
     pub fn new(skeleton_data: Arc<SkeletonData>) -> Self {
         let c_animation_state_data = unsafe { spAnimationStateData_create(skeleton_data.c_ptr()) };
         Self {
@@ -63,8 +67,8 @@ impl AnimationStateData {
     }
 
     pub fn set_mix_by_name(&mut self, from_name: &str, to_name: &str, duration: f32) {
-        let c_from_name = CString::new(from_name).unwrap();
-        let c_to_name = CString::new(to_name).unwrap();
+        let c_from_name = to_c_str(from_name);
+        let c_to_name = to_c_str(to_name);
         unsafe {
             spAnimationStateData_setMixByName(
                 self.c_ptr(),
@@ -85,7 +89,7 @@ impl AnimationStateData {
         unsafe { spAnimationStateData_getMix(self.c_ptr(), from.c_ptr(), to.c_ptr()) }
     }
 
-    c_accessor_tmp_ptr!(
+    c_accessor_tmp_ptr_mut!(
         skeleton_data,
         skeleton_data_mut,
         skeletonData,

@@ -200,7 +200,7 @@ pub const SP_POSITION_MODE_FIXED: spPositionMode = 0;
 pub struct spSlotData {
     pub index: c_int,
     pub name: *const c_char,
-    pub boneData: *const spBoneData,
+    pub boneData: *mut spBoneData,
     pub attachmentName: *const c_char,
     pub color: spColor,
     pub darkColor: *mut spColor,
@@ -731,7 +731,7 @@ pub struct spAtlasRegion {
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct spAtlasPage {
-    pub atlas: *const spAtlas,
+    pub atlas: *mut spAtlas,
     pub name: *const c_char,
     pub format: spAtlasFormat,
     pub minFilter: spAtlasFilter,
@@ -7181,7 +7181,7 @@ pub unsafe extern "C" fn spAtlasPage_create(
         b"spine.c\0" as *const u8 as *const c_char,
         3053 as c_int,
     ) as *mut spAtlasPage;
-    let ref mut fresh47 = *(&mut (*self_0).atlas as *mut *const spAtlas as *mut *mut spAtlas);
+    let ref mut fresh47 = *(&mut (*self_0).atlas as *mut *mut spAtlas);
     *fresh47 = atlas;
     let ref mut fresh48 = *(&mut (*self_0).name as *mut *const c_char as *mut *mut c_char);
     *fresh48 = _spMalloc(
@@ -10190,10 +10190,8 @@ pub unsafe extern "C" fn spPathConstraint_apply(mut self_0: *mut spPathConstrain
     p = 3 as c_int;
     while i < boneCount {
         let mut bone_0: *mut spBone = *bones.offset(i as isize);
-        *(&mut (*bone_0).worldX as *mut c_float) +=
-            (boneX - (*bone_0).worldX) * translateMix;
-        *(&mut (*bone_0).worldY as *mut c_float) +=
-            (boneY - (*bone_0).worldY) * translateMix;
+        *(&mut (*bone_0).worldX as *mut c_float) += (boneX - (*bone_0).worldX) * translateMix;
+        *(&mut (*bone_0).worldY as *mut c_float) += (boneY - (*bone_0).worldY) * translateMix;
         x = *positions.offset(p as isize);
         y = *positions.offset((p + 1 as c_int) as isize);
         dx = x - boneX;
@@ -18905,8 +18903,7 @@ pub unsafe extern "C" fn spSlotData_create(
         10082 as c_int,
     ) as *mut c_char;
     spine_strcpy(*fresh214, name);
-    let ref mut fresh215 =
-        *(&(*self_0).boneData as *const *const spBoneData as *mut *mut spBoneData);
+    let ref mut fresh215 = *(&mut (*self_0).boneData as *mut *mut spBoneData);
     *fresh215 = boneData;
     spColor_setFromFloats(
         &mut (*self_0).color,
@@ -19056,10 +19053,8 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteWorld(
                 &mut x,
                 &mut y,
             );
-            *(&mut (*bone).worldX as *mut c_float) +=
-                (x - (*bone).worldX) * translateMix;
-            *(&mut (*bone).worldY as *mut c_float) +=
-                (y - (*bone).worldY) * translateMix;
+            *(&mut (*bone).worldX as *mut c_float) += (x - (*bone).worldX) * translateMix;
+            *(&mut (*bone).worldY as *mut c_float) += (y - (*bone).worldY) * translateMix;
             modified = 1 as c_int;
         }
         if scaleMix > 0 as c_int as c_float {

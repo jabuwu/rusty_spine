@@ -53,7 +53,10 @@ use std::sync::{Arc, Mutex};
 use glam::{Mat4, Vec2, Vec3};
 use miniquad::*;
 use rusty_spine::{
-    atlas::{AtlasFilter, AtlasFormat, AtlasWrap}, draw::CullDirection, AnimationEvent, AnimationStateData, Atlas, BlendMode, Color, SkeletonBinary, SkeletonController, SkeletonControllerSettings, SkeletonJson
+    atlas::{AtlasFilter, AtlasFormat, AtlasWrap},
+    controller::{SkeletonController, SkeletonControllerSettings},
+    draw::{ColorSpace, CullDirection},
+    AnimationEvent, AnimationStateData, Atlas, BlendMode, Color, SkeletonBinary, SkeletonJson,
 };
 
 const MAX_MESH_VERTICES: usize = 10000;
@@ -231,7 +234,7 @@ impl Spine {
             .with_settings(SkeletonControllerSettings {
                 premultiplied_alpha,
                 cull_direction: CullDirection::CounterClockwise,
-                //color_space: ColorSpace::SRGB, // TODO
+                color_space: ColorSpace::SRGB,
             });
 
         // Listen for animation events

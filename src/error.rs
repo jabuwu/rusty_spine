@@ -1,47 +1,79 @@
 use std::{error, ffi::NulError, fmt};
 
+/// Error types when interacting with the Spine runtime.
 #[derive(Debug)]
-pub enum Error {
-    Spine(String),
+pub enum SpineError {
+    /// A parsing error straight from the Spine C runtime.
+    ParsingFailed { reason: String },
+    /// A wrapper for [`std::ffi::NulError`].
     NulError(NulError),
-    NotFound,
-    FailedToReadFile(String),
+    /// An error when something couldn't be found, represented by `what` it was and its `name`.
+    NotFound { what: String, name: String },
+    /// An error when failing to read files.
+    FailedToReadFile { file: String },
+    /// An error when a specified path is not utf-8.
+    PathNotUtf8,
+    /// Failed to create the requested type.
+    CreationFailed { what: String },
 }
 
-impl Error {
-    pub fn new_from_spine(message: &str) -> Self {
-        Self::Spine(String::from(message))
+impl SpineError {
+    pub(crate) fn new_from_spine(reason: &str) -> Self {
+        Self::ParsingFailed {
+            reason: reason.to_owned(),
+        }
+    }
+
+    pub(crate) fn new_not_found(what: &str, name: &str) -> Self {
+        Self::NotFound {
+            what: what.to_owned(),
+            name: name.to_owned(),
+        }
+    }
+
+    pub(crate) fn new_creation_failed(what: &str) -> Self {
+        Self::CreationFailed {
+            what: what.to_owned(),
+        }
     }
 }
 
-impl From<NulError> for Error {
+impl From<NulError> for SpineError {
     fn from(err: NulError) -> Self {
         Self::NulError(err)
     }
 }
 
-impl fmt::Display for Error {
+impl fmt::Display for SpineError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::Spine(str) => {
-                write!(f, "Spine error: {}", str)?;
+            SpineError::ParsingFailed { reason } => {
+                write!(f, "Spine parsing failed: {reason}")?;
                 Ok(())
             }
-            Error::NulError(error) => {
-                write!(f, "Nul error: {}", error)?;
+            SpineError::NulError(error) => {
+                write!(f, "Nul error: {error}")?;
                 Ok(())
             }
-            Error::NotFound => {
+            SpineError::NotFound { what, name } => {
                 // TODO: make this error better, this is not helpful
-                write!(f, "Not found.")?;
+                write!(f, "{what} not found: {name}")?;
                 Ok(())
             }
-            Self::FailedToReadFile(file) => {
-                write!(f, "Failed to read file: {}", file)?;
+            Self::FailedToReadFile { file } => {
+                write!(f, "Failed to read file: {file}")?;
+                Ok(())
+            }
+            SpineError::PathNotUtf8 => {
+                write!(f, "Path not utf-8")?;
+                Ok(())
+            }
+            SpineError::CreationFailed { what } => {
+                write!(f, "Failed to create {what}")?;
                 Ok(())
             }
         }
     }
 }
 
-impl error::Error for Error {}
+impl error::Error for SpineError {}

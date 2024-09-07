@@ -1,30 +1,60 @@
 use crate::{
-    c::{c_void, spSkeletonClipping_clipTriangles, spMeshAttachment_updateUVs},
+    c::{c_void, spMeshAttachment_updateUVs},
     BlendMode, Color, Skeleton, SkeletonClipping,
 };
 
-use super::CullDirection;
+use super::{ColorSpace, CullDirection};
 
+#[allow(unused_imports)]
+use crate::extension;
+
+/// Renderables generated from [`SimpleDrawer::draw`].
+#[derive(Clone)]
 pub struct SimpleRenderable {
-    pub slot_index: i32,
+    /// The index of the slot in [`Skeleton`] that this renderable represents.
+    pub slot_index: usize,
+    /// A list of vertex attributes for a mesh.
     pub vertices: Vec<[f32; 2]>,
+    /// A list of UV attributes for a mesh.
     pub uvs: Vec<[f32; 2]>,
+    /// A list of indices for a mesh.
     pub indices: Vec<u16>,
+    /// The color tint of the mesh.
     pub color: Color,
+    /// The dark color tint of the mesh.
+    /// See the [Spine User Guide](http://en.esotericsoftware.com/spine-slots#Tint-black).
     pub dark_color: Color,
+    /// The blend mode to use when drawing this mesh.
     pub blend_mode: BlendMode,
+    /// The attachment's renderer object as a raw pointer. Usually represents the texture created
+    /// from [`extension::set_create_texture_cb`].
     pub attachment_renderer_object: Option<*const c_void>,
-}
-
-pub struct SimpleDrawer {
-    pub cull_direction: CullDirection,
-    pub premultiplied_alpha: bool,
 }
 
 /// A simple drawer with no optimizations.
 ///
 /// Assumes use of the default atlas attachment loader.
+///
+/// See [`SimpleDrawer::draw`]
+pub struct SimpleDrawer {
+    /// The cull direction to use for the vertices.
+    pub cull_direction: CullDirection,
+    /// Set to `true` if the textures are expected to have premultiplied alpha.
+    pub premultiplied_alpha: bool,
+    /// The color space to use for the colors returned in [`SimpleRenderable`].
+    pub color_space: ColorSpace,
+}
+
 impl SimpleDrawer {
+    /// This function returns a list of [`SimpleRenderable`] structs containing all the necessary
+    /// data to create and render meshes. One renderable is created for each visible attachment on
+    /// the skeleton. If a [`SkeletonClipping`] is provided, meshes will be properly clipped. The
+    /// renderables are expected to be rendered in the order provided with the first renderable
+    /// being drawn behind all the others.
+    ///
+    /// # Panics
+    ///
+    /// Panics if not using the default attachment loader with valid atlas regions.
     pub fn draw(
         &self,
         skeleton: &mut Skeleton,
@@ -34,7 +64,9 @@ impl SimpleDrawer {
         let mut world_vertices = vec![];
         world_vertices.resize(1000, 0.);
         for slot_index in 0..skeleton.slots_count() {
-            let slot = skeleton.draw_order_at_index(slot_index).unwrap();
+            let Some(slot) = skeleton.draw_order_at_index(slot_index) else {
+                continue;
+            };
             if !slot.bone().active() {
                 if let Some(clipper) = clipper.as_deref_mut() {
                     clipper.clip_end(&slot);
@@ -51,7 +83,6 @@ impl SimpleDrawer {
                 unsafe {
                     spMeshAttachment_updateUVs(mesh_attachment.c_ptr());
                 };
-
                 color = mesh_attachment.color();
 
                 unsafe {
@@ -147,12 +178,10 @@ impl SimpleDrawer {
                         world_vertices[i as usize * 2 + 1],
                     ]);
 
-                    unsafe {
-                        uvs.push([
-                            region_attachment.uvs()[i as usize * 2],
-                            region_attachment.uvs()[i as usize * 2 + 1],
-                        ]);
-                    }
+                    uvs.push([
+                        region_attachment.uvs()[i as usize * 2],
+                        region_attachment.uvs()[i as usize * 2 + 1],
+                    ]);
                 }
 
                 indices.reserve(6);
@@ -188,23 +217,18 @@ impl SimpleDrawer {
             if let Some(clipper) = clipper.as_deref_mut() {
                 if clipper.is_clipping() {
                     unsafe {
-                        spSkeletonClipping_clipTriangles(
-                            clipper.c_ptr(),
-                            vertices.as_mut_ptr() as *mut f32,
-                            vertices.len() as i32,
-                            indices.as_mut_ptr(),
-                            indices.len() as i32,
-                            uvs.as_mut_ptr() as *mut f32,
+                        clipper.clip_triangles(
+                            vertices.as_mut_slice(),
+                            indices.as_mut_slice(),
+                            uvs.as_mut_slice(),
                             2,
                         );
-                    }
-                    unsafe {
                         let clipped_vertices_size =
                             (*clipper.c_ptr_ref().clippedVertices).size as usize;
                         vertices.resize(clipped_vertices_size / 2, [0., 0.]);
                         std::ptr::copy_nonoverlapping(
                             (*clipper.c_ptr_ref().clippedVertices).items,
-                            vertices.as_mut_ptr() as *mut f32,
+                            vertices.as_mut_ptr().cast::<f32>(),
                             clipped_vertices_size,
                         );
                         let clipped_triangles_size =
@@ -212,58 +236,76 @@ impl SimpleDrawer {
                         indices.resize(clipped_triangles_size, 0);
                         std::ptr::copy_nonoverlapping(
                             (*clipper.c_ptr_ref().clippedTriangles).items,
-                            indices.as_mut_ptr() as *mut u16,
+                            indices.as_mut_ptr(),
                             clipped_triangles_size,
                         );
                         let clipped_uvs_size = (*clipper.c_ptr_ref().clippedUVs).size as usize;
                         uvs.resize(clipped_uvs_size / 2, [0., 0.]);
                         std::ptr::copy_nonoverlapping(
                             (*clipper.c_ptr_ref().clippedUVs).items,
-                            uvs.as_mut_ptr() as *mut f32,
+                            uvs.as_mut_ptr().cast::<f32>(),
                             clipped_uvs_size,
                         );
                     }
                 }
             }
 
-            let attachment_renderer_object = if let Some(mesh_attachment) =
-                slot.attachment().and_then(|a| a.as_mesh())
-            {
-                Some(unsafe {
-                    mesh_attachment
-                        .renderer_object()
-                        .get_atlas_region()
-                        .unwrap()
-                        .page()
-                        .c_ptr_ref()
-                        .rendererObject as *const c_void
-                })
-            } else if let Some(region_attachment) = slot.attachment().and_then(|a| a.as_region()) {
-                Some(unsafe {
-                    region_attachment
-                        .renderer_object()
-                        .get_atlas_region()
-                        .unwrap()
-                        .page()
-                        .c_ptr_ref()
-                        .rendererObject as *const c_void
-                })
-            } else {
-                None
-            };
+            let attachment_renderer_object =
+                slot.attachment().and_then(|a| a.as_mesh()).map_or_else(
+                    || {
+                        slot.attachment().and_then(|a| a.as_region()).and_then(
+                            |region_attachment| unsafe {
+                                let attachment_renderer_object = region_attachment
+                                    .renderer_object()
+                                    .get_atlas_region()
+                                    .unwrap()
+                                    .page()
+                                    .c_ptr_ref()
+                                    .rendererObject
+                                    .cast_const();
+                                if attachment_renderer_object.is_null() {
+                                    None
+                                } else {
+                                    Some(attachment_renderer_object)
+                                }
+                            },
+                        )
+                    },
+                    |mesh_attachment| unsafe {
+                        let attachment_renderer_object = mesh_attachment
+                            .renderer_object()
+                            .get_atlas_region()
+                            .unwrap()
+                            .page()
+                            .c_ptr_ref()
+                            .rendererObject
+                            .cast_const();
+                        if attachment_renderer_object.is_null() {
+                            None
+                        } else {
+                            Some(attachment_renderer_object)
+                        }
+                    },
+                );
 
             color *= slot.color() * skeleton.color();
+            let mut dark_color = slot.dark_color().unwrap_or_default();
             if self.premultiplied_alpha {
                 color.premultiply_alpha();
-            }
-
-            let mut dark_color = slot
-                .dark_color()
-                .unwrap_or(Color::new_rgba(0.0, 0.0, 0.0, 0.0));
-            if self.premultiplied_alpha {
+                dark_color *= color.a;
                 dark_color.a = 1.0;
-                dark_color.premultiply_alpha();
+            } else {
+                dark_color.a = 0.;
             }
+            color = match self.color_space {
+                ColorSpace::SRGB => color,
+                ColorSpace::Linear => color.nonlinear_to_linear(),
+            };
+
+            dark_color = match self.color_space {
+                ColorSpace::SRGB => dark_color,
+                ColorSpace::Linear => dark_color.nonlinear_to_linear(),
+            };
 
             renderables.push(SimpleRenderable {
                 slot_index,
@@ -280,9 +322,34 @@ impl SimpleDrawer {
             }
         }
 
-        if let Some(clipper) = clipper.as_deref_mut() {
+        if let Some(clipper) = clipper {
             clipper.clip_end2();
         }
         renderables
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::test::TestAsset;
+
+    use super::*;
+
+    /// Ensure all the example assets draw without error.
+    #[test]
+    fn simple_drawer() {
+        for json in [true, false] {
+            for example_asset in TestAsset::all() {
+                let (mut skeleton, _) = example_asset.instance(json);
+                let drawer = SimpleDrawer {
+                    cull_direction: CullDirection::Clockwise,
+                    premultiplied_alpha: false,
+                    color_space: ColorSpace::Linear,
+                };
+                let mut clipper = SkeletonClipping::new();
+                let renderables = drawer.draw(&mut skeleton, Some(&mut clipper));
+                assert!(!renderables.is_empty());
+            }
+        }
     }
 }

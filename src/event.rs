@@ -66,46 +66,54 @@ pub struct Event {
 }
 
 impl NewFromPtr<spEvent> for Event {
-    unsafe fn new_from_ptr(c_event: *const spEvent) -> Self {
+    unsafe fn new_from_ptr(c_event: *mut spEvent) -> Self {
         Self {
-            c_event: SyncPtr(c_event as *mut spEvent),
+            c_event: SyncPtr(c_event),
         }
     }
 }
 
 impl Event {
-    c_accessor_tmp_ptr!(
+    c_accessor_tmp_ptr_mut!(
+        /// The events's setup pose data.
         data,
+        /// The events's mutable setup pose data.
         data_mut,
         data,
         EventData,
         spEventData
     );
     c_accessor!(
+        /// The animation time this event was keyed.
         time,
         time,
         f32
     );
     c_accessor!(
+        /// The event's int value.
         int_value,
         intValue,
         i32
     );
     c_accessor!(
+        /// The event's float value.
         float_value,
         floatValue,
         f32
     );
     c_accessor_string!(
+        /// The event's string value or an empty string.
         string_value,
         stringValue
     );
     c_accessor!(
+        /// The event's audio volume value.
         volume,
         volume,
         f32
     );
     c_accessor!(
+        /// The event's audio balance value.
         balance,
         balance,
         f32
@@ -122,42 +130,49 @@ pub struct EventData {
 }
 
 impl NewFromPtr<spEventData> for EventData {
-    unsafe fn new_from_ptr(c_event_data: *const spEventData) -> Self {
+    unsafe fn new_from_ptr(c_event_data: *mut spEventData) -> Self {
         Self {
-            c_event_data: SyncPtr(c_event_data as *mut spEventData),
+            c_event_data: SyncPtr(c_event_data),
         }
     }
 }
 
 impl EventData {
     c_accessor_string!(
+        ///The name of the event, which is unique across all events in the skeleton.
         name,
         name
     );
     c_accessor!(
+        /// The event's int value.
         int_value,
         intValue,
         i32
     );
     c_accessor!(
+        /// The event's float value.
         float_value,
         floatValue,
         f32
     );
     c_accessor_string!(
+        /// The event's string value or an empty string.
         string_value,
         stringValue
     );
     c_accessor_string!(
+        /// The event's audio path.
         audio_path,
         audioPath
     );
     c_accessor!(
+        /// The event's audio volume value.
         volume,
         volume,
         f32
     );
     c_accessor!(
+        /// The event's audio balance value.
         balance,
         balance,
         f32

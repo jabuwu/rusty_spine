@@ -17,38 +17,43 @@ use crate::{
 ///
 /// Attachments are reference counted and can be stored and worked with directly, however, some of
 /// the underlying data that attachments point to may be cleared. For this reason, attachments
-/// should be used with caution, and only used so long as the SkeletonData they came from remains
-/// valid, and only attached to the slot they are meant for.
+/// should be used with caution, and only used so long as the
+/// [`SkeletonData`](`crate::SkeletonData`) they came from remains valid, and only attached to the
+/// slot they are meant for.
 #[derive(Debug)]
 pub struct Attachment {
     c_attachment: SyncPtr<spAttachment>,
 }
 
 impl NewFromPtr<spAttachment> for Attachment {
-    unsafe fn new_from_ptr(c_attachment: *const spAttachment) -> Self {
-        (*(c_attachment as *mut spAttachment)).refCount += 1;
+    unsafe fn new_from_ptr(c_attachment: *mut spAttachment) -> Self {
+        (*c_attachment).refCount += 1;
         Self {
-            c_attachment: SyncPtr(c_attachment as *mut spAttachment),
+            c_attachment: SyncPtr(c_attachment),
         }
     }
 }
 
 impl Attachment {
+    /// Get this attachment as a [`RegionAttachment`], or [`None`] if it's a different type.
+    #[must_use]
     pub fn as_region(&self) -> Option<RegionAttachment> {
         if self.attachment_type() == AttachmentType::Region {
             Some(RegionAttachment::new_from_ptr(
-                self.c_attachment.0 as *mut spRegionAttachment,
+                self.c_attachment.0.cast::<spRegionAttachment>(),
             ))
         } else {
             None
         }
     }
 
+    /// Get this attachment as a [`BoundingBoxAttachment`], or [`None`] if it's a different type.
+    #[must_use]
     pub fn as_bounding_box(&self) -> Option<BoundingBoxAttachment> {
         if self.attachment_type() == AttachmentType::BoundingBox {
             Some(unsafe {
                 BoundingBoxAttachment::new_from_ptr(
-                    self.c_attachment.0 as *mut spBoundingBoxAttachment,
+                    self.c_attachment.0.cast::<spBoundingBoxAttachment>(),
                 )
             })
         } else {
@@ -56,38 +61,53 @@ impl Attachment {
         }
     }
 
+    /// Get this attachment as a [`MeshAttachment`], or [`None`] if it's a different type.
+    #[must_use]
     pub fn as_mesh(&self) -> Option<MeshAttachment> {
         if self.attachment_type() == AttachmentType::Mesh {
             Some(unsafe {
-                MeshAttachment::new_from_ptr(self.c_attachment.0 as *mut spMeshAttachment)
+                MeshAttachment::new_from_ptr(self.c_attachment.0.cast::<spMeshAttachment>())
             })
         } else {
             None
         }
     }
 
+    /// Get this attachment as a [`PointAttachment`], or [`None`] if it's a different type.
+    #[must_use]
     pub fn as_point(&self) -> Option<PointAttachment> {
         if self.attachment_type() == AttachmentType::Point {
             Some(unsafe {
-                PointAttachment::new_from_ptr(self.c_attachment.0 as *mut spPointAttachment)
+                PointAttachment::new_from_ptr(self.c_attachment.0.cast::<spPointAttachment>())
             })
         } else {
             None
         }
     }
 
+    /// Get this attachment as a [`ClippingAttachment`], or [`None`] if it's a different type.
+    #[must_use]
     pub fn as_clipping(&self) -> Option<ClippingAttachment> {
         if self.attachment_type() == AttachmentType::Clipping {
             Some(unsafe {
-                ClippingAttachment::new_from_ptr(self.c_attachment.0 as *mut spClippingAttachment)
+                ClippingAttachment::new_from_ptr(self.c_attachment.0.cast::<spClippingAttachment>())
             })
         } else {
             None
         }
     }
 
-    c_accessor_string!(name, name);
-    c_accessor_enum!(attachment_type, type_0, AttachmentType);
+    c_accessor_string!(
+        /// The attachment's name.
+        name,
+        name
+    );
+    c_accessor_enum!(
+        /// The attachment's type.
+        attachment_type,
+        type_0,
+        AttachmentType
+    );
     c_ptr!(c_attachment, spAttachment);
 }
 
@@ -105,6 +125,7 @@ impl Drop for Attachment {
     }
 }
 
+/// The type variants of an [`Attachment`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AttachmentType {
     Region = 0,

@@ -13,7 +13,8 @@ pub struct Color {
 }
 
 impl Color {
-    pub fn new_rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
+    #[must_use]
+    pub const fn new_rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
         Self { r, g, b, a }
     }
 
@@ -108,6 +109,39 @@ impl Color {
         self.g *= self.a;
         self.b *= self.a;
     }
+
+    #[must_use]
+    pub fn linear_to_nonlinear(&self) -> Color {
+        Color {
+            r: linear_to_nonlinear(self.r),
+            g: linear_to_nonlinear(self.g),
+            b: linear_to_nonlinear(self.b),
+            a: self.a,
+        }
+    }
+
+    #[must_use]
+    pub fn nonlinear_to_linear(&self) -> Color {
+        Color {
+            r: nonlinear_to_linear(self.r),
+            g: nonlinear_to_linear(self.g),
+            b: nonlinear_to_linear(self.b),
+            a: self.a,
+        }
+    }
+}
+
+impl Mul<f32> for Color {
+    type Output = Color;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        Color {
+            r: self.r * rhs,
+            g: self.g * rhs,
+            b: self.b * rhs,
+            a: self.a * rhs,
+        }
+    }
 }
 
 impl Mul<Color> for Color {
@@ -123,11 +157,51 @@ impl Mul<Color> for Color {
     }
 }
 
+impl MulAssign<f32> for Color {
+    fn mul_assign(&mut self, rhs: f32) {
+        self.r *= rhs;
+        self.g *= rhs;
+        self.b *= rhs;
+        self.a *= rhs;
+    }
+}
+
 impl MulAssign<Color> for Color {
     fn mul_assign(&mut self, rhs: Color) {
         self.r *= rhs.r;
         self.g *= rhs.g;
         self.b *= rhs.b;
         self.a *= rhs.a;
+    }
+}
+
+impl From<[f32; 4]> for Color {
+    fn from(value: [f32; 4]) -> Self {
+        Self {
+            r: value[0],
+            g: value[1],
+            b: value[2],
+            a: value[3],
+        }
+    }
+}
+
+fn linear_to_nonlinear(x: f32) -> f32 {
+    if x <= 0.0 {
+        x
+    } else if x <= 0.0031308 {
+        x * 12.92
+    } else {
+        (1.055 * x.powf(1.0 / 2.4)) - 0.055
+    }
+}
+
+fn nonlinear_to_linear(x: f32) -> f32 {
+    if x <= 0.0 {
+        x
+    } else if x <= 0.04045 {
+        x / 12.92
+    } else {
+        ((x + 0.055) / 1.055).powf(2.4)
     }
 }
