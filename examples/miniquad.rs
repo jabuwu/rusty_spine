@@ -654,6 +654,8 @@ impl EventHandler for Stage {
                     format,
                 } => {
                     use image::io::Reader as ImageReader;
+
+                    #[allow(clippy::needless_borrows_for_generic_args)]
                     let image = ImageReader::open(&path)
                         .unwrap_or_else(|_| panic!("failed to open image: {}", &path))
                         .decode()

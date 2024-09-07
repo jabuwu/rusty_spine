@@ -937,8 +937,7 @@ macro_rules! c_vertex_attachment_accessors {
             stride: i32,
         ) {
             crate::c::spVertexAttachment_computeWorldVertices(
-                self.vertex_attachment() as *const crate::c::spVertexAttachment
-                    as *mut crate::c::spVertexAttachment,
+                (self.vertex_attachment() as *const crate::c::spVertexAttachment).cast_mut(),
                 slot.c_ptr(),
                 start,
                 count,
@@ -1004,8 +1003,8 @@ macro_rules! c_handle_decl {
             #[must_use]
             pub(crate) const fn new(c_item: *const $c_type, c_parent: *const $c_parent) -> Self {
                 Self {
-                    c_item: SyncPtr(c_item as *mut $c_type),
-                    c_parent: SyncPtr(c_parent as *mut $c_parent),
+                    c_item: SyncPtr(c_item.cast_mut()),
+                    c_parent: SyncPtr(c_parent.cast_mut()),
                 }
             }
 
@@ -1070,8 +1069,8 @@ macro_rules! c_handle_indexed_decl {
             ) -> Self {
                 Self {
                     index,
-                    c_item: SyncPtr(c_item as *mut $c_type),
-                    c_parent: SyncPtr(c_parent as *mut $c_parent),
+                    c_item: SyncPtr(c_item.cast_mut()),
+                    c_parent: SyncPtr(c_parent.cast_mut()),
                 }
             }
 
