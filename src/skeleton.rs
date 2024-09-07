@@ -17,9 +17,6 @@ use crate::{
     Attachment,
 };
 
-#[cfg(not(feature = "spine38"))]
-use crate::c::spSkeleton_updateWorldTransformWith;
-
 #[cfg(feature = "mint")]
 use mint::Vector2;
 
@@ -57,11 +54,6 @@ impl Skeleton {
         unsafe {
             spSkeleton_updateWorldTransform(self.c_ptr());
         }
-    }
-
-    #[cfg(not(feature = "spine38"))]
-    pub unsafe fn update_world_transform_with(&mut self, parent: &Bone) {
-        spSkeleton_updateWorldTransformWith(self.c_ptr(), parent.c_ptr());
     }
 
     pub fn set_to_setup_pose(&mut self) {

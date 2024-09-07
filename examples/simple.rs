@@ -1,6 +1,3 @@
-#[cfg(feature = "spine38")]
-compile_error!("This example does not work with Spine 3.8");
-
 use std::sync::Arc;
 
 use rusty_spine::*;

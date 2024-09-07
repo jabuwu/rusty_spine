@@ -2,19 +2,13 @@ use std::ffi::CString;
 use std::{path::Path, ptr::null_mut};
 
 use crate::c::{spAtlasFilter, spAtlasFormat, spAtlasRegion, spAtlasWrap, spAtlas_createFromFile};
-use crate::c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr};
+use crate::c_interface::{CTmpRef, NewFromPtr, SyncPtr};
 use crate::{
     c::{c_int, spAtlas, spAtlasPage, spAtlas_create, spAtlas_dispose},
     error::Error,
 };
 
 use atlas::*;
-
-#[cfg(not(feature = "spine38"))]
-use std::ffi::CStr;
-
-#[cfg(not(feature = "spine38"))]
-use crate::{c::spTextureRegion, texture_region::TextureRegion};
 
 #[cfg(feature = "mint")]
 use mint::Vector2;
@@ -86,19 +80,8 @@ impl Atlas {
         }
     }
 
-    pub fn pages_mut(&mut self) -> AtlasPageMutIterator {
-        AtlasPageMutIterator {
-            _atlas: self,
-            page: unsafe { self.c_ptr_mut().pages },
-        }
-    }
-
     pub fn find_page(&self, name: &str) -> Option<CTmpRef<Self, AtlasPage>> {
         self.pages().find(|page| page.name() == name)
-    }
-
-    pub fn find_page_mut(&mut self, name: &str) -> Option<CTmpMut<Self, AtlasPage>> {
-        self.pages_mut().find(|page| page.name() == name)
     }
 
     pub fn regions(&self) -> AtlasRegionIterator {
@@ -108,19 +91,8 @@ impl Atlas {
         }
     }
 
-    pub fn regions_mut(&mut self) -> AtlasRegionMutIterator {
-        AtlasRegionMutIterator {
-            _atlas: self,
-            region: unsafe { self.c_ptr_mut().regions },
-        }
-    }
-
     pub fn find_region(&self, name: &str) -> Option<CTmpRef<Self, AtlasRegion>> {
         self.regions().find(|region| region.name() == name)
-    }
-
-    pub fn find_region_mut(&mut self, name: &str) -> Option<CTmpMut<Self, AtlasRegion>> {
-        self.regions_mut().find(|region| region.name() == name)
     }
 
     c_accessor_renderer_object!();
@@ -163,8 +135,6 @@ pub mod atlas {
         c_accessor_enum!(v_wrap, vWrap, AtlasWrap);
         c_accessor!(width, width, i32);
         c_accessor!(height, height, i32);
-        #[cfg(not(feature = "spine38"))]
-        c_accessor_bool!(pma, pma);
         c_accessor_renderer_object!();
         c_ptr!(c_atlas_page, spAtlasPage);
     }
@@ -192,28 +162,6 @@ pub mod atlas {
                 let page = unsafe { AtlasPage::new_from_ptr(self.page) };
                 self.page = unsafe { (*self.page).next };
                 Some(CTmpRef::new(self._atlas, page))
-            } else {
-                None
-            }
-        }
-    }
-
-    pub struct AtlasPageMutIterator<'a> {
-        pub(crate) _atlas: &'a Atlas,
-        pub(crate) page: *mut spAtlasPage,
-    }
-
-    impl<'a> Iterator for AtlasPageMutIterator<'a> {
-        type Item = CTmpMut<'a, Atlas, AtlasPage>;
-
-        fn next(&mut self) -> Option<Self::Item> {
-            if !self.page.is_null() {
-                let page = unsafe { AtlasPage::new_from_ptr(self.page) };
-                self.page = unsafe { (*self.page).next };
-                Some(CTmpMut::new(
-                    unsafe { &mut *(self._atlas as *const Atlas as *mut Atlas) },
-                    page,
-                ))
             } else {
                 None
             }
@@ -307,13 +255,6 @@ pub mod atlas {
     }
 
     impl AtlasRegion {
-        #[cfg(not(feature = "spine38"))]
-        c_accessor_super!(
-            texture_region,
-            texture_region_mut,
-            TextureRegion,
-            spTextureRegion
-        );
         c_accessor_string!(name, name);
         c_accessor!(x, x, i32);
         c_accessor!(y, y, i32);
@@ -321,21 +262,6 @@ pub mod atlas {
         c_accessor_slice_optional!(splits, splits, &[c_int; 4], 4);
         c_accessor_slice_optional!(pads, pads, &[c_int; 4], 4);
         c_accessor_tmp_ptr!(page, page_mut, page, AtlasPage, spAtlasPage);
-
-        #[cfg(not(feature = "spine38"))]
-        pub fn key_values(&self) -> Vec<KeyValue> {
-            let mut vec = vec![];
-            unsafe {
-                let array = &mut *self.c_ptr_ref().keyValues;
-                for i in 0..array.size {
-                    let item = &*array.items.offset(i as isize);
-                    let name = String::from(CStr::from_ptr(item.name).to_str().unwrap());
-                    let values = item.values.clone();
-                    vec.push(KeyValue { name, values });
-                }
-            }
-            vec
-        }
 
         c_ptr!(c_atlas_region, spAtlasRegion);
     }
@@ -371,28 +297,6 @@ pub mod atlas {
             Vector2 {
                 x: self.x(),
                 y: self.y(),
-            }
-        }
-    }
-
-    pub struct AtlasRegionMutIterator<'a> {
-        pub(crate) _atlas: &'a Atlas,
-        pub(crate) region: *mut spAtlasRegion,
-    }
-
-    impl<'a> Iterator for AtlasRegionMutIterator<'a> {
-        type Item = CTmpMut<'a, Atlas, AtlasRegion>;
-
-        fn next(&mut self) -> Option<Self::Item> {
-            if !self.region.is_null() {
-                let page = unsafe { AtlasRegion::new_from_ptr(self.region) };
-                self.region = unsafe { (*self.region).next };
-                Some(CTmpMut::new(
-                    unsafe { &mut *(self._atlas as *const Atlas as *mut Atlas) },
-                    page,
-                ))
-            } else {
-                None
             }
         }
     }

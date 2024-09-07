@@ -1,45 +1,65 @@
 use crate::{
     c::{spEvent, spEventData},
     c_interface::{NewFromPtr, SyncPtr},
+    TrackEntry,
 };
+
+#[allow(unused_imports)]
+use crate::AnimationState;
+
+/// A wrapper for [`Event`] that makes events slightly nicer to work with in Rust.
+///
+/// To receive events, see [`AnimationState::set_listener`].
+pub enum AnimationEvent<'a> {
+    Start {
+        /// The track this event originated from.
+        track_entry: TrackEntry,
+    },
+    Interrupt {
+        /// The track this event originated from.
+        track_entry: TrackEntry,
+    },
+    End {
+        /// The track this event originated from.
+        track_entry: TrackEntry,
+    },
+    Complete {
+        /// The track this event originated from.
+        track_entry: TrackEntry,
+    },
+    Dispose {
+        /// The track this event originated from.
+        track_entry: TrackEntry,
+    },
+    Event {
+        /// The track this event originated from.
+        track_entry: TrackEntry,
+        /// The name of the event, which is unique across all events in the skeleton.
+        name: &'a str,
+        /// The animation time this event was keyed.
+        time: f32,
+        /// The event's int value.
+        int: i32,
+        /// The event's float value.
+        float: f32,
+        /// The event's string value or an empty string.
+        string: &'a str,
+        /// The event's audio path or an empty string.
+        audio_path: &'a str,
+        /// The event's audio volume.
+        volume: f32,
+        /// The event's audio balance.
+        balance: f32,
+        /// The raw event data.
+        event: Event,
+    },
+}
 
 /// Events fired from animations.
 ///
 /// [Spine API Reference](http://esotericsoftware.com/spine-api-reference#Event)
 ///
-/// To receive events, set a listener on [AnimationState](struct.AnimationState.html)
-/// ```
-/// # #[path="./doctests.rs"]
-/// # mod doctests;
-/// # use rusty_spine::{AnimationState, EventType};
-/// # let (_, mut animation_state) = doctests::test_spineboy_instance();
-/// animation_state.set_listener(|animation_state, event_type, track_entry, event| {
-///     match event_type {
-///         EventType::Start => {
-///             println!("Animation started!");
-///         }
-///         EventType::Interrupt => {
-///             println!("Animation interrupted!");
-///         }
-///         EventType::End => {
-///             println!("Animation ended!");
-///         }
-///         EventType::Complete => {
-///             println!("Animation completed!");
-///         }
-///         EventType::Dispose => {
-///             println!("Animation disposed!");
-///         }
-///         EventType::Event => {
-///             println!("Animation event!");
-///             if let Some(event) = event {
-///                 println!("  Event name: {}", event.data().name());
-///             }
-///         }
-///         _ => {}
-///     }
-/// });
-/// ```
+/// To receive events, see [`AnimationState::set_listener`].
 #[derive(Debug)]
 pub struct Event {
     c_event: SyncPtr<spEvent>,
@@ -54,13 +74,42 @@ impl NewFromPtr<spEvent> for Event {
 }
 
 impl Event {
-    c_accessor_tmp_ptr!(data, data_mut, data, EventData, spEventData);
-    c_accessor!(time, time, f32);
-    c_accessor!(int_value, intValue, i32);
-    c_accessor!(float_value, floatValue, f32);
-    c_accessor_string!(string_value, stringValue);
-    c_accessor!(volume, volume, f32);
-    c_accessor!(balance, balance, f32);
+    c_accessor_tmp_ptr!(
+        data,
+        data_mut,
+        data,
+        EventData,
+        spEventData
+    );
+    c_accessor!(
+        time,
+        time,
+        f32
+    );
+    c_accessor!(
+        int_value,
+        intValue,
+        i32
+    );
+    c_accessor!(
+        float_value,
+        floatValue,
+        f32
+    );
+    c_accessor_string!(
+        string_value,
+        stringValue
+    );
+    c_accessor!(
+        volume,
+        volume,
+        f32
+    );
+    c_accessor!(
+        balance,
+        balance,
+        f32
+    );
     c_ptr!(c_event, spEvent);
 }
 
@@ -81,12 +130,37 @@ impl NewFromPtr<spEventData> for EventData {
 }
 
 impl EventData {
-    c_accessor_string!(name, name);
-    c_accessor!(int_value, intValue, i32);
-    c_accessor!(float_value, floatValue, f32);
-    c_accessor_string!(string_value, stringValue);
-    c_accessor_string!(audio_path, audioPath);
-    c_accessor!(volume, volume, f32);
-    c_accessor!(balance, balance, f32);
+    c_accessor_string!(
+        name,
+        name
+    );
+    c_accessor!(
+        int_value,
+        intValue,
+        i32
+    );
+    c_accessor!(
+        float_value,
+        floatValue,
+        f32
+    );
+    c_accessor_string!(
+        string_value,
+        stringValue
+    );
+    c_accessor_string!(
+        audio_path,
+        audioPath
+    );
+    c_accessor!(
+        volume,
+        volume,
+        f32
+    );
+    c_accessor!(
+        balance,
+        balance,
+        f32
+    );
     c_ptr!(c_event_data, spEventData);
 }

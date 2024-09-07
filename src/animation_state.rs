@@ -16,11 +16,8 @@ use crate::{
     c_interface::{CTmpMut, CTmpRef, NewFromPtr, SyncPtr},
     error::Error,
     event::Event,
-    skeleton::Skeleton,
+    skeleton::Skeleton, AnimationEvent,
 };
-
-#[cfg(not(feature = "spine38"))]
-use crate::c::{spAnimationState_clearNext, spTrackEntry_getTrackComplete};
 
 /// The live animation state for a skeleton, allowing animation layering and crossfading.
 ///
@@ -255,7 +252,7 @@ impl AnimationState {
 
     pub fn set_listener<F>(&mut self, listener: F)
     where
-        F: Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>) + 'static,
+        F: Fn(&AnimationState, AnimationEvent) + 'static,
     {
         extern "C" fn c_listener(
             c_animation_state: *mut spAnimationState,
@@ -263,26 +260,60 @@ impl AnimationState {
             c_track_entry: *mut spTrackEntry,
             c_event: *mut spEvent,
         ) {
-            let user_data =
-                unsafe { &mut *((*c_animation_state).userData as *mut AnimationStateUserData) };
+            let user_data = unsafe {
+                &mut *((*c_animation_state)
+                    .userData
+                    .cast::<AnimationStateUserData>())
+            };
             if let Some(listener) = &user_data.listener {
                 let animation_state = unsafe { AnimationState::new_from_ptr(c_animation_state) };
                 let track_entry = unsafe { TrackEntry::new_from_ptr(c_track_entry) };
-                let event = if !c_event.is_null() {
-                    Some(unsafe { Event::new_from_ptr(c_event) })
-                } else {
-                    None
+                let event_type = EventType::from(c_event_type);
+                match event_type {
+                    EventType::Start => {
+                        listener(&animation_state, AnimationEvent::Start { track_entry });
+                    }
+                    EventType::Interrupt => {
+                        listener(&animation_state, AnimationEvent::Interrupt { track_entry });
+                    }
+                    EventType::End => {
+                        listener(&animation_state, AnimationEvent::End { track_entry });
+                    }
+                    EventType::Complete => {
+                        listener(&animation_state, AnimationEvent::Complete { track_entry });
+                    }
+                    EventType::Dispose => {
+                        listener(&animation_state, AnimationEvent::Dispose { track_entry });
+                    }
+                    EventType::Event => {
+                        assert!(!c_event.is_null());
+                        let event = unsafe { Event::new_from_ptr(c_event) };
+                        let raw_event = unsafe { Event::new_from_ptr(c_event) };
+                        listener(
+                            &animation_state,
+                            AnimationEvent::Event {
+                                track_entry,
+                                name: event.data().name(),
+                                time: event.time(),
+                                int: event.int_value(),
+                                float: event.float_value(),
+                                string: event.string_value(),
+                                audio_path: event.data().audio_path(),
+                                volume: event.volume(),
+                                balance: event.balance(),
+                                event: raw_event,
+                            },
+                        );
+                    }
+                    EventType::Unknown => {}
                 };
-                listener(
-                    &animation_state,
-                    EventType::from(c_event_type),
-                    &track_entry,
-                    event.as_ref(),
-                );
             }
         }
-        let user_data =
-            unsafe { &mut *((*self.c_animation_state.0).userData as *mut AnimationStateUserData) };
+        let user_data = unsafe {
+            &mut *((*self.c_animation_state.0)
+                .userData
+                .cast::<AnimationStateUserData>())
+        };
         user_data.listener = Some(Box::new(listener));
         unsafe {
             self.c_ptr_mut().listener = Some(c_listener);
@@ -292,13 +323,6 @@ impl AnimationState {
     pub fn clear_listener_notifications(&mut self) {
         unsafe {
             spAnimationState_clearListenerNotifications(self.c_ptr());
-        }
-    }
-
-    #[cfg(not(feature = "spine38"))]
-    pub fn clear_next(&mut self, entry: &TrackEntry) {
-        unsafe {
-            spAnimationState_clearNext(self.c_ptr(), entry.c_ptr());
         }
     }
 
@@ -348,9 +372,11 @@ impl Drop for AnimationState {
     }
 }
 
+type AnimationStateListenerCb = Box<dyn Fn(&AnimationState, AnimationEvent)>;
+
 #[derive(Default)]
 struct AnimationStateUserData {
-    listener: Option<Box<dyn Fn(&AnimationState, EventType, &TrackEntry, Option<&Event>)>>,
+    listener: Option<AnimationStateListenerCb>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -396,11 +422,6 @@ impl TrackEntry {
         unsafe { spTrackEntry_getAnimationTime(self.c_ptr()) }
     }
 
-    #[cfg(not(feature = "spine38"))]
-    pub fn track_complete(&self) -> f32 {
-        unsafe { spTrackEntry_getTrackComplete(self.c_ptr()) }
-    }
-
     fn handle_valid(handle: &TrackEntryHandle) -> bool {
         let track_count = unsafe { (*handle.c_parent.0).tracksCount };
         if handle.index < track_count {
@@ -417,8 +438,6 @@ impl TrackEntry {
     }
 
     c_accessor_tmp_ptr!(animation, animation_mut, animation, Animation, spAnimation);
-    #[cfg(not(feature = "spine38"))]
-    c_accessor_tmp_ptr!(previous, previous_mut, previous, TrackEntry, spTrackEntry);
     c_accessor_tmp_ptr!(next, next_mut, next, TrackEntry, spTrackEntry);
     c_accessor_tmp_ptr!(
         mixing_from,
@@ -431,10 +450,6 @@ impl TrackEntry {
     c_accessor!(track_index, trackIndex, i32);
     c_accessor_bool_mut!(looping, set_looping, loop_0);
     c_accessor_bool_mut!(hold_previous, set_hold_previous, holdPrevious);
-    #[cfg(not(feature = "spine38"))]
-    c_accessor_bool_mut!(reverse, set_reverse, reverse);
-    #[cfg(not(feature = "spine38"))]
-    c_accessor_bool_mut!(shortest_rotation, set_shortest_rotation, shortestRotation);
     c_accessor_mut!(event_threshold, set_event_threshold, eventThreshold, f32);
     c_accessor_mut!(
         attachment_threshold,

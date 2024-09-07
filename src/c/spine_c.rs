@@ -1279,7 +1279,7 @@ pub unsafe extern "C" fn _spTimeline_init(
     >,
     mut getPropertyId: Option<unsafe extern "C" fn(*const spTimeline) -> c_int>,
 ) {
-    *(&(*self_0).type_0 as *const spTimelineType as *mut spTimelineType) = type_0;
+    *(&mut (*self_0).type_0 as *mut spTimelineType) = type_0;
     let ref mut fresh1 =
         *(&(*self_0).vtable as *const *const c_void as *mut *mut _spTimelineVtable);
     *fresh1 = _spCalloc(
@@ -1586,7 +1586,7 @@ pub unsafe extern "C" fn _spBaseTimeline_create(
         apply,
         getPropertyId,
     );
-    *(&(*self_0).framesCount as *const c_int as *mut c_int) = framesCount * frameSize;
+    *(&mut (*self_0).framesCount as *mut c_int) = framesCount * frameSize;
     let ref mut fresh6 = *(&(*self_0).frames as *const *mut c_float as *mut *mut c_float);
     *fresh6 = _spCalloc(
         (*self_0).framesCount as size_t,
@@ -2771,7 +2771,7 @@ pub unsafe extern "C" fn spAttachmentTimeline_create(
             _spAttachmentTimeline_getPropertyId as unsafe extern "C" fn(*const spTimeline) -> c_int,
         ),
     );
-    *(&(*self_0).framesCount as *const c_int as *mut c_int) = framesCount;
+    *(&mut (*self_0).framesCount as *mut c_int) = framesCount;
     let ref mut fresh7 = *(&(*self_0).frames as *const *mut c_float as *mut *mut c_float);
     *fresh7 = _spCalloc(
         framesCount as size_t,
@@ -3171,7 +3171,7 @@ pub unsafe extern "C" fn spDeformTimeline_create(
         ),
         Some(_spDeformTimeline_getPropertyId as unsafe extern "C" fn(*const spTimeline) -> c_int),
     );
-    *(&(*self_0).framesCount as *const c_int as *mut c_int) = framesCount;
+    *(&mut (*self_0).framesCount as *mut c_int) = framesCount;
     let ref mut fresh11 = *(&(*self_0).frames as *const *mut c_float as *mut *mut c_float);
     *fresh11 = _spCalloc(
         (*self_0).framesCount as size_t,
@@ -3187,7 +3187,7 @@ pub unsafe extern "C" fn spDeformTimeline_create(
         b"spine.c\0" as *const u8 as *const c_char,
         1138 as c_int,
     ) as *mut *mut c_float;
-    *(&(*self_0).frameVerticesCount as *const c_int as *mut c_int) = frameVerticesCount;
+    *(&mut (*self_0).frameVerticesCount as *mut c_int) = frameVerticesCount;
     return self_0;
 }
 #[no_mangle]
@@ -3322,7 +3322,7 @@ pub unsafe extern "C" fn spEventTimeline_create(mut framesCount: c_int) -> *mut 
         ),
         Some(_spEventTimeline_getPropertyId as unsafe extern "C" fn(*const spTimeline) -> c_int),
     );
-    *(&(*self_0).framesCount as *const c_int as *mut c_int) = framesCount;
+    *(&mut (*self_0).framesCount as *mut c_int) = framesCount;
     let ref mut fresh16 = *(&(*self_0).frames as *const *mut c_float as *mut *mut c_float);
     *fresh16 = _spCalloc(
         framesCount as size_t,
@@ -3467,7 +3467,7 @@ pub unsafe extern "C" fn spDrawOrderTimeline_create(
             _spDrawOrderTimeline_getPropertyId as unsafe extern "C" fn(*const spTimeline) -> c_int,
         ),
     );
-    *(&(*self_0).framesCount as *const c_int as *mut c_int) = framesCount;
+    *(&mut (*self_0).framesCount as *mut c_int) = framesCount;
     let ref mut fresh20 = *(&(*self_0).frames as *const *mut c_float as *mut *mut c_float);
     *fresh20 = _spCalloc(
         framesCount as size_t,
@@ -3483,7 +3483,7 @@ pub unsafe extern "C" fn spDrawOrderTimeline_create(
         b"spine.c\0" as *const u8 as *const c_char,
         1290 as c_int,
     ) as *mut *mut c_int;
-    *(&(*self_0).slotsCount as *const c_int as *mut c_int) = slotsCount;
+    *(&mut (*self_0).slotsCount as *mut c_int) = slotsCount;
     return self_0;
 }
 #[no_mangle]
@@ -7827,7 +7827,7 @@ pub unsafe extern "C" fn _spAttachment_init(
         3525 as c_int,
     ) as *mut c_char;
     spine_strcpy(*fresh56, name);
-    *(&(*self_0).type_0 as *const spAttachmentType as *mut spAttachmentType) = type_0;
+    *(&mut (*self_0).type_0 as *mut spAttachmentType) = type_0;
 }
 #[no_mangle]
 pub unsafe extern "C" fn _spAttachment_deinit(mut self_0: *mut spAttachment) {
@@ -8006,8 +8006,8 @@ pub unsafe extern "C" fn spBone_create(
     *fresh65 = skeleton;
     let ref mut fresh66 = *(&(*self_0).parent as *const *mut spBone as *mut *mut spBone);
     *fresh66 = parent;
-    *(&(*self_0).a as *const c_float as *mut c_float) = 1.0f32;
-    *(&(*self_0).d as *const c_float as *mut c_float) = 1.0f32;
+    *(&mut (*self_0).a as *mut c_float) = 1.0f32;
+    *(&mut (*self_0).d as *mut c_float) = 1.0f32;
     spBone_setToSetupPose(self_0);
     return self_0;
 }
@@ -8064,28 +8064,28 @@ pub unsafe extern "C" fn spBone_updateWorldTransformWith(
     (*self_0).appliedValid = 1 as c_int;
     if parent.is_null() {
         let mut rotationY: c_float = rotation + 90 as c_int as c_float + shearY;
-        *(&(*self_0).a as *const c_float as *mut c_float) =
+        *(&mut (*self_0).a as *mut c_float) =
             cosf((rotation + shearX) * (3.1415926535897932385f32 / 180 as c_int as c_float))
                 * scaleX
                 * sx;
-        *(&(*self_0).b as *const c_float as *mut c_float) =
+        *(&mut (*self_0).b as *mut c_float) =
             cosf(rotationY * (3.1415926535897932385f32 / 180 as c_int as c_float)) * scaleY * sx;
-        *(&(*self_0).c as *const c_float as *mut c_float) =
+        *(&mut (*self_0).c as *mut c_float) =
             sinf((rotation + shearX) * (3.1415926535897932385f32 / 180 as c_int as c_float))
                 * scaleX
                 * sy;
-        *(&(*self_0).d as *const c_float as *mut c_float) =
+        *(&mut (*self_0).d as *mut c_float) =
             sinf(rotationY * (3.1415926535897932385f32 / 180 as c_int as c_float)) * scaleY * sy;
-        *(&(*self_0).worldX as *const c_float as *mut c_float) = x * sx + (*(*self_0).skeleton).x;
-        *(&(*self_0).worldY as *const c_float as *mut c_float) = y * sy + (*(*self_0).skeleton).y;
+        *(&mut (*self_0).worldX as *mut c_float) = x * sx + (*(*self_0).skeleton).x;
+        *(&mut (*self_0).worldY as *mut c_float) = y * sy + (*(*self_0).skeleton).y;
         return;
     }
     pa = (*parent).a;
     pb = (*parent).b;
     pc = (*parent).c;
     pd = (*parent).d;
-    *(&(*self_0).worldX as *const c_float as *mut c_float) = pa * x + pb * y + (*parent).worldX;
-    *(&(*self_0).worldY as *const c_float as *mut c_float) = pc * x + pd * y + (*parent).worldY;
+    *(&mut (*self_0).worldX as *mut c_float) = pa * x + pb * y + (*parent).worldX;
+    *(&mut (*self_0).worldY as *mut c_float) = pc * x + pd * y + (*parent).worldY;
     match (*(*self_0).data).transformMode as c_uint {
         0 => {
             let mut rotationY_0: c_float = rotation + 90 as c_int as c_float + shearY;
@@ -8099,23 +8099,23 @@ pub unsafe extern "C" fn spBone_updateWorldTransformWith(
                     * scaleX;
             let mut ld: c_float =
                 sinf(rotationY_0 * (3.1415926535897932385f32 / 180 as c_int as c_float)) * scaleY;
-            *(&(*self_0).a as *const c_float as *mut c_float) = pa * la + pb * lc;
-            *(&(*self_0).b as *const c_float as *mut c_float) = pa * lb + pb * ld;
-            *(&(*self_0).c as *const c_float as *mut c_float) = pc * la + pd * lc;
-            *(&(*self_0).d as *const c_float as *mut c_float) = pc * lb + pd * ld;
+            *(&mut (*self_0).a as *mut c_float) = pa * la + pb * lc;
+            *(&mut (*self_0).b as *mut c_float) = pa * lb + pb * ld;
+            *(&mut (*self_0).c as *mut c_float) = pc * la + pd * lc;
+            *(&mut (*self_0).d as *mut c_float) = pc * lb + pd * ld;
             return;
         }
         1 => {
             let mut rotationY_1: c_float = rotation + 90 as c_int as c_float + shearY;
-            *(&(*self_0).a as *const c_float as *mut c_float) =
+            *(&mut (*self_0).a as *mut c_float) =
                 cosf((rotation + shearX) * (3.1415926535897932385f32 / 180 as c_int as c_float))
                     * scaleX;
-            *(&(*self_0).b as *const c_float as *mut c_float) =
+            *(&mut (*self_0).b as *mut c_float) =
                 cosf(rotationY_1 * (3.1415926535897932385f32 / 180 as c_int as c_float)) * scaleY;
-            *(&(*self_0).c as *const c_float as *mut c_float) =
+            *(&mut (*self_0).c as *mut c_float) =
                 sinf((rotation + shearX) * (3.1415926535897932385f32 / 180 as c_int as c_float))
                     * scaleX;
-            *(&(*self_0).d as *const c_float as *mut c_float) =
+            *(&mut (*self_0).d as *mut c_float) =
                 sinf(rotationY_1 * (3.1415926535897932385f32 / 180 as c_int as c_float)) * scaleY;
         }
         2 => {
@@ -8150,10 +8150,10 @@ pub unsafe extern "C" fn spBone_updateWorldTransformWith(
             lb_0 = cosf(ry * (3.1415926535897932385f32 / 180 as c_int as c_float)) * scaleY;
             lc_0 = sinf(rx * (3.1415926535897932385f32 / 180 as c_int as c_float)) * scaleX;
             ld_0 = sinf(ry * (3.1415926535897932385f32 / 180 as c_int as c_float)) * scaleY;
-            *(&(*self_0).a as *const c_float as *mut c_float) = pa * la_0 - pb * lc_0;
-            *(&(*self_0).b as *const c_float as *mut c_float) = pa * lb_0 - pb * ld_0;
-            *(&(*self_0).c as *const c_float as *mut c_float) = pc * la_0 + pd * lc_0;
-            *(&(*self_0).d as *const c_float as *mut c_float) = pc * lb_0 + pd * ld_0;
+            *(&mut (*self_0).a as *mut c_float) = pa * la_0 - pb * lc_0;
+            *(&mut (*self_0).b as *mut c_float) = pa * lb_0 - pb * ld_0;
+            *(&mut (*self_0).c as *mut c_float) = pc * la_0 + pd * lc_0;
+            *(&mut (*self_0).d as *mut c_float) = pc * lb_0 + pd * ld_0;
         }
         3 | 4 => {
             let mut za: c_float = 0.;
@@ -8198,17 +8198,17 @@ pub unsafe extern "C" fn spBone_updateWorldTransformWith(
                 (90 as c_int as c_float + shearY)
                     * (3.1415926535897932385f32 / 180 as c_int as c_float),
             ) * scaleY;
-            *(&(*self_0).a as *const c_float as *mut c_float) = za * la_1 + zb * lc_1;
-            *(&(*self_0).b as *const c_float as *mut c_float) = za * lb_1 + zb * ld_1;
-            *(&(*self_0).c as *const c_float as *mut c_float) = zc * la_1 + zd * lc_1;
-            *(&(*self_0).d as *const c_float as *mut c_float) = zc * lb_1 + zd * ld_1;
+            *(&mut (*self_0).a as *mut c_float) = za * la_1 + zb * lc_1;
+            *(&mut (*self_0).b as *mut c_float) = za * lb_1 + zb * ld_1;
+            *(&mut (*self_0).c as *mut c_float) = zc * la_1 + zd * lc_1;
+            *(&mut (*self_0).d as *mut c_float) = zc * lb_1 + zd * ld_1;
         }
         _ => {}
     }
-    *(&(*self_0).a as *const c_float as *mut c_float) *= sx;
-    *(&(*self_0).b as *const c_float as *mut c_float) *= sx;
-    *(&(*self_0).c as *const c_float as *mut c_float) *= sy;
-    *(&(*self_0).d as *const c_float as *mut c_float) *= sy;
+    *(&mut (*self_0).a as *mut c_float) *= sx;
+    *(&mut (*self_0).b as *mut c_float) *= sx;
+    *(&mut (*self_0).c as *mut c_float) *= sy;
+    *(&mut (*self_0).d as *mut c_float) *= sy;
 }
 #[no_mangle]
 pub unsafe extern "C" fn spBone_setToSetupPose(mut self_0: *mut spBone) {
@@ -8358,10 +8358,10 @@ pub unsafe extern "C" fn spBone_rotateWorld(mut self_0: *mut spBone, mut degrees
     let mut d: c_float = (*self_0).d;
     let mut cosine: c_float = cosf(degrees * (3.1415926535897932385f32 / 180 as c_int as c_float));
     let mut sine: c_float = sinf(degrees * (3.1415926535897932385f32 / 180 as c_int as c_float));
-    *(&(*self_0).a as *const c_float as *mut c_float) = cosine * a - sine * c;
-    *(&(*self_0).b as *const c_float as *mut c_float) = cosine * b - sine * d;
-    *(&(*self_0).c as *const c_float as *mut c_float) = sine * a + cosine * c;
-    *(&(*self_0).d as *const c_float as *mut c_float) = sine * b + cosine * d;
+    *(&mut (*self_0).a as *mut c_float) = cosine * a - sine * c;
+    *(&mut (*self_0).b as *mut c_float) = cosine * b - sine * d;
+    *(&mut (*self_0).c as *mut c_float) = sine * a + cosine * c;
+    *(&mut (*self_0).d as *mut c_float) = sine * b + cosine * d;
     *(&mut (*self_0).appliedValid as *mut c_int) = 0 as c_int;
 }
 #[no_mangle]
@@ -8376,7 +8376,7 @@ pub unsafe extern "C" fn spBoneData_create(
         b"spine.c\0" as *const u8 as *const c_char,
         3962 as c_int,
     ) as *mut spBoneData;
-    *(&(*self_0).index as *const c_int as *mut c_int) = index;
+    *(&mut (*self_0).index as *mut c_int) = index;
     let ref mut fresh67 = *(&(*self_0).name as *const *const c_char as *mut *mut c_char);
     *fresh67 = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
@@ -8571,7 +8571,7 @@ pub unsafe extern "C" fn spEvent_create(
     ) as *mut spEvent;
     let ref mut fresh69 = *(&(*self_0).data as *const *mut spEventData as *mut *mut spEventData);
     *fresh69 = data;
-    *(&(*self_0).time as *const c_float as *mut c_float) = time;
+    *(&mut (*self_0).time as *mut c_float) = time;
     return self_0;
 }
 #[no_mangle]
@@ -10190,9 +10190,9 @@ pub unsafe extern "C" fn spPathConstraint_apply(mut self_0: *mut spPathConstrain
     p = 3 as c_int;
     while i < boneCount {
         let mut bone_0: *mut spBone = *bones.offset(i as isize);
-        *(&(*bone_0).worldX as *const c_float as *mut c_float) +=
+        *(&mut (*bone_0).worldX as *mut c_float) +=
             (boneX - (*bone_0).worldX) * translateMix;
-        *(&(*bone_0).worldY as *const c_float as *mut c_float) +=
+        *(&mut (*bone_0).worldY as *mut c_float) +=
             (boneY - (*bone_0).worldY) * translateMix;
         x = *positions.offset(p as isize);
         y = *positions.offset((p + 1 as c_int) as isize);
@@ -10203,8 +10203,8 @@ pub unsafe extern "C" fn spPathConstraint_apply(mut self_0: *mut spPathConstrain
             if length != 0 as c_int as c_float {
                 s = (spine_sqrtf(dx * dx + dy * dy) / length - 1 as c_int as c_float) * rotateMix
                     + 1 as c_int as c_float;
-                *(&(*bone_0).a as *const c_float as *mut c_float) *= s;
-                *(&(*bone_0).c as *const c_float as *mut c_float) *= s;
+                *(&mut (*bone_0).a as *mut c_float) *= s;
+                *(&mut (*bone_0).c as *mut c_float) *= s;
             }
         }
         boneX = x;
@@ -10243,10 +10243,10 @@ pub unsafe extern "C" fn spPathConstraint_apply(mut self_0: *mut spPathConstrain
             r *= rotateMix;
             cosine = cosf(r);
             sine = sinf(r);
-            *(&(*bone_0).a as *const c_float as *mut c_float) = cosine * a - sine * c;
-            *(&(*bone_0).b as *const c_float as *mut c_float) = cosine * b - sine * d;
-            *(&(*bone_0).c as *const c_float as *mut c_float) = sine * a + cosine * c;
-            *(&(*bone_0).d as *const c_float as *mut c_float) = sine * b + cosine * d;
+            *(&mut (*bone_0).a as *mut c_float) = cosine * a - sine * c;
+            *(&mut (*bone_0).b as *mut c_float) = cosine * b - sine * d;
+            *(&mut (*bone_0).c as *mut c_float) = sine * a + cosine * c;
+            *(&mut (*bone_0).d as *mut c_float) = sine * b + cosine * d;
         }
         *(&mut (*bone_0).appliedValid as *mut c_int) = -(1 as c_int);
         i += 1;
@@ -18896,7 +18896,7 @@ pub unsafe extern "C" fn spSlotData_create(
         b"spine.c\0" as *const u8 as *const c_char,
         10080 as c_int,
     ) as *mut spSlotData;
-    *(&(*self_0).index as *const c_int as *mut c_int) = index;
+    *(&mut (*self_0).index as *mut c_int) = index;
     let ref mut fresh214 = *(&(*self_0).name as *const *const c_char as *mut *mut c_char);
     *fresh214 = _spMalloc(
         (::core::mem::size_of::<c_char>() as c_ulong)
@@ -19042,10 +19042,10 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteWorld(
             r *= rotateMix;
             cosine = cosf(r);
             sine = sinf(r);
-            *(&(*bone).a as *const c_float as *mut c_float) = cosine * a - sine * c;
-            *(&(*bone).b as *const c_float as *mut c_float) = cosine * b - sine * d;
-            *(&(*bone).c as *const c_float as *mut c_float) = sine * a + cosine * c;
-            *(&(*bone).d as *const c_float as *mut c_float) = sine * b + cosine * d;
+            *(&mut (*bone).a as *mut c_float) = cosine * a - sine * c;
+            *(&mut (*bone).b as *mut c_float) = cosine * b - sine * d;
+            *(&mut (*bone).c as *mut c_float) = sine * a + cosine * c;
+            *(&mut (*bone).d as *mut c_float) = sine * b + cosine * d;
             modified = 1 as c_int;
         }
         if translateMix != 0 as c_int as c_float {
@@ -19056,9 +19056,9 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteWorld(
                 &mut x,
                 &mut y,
             );
-            *(&(*bone).worldX as *const c_float as *mut c_float) +=
+            *(&mut (*bone).worldX as *mut c_float) +=
                 (x - (*bone).worldX) * translateMix;
-            *(&(*bone).worldY as *const c_float as *mut c_float) +=
+            *(&mut (*bone).worldY as *mut c_float) +=
                 (y - (*bone).worldY) * translateMix;
             modified = 1 as c_int;
         }
@@ -19068,15 +19068,15 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteWorld(
             if s > 0.00001f32 {
                 s = (s + (ts - s + (*(*self_0).data).offsetScaleX) * scaleMix) / s;
             }
-            *(&(*bone).a as *const c_float as *mut c_float) *= s;
-            *(&(*bone).c as *const c_float as *mut c_float) *= s;
+            *(&mut (*bone).a as *mut c_float) *= s;
+            *(&mut (*bone).c as *mut c_float) *= s;
             s = spine_sqrtf((*bone).b * (*bone).b + (*bone).d * (*bone).d);
             ts = spine_sqrtf(tb * tb + td * td);
             if s > 0.00001f32 {
                 s = (s + (ts - s + (*(*self_0).data).offsetScaleY) * scaleMix) / s;
             }
-            *(&(*bone).b as *const c_float as *mut c_float) *= s;
-            *(&(*bone).d as *const c_float as *mut c_float) *= s;
+            *(&mut (*bone).b as *mut c_float) *= s;
+            *(&mut (*bone).d as *mut c_float) *= s;
             modified = 1 as c_int;
         }
         if shearMix > 0 as c_int as c_float {
@@ -19091,8 +19091,8 @@ pub unsafe extern "C" fn _spTransformConstraint_applyAbsoluteWorld(
                 r += 3.1415926535897932385f32 * 2 as c_int as c_float;
             }
             r = by + (r + offsetShearY) * shearMix;
-            *(&(*bone).b as *const c_float as *mut c_float) = cosf(r) * s;
-            *(&(*bone).d as *const c_float as *mut c_float) = sinf(r) * s;
+            *(&mut (*bone).b as *mut c_float) = cosf(r) * s;
+            *(&mut (*bone).d as *mut c_float) = sinf(r) * s;
             modified = 1 as c_int;
         }
         if modified != 0 {
@@ -19151,10 +19151,10 @@ pub unsafe extern "C" fn _spTransformConstraint_applyRelativeWorld(
             r *= rotateMix;
             cosine = cosf(r);
             sine = sinf(r);
-            *(&(*bone).a as *const c_float as *mut c_float) = cosine * a - sine * c;
-            *(&(*bone).b as *const c_float as *mut c_float) = cosine * b - sine * d;
-            *(&(*bone).c as *const c_float as *mut c_float) = sine * a + cosine * c;
-            *(&(*bone).d as *const c_float as *mut c_float) = sine * b + cosine * d;
+            *(&mut (*bone).a as *mut c_float) = cosine * a - sine * c;
+            *(&mut (*bone).b as *mut c_float) = cosine * b - sine * d;
+            *(&mut (*bone).c as *mut c_float) = sine * a + cosine * c;
+            *(&mut (*bone).d as *mut c_float) = sine * b + cosine * d;
             modified = 1 as c_int;
         }
         if translateMix != 0 as c_int as c_float {
@@ -19165,8 +19165,8 @@ pub unsafe extern "C" fn _spTransformConstraint_applyRelativeWorld(
                 &mut x,
                 &mut y,
             );
-            *(&(*bone).worldX as *const c_float as *mut c_float) += x * translateMix;
-            *(&(*bone).worldY as *const c_float as *mut c_float) += y * translateMix;
+            *(&mut (*bone).worldX as *mut c_float) += x * translateMix;
+            *(&mut (*bone).worldY as *mut c_float) += y * translateMix;
             modified = 1 as c_int;
         }
         if scaleMix > 0 as c_int as c_float {
@@ -19174,14 +19174,14 @@ pub unsafe extern "C" fn _spTransformConstraint_applyRelativeWorld(
                 + (*(*self_0).data).offsetScaleX)
                 * scaleMix
                 + 1 as c_int as c_float;
-            *(&(*bone).a as *const c_float as *mut c_float) *= s;
-            *(&(*bone).c as *const c_float as *mut c_float) *= s;
+            *(&mut (*bone).a as *mut c_float) *= s;
+            *(&mut (*bone).c as *mut c_float) *= s;
             s = (spine_sqrtf(tb * tb + td * td) - 1 as c_int as c_float
                 + (*(*self_0).data).offsetScaleY)
                 * scaleMix
                 + 1 as c_int as c_float;
-            *(&(*bone).b as *const c_float as *mut c_float) *= s;
-            *(&(*bone).d as *const c_float as *mut c_float) *= s;
+            *(&mut (*bone).b as *mut c_float) *= s;
+            *(&mut (*bone).d as *mut c_float) *= s;
             modified = 1 as c_int;
         }
         if shearMix > 0 as c_int as c_float {
@@ -19196,8 +19196,8 @@ pub unsafe extern "C" fn _spTransformConstraint_applyRelativeWorld(
             r = atan2f(d, b)
                 + (r - 3.1415926535897932385f32 / 2 as c_int as c_float + offsetShearY) * shearMix;
             s = spine_sqrtf(b * b + d * d);
-            *(&(*bone).b as *const c_float as *mut c_float) = cosf(r) * s;
-            *(&(*bone).d as *const c_float as *mut c_float) = sinf(r) * s;
+            *(&mut (*bone).b as *mut c_float) = cosf(r) * s;
+            *(&mut (*bone).d as *mut c_float) = sinf(r) * s;
             modified = 1 as c_int;
         }
         if modified != 0 {
@@ -20171,14 +20171,14 @@ pub unsafe extern "C" fn _spInternalRandom() -> c_float {
     return spine_rand() as c_float / 2147483647 as c_int as c_float;
 }
 static mut mallocFunc: Option<unsafe extern "C" fn(size_t) -> *mut c_void> =
-    { Some(spine_malloc as unsafe extern "C" fn(size_t) -> *mut c_void) };
+    Some(spine_malloc as unsafe extern "C" fn(size_t) -> *mut c_void);
 static mut reallocFunc: Option<unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void> =
-    { Some(spine_realloc as unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void) };
+    Some(spine_realloc as unsafe extern "C" fn(*mut c_void, size_t) -> *mut c_void);
 static mut debugMallocFunc: Option<
     unsafe extern "C" fn(size_t, *const c_char, c_int) -> *mut c_void,
 > = None;
 static mut freeFunc: Option<unsafe extern "C" fn(*mut c_void) -> ()> =
-    { Some(spine_free as unsafe extern "C" fn(*mut c_void) -> ()) };
+    Some(spine_free as unsafe extern "C" fn(*mut c_void) -> ());
 static mut randomFunc: Option<unsafe extern "C" fn() -> c_float> = unsafe {
     Some(::core::mem::transmute::<
         unsafe extern "C" fn() -> c_float,

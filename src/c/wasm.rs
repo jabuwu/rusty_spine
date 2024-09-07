@@ -811,15 +811,210 @@ unsafe fn spine_free(ptr: *mut c_void) {
 }
 
 #[no_mangle]
-unsafe fn spine_memcpy(dest: *mut c_void, src: *const c_void, n: size_t) -> *mut c_void {
-    std::ptr::copy_nonoverlapping(src, dest, n as usize);
-    dest
+unsafe extern "C" fn spine_memcpy(
+    dst0: *mut c_void,
+    src0: *const c_void,
+    mut length: size_t,
+) -> *mut c_void {
+    type Word = size_t;
+    let mut dst: *mut c_char = dst0.cast::<c_char>();
+    let mut src: *const c_char = src0.cast::<c_char>();
+    let mut t: size_t;
+    if !(length == 0 as c_int as c_ulong || dst.cast_const() == src) {
+        if dst < src.cast_mut() && dst.offset(length as isize) > src.cast_mut()
+            || src < dst.cast_const() && src.offset(length as isize) > dst.cast_const()
+        {
+            panic!();
+        }
+        t = src as c_long as size_t;
+        if (t | dst as c_long as c_ulong)
+            & (::core::mem::size_of::<Word>() as c_ulong).wrapping_sub(1 as c_int as c_ulong)
+            != 0
+        {
+            if (t ^ dst as c_long as c_ulong)
+                & (::core::mem::size_of::<Word>() as c_ulong).wrapping_sub(1 as c_int as c_ulong)
+                != 0
+                || length < ::core::mem::size_of::<Word>() as c_ulong
+            {
+                t = length;
+            } else {
+                t = (::core::mem::size_of::<Word>() as c_ulong).wrapping_sub(
+                    t & (::core::mem::size_of::<Word>() as c_ulong)
+                        .wrapping_sub(1 as c_int as c_ulong),
+                );
+            }
+            length = (length as c_ulong).wrapping_sub(t) as size_t as size_t;
+            loop {
+                let fresh0 = src;
+                src = src.offset(1);
+                let fresh1 = dst;
+                dst = dst.offset(1);
+                *fresh1 = *fresh0;
+                t = t.wrapping_sub(1);
+                if t == 0 {
+                    break;
+                }
+            }
+        }
+        t = length.wrapping_div(::core::mem::size_of::<Word>() as c_ulong);
+        if t != 0 {
+            loop {
+                *dst.cast::<Word>() = *(src as *mut Word);
+                src = src.offset(::core::mem::size_of::<Word>() as c_ulong as isize);
+                dst = dst.offset(::core::mem::size_of::<Word>() as c_ulong as isize);
+                t = t.wrapping_sub(1);
+                if t == 0 {
+                    break;
+                }
+            }
+        }
+        t = length
+            & (::core::mem::size_of::<Word>() as c_ulong).wrapping_sub(1 as c_int as c_ulong);
+        if t != 0 {
+            loop {
+                let fresh2 = src;
+                src = src.offset(1);
+                let fresh3 = dst;
+                dst = dst.offset(1);
+                *fresh3 = *fresh2;
+                t = t.wrapping_sub(1);
+                if t == 0 {
+                    break;
+                }
+            }
+        }
+    }
+    dst0
 }
 
 #[no_mangle]
-unsafe fn spine_memmove(dest: *mut c_void, src: *const c_void, n: size_t) -> *mut c_void {
-    std::ptr::copy(src, dest, n as usize);
-    dest
+unsafe extern "C" fn spine_memmove(
+    dst0: *mut c_void,
+    src0: *const c_void,
+    mut length: size_t,
+) -> *mut c_void {
+    type Word = size_t;
+    let mut dst: *mut c_char = dst0.cast::<c_char>();
+    let mut src: *const c_char = src0.cast::<c_char>();
+    let mut t: size_t;
+    if !(length == 0 as c_int as c_ulong || dst.cast_const() == src) {
+        if (dst as c_ulong) < src as c_ulong {
+            t = src as c_long as size_t;
+            if (t | dst as c_long as c_ulong)
+                & (::core::mem::size_of::<Word>() as c_ulong).wrapping_sub(1 as c_int as c_ulong)
+                != 0
+            {
+                if (t ^ dst as c_long as c_ulong)
+                    & (::core::mem::size_of::<Word>() as c_ulong)
+                        .wrapping_sub(1 as c_int as c_ulong)
+                    != 0
+                    || length < ::core::mem::size_of::<Word>() as c_ulong
+                {
+                    t = length;
+                } else {
+                    t = (::core::mem::size_of::<Word>() as c_ulong).wrapping_sub(
+                        t & (::core::mem::size_of::<Word>() as c_ulong)
+                            .wrapping_sub(1 as c_int as c_ulong),
+                    );
+                }
+                length = (length as c_ulong).wrapping_sub(t) as size_t as size_t;
+                loop {
+                    let fresh0 = src;
+                    src = src.offset(1);
+                    let fresh1 = dst;
+                    dst = dst.offset(1);
+                    *fresh1 = *fresh0;
+                    t = t.wrapping_sub(1);
+                    if t == 0 {
+                        break;
+                    }
+                }
+            }
+            t = length.wrapping_div(::core::mem::size_of::<Word>() as c_ulong);
+            if t != 0 {
+                loop {
+                    *dst.cast::<Word>() = *(src as *mut Word);
+                    src = src.offset(::core::mem::size_of::<Word>() as c_ulong as isize);
+                    dst = dst.offset(::core::mem::size_of::<Word>() as c_ulong as isize);
+                    t = t.wrapping_sub(1);
+                    if t == 0 {
+                        break;
+                    }
+                }
+            }
+            t = length
+                & (::core::mem::size_of::<Word>() as c_ulong).wrapping_sub(1 as c_int as c_ulong);
+            if t != 0 {
+                loop {
+                    let fresh2 = src;
+                    src = src.offset(1);
+                    let fresh3 = dst;
+                    dst = dst.offset(1);
+                    *fresh3 = *fresh2;
+                    t = t.wrapping_sub(1);
+                    if t == 0 {
+                        break;
+                    }
+                }
+            }
+        } else {
+            src = src.offset(length as isize);
+            dst = dst.offset(length as isize);
+            t = src as c_long as size_t;
+            if (t | dst as c_long as c_ulong)
+                & (::core::mem::size_of::<Word>() as c_ulong).wrapping_sub(1 as c_int as c_ulong)
+                != 0
+            {
+                if (t ^ dst as c_long as c_ulong)
+                    & (::core::mem::size_of::<Word>() as c_ulong)
+                        .wrapping_sub(1 as c_int as c_ulong)
+                    != 0
+                    || length <= ::core::mem::size_of::<Word>() as c_ulong
+                {
+                    t = length;
+                } else {
+                    t &= (::core::mem::size_of::<Word>() as c_ulong)
+                        .wrapping_sub(1 as c_int as c_ulong);
+                }
+                length = (length as c_ulong).wrapping_sub(t) as size_t as size_t;
+                loop {
+                    src = src.offset(-1);
+                    dst = dst.offset(-1);
+                    *dst = *src;
+                    t = t.wrapping_sub(1);
+                    if t == 0 {
+                        break;
+                    }
+                }
+            }
+            t = length.wrapping_div(::core::mem::size_of::<Word>() as c_ulong);
+            if t != 0 {
+                loop {
+                    src = src.offset(-(::core::mem::size_of::<Word>() as c_ulong as isize));
+                    dst = dst.offset(-(::core::mem::size_of::<Word>() as c_ulong as isize));
+                    *dst.cast::<Word>() = *(src as *mut Word);
+                    t = t.wrapping_sub(1);
+                    if t == 0 {
+                        break;
+                    }
+                }
+            }
+            t = length
+                & (::core::mem::size_of::<Word>() as c_ulong).wrapping_sub(1 as c_int as c_ulong);
+            if t != 0 {
+                loop {
+                    src = src.offset(-1);
+                    dst = dst.offset(-1);
+                    *dst = *src;
+                    t = t.wrapping_sub(1);
+                    if t == 0 {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    dst0
 }
 
 #[no_mangle]
@@ -916,12 +1111,6 @@ fn fmt(format: String, args: Vec<Box<dyn Any>>) -> String {
     new_str
 }
 
-#[cfg_attr(feature = "spine38", allow(dead_code))]
-pub(crate) fn printf(c_format: *const c_char, args: Vec<Box<dyn Any>>) {
-    let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
-    print!("{}", fmt(format, args));
-}
-
 pub(crate) fn sprintf(c_str: *mut c_char, c_format: *const c_char, args: Vec<Box<dyn Any>>) {
     let format = unsafe { CStr::from_ptr(c_format).to_str().unwrap().to_owned() };
     let result = fmt(format, args);
@@ -938,18 +1127,6 @@ pub(crate) fn sscanf(c_str: *const c_char, c_format: *const c_char, args: *mut c
     unsafe {
         *args = c_uint::from_str_radix(&str[0..(str.len().min(4))], 16).unwrap();
     }
-}
-
-#[cfg_attr(feature = "spine38", allow(unused_macros))]
-macro_rules! spine_printf {
-    ($format:expr) => {
-        crate::c::wasm::printf($format, vec![]);
-    };
-    ($format:expr, $($arg:expr),+ $(,)? ) => {
-        crate::c::wasm::printf($format, vec![
-            $(Box::new($arg)),+
-        ]);
-    };
 }
 
 macro_rules! spine_sprintf {
