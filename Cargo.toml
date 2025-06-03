@@ -1,6 +1,6 @@
 [package]
 name = "rusty_spine"
-version = "0.8.0"
+version = "0.9.0"
 edition = "2021"
 description = "Spine runtime for Rust (and wasm!) transpiled from the official C Runtime."
 homepage = "https://github.com/jabuwu/rusty_spine"
@@ -28,8 +28,10 @@ cosmic-text = "0.9"
 opt-level = 3
 
 [features]
-default = [ "draw_functions", "mint" ]
+default = [ "draw_functions", "mint", "v42" ]
 draw_functions = []
+v42 = []
+v38 = []
 
 [workspace]
 resolver = "2"
