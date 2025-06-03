@@ -1389,7 +1389,8 @@ mod tests {
         let mut error_msg: [super::c_char; 255] = [0; 255];
         spine_sprintf!(
             error_msg.as_mut_ptr(),
-            255 as super::c_int as super::size_t,
+            // 255 as super::c_int as super::size_t,
+            255 as *const i8,
             (b"Skeleton version %s does not match runtime version %s\0" as *const u8)
                 .cast::<super::c_char>(),
             (b"4.1\0" as *const u8).cast::<super::c_char>(),
@@ -1406,7 +1407,8 @@ mod tests {
         let mut error_msg: [super::c_char; 16] = [0; 16];
         spine_sprintf!(
             error_msg.as_mut_ptr(),
-            16 as super::c_int as super::size_t,
+            // 16 as super::c_int as super::size_t,
+            16 as *const i8,
             (b"Skeleton version %s does not match runtime version %s\0" as *const u8)
                 .cast::<super::c_char>(),
             (b"4.1\0" as *const u8).cast::<super::c_char>(),
