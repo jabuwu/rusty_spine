@@ -19,10 +19,11 @@ libc = { version = "0.2", optional = true }
 mint = { version = "0.5", optional = true }
 
 [dev-dependencies]
-miniquad = "0.3.16"
-image = { version = "0.24", default-features = false, features = [ "png", "webp", "jpeg" ] }
+egui-miniquad = "0.16.0"
+egui = "0.31"
 glam = "0.23"
-cosmic-text = "0.9"
+image = { version = "0.25", default-features = false, features = [ "png", "webp", "jpeg" ] }
+miniquad = "0.4.8"
 
 [profile.dev.package."*"]
 opt-level = 3
