@@ -4,6 +4,7 @@
     non_camel_case_types,
     non_snake_case,
     non_upper_case_globals,
+    static_mut_refs,
     unused_assignments,
     unused_mut,
     clippy::all,
@@ -10166,7 +10167,7 @@ pub unsafe extern "C" fn spKeyValueArray_ensureCapacity(
 #[no_mangle]
 pub unsafe extern "C" fn spKeyValueArray_add(
     mut self_0: *mut spKeyValueArray,
-    mut value: spKeyValue,
+    mut value: &spKeyValue,
 ) {
     if (*self_0).size == (*self_0).capacity {
         (*self_0).capacity = if 8 as c_int > ((*self_0).size as c_float * 1.75f32) as c_int {
@@ -10183,7 +10184,7 @@ pub unsafe extern "C" fn spKeyValueArray_add(
     }
     let fresh32 = (*self_0).size;
     (*self_0).size += 1;
-    *((*self_0).items).offset(fresh32 as isize) = value;
+    *((*self_0).items).offset(fresh32 as isize) = *value;
 }
 #[no_mangle]
 pub unsafe extern "C" fn spKeyValueArray_addAll(
@@ -10192,7 +10193,7 @@ pub unsafe extern "C" fn spKeyValueArray_addAll(
 ) {
     let mut i: c_int = 0 as c_int;
     while i < (*other).size {
-        spKeyValueArray_add(self_0, *((*other).items).offset(i as isize));
+        spKeyValueArray_add(self_0, &*((*other).items).offset(i as isize));
         i += 1;
     }
 }
@@ -10206,14 +10207,14 @@ pub unsafe extern "C" fn spKeyValueArray_addAllValues(
     let mut i: c_int = offset;
     let mut n: c_int = offset + count;
     while i < n {
-        spKeyValueArray_add(self_0, *values.offset(i as isize));
+        spKeyValueArray_add(self_0, &*values.offset(i as isize));
         i += 1;
     }
 }
 #[no_mangle]
 pub unsafe extern "C" fn spKeyValueArray_contains(
     mut self_0: *mut spKeyValueArray,
-    mut value: spKeyValue,
+    mut value: &spKeyValue,
 ) -> c_int {
     let mut items: *mut spKeyValue = (*self_0).items;
     let mut i: c_int = 0;
@@ -10783,7 +10784,7 @@ pub unsafe extern "C" fn spAtlas_create(
                                 as c_float;
                         i += 1;
                     }
-                    spKeyValueArray_add((*region).keyValues, keyValue);
+                    spKeyValueArray_add((*region).keyValues, &keyValue);
                 }
             }
             if (*region).super_0.originalWidth == 0 as c_int

@@ -39,7 +39,7 @@ use std::alloc::Layout;
 use std::any::Any;
 use std::collections::HashMap;
 use std::ffi::{CStr, CString};
-use std::sync::{Arc, Mutex, Once};
+use std::sync::{Arc, Mutex, OnceLock};
 
 pub mod types {
     #[allow(non_camel_case_types)]
@@ -81,18 +81,16 @@ type size_t = c_ulong;
 struct Allocator {
     allocations: HashMap<*const c_void, Layout>,
 }
+unsafe impl Send for Allocator {}
+unsafe impl Sync for Allocator {}
 
+#[allow(static_mut_refs)]
 impl Allocator {
     fn singleton() -> Arc<Mutex<Allocator>> {
-        static START: Once = Once::new();
-        static mut INSTANCE: Option<Arc<Mutex<Allocator>>> = None;
-        START.call_once(|| unsafe {
-            INSTANCE = Some(Arc::new(Mutex::new(Allocator::default())));
-        });
-        unsafe {
-            let singleton = INSTANCE.as_ref().unwrap();
-            singleton.clone()
-        }
+        static INSTANCE: OnceLock<Arc<Mutex<Allocator>>> = OnceLock::new();
+        INSTANCE
+            .get_or_init(|| Arc::new(Mutex::new(Allocator::default())))
+            .clone()
     }
 
     pub fn malloc(&mut self, size: usize) -> *mut c_void {
@@ -236,7 +234,7 @@ pub unsafe extern "C" fn spine_strncmp(
     0 as c_int
 }
 
-static mut CHARMAP: [c_uchar; 256] = [
+const CHARMAP: [c_uchar; 256] = [
     '\0' as i32 as c_uchar,
     '\u{1}' as i32 as c_uchar,
     '\u{2}' as i32 as c_uchar,

@@ -33,12 +33,12 @@ pub fn replace_identifier(
             && src[src_index - 1..]
                 .chars()
                 .next()
-                .map_or(false, |c| c.is_alphanumeric() || c == '_');
+                .is_some_and(|c| c.is_alphanumeric() || c == '_');
         let after_is_alphanumeric = src_index + identifier.len() < src.len()
             && src[(src_index + identifier.len())..]
                 .chars()
                 .next()
-                .map_or(false, |c| c.is_alphanumeric() || c == '_');
+                .is_some_and(|c| c.is_alphanumeric() || c == '_');
         if !before_is_alphanumeric && !after_is_alphanumeric {
             let new_src = String::from(&src[0..src_index])
                 + replacement

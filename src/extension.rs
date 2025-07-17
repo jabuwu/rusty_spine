@@ -18,7 +18,7 @@
 
 use std::ffi::CStr;
 use std::fs::read;
-use std::sync::{Arc, Mutex, Once};
+use std::sync::{Arc, Mutex, OnceLock};
 
 use crate::c::{c_int, c_void, size_t};
 use crate::c_interface::NewFromPtr;
@@ -27,9 +27,9 @@ use crate::{
     c::{c_char, spAtlasPage},
 };
 
-type CreateTextureCb = Box<dyn Fn(&mut AtlasPage, &str)>;
-type DisposeTextureCb = Box<dyn Fn(&mut AtlasPage)>;
-type ReadFileCb = Box<dyn Fn(&str) -> Option<Vec<u8>>>;
+type CreateTextureCb = Box<dyn Fn(&mut AtlasPage, &str) + Send + Sync>;
+type DisposeTextureCb = Box<dyn Fn(&mut AtlasPage) + Send + Sync>;
+type ReadFileCb = Box<dyn Fn(&str) -> Option<Vec<u8>> + Send + Sync>;
 
 #[derive(Default)]
 pub(crate) struct Extension {
@@ -40,15 +40,10 @@ pub(crate) struct Extension {
 
 impl Extension {
     fn singleton() -> Arc<Mutex<Extension>> {
-        static START: Once = Once::new();
-        static mut INSTANCE: Option<Arc<Mutex<Extension>>> = None;
-        START.call_once(|| unsafe {
-            INSTANCE = Some(Arc::new(Mutex::new(Extension::default())));
-        });
-        unsafe {
-            let singleton = INSTANCE.as_ref().unwrap();
-            singleton.clone()
-        }
+        static INSTANCE: OnceLock<Arc<Mutex<Extension>>> = OnceLock::new();
+        INSTANCE
+            .get_or_init(|| Arc::new(Mutex::new(Extension::default())))
+            .clone()
     }
 }
 
@@ -104,7 +99,7 @@ impl Extension {
 /// Panics if the internal mutex is poisoned.
 pub fn set_create_texture_cb<F>(create_texture_cb: F)
 where
-    F: Fn(&mut AtlasPage, &str) + 'static,
+    F: Fn(&mut AtlasPage, &str) + Send + Sync + 'static,
 {
     let singleton = Extension::singleton();
     let mut extension = singleton.lock().unwrap();
@@ -120,7 +115,7 @@ where
 /// Panics if the internal mutex is poisoned.
 pub fn set_dispose_texture_cb<F>(dispose_texture_cb: F)
 where
-    F: Fn(&mut AtlasPage) + 'static,
+    F: Fn(&mut AtlasPage) + Send + Sync + 'static,
 {
     let singleton = Extension::singleton();
     let mut extension = singleton.lock().unwrap();
@@ -145,7 +140,7 @@ where
 /// Panics if the internal mutex is poisoned.
 pub fn set_read_file_cb<F>(read_file_cb: F)
 where
-    F: Fn(&str) -> Option<Vec<u8>> + 'static,
+    F: Fn(&str) -> Option<Vec<u8>> + Send + Sync + 'static,
 {
     let singleton = Extension::singleton();
     let mut extension = singleton.lock().unwrap();
