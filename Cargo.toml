@@ -7,6 +7,7 @@ homepage = "https://github.com/jabuwu/rusty_spine"
 repository = "https://github.com/jabuwu/rusty_spine"
 readme = "README.md"
 license-file = "LICENSE"
+rust-version = "1.82"
 exclude = [
     "/.github",
     "/assets",
