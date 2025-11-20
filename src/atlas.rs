@@ -106,7 +106,7 @@ impl Atlas {
 
     /// Iterator over the [`AtlasPage`] list in this atlas.
     #[must_use]
-    pub fn pages(&self) -> AtlasPageIterator {
+    pub fn pages(&self) -> AtlasPageIterator<'_> {
         AtlasPageIterator {
             _atlas: self,
             page: unsafe { self.c_ptr_mut().pages },
@@ -115,13 +115,13 @@ impl Atlas {
 
     /// Find an [`AtlasPage`] in this atlas by name.
     #[must_use]
-    pub fn find_page(&self, name: &str) -> Option<CTmpRef<Self, AtlasPage>> {
+    pub fn find_page(&self, name: &str) -> Option<CTmpRef<'_, Self, AtlasPage>> {
         self.pages().find(|page| page.name() == name)
     }
 
     /// Iterator over the [`AtlasRegion`] list in this atlas, across all pages.
     #[must_use]
-    pub fn regions(&self) -> AtlasRegionIterator {
+    pub fn regions(&self) -> AtlasRegionIterator<'_> {
         AtlasRegionIterator {
             _atlas: self,
             region: unsafe { self.c_ptr_mut().regions },
@@ -130,7 +130,7 @@ impl Atlas {
 
     /// Find an [`AtlasRegion`] in this atlas by name, across all pages.
     #[must_use]
-    pub fn find_region(&self, name: &str) -> Option<CTmpRef<Self, AtlasRegion>> {
+    pub fn find_region(&self, name: &str) -> Option<CTmpRef<'_, Self, AtlasRegion>> {
         self.regions().find(|region| region.name() == name)
     }
 

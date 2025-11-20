@@ -33,7 +33,7 @@ macro_rules! attachment_accessor {
     ($(#[$($attrss1:tt)*])* $fn:ident, $(#[$($attrss2:tt)*])* $fn_mut:ident, $type:ident, $c_type:ident, $attachment_type:expr) => {
         $(#[$($attrss1)*])*
         #[must_use]
-        pub fn $fn(&self) -> Option<CTmpRef<Self, $type>> {
+        pub fn $fn(&self) -> Option<CTmpRef<'_, Self, $type>> {
             let attachment = unsafe { self.c_ptr_ref().attachment };
             if !attachment.is_null() {
                 if AttachmentType::from(unsafe { (*attachment).type_0 }) == $attachment_type {

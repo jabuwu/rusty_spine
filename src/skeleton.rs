@@ -219,38 +219,38 @@ impl Skeleton {
 
     /// The root bone, or [`None`] if the skeleton has no bones.
     #[must_use]
-    pub fn bone_root(&self) -> CTmpRef<Skeleton, Bone> {
+    pub fn bone_root(&self) -> CTmpRef<'_, Skeleton, Bone> {
         CTmpRef::new(self, unsafe { Bone::new_from_ptr(self.c_ptr_mut().root) })
     }
 
     /// The mutable root bone, or [`None`] if the skeleton has no bones.
     #[must_use]
-    pub fn bone_root_mut(&mut self) -> CTmpMut<Skeleton, Bone> {
+    pub fn bone_root_mut(&mut self) -> CTmpMut<'_, Skeleton, Bone> {
         CTmpMut::new(self, unsafe { Bone::new_from_ptr(self.c_ptr_mut().root) })
     }
 
     #[must_use]
-    pub fn find_bone(&self, name: &str) -> Option<CTmpRef<Skeleton, Bone>> {
+    pub fn find_bone(&self, name: &str) -> Option<CTmpRef<'_, Skeleton, Bone>> {
         self.bones().find(|bone| bone.data().name() == name)
     }
 
     #[must_use]
-    pub fn find_bone_mut(&mut self, name: &str) -> Option<CTmpMut<Skeleton, Bone>> {
+    pub fn find_bone_mut(&mut self, name: &str) -> Option<CTmpMut<'_, Skeleton, Bone>> {
         self.bones_mut().find(|bone| bone.data().name() == name)
     }
 
     #[must_use]
-    pub fn find_slot(&self, name: &str) -> Option<CTmpRef<Skeleton, Slot>> {
+    pub fn find_slot(&self, name: &str) -> Option<CTmpRef<'_, Skeleton, Slot>> {
         self.slots().find(|slot| slot.data().name() == name)
     }
 
     #[must_use]
-    pub fn find_slot_mut(&mut self, name: &str) -> Option<CTmpMut<Skeleton, Slot>> {
+    pub fn find_slot_mut(&mut self, name: &str) -> Option<CTmpMut<'_, Skeleton, Slot>> {
         self.slots_mut().find(|slot| slot.data().name() == name)
     }
 
     #[must_use]
-    pub fn find_ik_constraint(&self, name: &str) -> Option<CTmpRef<Skeleton, IkConstraint>> {
+    pub fn find_ik_constraint(&self, name: &str) -> Option<CTmpRef<'_, Skeleton, IkConstraint>> {
         self.ik_constraints()
             .find(|ik_constraint| ik_constraint.data().name() == name)
     }
@@ -259,13 +259,16 @@ impl Skeleton {
     pub fn find_ik_constraint_mut(
         &mut self,
         name: &str,
-    ) -> Option<CTmpMut<Skeleton, IkConstraint>> {
+    ) -> Option<CTmpMut<'_, Skeleton, IkConstraint>> {
         self.ik_constraints_mut()
             .find(|ik_constraint| ik_constraint.data().name() == name)
     }
 
     #[must_use]
-    pub fn find_path_constraint(&self, name: &str) -> Option<CTmpRef<Skeleton, PathConstraint>> {
+    pub fn find_path_constraint(
+        &self,
+        name: &str,
+    ) -> Option<CTmpRef<'_, Skeleton, PathConstraint>> {
         self.path_constraints()
             .find(|path_constraint| path_constraint.data().name() == name)
     }
@@ -274,7 +277,7 @@ impl Skeleton {
     pub fn find_path_constraint_mut(
         &mut self,
         name: &str,
-    ) -> Option<CTmpMut<Skeleton, PathConstraint>> {
+    ) -> Option<CTmpMut<'_, Skeleton, PathConstraint>> {
         self.path_constraints_mut()
             .find(|path_constraint| path_constraint.data().name() == name)
     }
@@ -283,7 +286,7 @@ impl Skeleton {
     pub fn find_physics_constraint(
         &self,
         name: &str,
-    ) -> Option<CTmpRef<Skeleton, PhysicsConstraint>> {
+    ) -> Option<CTmpRef<'_, Skeleton, PhysicsConstraint>> {
         self.physics_constraints()
             .find(|physics_constraint| physics_constraint.data().name() == name)
     }
@@ -292,7 +295,7 @@ impl Skeleton {
     pub fn find_physics_constraint_mut(
         &mut self,
         name: &str,
-    ) -> Option<CTmpMut<Skeleton, PhysicsConstraint>> {
+    ) -> Option<CTmpMut<'_, Skeleton, PhysicsConstraint>> {
         self.physics_constraints_mut()
             .find(|physics_constraint| physics_constraint.data().name() == name)
     }
@@ -301,7 +304,7 @@ impl Skeleton {
     pub fn find_transform_constraint(
         &self,
         name: &str,
-    ) -> Option<CTmpRef<Skeleton, TransformConstraint>> {
+    ) -> Option<CTmpRef<'_, Skeleton, TransformConstraint>> {
         self.transform_constraints()
             .find(|transform_constraint| transform_constraint.data().name() == name)
     }
@@ -310,7 +313,7 @@ impl Skeleton {
     pub fn find_transform_constraint_mut(
         &mut self,
         name: &str,
-    ) -> Option<CTmpMut<Skeleton, TransformConstraint>> {
+    ) -> Option<CTmpMut<'_, Skeleton, TransformConstraint>> {
         self.transform_constraints_mut()
             .find(|transform_constraint| transform_constraint.data().name() == name)
     }

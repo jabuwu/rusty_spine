@@ -52,22 +52,22 @@ impl SkeletonData {
     }
 
     #[must_use]
-    pub fn find_bone(&self, name: &str) -> Option<CTmpRef<SkeletonData, BoneData>> {
+    pub fn find_bone(&self, name: &str) -> Option<CTmpRef<'_, SkeletonData, BoneData>> {
         self.bones().find(|bone| bone.name() == name)
     }
 
     #[must_use]
-    pub fn find_slot(&self, name: &str) -> Option<CTmpRef<SkeletonData, SlotData>> {
+    pub fn find_slot(&self, name: &str) -> Option<CTmpRef<'_, SkeletonData, SlotData>> {
         self.slots().find(|slot| slot.name() == name)
     }
 
     #[must_use]
-    pub fn find_skin(&self, name: &str) -> Option<CTmpRef<SkeletonData, Skin>> {
+    pub fn find_skin(&self, name: &str) -> Option<CTmpRef<'_, SkeletonData, Skin>> {
         self.skins().find(|skin| skin.name() == name)
     }
 
     #[must_use]
-    pub fn find_animation(&self, name: &str) -> Option<CTmpRef<SkeletonData, Animation>> {
+    pub fn find_animation(&self, name: &str) -> Option<CTmpRef<'_, SkeletonData, Animation>> {
         self.animations().find(|animation| animation.name() == name)
     }
 
@@ -75,7 +75,7 @@ impl SkeletonData {
     pub fn find_ik_constraint(
         &self,
         name: &str,
-    ) -> Option<CTmpRef<SkeletonData, IkConstraintData>> {
+    ) -> Option<CTmpRef<'_, SkeletonData, IkConstraintData>> {
         self.ik_constraints()
             .find(|ik_constraint| ik_constraint.name() == name)
     }
@@ -84,7 +84,7 @@ impl SkeletonData {
     pub fn find_path_constraint(
         &self,
         name: &str,
-    ) -> Option<CTmpRef<SkeletonData, PathConstraintData>> {
+    ) -> Option<CTmpRef<'_, SkeletonData, PathConstraintData>> {
         self.path_constraints()
             .find(|path_constraint| path_constraint.name() == name)
     }
@@ -93,7 +93,7 @@ impl SkeletonData {
     pub fn find_physics_constraint(
         &self,
         name: &str,
-    ) -> Option<CTmpRef<SkeletonData, PhysicsConstraintData>> {
+    ) -> Option<CTmpRef<'_, SkeletonData, PhysicsConstraintData>> {
         self.physics_constraints()
             .find(|physics_constraint| physics_constraint.name() == name)
     }
@@ -102,7 +102,7 @@ impl SkeletonData {
     pub fn find_transform_constraint(
         &self,
         name: &str,
-    ) -> Option<CTmpRef<SkeletonData, TransformConstraintData>> {
+    ) -> Option<CTmpRef<'_, SkeletonData, TransformConstraintData>> {
         self.transform_constraints()
             .find(|transform_constraint| transform_constraint.name() == name)
     }

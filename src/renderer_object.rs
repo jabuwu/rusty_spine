@@ -74,7 +74,7 @@ impl<'a> RendererObject<'a> {
     /// # Safety
     /// This function does not guarantee that the returned option has a valid [`AtlasRegion`] and
     /// could segfault if the renderer object is a different type.
-    pub unsafe fn get_atlas_region(&mut self) -> Option<CTmpRef<Self, AtlasRegion>> {
+    pub unsafe fn get_atlas_region(&mut self) -> Option<CTmpRef<'_, Self, AtlasRegion>> {
         let ptr = *self.renderer_object;
         if !ptr.is_null() {
             Some(CTmpRef::new(
