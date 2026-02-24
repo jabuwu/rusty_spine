@@ -553,7 +553,7 @@ macro_rules! c_accessor_color_mut {
         #[must_use]
         pub fn $rust_mut(&mut self) -> &mut crate::color::Color {
             unsafe {
-                &mut *(&mut self.c_ptr_mut().color as *mut crate::c::spColor)
+                &mut *(&mut self.c_ptr_mut().$c as *mut crate::c::spColor)
                     .cast::<crate::color::Color>()
             }
         }
