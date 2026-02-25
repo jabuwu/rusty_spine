@@ -315,3 +315,30 @@ impl From<spBlendMode> for BlendMode {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::{test::TestAsset, Color};
+
+    #[test]
+    fn set_dark_color_then_setup_pose_repro() {
+        let (mut skeleton, _) = TestAsset::spineboy().instance(true);
+        skeleton.set_to_setup_pose();
+
+        let slot_index = skeleton
+            .slots()
+            .enumerate()
+            .find_map(|(index, slot)| slot.dark_color().is_none().then_some(index))
+            .expect("missing slot without dark color");
+
+        let mut slot = skeleton
+            .slot_at_index_mut(slot_index)
+            .expect("missing slot by index");
+        assert!(slot.data().dark_color().is_none());
+
+        slot.set_dark_color(Color::new_rgba(0.12, 0.18, 0.24, 1.0));
+        assert!(slot.dark_color().is_some());
+
+        slot.set_to_setup_pose();
+    }
+}
