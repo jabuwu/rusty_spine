@@ -753,7 +753,7 @@ impl TrackEntry {
         /// [`timescale`](`Self::timescale`) affects the delay.
         ///
         /// When using addAnimation with a delay <= 0, the delay is set using the mix duration from
-        /// the AnimationStateData. If mixDuration is set afterward, the delay may need to be
+        /// the [`AnimationStateData`]. If mixDuration is set afterward, the delay may need to be
         /// adjusted.
         delay,
         /// Set the delay, see [`delay`](`Self::delay`).

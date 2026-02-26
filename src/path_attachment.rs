@@ -31,7 +31,7 @@ impl PathAttachment {
     c_attachment_accessors!();
     c_vertex_attachment_accessors!();
     c_accessor_bool_mut!(
-        /// If `true, the start and end knots are connected.
+        /// If `true`, the start and end knots are connected.
         closed,
         /// Set closed, see [`closed`](`Self::closed`).
         set_closed,
