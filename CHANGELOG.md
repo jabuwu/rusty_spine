@@ -1,3 +1,7 @@
+# 0.8.1 (unreleased)
+- Upstream fixes
+  - Fix heap-buffer-overflow in _readVertices for weighted vertices ([EsotericSoftware/spine-runtimes#2992](https://github.com/EsotericSoftware/spine-runtimes/pull/2992))
+
 # 0.8.0
 - Upgrade runtime to Spine 4.2
 - Fix `memcpy` crash in Rust 1.78 (when not using `libc` feature)
