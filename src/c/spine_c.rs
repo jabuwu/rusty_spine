@@ -18807,45 +18807,60 @@ unsafe extern "C" fn _readVerticesBinary(
         *bonesCount = 0 as c_int;
         return *verticesLength;
     }
-    let mut v: *mut c_float = _spMalloc(
-        (::core::mem::size_of::<c_float>() as c_ulong)
-            .wrapping_mul((*verticesLength * 3 as c_int * 3 as c_int) as c_ulong),
-        (b"spine.c\0" as *const u8).cast::<c_char>(),
-        10029 as c_int,
-    )
-    .cast::<c_float>();
-    let mut b: *mut c_int = _spMalloc(
-        (::core::mem::size_of::<c_int>() as c_ulong)
-            .wrapping_mul((*verticesLength * 3 as c_int) as c_ulong),
-        (b"spine.c\0" as *const u8).cast::<c_char>(),
-        10030 as c_int,
-    )
-    .cast::<c_int>();
-    let mut boneIdx: c_int = 0 as c_int;
-    let mut vertexIdx: c_int = 0 as c_int;
+    let mut savedCursor: *const c_uchar = (*input).cursor;
+    let mut totalBoneEntries: c_int = 0 as c_int;
+    let mut totalVertexEntries: c_int = 0 as c_int;
     let mut i: c_int = 0 as c_int;
     while i < vertexCount {
         let mut boneCount: c_int = readVarint(input, 1 as c_int);
-        let fresh109 = boneIdx;
-        boneIdx += 1;
-        *b.offset(fresh109 as isize) = boneCount;
+        totalBoneEntries += 1 as c_int + boneCount;
+        totalVertexEntries += boneCount * 3 as c_int;
         let mut ii: c_int = 0 as c_int;
         while ii < boneCount {
-            let fresh110 = boneIdx;
-            boneIdx += 1;
-            *b.offset(fresh110 as isize) = readVarint(input, 1 as c_int);
-            let fresh111 = vertexIdx;
-            vertexIdx += 1;
-            *v.offset(fresh111 as isize) = readFloat(input) * scale;
-            let fresh112 = vertexIdx;
-            vertexIdx += 1;
-            *v.offset(fresh112 as isize) = readFloat(input) * scale;
-            let fresh113 = vertexIdx;
-            vertexIdx += 1;
-            *v.offset(fresh113 as isize) = readFloat(input);
+            readVarint(input, 1 as c_int);
+            readFloat(input);
+            readFloat(input);
+            readFloat(input);
             ii += 1;
         }
         i += 1;
+    }
+    (*input).cursor = savedCursor;
+    let mut v: *mut c_float = _spMalloc(
+        (::core::mem::size_of::<c_float>() as c_ulong).wrapping_mul(totalVertexEntries as c_ulong),
+        (b"spine.c\0" as *const u8).cast::<c_char>(),
+        1 as c_int,
+    ) as *mut c_float;
+    let mut b: *mut c_int = _spMalloc(
+        (::core::mem::size_of::<c_int>() as c_ulong).wrapping_mul(totalBoneEntries as c_ulong),
+        (b"spine.c\0" as *const u8).cast::<c_char>(),
+        1 as c_int,
+    ) as *mut c_int;
+    let mut boneIdx: c_int = 0 as c_int;
+    let mut vertexIdx: c_int = 0 as c_int;
+    let mut i_0: c_int = 0 as c_int;
+    while i_0 < vertexCount {
+        let mut boneCount_0: c_int = readVarint(input, 1 as c_int);
+        let fresh1 = boneIdx;
+        boneIdx = boneIdx + 1;
+        *b.offset(fresh1 as isize) = boneCount_0;
+        let mut ii_0: c_int = 0 as c_int;
+        while ii_0 < boneCount_0 {
+            let fresh2 = boneIdx;
+            boneIdx = boneIdx + 1;
+            *b.offset(fresh2 as isize) = readVarint(input, 1 as c_int);
+            let fresh3 = vertexIdx;
+            vertexIdx = vertexIdx + 1;
+            *v.offset(fresh3 as isize) = readFloat(input) * scale;
+            let fresh4 = vertexIdx;
+            vertexIdx = vertexIdx + 1;
+            *v.offset(fresh4 as isize) = readFloat(input) * scale;
+            let fresh5 = vertexIdx;
+            vertexIdx = vertexIdx + 1;
+            *v.offset(fresh5 as isize) = readFloat(input);
+            ii_0 += 1;
+        }
+        i_0 += 1;
     }
     *vertices = v;
     *bones = b;
