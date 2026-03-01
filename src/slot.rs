@@ -3,12 +3,12 @@ use crate::{
     bone::Bone,
     c::{
         spAttachment, spBlendMode, spBone, spBoneData, spBoundingBoxAttachment,
-        spClippingAttachment, spMeshAttachment, spPointAttachment, spRegionAttachment, spSkeleton,
-        spSlot, spSlotData, spSlotData_setAttachmentName, spSlot_setAttachment,
-        spSlot_setToSetupPose,
+        spClippingAttachment, spColor, spColor_create, spMeshAttachment, spPointAttachment,
+        spRegionAttachment, spSkeleton, spSlot, spSlotData, spSlotData_setAttachmentName,
+        spSlot_setAttachment, spSlot_setToSetupPose,
     },
     c_interface::{to_c_str, CTmpRef, NewFromPtr, SyncPtr},
-    AttachmentType, BoneData, BoundingBoxAttachment, ClippingAttachment, MeshAttachment,
+    AttachmentType, BoneData, BoundingBoxAttachment, ClippingAttachment, Color, MeshAttachment,
     PointAttachment, RegionAttachment, Skeleton,
 };
 
@@ -81,6 +81,21 @@ impl Slot {
     #[must_use]
     pub fn handle(&self) -> SlotHandle {
         SlotHandle::new(self.c_ptr(), unsafe { self.bone().c_ptr_mut().skeleton })
+    }
+
+    /// Set the dark color used to tint the slot's attachment for two color tinting, or [`None`] if
+    /// two color tinting is not used. The dark color's alpha is not used.
+    ///
+    /// If this slot did not already have a dark color configured, one will be allocated, and
+    /// cannot be removed.
+    pub fn set_dark_color(&mut self, value: Color) {
+        unsafe {
+            let dark_color = &mut (*self.c_ptr()).darkColor;
+            if dark_color.is_null() {
+                *dark_color = spColor_create();
+            }
+            **dark_color = std::mem::transmute::<Color, spColor>(value);
+        }
     }
 
     attachment_accessor!(
