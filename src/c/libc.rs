@@ -50,7 +50,14 @@ unsafe extern "C" fn spine_strncmp(s1: *const c_char, s2: *const c_char, n: size
 
 #[no_mangle]
 unsafe extern "C" fn spine_strcasecmp(s1: *const c_char, s2: *const c_char) -> c_int {
-    libc::strcasecmp(s1, s2)
+    #[cfg(target_env = "msvc")]
+    {
+        libc::stricmp(s1, s2)
+    }
+    #[cfg(not(target_env = "msvc"))]
+    {
+        libc::strcasecmp(s1, s2)
+    }
 }
 
 #[no_mangle]
@@ -189,19 +196,31 @@ macro_rules! spine_printf {
 
 macro_rules! spine_snprintf {
     ($str:expr, $len:expr, $format:expr) => {
-        libc::snprintf($str, $len as usize, $format);
+        #[cfg(target_env = "msvc")]
+        snprintf($str as *mut c_char, $len as usize, $format as *const c_char);
+        #[cfg(not(target_env = "msvc"))]
+        libc::snprintf($str as *mut c_char, $len as usize, $format as *const c_char);
     };
     ($str:expr, $len:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
-        libc::snprintf($str, $len as usize, $format, $($arg),+);
+        #[cfg(target_env = "msvc")]
+        snprintf($str as *mut c_char, $len as usize, $format as *const c_char, $($arg),*);
+        #[cfg(not(target_env = "msvc"))]
+        libc::snprintf($str as *mut c_char, $len as usize, $format as *const c_char, $($arg),*);
     };
 }
 
 macro_rules! spine_sscanf {
     ($str:expr, $format:expr) => {
-        libc::sscanf($str, $format);
+        #[cfg(target_env = "msvc")]
+        sscanf($str as *const c_char, $format as *const c_char);
+        #[cfg(not(target_env = "msvc"))]
+        libc::sscanf($str as *const c_char, $format as *const c_char);
     };
     ($str:expr, $format:expr, $($arg:expr),+ $(,)? ) => {
-        libc::sscanf($str, $format, $($arg),+);
+        #[cfg(target_env = "msvc")]
+        sscanf($str as *const c_char, $format as *const c_char, $($arg),*);
+        #[cfg(not(target_env = "msvc"))]
+        libc::sscanf($str as *const c_char, $format as *const c_char, $($arg),+);
     };
 }
 
